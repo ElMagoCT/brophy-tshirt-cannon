@@ -181,3 +181,22 @@ These are not applied in the sheet yet; each needs Micah's OK or a bench test.
    brackets against the $60 hardware allowance. **About −$66.**
 
 Cuts 1–3 together bring A+B to about $1,970.
+
+## 2026-11-02 - Glacis full design (proposed, waiting on Micah)
+
+Micah asked for the Glacis concept designed in full. The model is in `cad/glacis/` and in Onshape as
+"Brophy Mark 5 - Glacis". The parts list is the "Glacis BOM" tab ($2,102.30 with owned items at $0).
+Every call is listed with its reason in `docs/glacis/JUDGMENTS.md`. The ones that touch earlier
+decisions:
+
+- **QEV:** Humphrey QE5 3/4 NPT ($51.75, rated 150 psi) instead of the proposed Parker 0R75B
+  ($101-125). It has the same port layout.
+- **Chambers:** a 4 in malleable stack (~1.0 L, $130.10 each) running sideways from the QEV's side
+  port, instead of the 2 in x 18 in nipple. A long chamber doesn't fit inside 28 in.
+- **Per-chamber safety:** the relief, bleed and muffler sit in each barrel's inlet pocket, between the
+  check valve and the QEV, not on a chamber tee.
+- **Tanks:** Micah's two AliExpress 1.6 gal / 200 psi tanks, not the Viair 91028. No onboard pump yet;
+  a spot is reserved behind the pivot.
+- **Drive:** Falcons on a 40:1 two-stage HTD belt, not the stash CIMs. Micah specified Falcons for
+  Glacis.
+- **Elevation:** two FEETECH STS3215 bus servos replace the linear actuator and the AS5600.

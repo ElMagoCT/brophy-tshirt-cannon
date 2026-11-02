@@ -1,0 +1,88 @@
+Name,Seller,Amount,Individual Price,Price,Link,Type,Purpose,Alternative/Notes
+PRESSURE SIDE - tanks to the fill valve (200 psi)
+"Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT (your pick)",Aliexpress,2,56.31,112.62,https://www.aliexpress.us/item/3256804024554756.html,Motion,Two tanks stacked across the rear in printed ring cradles,"Listing says 6 L / 1.6 gal, not 2 gal; only 11 left (2026-11-02, L)"
+"Tank relief valve 200 psi, 1/4 MNPT (Conrader CAS250200)",Compressor Source,1,6.99,6.99,https://compressor-source.com/products/200-psi-1-4-male-npt-air-compressor-pressure-relief-safety-pop-off-valve,Motion,Hardware relief on the tank zone (on the rear manifold),"UV/NB stamped, +/-3%; snippet shows $6.49 (2026-11-02, L/S)"
+"Tank gauge 0-300 psi, 2 in, 1/4 NPT back mount (ECO-B300)",Compressor Source,1,5.95,5.95,https://compressor-source.com/search?q=ECO-B300,Motion,Readable through the rear panel with the power off,"$5.95 read on the product page (2026-11-02, L); link is a store search"
+"Tank fill valve (Schrader), Milton S-684-4W",Milton,1,7.04,7.04,https://miltonindustries.com/products/1-4-mnpt-male-tank-valve,Motion,Precharge from a shop compressor (no onboard pump yet),"Stock not stated (2026-11-01, L)"
+"Bleed ball valve 1/4 FNPT x FNPT, BV-02-FF (1 tank + 3 barrels)",Compressor Source,4,5.29,21.16,https://compressor-source.com/products/1-4-female-female-npt-brass-ball-valve-water-moisture-air-tank-drain-shut-off,Motion,Manual dump for the tanks and each barrel's inlet pocket,"12 in stock (2026-11-01, L)"
+"Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (tank)",eBay,1,15.58,15.58,https://www.ebay.com/itm/146278584626,Electrical,Tank pressure for the dashboard and fill logic,"22 available; check the wire colours (2026-11-01, L)"
+"Pressure transducer 0-200 psi, 0.5-4.5 V, 1/8 NPT (gun manifold)",eBay,1,15.20,15.20,https://www.ebay.com/itm/366075104018,Electrical,Closed-loop metering of each chamber's fill,"21 available (2026-11-01, L)"
+"Fill / metering valve, Aignep 02F 2/2 NC direct-acting 12 V DC, 1/4 NPTF",Hose Warehouse,1,41.36,41.36,https://www.hosewarehouse.com/search?q=02F03102N0N10201,Electrical,Meters tank air into the gun manifold (580 psi body),"Part 02F03102N0N10201; Global Industrial $62.04. Confirm the coil + DIN plug are included (2026-11-02, L); link is a store search"
+"Rear manifold: 1/4 NPT brass cross x3 + 2 close nipples (built, see crosses below)",Other,0,0.00,0.00,,Motion,"8 ports: 2 tank tubes, transducer, relief, gauge, fill, bleed, fill valve",Rated brass manifold blocks are $145-159; crosses are 1200 psi and $4 each
+"DOT nylon air-brake tube 1/4 in OD, SAE J844, 50 ft",eBay,1,21.49,21.49,https://www.ebay.com/itm/153495754001,Motion,"Tank tubes, service loop to the gun, three gun supply tubes (~12 ft used)","Manifold/chamber side only. >10 available (2026-11-01, L)"
+"DOT push-to-connect 1/4 tube x 1/4 NPT, straight, 10-pack (Boeray)",Amazon,1,19.99,19.99,https://www.amazon.com/dp/B0D8PX7Z94,Motion,"7 used: 4 on the gun manifold, 2 rear manifold, 1 fill valve","In stock (2026-11-01, L)"
+"DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT, 5-pack (Boeray)",Amazon,1,17.99,17.99,https://www.amazon.com/dp/B0D8Q2618F,Motion,"5 used: 2 tank outlets, 3 barrel supply inlets","SAE J1131, 250 psi, NPT (2026-11-02, L)"
+"1/4 NPT brass cross (4-way), 3-pack (ChillWaves)",Amazon,3,12.99,38.97,https://www.amazon.com/dp/B0FCMV6ML9,Motion,"8 used: 3 barrel inlet blocks, 2 gun manifold, 3 rear manifold","NPT, 1200 psi; only 19 left (2026-11-02, L)"
+"1/4 NPT brass close nipple 7/8 in, 5-pack (Legines)",Amazon,2,7.99,15.98,https://www.amazon.com/dp/B07L5G7CN3,Motion,18 needed; 8 more come in the fitting kit,"NPT, 1200 psi (2026-11-02, L)"
+"1/4 NPT brass nipple 1-1/2 in, 5-pack (Legines)",Amazon,1,10.99,10.99,https://www.amazon.com/dp/B07L5HNKQC,Motion,"3 used: gauge, fill port, bleed through the rear panel","NPT, 1200 psi (2026-11-02, L)"
+"Brass 1/4 NPT fitting kit, 37-pc (FloFlex)",Amazon,1,42.99,42.99,https://www.amazon.com/dp/B0D3FGYXVR,Motion,"Tees for the inlet reliefs, 1/4 x 1/8 bushings for the transducers, spare nipples","Only 8 left (2026-11-01, L)"
+"1/4 NPT brass hex plug, 5-pack (Legines)",Amazon,1,7.99,7.99,https://www.amazon.com/dp/B0757HRRX9,Motion,4 used: tank drains + spare tank ports (upper one is the future pump inlet),"NPT, 1200 psi (2026-11-02, L)"
+"Pipe thread sealant, RectorSeal T Plus 2",Other,1,4.25,4.25,https://www.homedepot.com/p/100116773,Tool,"Every NPT joint (sealant, not just tape)","Home Depot, 46 in store (2026-11-01, L)"
+"1 in cam-buckle strap 4 ft, 4-pack",Amazon,1,8.99,8.99,https://www.amazon.com/dp/B0GVS7RGTB,Structure,Tank hold-downs (2 per tank),"1,100 lb (2026-11-02, L, search page)"
+"GUN - three barrels, chambers at 150 psi"
+"Quick exhaust valve, Humphrey QE5, 3/4 NPTF",TECO,3,51.75,155.25,https://tecotechnology.com/products/humphrey-quick-exhaust-3-4-nptf-qe5,Motion,"Firing valve, one per barrel","Rated 1-150 psi, Cv 6.58; 60 in stock (2026-11-02, L). Sets the 150 psi chamber limit"
+"Dump / pilot valve, HornBlasters VA-4 12 V, 1/4 NPT",HornBlasters,3,34.99,104.97,https://www.hornblasters.com/products/hornblasters-brass-1-4-electric-air-valve,Electrical,Vents each QEV inlet to fire,"210 psi max, 2.5 mm orifice; sale price (2026-11-02, L)"
+"Check valve, Midland 46510, 1/4 FNPT brass",AFT Fasteners,3,22.48,67.44,https://www.aftfasteners.com/midland-industries-46510-high-pressure-check-valve-1-4-in-nominal-fip-x-fip-brass-body-import-qty-1,Motion,Isolates each barrel so one shot doesn't vent the others,"In stock (2026-11-01, L)"
+"Relief valve 150 psi, 1/4 MNPT (Conrader CAS250150)",Compressor Source,4,6.95,27.80,https://compressor-source.com/products/150-psi-1-4-male-npt-air-compressor-pressure-relief-safety-pop-off-valve-solid-brass,Motion,One in each barrel's inlet pocket + one on the gun manifold,"23 in stock (2026-11-01, L)"
+"Chamber: 4 in black malleable coupling, Class 150 (MSI A2030464)",Global Industrial,3,53.95,161.85,https://www.globalindustrial.com/p/4-150lb-black-malleable-iron-coupling-150-300-psi,Motion,Chamber body (~1.0 L per barrel),"NPT, 150-300 psi; ships in 3 days (2026-11-02, L). Biggest single cost: see judgments"
+Chamber: 4 x 3/4 black malleable hex bushing (MSI A204006412),Global Industrial,3,26.95,80.85,https://www.globalindustrial.com/p/4-x-34-150lb-black-malleable-iron-hex-bushing-150-300-psi,Motion,QEV end of the chamber,"NPT, 150-300 psi; no dimensions listed (2026-11-02, L)"
+Chamber: 4 in x close (2-7/8 in) Sch 40 black nipple (MSI A2770064C),Global Industrial,3,22.25,66.75,https://www.globalindustrial.com/p/4-x-close-2-78-schedule-40-black-carbon-steel-nipple-700-3000-psi,Motion,Chamber body,"NPT, 700-3000 psi (2026-11-02, L)"
+Chamber: 4 in black malleable cap (MSI A2040564),Global Industrial,3,26.95,80.85,https://www.globalindustrial.com/p/4-150lb-black-malleable-iron-round-cap-150-300-psi,Motion,Chamber end; the middle chamber's cap carries the left trunnion hub,"NPT, 150-300 psi (2026-11-02, L)"
+3/4 in x close galvanized Sch 40 nipple (MSI A2870012C),Global Industrial,6,1.56,9.36,https://www.globalindustrial.com/p/34-x-close-1-38-schedule-40-galvanized-carbon-steel-nipple-700-3000-psi,Motion,"QEV to chamber bushing, QEV to breech adapter","NPT, 700-3000 psi (2026-11-02, L)"
+"3/4 MNPT x 1/4 FNPT brass hex bushing, 2-pack",Amazon,2,7.99,15.98,https://www.amazon.com/dp/B0DQLBHBTH,Motion,QEV inlet to the 1/4 inlet block (3 used),"NPT, 1200 psi; only 15 left (2026-11-02, L)"
+"1/4 NPT brass sintered muffler, 10-pack (Zorfeter)",Amazon,1,9.99,9.99,https://www.amazon.com/dp/B0CP7ZM1XZ,Motion,6 used: dump and bleed outlets,"NPT in the title; length not stated, CAD assumes 22 mm (2026-11-02, L)"
+"Barrel tube 3 in OD x 1/16 wall aluminum, 47 in (WCP-1275)",WCP,2,54.99,109.98,https://wcproducts.com/products/wcp-1275,Structure,Three 23.5 in barrels (+1 spare) from two sticks,"In stock (2026-11-02, L)"
+"Breech adapter stock, 6061 round bar 3.5 in x 8 in (your CNC)",Other,1,40.00,40.00,,Structure,Three CNC adapters: 3/4 NPT female to the 3 in barrel socket,[UNVERIFIED] Aug-2026 allowance; check the stash first
+"DRIVE - Falcons, two-stage belts, 12 in printed mecanum"
+Falcon 500 (owned),Stash,4,0.00,0.00,,Motion,"One per wheel, plain PWM from the ESP32",Owned
+12T HTD 15 mm Falcon pulley (WCP-0319),WCP,4,7.99,31.96,https://wcproducts.com/products/wcp-0319,Motion,"First stage, 12T -> printed 72T","Page says 'reference only' but store shows available (2026-11-02, L)"
+"HTD 5M 15 mm belt, 80T",WCP,4,10.99,43.96,https://wcproducts.com/products/htd-timing-belts-15mm-width,Motion,Falcon 12T -> compound 72T,"In stock (2026-11-02, L)"
+"HTD 5M 15 mm belt, 150T",WCP,4,16.99,67.96,https://wcproducts.com/products/htd-timing-belts-15mm-width,Motion,Compound 18T -> wheel 120T (keeps the compound outside the wheel),"In stock (2026-11-02, L)"
+Bearing FR8 1/2 x 1-1/8 x 5/16 flanged (WCP-0781),WCP,12,1.99,23.88,https://wcproducts.com/products/wcp-0781,Motion,2 per wheel + 1 per compound pulley,"In stock (2026-11-02, L)"
+"Bearing R8 1/2 x 1-1/8 x 5/16, no flange (WCP-0778)",WCP,4,1.99,7.96,https://wcproducts.com/products/wcp-0778,Motion,Second bearing inside each compound pulley,"Add to cart (2026-11-02, L)"
+"685ZZ bearing 5 x 11 x 5 mm, 40-pack",Amazon,4,9.99,39.96,https://www.amazon.com/dp/B0G2XHXQCH,Motion,2 per roller x 64 rollers = 128,"Only 8 left; backup uxcell 20-pack B07FW26QBV (2026-11-02, L)"
+"M5 x 100 socket head cap screw 12.9, 20-pack",Amazon,4,7.70,30.80,https://www.amazon.com/dp/B0GHNNYVDH,Motion,Roller axles (64),"In stock (2026-11-02, L)"
+"M5 nylon lock nut, 100-pack",Amazon,1,4.99,4.99,https://www.amazon.com/dp/B0F1MQKZ4M,Motion,Roller axles,"In stock (2026-11-02, L)"
+"1/2-13 x 8 in Grade 8 hex bolt, 10-pack",Amazon,1,31.20,31.20,https://www.amazon.com/dp/B00BBCV4RO,Motion,Dead wheel axles (4) through both 1x2 rails,"In stock, sold by Amazon (2026-11-02, L)"
+"1/2-13 x 4 in Grade 8 hex bolt, 10-pack",Amazon,1,16.39,16.39,https://www.amazon.com/dp/B003PKMSSY,Motion,Compound pulley axles (4),"In stock (2026-11-02, L)"
+"1/2-13 Grade 8 nylock nut, 20-pack",Amazon,1,9.99,9.99,https://www.amazon.com/dp/B0D5R324KK,Motion,Axle nuts,"In stock (2026-11-02, L)"
+"Printed drive parts: 4 wheel cores + 16 lug arcs + 64 roller cores (PETG/PETG-CF), 64 treads (TPU 95A), pulleys",Owned,1,0.00,0.00,,Motion,"All drive prints, sized for a 256 mm bed",Filament assumed owned
+ELEVATION - two bus servos on a 9 mm belt
+"FEETECH STS3215 12 V bus servo, 2-pack (your pick)",Amazon,1,48.99,48.99,https://www.amazon.com/dp/B0FMXVR77Y,Motion,"16T -> 56T belt to the right trunnion, 0-90 deg","30 kg-cm each at 12 V, 12-bit encoder (2026-11-02, L)"
+Waveshare Bus Servo Adapter (A),Waveshare,1,4.99,4.99,https://www.waveshare.com/bus-servo-adapter-a.htm,Electrical,ESP32 UART to the servo bus,"Needs 9-12.6 V (2026-11-02, L)"
+"HTD 5M 9 mm belt, 115T (WCP-0629)",WCP,1,7.99,7.99,https://wcproducts.com/products/wcp-0629,Motion,Pulley + two pinions (CAD loop is exactly 575 mm),"105T/110T also $7.99 (2026-11-02, L)"
+"Flanged bearing 1/2 in hex bore, 1.125 OD (WCP-0783)",WCP,4,2.99,11.96,https://wcproducts.com/products/wcp-0783,Motion,Two per pivot bearing block,"AndyMark am-2986 is $4.00 (2026-11-02, L)"
+"1/2 in steel hex shaft, 12 in (AndyMark am-0856-1)",AndyMark,1,6.70,6.70,https://andymark.com/products/1-2-in-steel-hex-shaft-stock,Motion,Both trunnion stubs (cut 230 + 40 mm),"1018 steel, 287 in stock. WCP hex is aluminum (2026-11-02, L)"
+"FRAME + BODY - extrusion, printed frame, frosted acrylic"
+"80/20 1020 extrusion (owned): 2 x 32.24, 2 x 30.24, 2 x 20.25 in",Owned,1,0.00,0.00,,Structure,"Outer, inner and end rails (13.8 ft)",Owned; lengths from the CAD
+"80/20 1010 extrusion (owned): 2 x 20.56, 2 x 7.56, 2 x 6.59, 4 x 5.10 in",Owned,1,0.00,0.00,,Structure,"Turret towers, battery cross members, tank rack (7.5 ft)",Owned; lengths from the CAD
+"1/8 in 6061 sheet: bellypan (2 pieces), 4 drive plates, 2 gun cradle plates, 4 tower angles",Stash,0,39.99,0.00,https://www.amazon.com/dp/B01CITAC4Y,Structure,Waterjet parts,"Your note: 'hopefully we already have this'. If not: 4 x RMP 12x24 at $39.99 + $10.07 shipping each = $200 (2026-11-02, L)"
+1/4-20 economy T-nut (80/20 3382),DigiKey,50,0.37,18.50,https://www.digikey.com/en/products/detail/80-20-llc/3382/21783525,Structure,"Brackets, standoffs, bumper backings","796 in stock (2026-11-02, L)"
+"1/4-20 x 1/2 in stainless button head, 50-pack",Amazon,2,7.86,15.72,https://www.amazon.com/dp/B0D319V3DX,Structure,Extrusion hardware,"In stock (2026-11-02, L)"
+"M4 heat-set insert, 100-pack",Amazon,1,9.99,9.99,https://www.amazon.com/dp/B0FGCX5XT4,Structure,"Lug arcs to wheel cores, wall frame to standoffs","6 left (2026-11-02, L)"
+"M4 button head assortment 8-20 mm, 100 pcs",Amazon,2,9.49,18.98,https://www.amazon.com/dp/B0BHLBQJPX,Structure,98 body-frame joint screws + 64 wheel-arc screws,"18 left (2026-11-02, L)"
+"Frosted acrylic 1/8 in (owned): 15 panels, largest about 18 x 36 in",Owned,15,0.00,0.00,,Cosmetic,Body panels in the printed frame's grooves,Owned; outlines in the Onshape panels tab
+"Printed body frame: 87 pieces, 98 tapered tenons (PETG/ASA)",Owned,1,0.00,0.00,,Structure,Frame that holds the panels and LED strips,Filament assumed owned
+"Liner fabric, 1050D ballistic nylon, 60 in wide (yd)",Canvas Etc,3,15.33,45.99,https://www.canvasetc.com/product/1050-denier-super-ballistic-nylon-fabric-60-width/,Other,Sheet behind the panels around the air system (1.5 m2),"Not rated to stop fragments; denim works too (2026-11-02, L)"
+"WS2812B LED strip 5 m, 60 LED/m (BTF-LIGHTING)",Amazon,4,13.99,55.96,https://www.amazon.com/dp/B088FJF9XD,Electrical,18.7 m of slot round the panel edges,"IP30 is fine inside the body (2026-11-02, L)"
+BUMPERS - FRC style
+"Pool noodle 2.5 in white, 12-pack",Amazon,1,48.99,48.99,https://www.amazon.com/dp/B0B17MG8JV,Structure,8 used: two stacked per side,"48 in long, ~1 in core (2026-11-02, L)"
+"Bumper cloth, white cotton canvas 36 in x 10 ft (your pick)",Amazon,1,40.00,40.00,https://www.amazon.com/dp/B08GV3NKYN,Cosmetic,Cover wrapped round the noodles and printed backing,"Price from your list, not re-checked"
+ELECTRONICS + POWER
+FRC 12 V battery + charger (owned),Stash,2,0.00,0.00,,Electrical,"Two in parallel, side by side",Owned
+Power distribution (REV PDH / CTRE PDP) + 120 A main breaker (stash),Stash,1,0.00,0.00,,Electrical,Main power,Stash
+"Anderson SB50 housings, 2-pack (WCP-2533)",WCP,1,5.99,5.99,https://wcproducts.com/products/wcp-2533,Electrical,Robot side of the two battery leads,"(2026-11-02, L)"
+"SB50 6 AWG contacts, 4-pack (WCP-2534)",WCP,1,5.99,5.99,https://wcproducts.com/products/wcp-2534,Electrical,For the two housings,"(2026-11-02, L)"
+ESP32-S3-DevKitC-1-N8R8,Mouser,2,15.00,30.00,https://www.mouser.com/en/ProductDetail/Espressif-Systems/ESP32-S3-DevKitC-1-N8R8?qs=7D1LtPJG0i2PiuUUKucutQ%3D%3D,Electrical,Brain + one spare taped inside,"1,830 in stock (2026-11-01, S)"
+"12/24 V -> 5 V 20 A buck, potted",Amazon,1,15.99,15.99,https://www.amazon.com/dp/B089M5R3NJ,Electrical,"ESP32, LEDs, servo adapter logic","Cap LED brightness in firmware (2026-11-02, L)"
+"12 V 40 A SPDT relay + socket, 5-pack (Parts Express 330-085)",Parts Express,1,16.98,16.98,https://www.parts-express.com/Waterproof-30-40A-12V-DC-5-Pin-SPDT-Relays-with-12-AWG-Power-Wire-Interlocking-Relay-Sockets-330-085,Electrical,3 dump valves + fill valve + spare,"Flyback diode on every coil. 41 in stock (2026-11-01, L)"
+ULN2803A Darlington driver,DigiKey,1,3.84,3.84,https://www.digikey.com/en/products/detail/stmicroelectronics/ULN2803A/599591,Electrical,Relay coils from 3.3 V GPIO,"76,298 in stock (2026-11-01, L)"
+ADS1115 16-bit ADC (Adafruit 1085),Adafruit,1,14.95,14.95,https://www.adafruit.com/product/1085,Electrical,Reads both transducers,"In stock (2026-11-01, L)"
+"Latching mushroom E-stop 22 mm, NC",Friday Parts,1,12.17,12.17,https://www.fridayparts.com/22mm-nc-n-c-red-mushroom-emergency-stop-push-button-switch-600v-10a-zb2-be102c-xb2-bs142,Electrical,"Rear face, upper right: kills the valves and drive enable","In stock (2026-11-01, L)"
+USB-C panel-mount extension (Parts Express 130-033),Parts Express,1,5.98,5.98,https://www.parts-express.com/USB-C-Mountable-Extension-Cable-for-Power-Data-130-033,Electrical,USB straight to the robot through the rear panel,"141 in stock (2026-11-01, L)"
+"Fuse block + fuses, wire, lugs, heat shrink (stash)",Stash,1,0.00,0.00,,Electrical,Wiring,Your list has these at $0
+"LATER - spots left in the design, not in the total"
+12 V compressor ZHSYMX SQ420 (spot reserved in the left turret half),Amazon,0,127.99,0.00,https://www.amazon.com/dp/B0D6ZYBT4T,Motion,Onboard refill; dropped for now,"1.41 CFM free air, 100% duty at 100 psi (seller spec, 2026-11-01)"
+"Speaker horn + amp, fog trigger, video (from your list)",Other,0,0.00,0.00,,Other,Not designed in yet,See the Parts List Template tab
+
+Total,,,,2102.30

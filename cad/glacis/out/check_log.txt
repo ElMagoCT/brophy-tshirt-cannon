@@ -1,0 +1,21 @@
+drive: built
+gun: built
+elevation belt pitch length 575 mm (115.0 teeth)
+body: 17 faces, volume 180.4 L
+shell volume 34.04 L, 1 solid
+15 panels
+frame network volume 4.70 L
+45 edges
+87 pieces (24 nodes)
+joints: 98 tapered tenons with M4 cross screws, 6 ends without a neighbour piece
+body: 87 frame pieces (47 groove slivers dropped), 15 panels, 13 liners
+built 561 parts in 54 s
+envelope at  0 deg: 47.0 L x 27.8 W x 29.3 H in
+envelope at 90 deg: 37.8 L x 27.8 W x 47.5 H in
+body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
+mass estimate 95.8 kg (211 lb): body 8.5, bumper 1.5, drive 12.8, frame 10.5, gun 39.5, pneu 9.3, power 13.7, spot 0.1
+gun 39.5 kg, CG 13 mm ahead / -2 mm above the pivot -> 4.9 N*m at 0 deg
+interference: 0 pairs over 30 mm^3 (18 s)
+elevation sweep 0-90 deg: 0 clashes (1 s)
+printed parts over a 256 mm bed: 0 []
+parts in more than one piece: 0 []

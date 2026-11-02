@@ -23,7 +23,7 @@ You are the lead engineer on a high school robotics build. Think like the best h
 
 Mark 5 is a ground-up rebuild of Brophy College Prep's t-shirt cannon robot, built and operated by the Broncobots robotics club on behalf of student council for parades, games, and gym events. It's a three-barrel pneumatic cannon on a mecanum drive, controlled by an ESP32 over a WebSocket web UI so any laptop/phone can drive it with no special software.
 
-**Status:** Design/spec phase. Pneumatic architecture is chosen (150 PSI, Option A). A tiered BOM spreadsheet exists. Nothing has been purchased or built. No firmware, no dashboard code, no CAD in this repo yet. Several subsystems (elevation, LEDs, horn, video, dashboard, chassis, drive) are goal-level only.
+**Status:** Design phase. Pneumatic architecture is chosen (150 PSI, Option A). The "Glacis" body/chassis/drive/elevation design is fully modelled in `cad/glacis/` (CadQuery) and imported to Onshape ("Brophy Mark 5 - Glacis"); its parts list is the "Glacis BOM" tab ($2,102.30, 2026-11-02) and its decisions are in `docs/glacis/JUDGMENTS.md`, awaiting Micah's review. Nothing has been purchased or built. No firmware or dashboard code yet. Horn, video and fog are still goal-level only.
 
 ---
 
@@ -53,12 +53,12 @@ A reliable, good-looking, self-contained cannon that:
 | Fog machine control | Interface planned (XLR remote jack) — pinout not yet measured |
 | Drive motors / control | Decided: FRC stash 12V motors on ESP32 PWM |
 | BOM | In `/bom/` (Micah's xlsx + CSV mirrors via `bom/xlsx_to_csv.py`). Pneumatics + electronics re-verified live 2026-11-01: Tier A $1,213, A+B $2,283 (over the ceiling; cuts proposed in `docs/decisions.md`). Chassis/drive/aesthetics still Aug-2026 estimates |
-| Chassis | Not designed. Aluminum extrusion vs welded steel undecided |
-| Mecanum wheels | Want custom 3D printed. Not designed |
-| Elevation (0–90°) | Not designed |
+| Chassis | Glacis design (2026-11-02): 1x2/1x1 80/20 extrusion + 1/8 in plates, printed body frame, frosted acrylic. Awaiting Micah's review |
+| Mecanum wheels | Glacis design: 12 in printed, 16 rollers, Falcon two-stage belt 40:1. Not printed or tested |
+| Elevation (0–90°) | Glacis design: two STS3215 bus servos, 16T->56T 9 mm belt. Not built |
 | LEDs, horn, video, dashboard UI | Not designed |
 | Firmware | Not started |
-| CAD | Not started in this repo (Micah uses Onshape) |
+| CAD | `cad/glacis/` (CadQuery, checks clean) -> Onshape "Brophy Mark 5 - Glacis" (STEP import) |
 
 ---
 
