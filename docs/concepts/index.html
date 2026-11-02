@@ -16,6 +16,7 @@
     --text: #eceef2;
     --mute: #8a909b;
     --red: #ff1f3d;
+    --ok: #4cc38a;
     --radius: 12px;
     --font: "Inter", system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, monospace;
@@ -25,22 +26,20 @@
   body { min-height: 100vh; }
   button { font: inherit; color: inherit; }
 
-  header {
-    display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
-    padding: 28px 32px 8px;
-  }
+  header { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; padding: 28px 32px 8px; }
   header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
   header h1 b { color: var(--red); font-weight: 700; }
   header p { margin: 0; color: var(--mute); font-size: 14px; }
+  .seg { margin-left: auto; display: flex; gap: 6px; }
 
   main { padding: 8px 32px 48px; }
   section { margin-top: 26px; }
   section h2 {
     margin: 0 0 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--mute);
-    display: flex; align-items: center; gap: 10px;
+    text-transform: uppercase; color: var(--mute); display: flex; align-items: center; gap: 10px;
   }
   section h2::before { content: ""; width: 14px; height: 2px; background: var(--red); border-radius: 2px; }
+  section h2 span { text-transform: none; letter-spacing: 0; font-weight: 500; font-family: var(--mono); font-size: 11px; }
   .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
 
   .card {
@@ -62,28 +61,24 @@
   .thumb.ready::after { display: none; }
   @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
   .meta { padding: 10px 12px 12px; }
-  .meta .n { font-size: 14px; font-weight: 600; }
+  .meta .n { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .meta .n i { font-style: normal; font-family: var(--mono); font-size: 10.5px; font-weight: 500; }
+  .meta .n i.ok { color: var(--ok); }
+  .meta .n i.bad { color: var(--red); }
   .meta .d { margin-top: 3px; font-family: var(--mono); font-size: 11px; color: var(--mute); }
-  .meta .n i { font-style: normal; color: var(--red); font-family: var(--mono); font-size: 11px; margin-left: 6px; }
 
-  /* viewer */
-  #viewer {
-    position: fixed; inset: 0; z-index: 10; background: var(--bg);
-    display: grid; grid-template-columns: minmax(0, 1fr) 320px;
-  }
+  #viewer { position: fixed; inset: 0; z-index: 10; background: var(--bg); display: grid; grid-template-columns: minmax(0, 1fr) 320px; }
   #viewer[hidden] { display: none; }
   #stage { position: relative; min-width: 0; }
   #stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-  .topbar {
-    position: absolute; top: 16px; left: 16px; right: 16px;
-    display: flex; align-items: center; gap: 8px; pointer-events: none;
-  }
+  .topbar { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px; pointer-events: none; }
   .topbar > * { pointer-events: auto; }
   .icon-btn {
     width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line);
     background: rgba(22,25,32,.85); display: grid; place-items: center; cursor: pointer;
   }
   .icon-btn:hover { border-color: #3a404c; }
+  .icon-btn.on { color: var(--red); border-color: var(--red); }
   .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .title-chip {
     margin-left: 2px; font-weight: 600; font-size: 15px; height: 38px; display: flex; align-items: center;
@@ -91,15 +86,18 @@
   }
   .title-chip span { font-family: var(--mono); font-size: 11px; color: var(--mute); margin-left: 8px; font-weight: 500; }
   .readout {
-    position: absolute; left: 16px; bottom: 16px; font-family: var(--mono); font-size: 11px; color: var(--mute);
-    background: rgba(22,25,32,.85); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+    position: absolute; left: 16px; bottom: 16px; right: 16px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none;
+  }
+  .readout span {
+    font-family: var(--mono); font-size: 11px; color: var(--mute);
+    background: rgba(22,25,32,.88); border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px;
   }
   .readout b { color: var(--text); font-weight: 500; }
+  .readout .ok b { color: var(--ok); }
+  .readout .bad b { color: var(--red); }
+  .readout i { font-style: normal; display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
 
-  aside {
-    background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto;
-    padding: 18px 18px 28px;
-  }
+  aside { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 18px 18px 28px; }
   .grp { margin-bottom: 18px; }
   .grp > label, .grp > .lbl {
     display: block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
@@ -111,10 +109,7 @@
   }
   #name:focus { outline: none; border-color: var(--red); }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip {
-    padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2);
-    font-size: 12.5px; cursor: pointer;
-  }
+  .chip { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); font-size: 12.5px; cursor: pointer; }
   .chip:hover { border-color: #3a404c; }
   .chip.on { border-color: var(--red); background: rgba(255,31,61,.12); }
   .slider { display: grid; grid-template-columns: 78px 1fr 48px; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12.5px; }
@@ -126,10 +121,7 @@
   .color-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
   input[type=color] { width: 40px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: none; padding: 0; cursor: pointer; }
   .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
-  .btn {
-    padding: 9px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel-2);
-    font-size: 13px; font-weight: 500; cursor: pointer;
-  }
+  .btn { padding: 9px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel-2); font-size: 13px; font-weight: 500; cursor: pointer; }
   .btn:hover { border-color: #3a404c; }
   .btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
   .btn.primary:hover { filter: brightness(1.08); }
@@ -144,6 +136,7 @@
   @media (max-width: 900px) {
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     header, main { padding-left: 16px; padding-right: 16px; }
+    .seg { margin-left: 0; }
     #viewer { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) 46vh; }
     aside { border-left: 0; border-top: 1px solid var(--line); }
   }
@@ -162,7 +155,11 @@
 <body>
 <header>
   <h1>Mark <b>5</b> concepts</h1>
-  <p>20 directions. Click one to open it in 3D and tune it.</p>
+  <p>20 stealth hulls, each built around the real parts. Click one to open it.</p>
+  <div class="seg" id="gridMode">
+    <button class="chip on" data-mode="hull">Hull</button>
+    <button class="chip" data-mode="xray">X-ray</button>
+  </div>
 </header>
 <main id="grid"></main>
 
@@ -174,6 +171,7 @@
       <button class="icon-btn" id="next" aria-label="Next design"><svg viewBox="0 0 24 24"><path d="M13 6l6 6-6 6M5 12h14"/></svg></button>
       <div class="title-chip" id="vtitle"></div>
       <div style="flex:1"></div>
+      <button class="icon-btn" id="xray" aria-label="X-ray"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
       <button class="icon-btn" id="spin" aria-label="Turntable"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></button>
       <button class="icon-btn" id="home" aria-label="Reset view"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
     </div>
@@ -186,74 +184,147 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
-/* ---------- design data ---------- */
+/* ================= design data ================= */
 
 const RED = '#ff1f3d';
 const BASE = {
-  L: 30, W: 20, H: 11, barrelLen: 30, od: 3, elev: 30, drumN: 6,
-  body: 'box', layout: 'single', mount: 'yoke', face: 'bar',
-  sleeve: false, underglow: true, bodyGlow: true, rings: true, bumperStrip: true, skirts: false,
-  glow: 1, led: RED, backdrop: 'dark',
+  layout: 'single', hull: 'spectre', pod: 'slab',
+  nose: 0.5, flare: 0.5, chine: 0.5, barrelLen: 28, elev: 20, drumN: 6,
+  band: true, skirtGlow: true, underglow: true, rings: true, podBand: true,
+  glow: 1, led: RED, backdrop: 'dark', xray: false,
 };
 
 const PRESETS = [
-  { id: 'sabre',     name: 'Sabre',     body: 'wedge',   layout: 'single',         mount: 'yoke',   face: 'chevron', L: 34, H: 9, barrelLen: 36, elev: 25 },
-  { id: 'courier',   name: 'Courier',   body: 'box',     layout: 'single',         mount: 'cradle', face: 'bar', H: 12, sleeve: true },
-  { id: 'pebble',    name: 'Pebble',    body: 'pod',     layout: 'single',         mount: 'dome',   face: 'twin', L: 27, H: 12, elev: 35 },
-  { id: 'bastion',   name: 'Bastion',   body: 'armored', layout: 'single',         mount: 'turret', face: 'bar', W: 21, H: 13, od: 4, barrelLen: 26, skirts: true },
-  { id: 'rail',      name: 'Rail',      body: 'frame',   layout: 'single',         mount: 'yoke',   face: 'ring', L: 32, H: 10, barrelLen: 40, elev: 20 },
+  { id: 'spectre',  name: 'Spectre',  layout: 'single',   hull: 'spectre',  pod: 'arrow', nose: 0.85, flare: 0.6, chine: 0.4, barrelLen: 30, elev: 15 },
+  { id: 'monolith', name: 'Monolith', layout: 'single',   hull: 'monolith', pod: 'slab',  nose: 0.2,  flare: 0.2, chine: 0.5, barrelLen: 26, elev: 22 },
+  { id: 'raptor',   name: 'Raptor',   layout: 'single',   hull: 'raptor',   pod: 'hex',   nose: 0.5,  flare: 0.8, chine: 0.6, barrelLen: 28, elev: 28 },
+  { id: 'doorstop', name: 'Doorstop', layout: 'single',   hull: 'doorstop', pod: 'wedge', nose: 0.4,  flare: 0.4, chine: 0.3, barrelLen: 30, elev: 12 },
+  { id: 'citadel',  name: 'Citadel',  layout: 'single',   hull: 'citadel',  pod: 'slab',  nose: 0.3,  flare: 0.5, chine: 0.5, barrelLen: 24, elev: 32 },
 
-  { id: 'twinpeak',  name: 'Twin Peak', body: 'wedge',   layout: 'double-side',    mount: 'turret', face: 'twin', L: 32 },
-  { id: 'stacker',   name: 'Stacker',   body: 'box',     layout: 'double-stack',   mount: 'yoke',   face: 'bar', L: 28, H: 13, elev: 40 },
-  { id: 'hexduo',    name: 'Hex Duo',   body: 'hex',     layout: 'double-side',    mount: 'turret', face: 'chevron', H: 12 },
-  { id: 'outrigger', name: 'Outrigger', body: 'sled',    layout: 'double-side',    mount: 'pods',   face: 'bar', W: 22, H: 10 },
-  { id: 'halo',      name: 'Halo',      body: 'pod',     layout: 'double-stack',   mount: 'cradle', face: 'ring', L: 28, H: 12, sleeve: true },
+  { id: 'phantom',  name: 'Phantom',  layout: 'double',   hull: 'spectre',  pod: 'wedge', nose: 0.95, flare: 0.5, chine: 0.5, barrelLen: 28, elev: 18 },
+  { id: 'slab',     name: 'Slab',     layout: 'double',   hull: 'monolith', pod: 'hex',   nose: 0.3,  flare: 0.3, chine: 0.6, barrelLen: 26, elev: 25 },
+  { id: 'talon',    name: 'Talon',    layout: 'double',   hull: 'raptor',   pod: 'arrow', nose: 0.7,  flare: 0.9, chine: 0.4, barrelLen: 28, elev: 20 },
+  { id: 'ramp',     name: 'Ramp',     layout: 'double',   hull: 'doorstop', pod: 'slab',  nose: 0.5,  flare: 0.5, chine: 0.4, barrelLen: 28, elev: 30 },
+  { id: 'keep',     name: 'Keep',     layout: 'double',   hull: 'citadel',  pod: 'wedge', nose: 0.4,  flare: 0.6, chine: 0.5, barrelLen: 26, elev: 24 },
 
-  { id: 'trident',   name: 'Trident',   body: 'wedge',   layout: 'triple-row',     mount: 'yoke',   face: 'chevron', L: 34, H: 10 },
-  { id: 'trinity',   name: 'Trinity',   body: 'armored', layout: 'triple-cluster', mount: 'turret', face: 'bar', H: 12.5, skirts: true },
-  { id: 'broadside', name: 'Broadside', body: 'tank',    layout: 'triple-fan',     mount: 'cradle', face: 'twin', L: 34, W: 22, H: 10 },
-  { id: 'tripod',    name: 'Tri-Pod',   body: 'pod',     layout: 'triple-cluster', mount: 'dome',   face: 'ring', sleeve: true },
-  { id: 'organ',     name: 'Organ',     body: 'cab',     layout: 'triple-row',     mount: 'yoke',   face: 'bar', L: 32, elev: 45, sleeve: true },
+  { id: 'wraith',   name: 'Wraith',   layout: 'triple',   hull: 'spectre',  pod: 'hex',   nose: 0.7,  flare: 0.7, chine: 0.5, barrelLen: 28, elev: 20 },
+  { id: 'obelisk',  name: 'Obelisk',  layout: 'triple',   hull: 'monolith', pod: 'slab',  nose: 0.25, flare: 0.25,chine: 0.5, barrelLen: 26, elev: 28 },
+  { id: 'harrier',  name: 'Harrier',  layout: 'triple',   hull: 'raptor',   pod: 'wedge', nose: 0.6,  flare: 0.85,chine: 0.5, barrelLen: 28, elev: 15 },
+  { id: 'glacis',   name: 'Glacis',   layout: 'triple',   hull: 'doorstop', pod: 'arrow', nose: 0.5,  flare: 0.5, chine: 0.3, barrelLen: 30, elev: 22 },
+  { id: 'rampart',  name: 'Rampart',  layout: 'triple',   hull: 'citadel',  pod: 'hex',   nose: 0.35, flare: 0.55,chine: 0.5, barrelLen: 26, elev: 35 },
 
-  { id: 'sixgun',    name: 'Six-Gun',   body: 'box',     layout: 'revolver',       mount: 'yoke',   face: 'bar', L: 28, H: 12, drumN: 6 },
-  { id: 'gatling',   name: 'Gatling',   body: 'armored', layout: 'gatling',        mount: 'turret', face: 'chevron', W: 21, H: 12, drumN: 6, skirts: true },
-  { id: 'carousel',  name: 'Carousel',  body: 'tank',    layout: 'carousel',       mount: 'yoke',   face: 'twin', L: 34, drumN: 8, skirts: true },
-  { id: 'cylinder',  name: 'Cylinder',  body: 'hex',     layout: 'revolver',       mount: 'turret', face: 'ring', H: 12, drumN: 5, barrelLen: 36 },
-  { id: 'cyclone',   name: 'Cyclone',   body: 'pod',     layout: 'gatling',        mount: 'dome',   face: 'twin', L: 28, H: 12.5, drumN: 4, sleeve: true },
+  { id: 'revenant', name: 'Revenant', layout: 'revolver', hull: 'spectre',  pod: 'slab',  nose: 0.8,  flare: 0.6, chine: 0.5, barrelLen: 26, elev: 18, drumN: 6 },
+  { id: 'vault',    name: 'Vault',    layout: 'revolver', hull: 'monolith', pod: 'wedge', nose: 0.3,  flare: 0.3, chine: 0.5, barrelLen: 24, elev: 25, drumN: 8 },
+  { id: 'kestrel',  name: 'Kestrel',  layout: 'revolver', hull: 'raptor',   pod: 'arrow', nose: 0.6,  flare: 0.8, chine: 0.5, barrelLen: 28, elev: 20, drumN: 5 },
+  { id: 'incline',  name: 'Incline',  layout: 'revolver', hull: 'doorstop', pod: 'hex',   nose: 0.45, flare: 0.45,chine: 0.3, barrelLen: 26, elev: 15, drumN: 6 },
+  { id: 'bulwark',  name: 'Bulwark',  layout: 'revolver', hull: 'citadel',  pod: 'slab',  nose: 0.3,  flare: 0.5, chine: 0.5, barrelLen: 24, elev: 30, drumN: 7 },
 ];
 
-const BODIES = { box: 'Box', wedge: 'Wedge', pod: 'Pod', armored: 'Armored', sled: 'Sled', cab: 'Cab', hex: 'Hex', frame: 'Frame', tank: 'Tank' };
-const MOUNTS = { yoke: 'Yoke', cradle: 'Cradle', turret: 'Turret', dome: 'Dome', pods: 'Pods' };
-const FACES = { bar: 'Bar', twin: 'Twin', chevron: 'Chevron', ring: 'Eyes', none: 'None' };
-const LAYOUTS = {
-  Single:    { single: 'Single' },
-  Double:    { 'double-side': 'Side by side', 'double-stack': 'Over-under' },
-  Triple:    { 'triple-row': 'Row', 'triple-cluster': 'Cluster', 'triple-fan': 'Fan' },
-  Revolving: { revolver: 'Revolver', gatling: 'Gatling', carousel: 'Carousel' },
+const LAYOUTS = { single: 'Single', double: 'Double', triple: 'Triple', revolver: 'Revolving' };
+const LAYOUT_NOTE = { single: '', double: 'stacked', triple: 'stacked', revolver: 'one barrel' };
+const HULLS = { spectre: 'Spectre', monolith: 'Monolith', raptor: 'Raptor', doorstop: 'Doorstop', citadel: 'Citadel' };
+const PODS = { slab: 'Slab', wedge: 'Wedge', hex: 'Hex', arrow: 'Arrow' };
+const barrelCount = l => ({ single: 1, double: 2, triple: 3, revolver: 1 }[l]);
+
+/* ================= packaging (inches; x forward, y up, z left/right) =================
+   Real parts the body has to hold, from the Tier A BOM:
+   - 4x 6" mecanum, FRC stash CIM + Toughbox Mini per corner, track 21", wheelbase 20"
+   - 12V SLA battery 7.1 x 3 x 6.6, ZHSYMX compressor 9.6 x 5 x 7.1, electronics tray
+   - Viair 2.5 gal tank, 6" x 21.5", mounted across the rear over the back axle
+   - per barrel: 3/4" QEV + transverse 4" Sch 40 chamber (~0.94 L) + dump valve + check valve
+   - 12V linear actuator for 0-90 deg elevation
+   Every body panel is flat: side panels keep a fixed slope, nose and tail are uniform
+   scales of the full section, so each facet is a planar trapezoid or triangle.        */
+
+const PK = {
+  wheelR: 3, wheelW: 2.2, axleX: 10, wheelZ: 10.5,
+  pitch: 3.6, chR: 2.25, chLen: 7.5, qev: [3.4, 3.0, 2.8], barrelR: 1.5, shirtR: 1.65,
+  tank: { x: -11, y: 9.9, r: 3, len: 21.5 },
 };
-const catOf = layout => Object.keys(LAYOUTS).find(k => layout in LAYOUTS[k]);
-const layoutName = layout => LAYOUTS[catOf(layout)][layout];
-const isRevolving = layout => catOf(layout) === 'Revolving';
+const PIVOT_X = { spectre: -1.5, monolith: -2, raptor: -1.5, doorstop: -2.5, citadel: 4.5 };
+// belt: LED band height; ks/ku: skirt / upper-side slope (dz per dy); nose and tail are
+// uniform scales of the end sections about height noseY / tailY
+const HULL_DEF = {
+  spectre:  { belt: 6.9, ks: 0.18, ku: 0.16, deckF: 11.2, deckR: 13.9, noseK: 1.0,  noseS: 0.42, noseY: 7.0, tailL: 1.8, tailS: 0.74, tailY: 6.5 },
+  monolith: { belt: 7.2, ks: 0.07, ku: 0.10, deckF: 13.4, deckR: 13.9, noseK: 0.35, noseS: 0.84, noseY: 7.5, tailL: 0.9, tailS: 0.9,  tailY: 7.5 },
+  raptor:   { belt: 8.6, ks: 0.26, ku: 0.20, deckF: 12.2, deckR: 14.0, noseK: 0.85, noseS: 0.42, noseY: 8.6, tailL: 2.2, tailS: 0.64, tailY: 8.5 },
+  doorstop: { belt: 6.6, ks: 0.15, ku: 0.14, deckF: 9.8,  deckR: 15.4, noseK: 0.55, noseS: 0.62, noseY: 4.6, tailL: 0.8, tailS: 0.92, tailY: 8 },
+  citadel:  { belt: 7.0, ks: 0.15, ku: 0.14, deckF: 11.8, deckR: 15.4, noseK: 0.6,  noseS: 0.6,  noseY: 6,   tailL: 1.4, tailS: 0.86, tailY: 8, step: [-4.8, -6.8] },
+};
 
-/* ---------- persistence (per-viewer convenience only) ---------- */
-
-const STORE = 'mk5-concepts-v1';
-function loadStore() {
-  try { return JSON.parse(localStorage.getItem(STORE)) || { edits: {}, custom: [] }; }
-  catch { return { edits: {}, custom: [] }; }
+function hullStations(c) {
+  const H = HULL_DEF[c.hull], nl = 1.5 + c.nose * 6.5, xF = 13.6, xR = -14.6;
+  const yb1 = H.belt + c.chine * 2.2, yb2 = yb1 + 0.6;
+  const zb = 12.15, zm = Math.min(14, zb + (yb1 - 0.9) * H.ks * (0.4 + c.flare * 1.2));
+  const full = (x, yd) => ({ x, y0: 0.9, zb, yb1, yb2, zm, yd, zt: zm - (yd - yb2) * H.ku });
+  const scaled = (b, x, s, yP) => ({
+    x, y0: yP + s * (b.y0 - yP), zb: s * b.zb, yb1: yP + s * (b.yb1 - yP), yb2: yP + s * (b.yb2 - yP),
+    zm: s * b.zm, yd: yP + s * (b.yd - yP), zt: s * b.zt,
+  });
+  const F = full(xF, H.deckF), R = full(xR, H.deckR);
+  const st = [scaled(F, xF + nl * H.noseK, H.noseS, H.noseY), F];
+  if (H.step) st.push(full(H.step[0], H.deckF), full(H.step[1], H.deckR));
+  st.push(R, scaled(R, xR - H.tailL, H.tailS, H.tailY));
+  st.ku = H.ku;
+  return st;
 }
-function saveStore() { try { localStorage.setItem(STORE, JSON.stringify(store)); } catch {} }
-const store = loadStore();
-store.edits ||= {}; store.custom ||= [];
 
-const designs = () => [
-  ...PRESETS.map(p => ({ ...BASE, ...p, ...(store.edits[p.id] || {}) })),
-  ...store.custom.map(c => ({ ...BASE, ...c })),
-];
+// 8-point section, counter-clockwise from bottom-left: floor, right skirt, right LED band,
+// right upper, deck, left upper, left band, left skirt
+const sectionPts = s => [[-s.zb, s.y0], [s.zb, s.y0], [s.zm, s.yb1], [s.zm, s.yb2], [s.zt, s.yd], [-s.zt, s.yd], [-s.zm, s.yb2], [-s.zm, s.yb1]];
+const HULL_KINDS = ['floor', 'skirt', 'band', 'upper', 'deck', 'upper', 'band', 'skirt'];
 
-/* ---------- textures ---------- */
+function sectionAt(st, x) {
+  if (x > st[0].x || x < st[st.length - 1].x) return null;
+  for (let i = 0; i < st.length - 1; i++) {
+    const a = st[i], b = st[i + 1];
+    if (x <= a.x && x >= b.x) {
+      const t = a.x === b.x ? 0 : (a.x - x) / (a.x - b.x), o = { x };
+      for (const k of ['y0', 'zb', 'yb1', 'yb2', 'zm', 'yd', 'zt']) o[k] = a[k] + (b[k] - a[k]) * t;
+      return o;
+    }
+  }
+  return null;
+}
+const deckAt = (st, x) => sectionAt(st, x)?.yd ?? -Infinity;
+function hullTopAt(st, x, z) {
+  const s = sectionAt(st, x); if (!s) return -Infinity;
+  const az = Math.abs(z);
+  if (az <= s.zt) return s.yd;
+  if (az <= s.zm) return s.yd + (s.yb2 - s.yd) * (az - s.zt) / (s.zm - s.zt);
+  return s.yb2;
+}
+function insidePoly(poly, z, y, tol = 0.05) {
+  let area = 0;
+  for (let i = 0; i < poly.length; i++) { const [z1, y1] = poly[i], [z2, y2] = poly[(i + 1) % poly.length]; area += z1 * y2 - z2 * y1; }
+  if (Math.abs(area) < 1e-6) return false;
+  const sg = Math.sign(area);
+  for (let i = 0; i < poly.length; i++) {
+    const [z1, y1] = poly[i], [z2, y2] = poly[(i + 1) % poly.length];
+    const len = Math.hypot(z2 - z1, y2 - y1); if (len < 1e-9) continue;
+    if (sg * ((z2 - z1) * (y - y1) - (y2 - y1) * (z - z1)) < -tol * len) return false;
+  }
+  return true;
+}
+function inside(st, p) {
+  const s = sectionAt(st, p.x);
+  return !!s && insidePoly(sectionPts(s), p.z, p.y);
+}
+// polygon stations [{x, pts}] sorted by x descending, linearly interpolated
+function polyAt(sts, x) {
+  if (!sts.length || x > sts[0].x || x < sts[sts.length - 1].x) return null;
+  for (let i = 0; i < sts.length - 1; i++) {
+    const a = sts[i], b = sts[i + 1];
+    if (x <= a.x && x >= b.x) {
+      const t = a.x === b.x ? 0 : (a.x - x) / (a.x - b.x);
+      return a.pts.map((p, j) => [p[0] + (b.pts[j][0] - p[0]) * t, p[1] + (b.pts[j][1] - p[1]) * t]);
+    }
+  }
+  return null;
+}
+
+/* ================= textures & materials ================= */
 
 const texCache = new Map();
 function canvasTex(key, w, h, draw, srgb = true) {
@@ -265,18 +336,17 @@ function canvasTex(key, w, h, draw, srgb = true) {
   texCache.set(key, t);
   return t;
 }
-// v = 0 is the bottom of a panel: bright there, gone by mid-height
+const mix = (a, b, t) => '#' + new THREE.Color(a).lerp(new THREE.Color(b), t).getHexString();
 const glowTex = () => canvasTex('glow', 8, 256, (x, w, h) => {
   const g = x.createLinearGradient(0, h, 0, 0);
-  g.addColorStop(0, '#fff'); g.addColorStop(0.05, '#fff'); g.addColorStop(0.16, '#c8c8c8');
-  g.addColorStop(0.36, '#484848'); g.addColorStop(0.6, '#000'); g.addColorStop(1, '#000');
+  g.addColorStop(0, '#fff'); g.addColorStop(0.06, '#fff'); g.addColorStop(0.2, '#bdbdbd');
+  g.addColorStop(0.45, '#3c3c3c'); g.addColorStop(0.75, '#000'); g.addColorStop(1, '#000');
   x.fillStyle = g; x.fillRect(0, 0, w, h);
 });
-const mix = (a, b, t) => '#' + new THREE.Color(a).lerp(new THREE.Color(b), t).getHexString();
 const tintTex = led => canvasTex('tint' + led, 8, 256, (x, w, h) => {
   const g = x.createLinearGradient(0, h, 0, 0);
-  g.addColorStop(0, mix(led, '#fff', 0.05)); g.addColorStop(0.18, mix(led, '#fff', 0.5));
-  g.addColorStop(0.5, '#fff'); g.addColorStop(1, '#fff');
+  g.addColorStop(0, mix(led, '#fff', 0.05)); g.addColorStop(0.22, mix(led, '#fff', 0.5));
+  g.addColorStop(0.6, '#fff'); g.addColorStop(1, '#fff');
   x.fillStyle = g; x.fillRect(0, 0, w, h);
 });
 const radialTex = (key, stops) => canvasTex(key, 256, 256, (x, w, h) => {
@@ -288,470 +358,475 @@ const underTex = () => radialTex('under', [[0, 'rgba(255,255,255,1)'], [0.35, 'r
 const shadowTex = () => radialTex('shadow', [[0, 'rgba(0,0,0,.7)'], [0.5, 'rgba(0,0,0,.35)'], [1, 'rgba(0,0,0,0)']]);
 const floorTex = (inner, outer) => radialTex('floor' + inner, [[0, inner], [0.08, inner], [0.22, mix(inner, outer, 0.55)], [0.5, outer], [1, outer]]);
 
-/* ---------- materials ---------- */
-
 function makeMats(c) {
   const led = new THREE.Color(c.led);
-  const glowing = c.bodyGlow && c.glow > 0;
-  const panel = glowing
-    ? new THREE.MeshStandardMaterial({ color: '#fff', map: tintTex(c.led), roughness: 0.55, emissive: led, emissiveMap: glowTex(), emissiveIntensity: 1.4 * c.glow })
-    : new THREE.MeshStandardMaterial({ color: '#f3f4f6', roughness: 0.55 });
+  const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.6, ...o });
   return {
-    white:   new THREE.MeshStandardMaterial({ color: '#f3f4f6', roughness: 0.5 }),
-    panel,
-    foam:    glowing
-      ? new THREE.MeshStandardMaterial({ color: '#fbfbfa', roughness: 0.92, emissive: led, emissiveMap: glowTex(), emissiveIntensity: 0.35 * c.glow })
-      : new THREE.MeshStandardMaterial({ color: '#f5f5f3', roughness: 0.92 }),
-    barrel:  new THREE.MeshStandardMaterial({ color: '#f6f7f9', roughness: 0.32, metalness: 0.08 }),
-    alu:     new THREE.MeshStandardMaterial({ color: '#c6cad1', roughness: 0.38, metalness: 0.55 }),
-    steel:   new THREE.MeshStandardMaterial({ color: '#8f959e', roughness: 0.45, metalness: 0.6 }),
-    dark:    new THREE.MeshStandardMaterial({ color: '#2a2e35', roughness: 0.65 }),
-    roller:  new THREE.MeshStandardMaterial({ color: '#3a3f47', roughness: 0.8 }),
-    bore:    new THREE.MeshBasicMaterial({ color: '#0b0c0f' }),
-    led:     new THREE.MeshBasicMaterial({ color: led, toneMapped: false, side: THREE.DoubleSide }),
-    clear:   new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.08, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide }),
-    frosted: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.6, transparent: true, opacity: 0.6, depthWrite: false }),
+    hull:   std('#f2f3f5', { roughness: 0.42, flatShading: true }),
+    glow:   std('#ffffff', { roughness: 0.45, flatShading: true, map: tintTex(c.led), emissive: led, emissiveMap: glowTex(), emissiveIntensity: 1.3 * c.glow }),
+    under:  std('#25282e', { flatShading: true }),
+    barrel: std('#f6f7f9', { roughness: 0.3, metalness: 0.08 }),
+    collar: std('#2a2e35'),
+    bore:   new THREE.MeshBasicMaterial({ color: '#0b0c0f' }),
+    led:    new THREE.MeshBasicMaterial({ color: led, toneMapped: false, side: THREE.DoubleSide }),
+    estop:  std('#d3202e', { roughness: 0.4 }),
+    glass:  std('#15181d', { roughness: 0.15, metalness: 0.3 }),
+    gauge:  std('#fafafa', { roughness: 0.3 }),
+    ghost:  new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4, transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide }),
+    edge:   new THREE.LineBasicMaterial({ color: '#dfe3ea', transparent: true, opacity: 0.32 }),
+    // x-ray internals
+    alu:    std('#a3abb5', { metalness: 0.5, roughness: 0.4 }),
+    steel:  std('#8f959e', { metalness: 0.6, roughness: 0.45 }),
+    dark:   std('#30343b'),
+    motor:  std('#7d858f', { metalness: 0.4 }),
+    batt:   std('#3d434c'),
+    comp:   std('#565c66', { metalness: 0.3 }),
+    pcb:    std('#2e6b57'),
+    tank:   std('#cfd4dc', { metalness: 0.5, roughness: 0.35 }),
+    brass:  std('#c9a447', { metalness: 0.6, roughness: 0.35 }),
+    air:    new THREE.MeshBasicMaterial({ color: '#79b8ff' }),
+    drum:   std('#e9ebef'),
+    frosted: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.6, transparent: true, opacity: 0.45, depthWrite: false }),
+    shirt:  std('#fbfbfb', { roughness: 0.9 }),
+    roller: std('#3a3f47', { roughness: 0.8 }),
+    fail:   new THREE.MeshBasicMaterial({ color: '#ff9f1a', wireframe: true }),
   };
 }
 
-/* ---------- geometry helpers ---------- */
+/* ================= geometry helpers ================= */
 
-const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const lerp = (a, b, t) => a + (b - a) * Math.min(1, Math.max(0, t));
 function mesh(geo, mat, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); return m; }
 const box = (w, h, d, mat, x, y, z) => mesh(new THREE.BoxGeometry(w, h, d), mat, x, y, z);
-const rbox = (w, h, d, r, mat, x, y, z) => mesh(new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2 - 0.01, h / 2 - 0.01, d / 2 - 0.01)), mat, x, y, z);
-// cylinder along X
-function xcyl(r, len, mat, x = 0, y = 0, z = 0, open = false, seg = 36) {
-  const g = new THREE.CylinderGeometry(r, r, len, seg, 1, open); g.rotateZ(-Math.PI / 2);
-  return mesh(g, mat, x, y, z);
-}
-function band(r, h, mat, x, y, z, axis = 'y') {
-  const g = new THREE.CylinderGeometry(r, r, h, 48, 1, true);
+function cyl(r, len, axis, mat, x = 0, y = 0, z = 0, seg = 28, open = false) {
+  const g = new THREE.CylinderGeometry(r, r, len, seg, 1, open);
   if (axis === 'x') g.rotateZ(-Math.PI / 2);
+  if (axis === 'z') g.rotateX(Math.PI / 2);
   return mesh(g, mat, x, y, z);
 }
+function between(a, b, r, mat, seg = 16) {
+  const d = V3().subVectors(b, a), len = d.length();
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, seg), mat);
+  m.position.copy(a).addScaledVector(d, 0.5);
+  m.quaternion.setFromUnitVectors(V3(0, 1, 0), d.normalize());
+  return m;
+}
+function airLine(points, M, r = 0.22) {
+  const curve = new THREE.CatmullRomCurve3(points.map(p => V3(...p)), false, 'centripetal');
+  return new THREE.Mesh(new THREE.TubeGeometry(curve, 48, r, 8, false), M.air);
+}
 
-function rrectShape(x, y, w, h, r) {
-  r = Math.min(r, w / 2 - 0.01, h / 2 - 0.01);
-  const s = new THREE.Shape();
-  s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.absarc(x + w - r, y + r, r, -Math.PI / 2, 0);
-  s.lineTo(x + w, y + h - r); s.absarc(x + w - r, y + h - r, r, 0, Math.PI / 2);
-  s.lineTo(x + r, y + h); s.absarc(x + r, y + h - r, r, Math.PI / 2, Math.PI);
-  s.lineTo(x, y + r); s.absarc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
-  return s;
-}
-function polyShape(pts) {
-  const s = new THREE.Shape(); s.moveTo(...pts[0]); pts.slice(1).forEach(p => s.lineTo(...p)); s.closePath(); return s;
-}
-// Caps get UVs normalised to the shape's bounding box; each side-wall facet gets v
-// running 0..1 through the extrusion depth. That lets one gradient texture paint the
-// "backlit bottom edge" on every panel.
-function extrude(shape, depth, bevel = 0) {
-  const pts = shape.getPoints(24);
-  const minX = Math.min(...pts.map(p => p.x)), maxX = Math.max(...pts.map(p => p.x));
-  const minY = Math.min(...pts.map(p => p.y)), maxY = Math.max(...pts.map(p => p.y));
-  const zmin = -bevel, zmax = depth + bevel;
-  const uv = {
-    generateTopUV(g, v, a, b, c) {
-      const f = i => new THREE.Vector2((v[i * 3] - minX) / (maxX - minX), (v[i * 3 + 1] - minY) / (maxY - minY));
-      return [f(a), f(b), f(c)];
-    },
-    generateSideWallUV(g, v, a, b, c, d) {
-      const z = i => (v[i * 3 + 2] - zmin) / (zmax - zmin);
-      return [new THREE.Vector2(0, z(a)), new THREE.Vector2(1, z(b)), new THREE.Vector2(1, z(c)), new THREE.Vector2(0, z(d))];
-    },
+// Loft polygon stations into one faceted mesh. Faces are grouped by the edge "kind" so
+// each band of facets can get its own material. v runs 0 -> 1 from the lower to the upper
+// end of each facet, so a bottom-bright texture lights the lower edge.
+function loft(stations, kinds, caps = true) {
+  const kindOf = typeof kinds === 'function' ? kinds : (s, e) => kinds[e % kinds.length];
+  const buckets = new Map();
+  const push = (kind, verts, uvs) => {
+    if (!buckets.has(kind)) buckets.set(kind, { pos: [], uv: [] });
+    const b = buckets.get(kind);
+    verts.forEach(v => b.pos.push(v.x, v.y, v.z)); uvs.forEach(u => b.uv.push(u[0], u[1]));
   };
-  return new THREE.ExtrudeGeometry(shape, {
-    depth, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelOffset: -bevel,
-    bevelSegments: 3, curveSegments: 14, UVGenerator: uv,
-  });
-}
-const lerp = (a, b, t) => a + (b - a) * Math.min(1, Math.max(0, t));
-
-/* ---------- body ---------- */
-
-// returns { group, topAt(x), front } in body-local coords (y = 0 at body bottom).
-// front = {x, y0, y1}: the flat vertical part of the nose; {x, y}: a fixed spot; {hex: true}: pointed nose
-function buildBody(c, M) {
-  const { L, W, H } = c;
-  const x0 = -L / 2, x1 = L / 2;
-  const g = new THREE.Group();
-  const side = (shape, bevel, mats = [M.panel, M.white], depth = W) => {
-    const d = depth - 2 * bevel;
-    const geo = extrude(shape, d, bevel); geo.translate(0, 0, -d / 2);
-    return new THREE.Mesh(geo, mats);
+  const n = stations[0].pts.length;
+  const centre = st => { let z = 0, y = 0; st.pts.forEach(p => { z += p[0]; y += p[1]; }); return V3(st.x, y / n, z / n); };
+  const P = (st, i) => V3(st.x, st.pts[i][1], st.pts[i][0]);
+  const tri = (kind, a, b, c, ua, ub, uc, ctr) => {
+    const nrm = V3().subVectors(b, a).cross(V3().subVectors(c, a));
+    if (nrm.lengthSq() < 1e-10) return;
+    const mid = V3().add(a).add(b).add(c).divideScalar(3).sub(ctr);
+    if (nrm.dot(mid) < 0) push(kind, [a, c, b], [ua, uc, ub]); else push(kind, [a, b, c], [ua, ub, uc]);
   };
-  let topAt = () => H, front = { x: x1, y0: 1.4, y1: H - 1.4 };
-
-  switch (c.body) {
-    case 'box': case 'tank':
-      g.add(side(rrectShape(x0, 0, L, H, 1.4), 0.6));
-      break;
-    case 'pod': {
-      g.add(side(rrectShape(x0, 0, L, H, Math.min(H * 0.48, L * 0.22)), 1.6));
-      front = { x: x1, y: H * 0.5 };
-      break;
-    }
-    case 'wedge': {
-      const k = x0 + L * 0.24, lo = H * 0.32;
-      g.add(side(polyShape([[x0, 0], [x1, 0], [x1, lo], [k, H], [x0, H]]), 0.5));
-      topAt = x => x <= k ? H : lerp(H, lo, (x - k) / (x1 - k));
-      front = { x: x1, y0: 0, y1: lo };
-      break;
-    }
-    case 'armored': {
-      const ch = H * 0.28, k = x1 - L * 0.24, mid = H * 0.52;
-      g.add(side(polyShape([[x0 + ch, 0], [x1 - ch, 0], [x1, ch], [x1, mid], [k, H], [x0 + ch, H], [x0, H - ch], [x0, ch]]), 0));
-      topAt = x => x <= k ? H : lerp(H, mid, (x - k) / (x1 - k));
-      front = { x: x1, y0: ch, y1: mid };
-      break;
-    }
-    case 'cab': {
-      const deck = H * 0.5, k1 = x0 + L * 0.42, k2 = x0 + L * 0.55;
-      g.add(side(polyShape([[x0, 0], [x1, 0], [x1, deck], [k2, deck], [k1, H], [x0, H]]), 0.5));
-      topAt = x => x <= k1 ? H : x >= k2 ? deck : lerp(H, deck, (x - k1) / (k2 - k1));
-      front = { x: x1, y0: 0, y1: deck };
-      break;
-    }
-    case 'sled': {
-      const deck = H * 0.42, pl = L * 0.5, ph = H * 0.5, px = -L * 0.06;
-      g.add(side(rrectShape(x0, 0, L, deck, 1.2), 0.5));
-      const pod = side(rrectShape(px - pl / 2, 0, pl, ph, Math.min(ph * 0.45, 3)), 0.9, [M.panel, M.white], W * 0.68);
-      pod.position.y = deck - 0.2; g.add(pod);
-      topAt = x => Math.abs(x - px) < pl / 2 - 1 ? deck - 0.2 + ph : deck;
-      front = { x: x1, y0: 0, y1: deck };
-      break;
-    }
-    case 'hex': {
-      const s = polyShape([[x1, 0], [L / 4, W / 2], [-L / 4, W / 2], [x0, 0], [-L / 4, -W / 2], [L / 4, -W / 2]]);
-      const geo = extrude(s, H, 0); geo.rotateX(-Math.PI / 2);
-      g.add(new THREE.Mesh(geo, [M.white, M.panel]));
-      front = { hex: true };
-      break;
-    }
-    case 'frame': {
-      const t = 1.0, hw = W / 2;
-      const ex = [];
-      for (const y of [t / 2, H - t / 2]) for (const z of [-hw + t / 2, hw - t / 2]) ex.push(box(L, t, t, M.alu, 0, y, z));
-      for (const y of [t / 2, H - t / 2]) for (const x of [x0 + t / 2, x1 - t / 2]) ex.push(box(t, t, W - 2 * t, M.alu, x, y, 0));
-      for (const x of [x0 + t / 2, x1 - t / 2]) for (const z of [-hw + t / 2, hw - t / 2]) ex.push(box(t, H - 2 * t, t, M.alu, x, H / 2, z));
-      ex.forEach(e => g.add(e));
-      // frosted panels inset in the frame; BoxGeometry face order +x,-x,+y,-y,+z,-z
-      const pm = [M.panel, M.panel, M.white, M.white, M.panel, M.panel];
-      g.add(mesh(new THREE.BoxGeometry(L - 2 * t, H - 2 * t, 0.25), pm, 0, H / 2, hw - t / 2));
-      g.add(mesh(new THREE.BoxGeometry(L - 2 * t, H - 2 * t, 0.25), pm, 0, H / 2, -hw + t / 2));
-      g.add(mesh(new THREE.BoxGeometry(0.25, H - 2 * t, W - 2 * t), pm, x1 - t / 2, H / 2, 0));
-      g.add(mesh(new THREE.BoxGeometry(0.25, H - 2 * t, W - 2 * t), pm, x0 + t / 2, H / 2, 0));
-      g.add(box(L - 2 * t, 0.25, W - 2 * t, M.white, 0, H - t / 2, 0));
-      front = { x: x1 - t / 2 + 0.06, y0: t, y1: H - t };
-      break;
+  for (let s = 0; s < stations.length - 1; s++) {
+    const A = stations[s], B = stations[s + 1], ctr = centre(A).add(centre(B)).multiplyScalar(0.5);
+    const u0 = s / (stations.length - 1), u1 = (s + 1) / (stations.length - 1);
+    for (let e = 0; e < n; e++) {
+      const f = (e + 1) % n, kind = kindOf(s, e);
+      const ve = A.pts[e][1] <= A.pts[f][1] ? 0 : 1, vf = 1 - ve;
+      const a0 = P(A, e), a1 = P(A, f), b1 = P(B, f), b0 = P(B, e);
+      tri(kind, a0, a1, b1, [u0, ve], [u0, vf], [u1, vf], ctr);
+      tri(kind, a0, b1, b0, [u0, ve], [u1, vf], [u1, ve], ctr);
     }
   }
-  return { group: g, topAt, front };
+  const ends = caps ? [stations[0], stations[stations.length - 1]] : [];
+  ends.forEach((st, i) => {
+    const c = centre(st), other = ends[1 - i];
+    const out = V3(Math.sign(st.x - other.x) || 1, 0, 0);
+    for (let e = 0; e < n; e++) {
+      const a = P(st, e), b = P(st, (e + 1) % n);
+      const nrm = V3().subVectors(a, c).cross(V3().subVectors(b, c));
+      if (nrm.lengthSq() < 1e-10) continue;
+      if (nrm.dot(out) < 0) push('cap', [c, b, a], [[0.5, 0.5], [0, 0], [1, 1]]);
+      else push('cap', [c, a, b], [[0.5, 0.5], [1, 1], [0, 0]]);
+    }
+  });
+  const geo = new THREE.BufferGeometry(), pos = [], uv = [], order = [];
+  let start = 0;
+  for (const [kind, b] of buckets) {
+    pos.push(...b.pos); uv.push(...b.uv);
+    const count = b.pos.length / 3;
+    geo.addGroup(start, count, order.length); order.push(kind);
+    start += count;
+  }
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  geo.computeVertexNormals();
+  return { geo, order };
+}
+function loftMesh(stations, kinds, matFor, M, xray, caps = true) {
+  const { geo, order } = loft(stations, kinds, caps);
+  const m = new THREE.Mesh(geo, order.map(k => { const mat = matFor(k); return xray && mat !== M.led ? M.ghost : mat; }));
+  if (!xray) return m;
+  const g = new THREE.Group(); g.add(m);
+  g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 12), M.edge));
+  return g;
 }
 
-/* ---------- wheels ---------- */
+/* ================= wheels ================= */
 
-function buildWheel(M, R, Wd, hand) {
-  const g = new THREE.Group();
-  const disc = new THREE.CylinderGeometry(R * 0.8, R * 0.8, 0.35, 36); disc.rotateX(Math.PI / 2);
-  for (const z of [-Wd / 2, Wd / 2]) g.add(mesh(disc, M.white, 0, 0, z));
-  const hub = new THREE.CylinderGeometry(R * 0.32, R * 0.32, Wd + 0.5, 24); hub.rotateX(Math.PI / 2);
-  g.add(mesh(hub, M.dark));
-  const ring = mesh(new THREE.RingGeometry(R * 0.42, R * 0.56, 36), M.led, 0, 0, Wd / 2 + 0.19);
-  g.add(ring);
-  const N = 10, rr = 0.6, len = Wd * 1.05;
-  const rg = new THREE.CapsuleGeometry(rr, len - 2 * rr, 3, 10);
-  for (let i = 0; i < N; i++) {
-    const th = (i / N) * Math.PI * 2;
-    const r = mesh(rg, M.roller, (R - rr) * Math.cos(th), (R - rr) * Math.sin(th), 0);
-    const axis = V3(-Math.sin(th), Math.cos(th), hand).normalize();
-    r.quaternion.setFromUnitVectors(V3(0, 1, 0), axis);
+function buildWheel(M, hand) {
+  const R = PK.wheelR, Wd = PK.wheelW, g = new THREE.Group();
+  const disc = new THREE.CylinderGeometry(R * 0.8, R * 0.8, 0.3, 32); disc.rotateX(Math.PI / 2);
+  for (const z of [-Wd / 2, Wd / 2]) g.add(mesh(disc, M.hull, 0, 0, z));
+  const rg = new THREE.CapsuleGeometry(0.58, Wd * 1.05 - 1.16, 3, 8);
+  for (let i = 0; i < 10; i++) {
+    const th = (i / 10) * Math.PI * 2;
+    const r = mesh(rg, M.roller, (R - 0.58) * Math.cos(th), (R - 0.58) * Math.sin(th), 0);
+    r.quaternion.setFromUnitVectors(V3(0, 1, 0), V3(-Math.sin(th), Math.cos(th), hand).normalize());
     g.add(r);
   }
   return g;
 }
 
-/* ---------- barrels ---------- */
+/* ================= gun ================= */
 
-// Barrel assembly in local coords: barrel axis along +X through the pivot (origin).
-function buildBarrels(c, M) {
-  const g = new THREE.Group();
-  const od = c.od, r = od / 2, len = c.barrelLen, x0 = -2, xm = len - 2;
-  const s = od + 1.0;
-  const withChambers = c.mount !== 'dome';
-
-  const tube = (parent, y, z, opts = {}) => {
-    const b = new THREE.Group(); b.position.set(0, y, z); if (opts.yaw) b.rotation.y = opts.yaw;
-    b.add(xcyl(r, len, M.barrel, (x0 + xm) / 2, 0, 0));
-    const bore = new THREE.CircleGeometry(r - 0.2, 32); bore.rotateY(Math.PI / 2);
-    b.add(mesh(bore, M.bore, xm + 0.01, 0, 0));
-    if (c.rings) {
-      b.add(band(r + 0.06, 0.7, M.led, xm - 0.9, 0, 0, 'x'));
-      b.add(band(r + 0.06, 0.25, M.led, x0 + len * 0.45, 0, 0, 'x'));
+// Gun contents in gun-local coords: origin on the trunnion axis, barrels along +x.
+// Stacked barrels sit on the centreline; each chamber runs sideways into a turret half
+// (alternating sides). The revolver has one barrel, one chamber and an exposed drum.
+function gunLayout(c) {
+  const n = barrelCount(c.layout), G = { barrels: [], qevs: [] };
+  if (c.layout === 'revolver') {
+    const N = c.drumN, rc = (PK.shirtR + 0.2) / Math.sin(Math.PI / N), R = rc + PK.shirtR + 0.35;
+    G.drum = { rc, R, N, x0: 0.6, x1: 9.6 };
+    G.qevs.push({ x: -1.6, y: rc, side: -1 });
+    G.barrels.push({ x0: 10.4, y: rc });
+    G.sw = R + 0.7;
+    G.block = { x0: -3.8, x1: 0.6, yB: -1.6, yT: rc + 2.3 };
+    G.corners = [[-3.8, -1.6], [-3.8, rc + 2.3], [0.6, -R], [9.6, -R], [9.6, R], [10.4, -1.2], [10.4, rc + 1.9], [-1, R + 0.65], [10.4, R + 0.65]];
+  } else {
+    for (let k = 0; k < n; k++) {
+      const y = (k - (n - 1) / 2) * PK.pitch;
+      G.qevs.push({ x: 0, y, side: k % 2 ? 1 : -1 });
+      G.barrels.push({ x0: PK.qev[0] / 2, y });
     }
-    if (c.sleeve) {
-      const sl = len * 0.72;
-      b.add(xcyl(r + 0.55, sl, M.clear, x0 + 1 + sl / 2, 0, 0, true));
-      b.add(box(sl - 0.6, 0.16, 0.16, M.led, x0 + 1 + sl / 2, r + 0.12, 0));
-      b.add(band(r + 0.6, 0.3, M.led, x0 + 1 + sl, 0, 0, 'x'));
-    }
-    if (!opts.bare) {
-      b.add(box(2.8, od + 0.5, od + 0.5, M.dark, x0 - 1.4, 0, 0));          // QEV
-      if (withChambers) b.add(xcyl(1.19, 8, M.steel, x0 - 2.8 - 4, 0, 0));  // 2" steel chamber
-    }
-    parent.add(b);
-    return b;
-  };
-
-  let halfW = r + 0.4;
-  switch (c.layout) {
-    case 'single': tube(g, 0, 0); break;
-    case 'double-side': {
-      const sp = c.mount === 'pods' ? Math.max(s, c.W - 5) : s;
-      tube(g, 0, -sp / 2); tube(g, 0, sp / 2); halfW = sp / 2 + r + 0.4; break;
-    }
-    case 'double-stack': tube(g, s / 2, 0); tube(g, -s / 2, 0); break;
-    case 'triple-row': {
-      const sp = c.mount === 'pods' ? Math.max(s, (c.W - 5) / 2) : s;
-      tube(g, 0, -sp); tube(g, 0, 0); tube(g, 0, sp); halfW = sp + r + 0.4; break;
-    }
-    case 'triple-cluster':
-      tube(g, s * 0.58, 0); tube(g, -s * 0.29, -s / 2); tube(g, -s * 0.29, s / 2); halfW = s / 2 + r + 0.4; break;
-    case 'triple-fan': {
-      const yaw = 6 * Math.PI / 180;
-      tube(g, 0, -s * 1.1, { yaw: yaw }); tube(g, 0, 0); tube(g, 0, s * 1.1, { yaw: -yaw }); halfW = s * 1.1 + r + 0.6; break;
-    }
-    case 'revolver': {
-      const n = c.drumN, rc = (r + 0.35) / Math.sin(Math.PI / n), Rd = rc + r + 0.7, dl = 6;
-      tube(g, 0, 0, { bare: true });
-      const drum = new THREE.Group(); drum.position.set(x0 - dl / 2, -rc, 0);
-      drum.add(xcyl(Rd, dl, M.white, 0, 0, 0, false, 48));
-      if (c.rings) drum.add(band(Rd + 0.05, 0.4, M.led, 0, 0, 0, 'x'));
-      const hole = new THREE.CircleGeometry(r - 0.1, 28); hole.rotateY(Math.PI / 2);
-      for (let i = 0; i < n; i++) {
-        const a = (i / n) * Math.PI * 2;
-        drum.add(mesh(hole, M.bore, dl / 2 + 0.01, rc * Math.cos(a), rc * Math.sin(a)));
-      }
-      drum.add(xcyl(0.6, dl + 2, M.alu, 0, 0, 0));
-      g.add(drum);
-      g.add(box(2.4, od + 0.4, od + 0.4, M.dark, x0 - dl - 1.2, 0, 0));
-      if (withChambers) g.add(xcyl(1.19, 7, M.steel, x0 - dl - 2.4 - 3.5, 0, 0));
-      halfW = Rd + 0.3;
-      break;
-    }
-    case 'gatling': {
-      const n = c.drumN, rg = (r + 0.3) / Math.sin(Math.PI / n);
-      for (let i = 0; i < n; i++) {
-        const a = (i / n) * Math.PI * 2;
-        tube(g, rg * Math.cos(a), rg * Math.sin(a), { bare: true });
-      }
-      const Rc = rg + r + 0.6;
-      for (const [x, t] of [[x0 + len * 0.72, 0.8], [x0 + 0.5, 1.0]]) {
-        g.add(xcyl(Rc, t, M.white, x, 0, 0, false, 48));
-        if (c.rings) g.add(band(Rc + 0.04, 0.3, M.led, x, 0, 0, 'x'));
-      }
-      g.add(xcyl(0.7, len, M.alu, (x0 + xm) / 2, 0, 0));
-      g.add(xcyl(Math.min(rg * 0.85, 2.4), 7, M.steel, x0 - 3.5, 0, 0));
-      g.add(xcyl(1.2, 2.5, M.dark, x0 - 8.2, 0, 0));
-      halfW = Rc + 0.3;
-      break;
-    }
-    case 'carousel':
-      // single barrel; the rotary magazine sits on the deck (see buildMagazine)
-      tube(g, 0, 0);
-      break;
+    G.sw = 2.0;
+    G.coreTop = (n - 1) / 2 * PK.pitch + 2.0;
+    const t = G.coreTop;
+    G.corners = [[-2.6, -t * 0.9], [-2.6, t * 0.9], [2.6, -t], [2.6, t], [4.8, -t * 0.85], [4.8, t * 0.85]];
   }
-  g.userData.halfW = halfW;
-  return g;
+  // sample points of the parts that live in the turret halves (fit check + clearance radius)
+  G.parts = [];
+  for (const q of G.qevs) {
+    const ring = z => Array.from({ length: 10 }, (_, i) => { const a = (i / 10) * Math.PI * 2; return V3(q.x + PK.chR * Math.cos(a), q.y + PK.chR * Math.sin(a), z); });
+    G.parts.push({ name: 'Chamber', pts: [...ring(q.side * 1.4), ...ring(q.side * (1.4 + PK.chLen))] });
+    const v = [];
+    for (const dx of [-0.75, 0.75]) for (const dy of [-0.75, 0.75]) for (const dz of [-0.75, 0.75]) v.push(V3(q.x + 0.3 + dx, q.y + 0.5 + dy, -q.side * 2.3 + dz));
+    v.push(V3(q.x + 0.3, q.y - 0.4, -q.side * 5.1));
+    G.parts.push({ name: 'Valves', pts: v });
+  }
+  let r = 0;
+  for (const p of G.parts) for (const v of p.pts) r = Math.max(r, Math.hypot(v.x, v.y));
+  for (const q of G.qevs) r = Math.max(r, Math.hypot(Math.abs(q.x) + 1.7, Math.abs(q.y) + 1.5));
+  G.Rint = r + 0.3;
+  G.top0 = Math.max(...G.corners.map(p => p[1]));
+  return G;
 }
 
-// Turntable magazine of upright frosted shirt tubes, for the carousel layout.
-function buildMagazine(c, M) {
-  const g = new THREE.Group();
-  const r = c.od / 2, n = c.drumN, rc = (r + 0.55) / Math.sin(Math.PI / n), Rm = rc + r + 0.9, th = 10;
-  g.add(mesh(new THREE.CylinderGeometry(Rm, Rm, 1.2, 56), M.white, 0, 0.6, 0));
-  g.add(band(Rm + 0.05, 0.3, M.led, 0, 0.45, 0));
-  const tubeGeo = new THREE.CylinderGeometry(r + 0.35, r + 0.35, th, 28);
-  for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2, x = rc * Math.cos(a), z = rc * Math.sin(a);
-    g.add(mesh(tubeGeo, M.frosted, x, 1.2 + th / 2, z));
-    if (c.rings) g.add(band(r + 0.4, 0.3, M.led, x, 1.2 + th - 0.6, z));
-  }
-  const ring = new THREE.TorusGeometry(rc, 0.4, 10, 64); ring.rotateX(Math.PI / 2);
-  g.add(mesh(ring, M.white, 0, 1.2 + th, 0));
-  g.add(mesh(new THREE.CylinderGeometry(0.8, 0.8, th + 1.6, 20), M.alu, 0, 1.2 + th / 2, 0));
-  g.userData.R = Rm;
-  return g;
-}
+const octPts = (w, yT, yB, ch) => {
+  ch = Math.max(0.05, Math.min(ch, (yT - yB) / 2 - 0.05, w - 0.05));
+  return [[-w + ch, yB], [w - ch, yB], [w, yB + ch], [w, yT - ch], [w - ch, yT], [-w + ch, yT], [-w, yT - ch], [-w, yB + ch]];
+};
 
-/* ---------- mount ---------- */
-
-function buildMount(c, M, baseY, mx, halfW, lift, barrelZs) {
-  const g = new THREE.Group();
-  const yoke = (y0, h) => {
-    const span = halfW * 2 + 2.2;
-    g.add(rbox(7, 1.2, span + 1.2, 0.4, M.white, mx, y0 + 0.6, 0));
+// The elevating part: barrels plus either a slim faceted core (stacks) or the revolver
+// breech, exposed drum, front post and top strap.
+function buildGun(c, M, G) {
+  const g = new THREE.Group(), xray = c.xray;
+  let collarX;
+  if (!G.drum) {
+    const cw = G.sw - 0.25, t = G.coreTop;
+    g.add(loftMesh([
+      { x: 4.8, pts: octPts(cw * 0.85, t * 0.85, -t * 0.85, 0.5) },
+      { x: 2.6, pts: octPts(cw, t, -t, 0.6) },
+      { x: -2.6, pts: octPts(cw * 0.9, t * 0.9, -t * 0.9, 0.6) },
+    ], ['core'], () => M.hull, M, xray));
+    collarX = 5.0;
+    // trunnion plates close the chamber openings in the slot walls
     for (const sgn of [-1, 1]) {
-      const z = sgn * (halfW + 1.1);
-      g.add(rbox(5.5, h + 1.8, 0.7, 0.3, M.white, mx, y0 + (h + 1.8) / 2, z));
-      const eye = mesh(new THREE.RingGeometry(0.75, 1.1, 28), M.led, mx, y0 + h, z + sgn * 0.37);
-      if (sgn < 0) eye.rotation.y = Math.PI;
-      g.add(eye);
-    }
-    const pin = new THREE.CylinderGeometry(0.5, 0.5, span + 1.6, 20); pin.rotateX(Math.PI / 2);
-    g.add(mesh(pin, M.alu, mx, y0 + h, 0));
-    return y0 + h;
-  };
-  let pivotY;
-  switch (c.mount) {
-    case 'yoke': pivotY = yoke(baseY, Math.max(6.5, lift)); break;
-    case 'turret': {
-      const rr = Math.min(c.W * 0.44, 9.5);
-      g.add(mesh(new THREE.CylinderGeometry(rr, rr, 1.6, 56), M.white, mx, baseY + 0.8, 0));
-      if (c.rings || c.bodyGlow) g.add(band(rr + 0.05, 0.32, M.led, mx, baseY + 0.55, 0));
-      pivotY = yoke(baseY + 1.6, Math.max(6, lift));
-      break;
-    }
-    case 'cradle': {
-      const h = Math.max(5.5, lift);
-      g.add(rbox(6, h - 1, 6.5, 0.9, M.white, mx, baseY + (h - 1) / 2, 0));
-      g.add(rbox(6.4, 0.35, 6.9, 0.15, M.led, mx, baseY + h - 1.6, 0));
-      g.add(rbox(4, 1, halfW * 2 + 2, 0.3, M.white, mx, baseY + h - 1, 0));
-      for (const sgn of [-1, 1]) g.add(rbox(4, 3, 0.6, 0.25, M.white, mx, baseY + h, sgn * (halfW + 0.7)));
-      const pin = new THREE.CylinderGeometry(0.45, 0.45, halfW * 2 + 2.2, 20); pin.rotateX(Math.PI / 2);
-      g.add(mesh(pin, M.alu, mx, baseY + h, 0));
-      pivotY = baseY + h;
-      break;
-    }
-    case 'dome': {
-      const rd = Math.min(c.W * 0.4, 9);
-      g.add(mesh(new THREE.SphereGeometry(rd, 48, 20, 0, Math.PI * 2, 0, Math.PI / 2), M.white, mx, baseY, 0));
-      g.add(band(rd + 0.04, 0.35, M.led, mx, baseY + 0.3, 0));
-      pivotY = baseY + Math.max(rd * 0.45, lift);
-      break;
-    }
-    case 'pods': {
-      const h = Math.max(5.5, lift);
-      for (const z of barrelZs) {
-        g.add(rbox(4.5, h, 3.4, 0.8, M.white, mx, baseY + h / 2, z));
-        g.add(rbox(4.8, 0.3, 3.7, 0.1, M.led, mx, baseY + h * 0.35, z));
+      const plate = cyl(G.Rint * 0.92, 0.12, 'z', M.collar, 0, 0, sgn * (G.sw - 0.08), 8);
+      plate.rotation.z = Math.PI / 8;
+      g.add(plate);
+      if (c.rings) {
+        const ring = mesh(new THREE.RingGeometry(G.Rint * 0.92 - 0.3, G.Rint * 0.92 - 0.05, 8), M.led, 0, 0, sgn * (G.sw - 0.16));
+        ring.rotation.z = Math.PI / 8;
+        g.add(ring);
       }
-      const span = Math.max(...barrelZs) - Math.min(...barrelZs) + 4;
-      const axle = new THREE.CylinderGeometry(0.55, 0.55, span, 20); axle.rotateX(Math.PI / 2);
-      g.add(mesh(axle, M.alu, mx, baseY + h, 0));
-      pivotY = baseY + h;
-      break;
     }
+  } else {
+    const d = G.drum, b = G.block, dl = d.x1 - d.x0, bw = G.sw - 0.4;
+    g.add(loftMesh([
+      { x: b.x1, pts: octPts(bw, b.yT, b.yB, 1.0) },
+      { x: -1.6, pts: octPts(bw, b.yT, b.yB, 1.0) },
+      { x: b.x0, pts: octPts(bw * 0.92, b.yT - 0.3, b.yB + 0.3, 1.0) },
+    ], ['core'], () => M.hull, M, xray));
+    const dg = new THREE.Group(); dg.position.x = (d.x0 + d.x1) / 2;
+    for (const sx of [-1, 1]) dg.add(cyl(d.R, 0.5, 'x', M.hull, sx * (dl / 2 - 0.25), 0, 0, 40));
+    const hole = new THREE.CircleGeometry(PK.shirtR + 0.1, 24); hole.rotateY(Math.PI / 2);
+    for (let i = 0; i < d.N; i++) {
+      const a = (i / d.N) * Math.PI * 2, y = d.rc * Math.cos(a), z = d.rc * Math.sin(a);
+      dg.add(cyl(PK.shirtR + 0.12, dl - 1, 'x', M.frosted, 0, y, z, 24, true));
+      dg.add(mesh(hole, M.bore, dl / 2 + 0.01, y, z));
+      if (i) {
+        dg.add(cyl(PK.shirtR - 0.3, dl - 1.6, 'x', M.shirt, 0, y, z, 20));
+        const face = new THREE.CircleGeometry(PK.shirtR - 0.3, 20); face.rotateY(Math.PI / 2);
+        dg.add(mesh(face, M.shirt, dl / 2 + 0.03, y, z));
+      }
+    }
+    if (c.rings) dg.add(cyl(d.R + 0.04, 0.3, 'x', M.led, dl / 2 - 0.25, 0, 0, 48, true));
+    dg.add(cyl(0.6, dl + 1.6, 'x', M.collar, 0, 0, 0, 16));
+    g.add(dg);
+    g.add(box(0.8, d.rc + 3.1, 3.8, M.hull, d.x1 + 0.4, (d.rc + 1.9 - 1.2) / 2, 0));         // front post
+    g.add(box(d.x1 + 1.8, 0.6, 2.0, M.hull, (d.x1 - 0.2) / 2, d.R + 0.35, 0));             // top strap
+    g.add(box(3, 2.2, 2.0, M.motor, d.x0 + 2, -d.R * 0.45, d.R * 0.72));                     // index motor
+    for (const sgn of [-1, 1]) g.add(cyl(1.1, 0.8, 'z', M.collar, 0, 0, sgn * (G.sw - 0.2), 20));
+    collarX = d.x1 + 0.95;
   }
-  return { group: g, pivotY };
+  for (const b of G.barrels) {
+    const len = c.barrelLen, x1 = b.x0 + len;
+    g.add(cyl(PK.barrelR, len, 'x', M.barrel, b.x0 + len / 2, b.y, 0, 32));
+    const bore = new THREE.CircleGeometry(PK.barrelR - 0.18, 28); bore.rotateY(Math.PI / 2);
+    g.add(mesh(bore, M.bore, x1 + 0.01, b.y, 0));
+    if (c.rings) g.add(cyl(PK.barrelR + 0.05, 0.7, 'x', M.led, x1 - 0.9, b.y, 0, 32, true));
+    if (!xray) g.add(cyl(PK.barrelR + 0.32, 0.6, 'x', M.collar, collarX, b.y, 0, 28));
+  }
+  if (!xray) return g;
+  for (const q of G.qevs) {
+    g.add(box(...PK.qev, M.dark, q.x, q.y, 0));
+    g.add(cyl(PK.chR, PK.chLen - 0.8, 'z', M.steel, q.x, q.y, q.side * (1.4 + PK.chLen / 2)));
+    g.add(cyl(PK.chR + 0.25, 0.8, 'z', M.steel, q.x, q.y, q.side * (1.4 + PK.chLen - 0.4)));
+    g.add(box(1.5, 1.5, 1.5, M.brass, q.x + 0.3, q.y + 0.5, -q.side * 2.3));
+    g.add(cyl(0.45, 2.2, 'z', M.brass, q.x + 0.3, q.y - 0.4, -q.side * 4.0));
+    g.add(airLine([[q.x + 0.3, q.y - 0.4, -q.side * 5.1], [q.x - 0.8, q.y - 0.6, -q.side * 5.8], [-0.4, 0, G.sw + 0.4]], M, 0.18));
+  }
+  return g;
 }
 
-/* ---------- full robot ---------- */
+// Fixed turret halves: the hull's upper side panels carry straight on up (same plane) and
+// wrap around the gun, leaving a centre slot for it to elevate through. Front and rear are
+// single sloped glacis panels down to the deck.
+const WRAP = {
+  slab:  { gf: 2.2, gr: 1.6, ch: 1.0 },
+  wedge: { gf: 7.0, gr: 1.2, ch: 1.4 },
+  hex:   { gf: 3.2, gr: 3.2, ch: 2.6 },
+  arrow: { gf: 5.5, gr: 1.6, ch: 1.0, narrow: true },
+};
+const WRAP_KINDS = ['wfloor', 'wside', 'wside', 'wtop', 'wled', 'wwall'];
+function wrapStations(c, st, xp, yT, G) {
+  const W = WRAP[c.pod], sw = G.sw, Rw = G.Rint + 0.6, ku = st.ku;
+  const xFront = st[1].x - 0.3, xBack = st[st.length - 2].x + 0.3;
+  const xf1 = Math.min(xp + Rw, xFront - 0.6), xr1 = Math.max(xp - Rw, xBack + 0.6);
+  const xf0 = Math.min(xf1 + W.gf, xFront), xr0 = Math.max(xr1 - W.gr, xBack);
+  const top = x => x > xf1 ? lerp(yT, deckAt(st, xf0), (x - xf1) / (xf0 - xf1))
+                 : x < xr1 ? lerp(yT, deckAt(st, xr0), (xr1 - x) / (xr1 - xr0)) : yT;
+  const sec = x => {
+    const s = sectionAt(st, x), tp = top(x);
+    const zo = y => s.zm - (y - s.yb2) * ku;
+    if (tp <= s.yd + 0.05) {
+      const zf = W.narrow && x > xp ? sw + 1.5 : s.zt;
+      return { x, pts: [[sw, s.yd], [zf, s.yd], [zf, s.yd], [zf, s.yd], [sw, s.yd], [sw, s.yd]] };
+    }
+    const ch = Math.min(W.ch, (tp - s.yd) * 0.45), zA = Math.max(sw + 0.6, zo(tp - ch));
+    return { x, pts: [[sw, s.yd], [s.zt, s.yd], [zA, tp - ch], [Math.max(sw + 0.3, zA - ch), tp], [sw, tp], [sw, tp - Math.min(0.55, tp - s.yd)]] };
+  };
+  const xs = [xf0, xf1, xr1, xr0, ...st.map(s => s.x).filter(x => x < xf0 && x > xr0)];
+  return [...new Set(xs.map(x => +x.toFixed(4)))].sort((a, b) => b - a).map(sec);
+}
+
+/* ================= full robot ================= */
 
 function buildRobot(cfg) {
   const c = { ...BASE, ...cfg };
-  const M = makeMats(c);
+  const M = makeMats(c), xray = c.xray;
   const g = new THREE.Group();
-  const R = 3, Wd = 2.4, chassisY = 2.4;
-  const { L, W, H } = c;
+  const st = hullStations(c);
+  const xp = PIVOT_X[c.hull];
 
-  // wheels, outboard of the body, with the front/rear bumpers spanning them
-  const wx = L / 2 - R - 0.6, wz = W / 2 + Wd / 2 + 0.35;
+  // hull (nose/tail underside faces read as a lower glacis, not as floor)
+  const matFor = k => k === 'floor' ? M.under : k === 'skirt' ? (c.skirtGlow ? M.glow : M.hull) : k === 'band' ? (c.band ? M.led : M.hull) : M.hull;
+  const kinds = (s, e) => e === 0 && (st[s].y0 > 1.2 || st[s + 1].y0 > 1.2) ? 'chin' : HULL_KINDS[e];
+  g.add(loftMesh(st.map(s => ({ x: s.x, pts: sectionPts(s) })), kinds, matFor, M, xray));
+
   for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-    const w = buildWheel(M, R, Wd, sx * sz);
-    w.position.set(sx * wx, R, sz * wz);
+    const w = buildWheel(M, sx * sz);
+    w.position.set(sx * PK.axleX, PK.wheelR, sz * PK.wheelZ);
     if (sz < 0) w.rotation.y = Math.PI;
     g.add(w);
   }
-  const overallW = W + 2 * (Wd + 0.35) + 0.6;
 
-  const body = buildBody(c, M);
-  body.group.position.y = chassisY;
-  g.add(body.group);
-
-  // bumpers (white foam, glowing along the bottom)
-  const bumpW = overallW + 0.8;
-  for (const sx of [-1, 1]) {
-    const bx = sx * (L / 2 + 1.75);
-    g.add(rbox(3.5, 4.6, bumpW, 1.5, M.foam, bx, 3.6, 0));
-    if (c.bumperStrip) g.add(box(0.25, 0.35, bumpW - 2.4, M.led, bx + sx * 1.62, 1.75, 0));
+  // trunnion height: chamber orbit clears the deck, gun clears the deck through 0-90 deg,
+  // barrels clear the nose at 0 deg
+  const G = gunLayout(c);
+  let yp = 0;
+  for (let x = xp - G.Rint; x <= xp + G.Rint + 1e-6; x += 0.5) yp = Math.max(yp, deckAt(st, x) + G.Rint + 0.5);
+  for (let a = 0; a <= 90; a += 5) {
+    const r = THREE.MathUtils.degToRad(a), co = Math.cos(r), si = Math.sin(r);
+    for (const [px, py] of G.corners) yp = Math.max(yp, deckAt(st, xp + px * co - py * si) + 0.6 - (px * si + py * co));
   }
+  const low = Math.min(...G.barrels.map(b => b.y)) - PK.barrelR;
+  for (let t = 0; t <= 1.0001; t += 0.05) yp = Math.max(yp, deckAt(st, xp + G.barrels[0].x0 + t * c.barrelLen) + 0.5 - low);
+  const yT = yp + G.Rint + 0.6;
 
-  if (c.skirts) {
-    for (const sz of [-1, 1]) {
-      const z = sz * (W / 2 + Wd + 0.9);
-      const pm = [M.white, M.white, M.white, M.white, M.panel, M.panel];
-      g.add(mesh(new THREE.BoxGeometry(L - 0.5, 3.6, 0.45), pm, 0, 2 * R - 0.5, z));
-      g.add(box(L - 1.5, 0.22, 0.12, M.led, 0, 2 * R - 2.2, z + sz * 0.27));
+  const gun = buildGun(c, M, G);
+  gun.position.set(xp, yp, 0);
+  gun.rotation.z = THREE.MathUtils.degToRad(c.elev);
+  g.add(gun);
+
+  const wrapR = wrapStations(c, st, xp, yT, G);
+  const wrapMat = k => k === 'wled' ? (c.podBand ? M.led : M.hull) : k === 'wfloor' ? M.under : M.hull;
+  for (const sgn of [1, -1]) g.add(loftMesh(wrapR.map(s => ({ x: s.x, pts: s.pts.map(([z, y]) => [sgn * z, y]) })), WRAP_KINDS, wrapMat, M, xray));
+  if (c.rings) {
+    const s = sectionAt(st, xp);
+    if (s) for (const sgn of [-1, 1]) {
+      const z = s.zm - (yp - s.yb2) * st.ku, n = V3(0, st.ku, sgn).normalize();
+      const ring = mesh(new THREE.RingGeometry(1.25, 1.65, 8), M.led, xp, yp + n.y * 0.04, sgn * z + n.z * 0.04);
+      ring.quaternion.setFromUnitVectors(V3(0, 0, 1), n);
+      g.add(ring);
     }
   }
 
-  // underglow line around the body bottom
-  if (c.underglow) {
-    g.add(box(L - 2, 0.22, 0.22, M.led, 0, chassisY + 0.15, W / 2 - 0.4));
-    g.add(box(L - 2, 0.22, 0.22, M.led, 0, chassisY + 0.15, -W / 2 + 0.4));
-  }
-
-  // face accents
-  const f = body.front;
-  if (c.face !== 'none') {
-    if (f.hex) {
-      const ang = Math.atan2(W / 2, L / 4), flen = Math.hypot(L / 4, W / 2) * 0.7, fy = chassisY + H * 0.45;
-      for (const sz of [-1, 1]) {
-        const s = box(flen, 0.45, 0.14, M.led, 3 * L / 8 + 0.06 * Math.sin(ang), fy, sz * (W / 4 + 0.06));
-        s.rotation.y = sz * ang;
-        g.add(s);
-      }
-    } else {
-      // On the nose if enough of it shows above the bumper, otherwise lying on the deck
-      // just behind the nose. Accents are built in a local frame where +X is "out".
-      const bumperTop = 3.6 + 2.3 - chassisY;
-      const lo = Math.max(f.y0 ?? 0, bumperTop + 0.5), hi = (f.y1 ?? 0) - 0.5;
-      const acc = new THREE.Group();
-      if (f.y !== undefined || hi - lo >= 0.6) {
-        acc.position.set(f.x + 0.07, chassisY + (f.y ?? (lo + hi) / 2), 0);
-      } else {
-        const xd = L / 2 - 2.2, slope = Math.atan2(body.topAt(xd + 1) - body.topAt(xd - 1), 2);
-        acc.position.set(xd, chassisY + body.topAt(xd) + 0.07, 0);
-        acc.rotation.z = Math.PI / 2 + slope;
-      }
-      if (c.face === 'bar') acc.add(box(0.14, 0.45, W * 0.55, M.led));
-      if (c.face === 'twin') for (const sz of [-1, 1]) acc.add(box(0.14, 0.5, W * 0.18, M.led, 0, 0, sz * W * 0.28));
-      if (c.face === 'chevron') for (const sz of [-1, 1]) {
-        const s = box(0.14, 0.42, W * 0.26, M.led, 0, 0, sz * W * 0.12);
-        s.rotation.x = sz * 0.3; acc.add(s);
-      }
-      if (c.face === 'ring') for (const sz of [-1, 1]) {
-        const ring = new THREE.RingGeometry(0.75, 1.1, 32); ring.rotateY(Math.PI / 2);
-        acc.add(mesh(ring, M.led, 0, 0, sz * W * 0.27));
-      }
-      g.add(acc);
+  // exterior details: rear service panel (gauges, E-stop, bleed), intake grilles, nose camera
+  const px0 = st[st.length - 2].x + 1.8, py0 = deckAt(st, px0);
+  if (Number.isFinite(py0)) {
+    const panel = new THREE.Group(); panel.position.set(px0, py0, 0);
+    panel.add(box(3.2, 0.3, 7.4, xray ? M.ghost : M.hull, 0, 0.15, 0));
+    for (const z of [-2.4, -0.4]) {
+      panel.add(cyl(0.95, 0.35, 'y', M.collar, 0, 0.45, z, 24));
+      panel.add(cyl(0.8, 0.37, 'y', M.gauge, 0, 0.46, z, 24));
+      const needle = box(0.07, 0.04, 0.65, M.estop, 0.15, 0.66, z + 0.2); needle.rotation.y = 0.8; panel.add(needle);
     }
+    panel.add(cyl(0.55, 0.7, 'y', M.collar, 0, 0.6, 1.6, 20));
+    panel.add(mesh(new THREE.SphereGeometry(0.85, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), M.estop, 0, 0.95, 1.6));
+    panel.add(box(1.4, 0.25, 0.35, M.estop, -0.2, 0.5, 3.1));
+    g.add(panel);
+  }
+  for (const sgn of [-1, 1]) {
+    const x = 3, s = sectionAt(st, x);
+    if (!s) continue;
+    const t = 0.42, z = s.zm + (s.zt - s.zm) * t, y = s.yb2 + (s.yd - s.yb2) * t;
+    const n = V3(0, st.ku, 1).normalize();
+    const grille = new THREE.Group();
+    grille.position.set(x, y + n.y * 0.04, sgn * (z + n.z * 0.04));
+    grille.quaternion.setFromUnitVectors(V3(0, 0, 1), V3(0, n.y, sgn * n.z));
+    for (let i = 0; i < 4; i++) grille.add(box(4.6, 0.2, 0.06, M.collar, 0, (i - 1.5) * 0.42, 0));
+    g.add(grille);
+  }
+  const nx = st[1].x - 0.9, ny = deckAt(st, nx);
+  if (Number.isFinite(ny)) {
+    g.add(box(1.4, 0.8, 2.0, xray ? M.ghost : M.hull, nx, ny + 0.4, 0));
+    g.add(box(0.06, 0.5, 1.3, M.glass, nx + 0.72, ny + 0.45, 0));
+  }
+  if (c.underglow) for (const sgn of [-1, 1]) g.add(box(st[1].x - st[st.length - 2].x - 1, 0.18, 0.18, M.led, (st[1].x + st[st.length - 2].x) / 2, 1.0, sgn * (st[1].zb - 0.05)));
+
+  // fit check: hull internals, plus chambers/valves through the whole elevation range
+  const parts = internals(c, M, st, xp, yp, G, gun);
+  const fails = [];
+  for (const p of parts) {
+    const ok = p.pts.every(q => inside(st, q));
+    if (!ok) fails.push(p.name);
+    if (xray && p.mesh) { if (!ok) p.mesh.traverse(n => { if (n.isMesh) n.material = M.fail; }); g.add(p.mesh); }
+    else if (p.mesh) p.mesh.traverse(n => n.geometry?.dispose());
+  }
+  const inWrap = p => { const poly = polyAt(wrapR, p.x); return !!poly && insidePoly(poly, Math.abs(p.z), p.y); };
+  for (const part of G.parts) {
+    const ok = [0, 30, 60, 90, c.elev].every(a => {
+      const r = THREE.MathUtils.degToRad(a);
+      return part.pts.every(q => {
+        const p = q.clone().applyAxisAngle(V3(0, 0, 1), r).add(V3(xp, yp, 0));
+        return Math.abs(p.z) <= G.sw + 0.05 || inWrap(p) || inside(st, p);
+      });
+    });
+    if (!ok) fails.push(part.name);
   }
 
-  // barrels + mount (the carousel moves the mount forward to make room for its magazine)
-  const mx = c.layout === 'carousel' ? L * 0.14 : -L * 0.08;
-  if (c.layout === 'carousel') {
-    const mag = buildMagazine(c, M);
-    const xm = -L / 2 + mag.userData.R + 0.4;
-    mag.position.set(xm, chassisY + body.topAt(xm), 0);
-    g.add(mag);
-  }
-  const baseY = chassisY + body.topAt(mx);
-  const barrels = buildBarrels(c, M);
-  const lb = new THREE.Box3().setFromObject(barrels);
-  const lift = -lb.min.y + 1.2;
-  const zs = [];
-  barrels.children.forEach(ch => { if (ch.isGroup) zs.push(ch.position.z); });
-  const mount = buildMount(c, M, baseY, mx, barrels.userData.halfW, lift, zs.length ? zs : [0]);
-  g.add(mount.group);
-  barrels.position.set(mx, mount.pivotY, 0);
-  barrels.rotation.z = THREE.MathUtils.degToRad(c.elev);
-  g.add(barrels);
-
-  g.userData = { overallW, overallL: L + 7, chassisY, led: c.led, underglow: c.underglow, glow: c.glow };
+  const hullW = 2 * Math.max(...st.map(s => s.zm));
+  g.userData = {
+    led: c.led, underglow: c.underglow, glow: c.glow,
+    overallL: st[0].x - st[st.length - 1].x, overallW: hullW, height: Math.max(yT, yp + G.top0),
+    footL: st[0].x - st[st.length - 1].x, footW: hullW, fails,
+    air: G.drum ? `1 chamber, ${G.drum.N}-shot drum` : `${G.qevs.length} × 0.94 L chamber${G.qevs.length > 1 ? 's' : ''}`,
+  };
   return g;
+}
+
+// Internal systems. Each part returns sample points for the fit check and (in x-ray) a mesh.
+function internals(c, M, st, xp, yp, G, gun) {
+  const parts = [];
+  const boxPts = (x0, y0, z0, x1, y1, z1) => { const p = []; for (const x of [x0, x1]) for (const y of [y0, y1]) for (const z of [z0, z1]) p.push(V3(x, y, z)); return p; };
+  const addBox = (name, x0, y0, z0, x1, y1, z1, mat) => parts.push({ name, pts: boxPts(x0, y0, z0, x1, y1, z1), mesh: box(x1 - x0, y1 - y0, z1 - z0, mat, (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2) });
+  const ring = (axis, cx, cy, cz, r, n = 10) => Array.from({ length: n }, (_, i) => {
+    const a = (i / n) * Math.PI * 2, u = r * Math.cos(a), v = r * Math.sin(a);
+    return axis === 'z' ? V3(cx + u, cy + v, cz) : axis === 'x' ? V3(cx, cy + u, cz + v) : V3(cx + u, cy, cz + v);
+  });
+
+  // drive: Toughbox Mini + CIM at each corner, frame rails, belly pan
+  const frame = new THREE.Group();
+  for (const sz of [-1, 1]) frame.add(box(27.5, 1, 1, M.alu, -0.4, 1.7, sz * 8.6));
+  for (const x of [13.2, -14.0, 0]) frame.add(box(1, 1, 18.2, M.alu, x, 1.7, 0));
+  frame.add(box(27, 0.12, 16.2, M.dark, -0.4, 2.24, 0));
+  parts.push({ name: 'Frame', pts: boxPts(-14.5, 1.2, -9.1, 13.7, 2.3, 9.1), mesh: frame });
+  for (const sx of [1, -1]) for (const sz of [1, -1]) {
+    const ax = sx * PK.axleX;
+    addBox('Gearbox', ax - 1.75, 2.6, sz * 6.7, ax + 1.75, 7.0, sz * 9.3, M.motor);
+    const cx = ax - sx * 1.6, z0 = sz * 2.4, z1 = sz * 6.7;
+    parts.push({ name: 'CIM', pts: [...ring('z', cx, 5.8, z0, 1.25), ...ring('z', cx, 5.8, z1, 1.25)], mesh: cyl(1.25, 4.3, 'z', M.motor, cx, 5.8, (z0 + z1) / 2) });
+  }
+  // power + air supply
+  addBox('Battery', -1, 2.3, -8.2, 6.1, 8.9, -5.2, M.batt);
+  const comp = new THREE.Group();
+  comp.add(box(9.6, 4.6, 5, M.comp, 1.8, 4.6, 5.5));
+  comp.add(cyl(1.7, 2.6, 'y', M.alu, 4.4, 8.1, 5.5, 20));
+  parts.push({ name: 'Compressor', pts: boxPts(-3, 2.3, 3, 6.6, 9.4, 8), mesh: comp });
+  addBox('Electronics', -2.5, 2.3, -3.2, 6, 3.9, 3.2, M.pcb);
+  const T = PK.tank, half = T.len / 2 - T.r;
+  const tank = new THREE.Group();
+  const cap = new THREE.CapsuleGeometry(T.r, T.len - 2 * T.r, 8, 24); cap.rotateX(Math.PI / 2);
+  tank.add(mesh(cap, M.tank, T.x, T.y, 0));
+  for (const z of [-5, 5]) tank.add(box(5, 1.2, 1.4, M.dark, T.x, T.y - T.r - 0.2, z));
+  parts.push({ name: 'Air tank', pts: [...ring('z', T.x, T.y, -half, T.r), ...ring('z', T.x, T.y, half, T.r), V3(T.x, T.y, -T.len / 2), V3(T.x, T.y, T.len / 2)], mesh: tank });
+  const man = new THREE.Group();
+  man.add(box(3, 1.4, 1.6, M.brass, -6.4, 10.2, 3.6));
+  man.add(box(1.4, 1.4, 1.4, M.brass, -6.4, 10.2, 1.8));
+  man.add(cyl(0.35, 1.0, 'y', M.steel, -5.6, 11.2, 3.6, 12));
+  parts.push({ name: 'Manifold', pts: boxPts(-7.9, 9.5, 1.1, -4.9, 11.7, 4.4), mesh: man });
+  addBox('Horn speaker', 10.6, 4.4, -2.1, 13.0, 8.2, 2.1, M.dark);
+
+  // air path: compressor -> tank -> fill valve/manifold -> up through the trunnion
+  if (c.xray) {
+    const air = new THREE.Group();
+    air.add(airLine([[4.4, 9.4, 5.5], [0, 11.0, 6.6], [-6.5, 11.0, 6.8], [-9.6, T.y + 1.5, 6.2]], M));
+    air.add(airLine([[-9.4, T.y + 1.8, 2.4], [-7.8, 10.8, 2.4], [-6.4, 10.2, 1.8]], M));
+    const hz = G.sw + 0.4;
+    air.add(airLine([[-4.9, 10.2, 3.6], [xp - 3, deckAt(st, xp - 3) - 0.8, Math.max(hz, 5)], [xp - 0.5, yp - 2.5, hz], [xp, yp, hz]], M));
+    parts.push({ name: 'Air lines', pts: [], mesh: air });
+  }
+
+  // elevation actuator: floor pivot to a lug under the gun
+  const lug = (G.drum ? V3(-0.8, G.block.yB + 0.4, 0) : V3(2.4, -G.coreTop + 0.6, 0)).applyAxisAngle(V3(0, 0, 1), gun.rotation.z).add(gun.position);
+  const base = V3(xp + 6.8, 4.6, 0), dir = V3().subVectors(lug, base), u = dir.clone().normalize();
+  const act = new THREE.Group(), bodyLen = Math.min(8.5, dir.length() - 0.6);
+  act.add(between(base, base.clone().addScaledVector(u, bodyLen), 0.95, M.dark));
+  act.add(between(base.clone().addScaledVector(u, bodyLen - 0.4), lug, 0.45, M.alu));
+  parts.push({ name: 'Actuator', pts: [base], mesh: act });
+  return parts;
 }
 
 function disposeTree(o) {
@@ -760,14 +835,15 @@ function disposeTree(o) {
     if (n.material) (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => m.dispose());
   });
 }
+const build = buildRobot;
 
-/* ---------- stage (scene + floor + decals) ---------- */
+/* ================= stage ================= */
 
 function makeStage() {
   const scene = new THREE.Scene();
-  scene.add(new THREE.HemisphereLight('#ffffff', '#3a3d44', 1.35));
-  const key = new THREE.DirectionalLight('#ffffff', 2.3); key.position.set(40, 70, 50); scene.add(key);
-  const rim = new THREE.DirectionalLight('#dfe6ff', 0.8); rim.position.set(-50, 30, -40); scene.add(rim);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#3a3d44', 1.25));
+  const key = new THREE.DirectionalLight('#ffffff', 2.4); key.position.set(30, 80, 45); scene.add(key);
+  const rim = new THREE.DirectionalLight('#dfe6ff', 0.9); rim.position.set(-50, 25, -40); scene.add(rim);
   const floor = new THREE.Mesh(new THREE.CircleGeometry(600, 72), new THREE.MeshBasicMaterial());
   floor.rotation.x = -Math.PI / 2; scene.add(floor);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shadowTex(), transparent: true, depthWrite: false }));
@@ -775,7 +851,6 @@ function makeStage() {
   const under = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: underTex(), transparent: true, depthWrite: false, toneMapped: false }));
   under.rotation.x = -Math.PI / 2; under.position.y = 0.04; scene.add(under);
   let robot = null, backdrop = null;
-
   function setBackdrop(kind) {
     if (kind === backdrop) return;
     backdrop = kind;
@@ -788,20 +863,20 @@ function makeStage() {
     if (robot) { scene.remove(robot); disposeTree(robot); }
     robot = r; scene.add(r);
     setBackdrop(cfg.backdrop);
-    const { overallW, overallL, led, underglow, glow } = r.userData;
-    shadow.scale.set(overallL * 1.5, overallW * 1.7, 1);
+    const { footL, footW, led, underglow, glow } = r.userData;
+    shadow.scale.set(footL * 1.4, footW * 1.6, 1);
     under.visible = underglow && glow > 0;
-    under.scale.set(overallL * 1.55, overallW * 1.75, 1);
+    under.scale.set(footL * 1.5, footW * 1.7, 1);
     under.material.color.set(led);
     const dark = cfg.backdrop !== 'light';
     under.material.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
-    under.material.opacity = (dark ? 0.85 : 0.35) * Math.min(glow, 1.3);
+    under.material.opacity = (dark ? 0.8 : 0.32) * Math.min(glow, 1.3) * (cfg.xray ? 0.5 : 1);
     under.material.needsUpdate = true;
   }
   return { scene, setRobot, get robot() { return robot; } };
 }
 
-// Exact perspective fit of the robot's (sampled) vertices from a fixed 3/4 front view.
+// Exact perspective fit of the robot's sampled vertices from a fixed 3/4 front view.
 function frame(camera, robot, controls, margin = 0.9) {
   robot.updateMatrixWorld(true);
   const pts = [];
@@ -833,11 +908,8 @@ function frame(camera, robot, controls, margin = 0.9) {
 function makeRenderer(opts = {}) {
   const r = new THREE.WebGLRenderer({ antialias: true, ...opts });
   r.toneMapping = THREE.NeutralToneMapping;
-  r.toneMappingExposure = 1.0;
   return r;
 }
-
-/* ---------- offscreen renders (thumbnails, PNG export) ---------- */
 
 const shot = (() => {
   const renderer = makeRenderer({ preserveDrawingBuffer: true });
@@ -847,44 +919,59 @@ const shot = (() => {
   return (cfg, w = 900, h = 600, type = 'image/jpeg') => {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    stage.setRobot(buildRobot(cfg), cfg);
-    frame(camera, stage.robot);
+    const r = build(cfg);
+    stage.setRobot(r, cfg);
+    frame(camera, r);
     renderer.render(stage.scene, camera);
-    return renderer.domElement.toDataURL(type, 0.9);
+    return { url: renderer.domElement.toDataURL(type, 0.9), info: r.userData };
   };
 })();
 
-/* ---------- grid ---------- */
+/* ================= persistence (per-viewer convenience) ================= */
+
+const STORE = 'mk5-concepts-v2';
+function loadStore() {
+  try { return JSON.parse(localStorage.getItem(STORE)) || { edits: {}, custom: [] }; }
+  catch { return { edits: {}, custom: [] }; }
+}
+function saveStore() { try { localStorage.setItem(STORE, JSON.stringify(store)); } catch {} }
+const store = loadStore();
+store.edits ||= {}; store.custom ||= [];
+const designs = () => [
+  ...PRESETS.map(p => ({ ...BASE, ...p, ...(store.edits[p.id] || {}) })),
+  ...store.custom.map(c => ({ ...BASE, ...c })),
+];
+
+/* ================= grid ================= */
 
 const gridEl = document.getElementById('grid');
 const cards = new Map();
+let gridX = false;
 function renderGrid() {
-  gridEl.innerHTML = '';
-  cards.clear();
+  gridEl.innerHTML = ''; cards.clear();
   const all = designs();
-  const groups = [...Object.keys(LAYOUTS), 'Yours'];
-  for (const cat of groups) {
-    const items = all.filter(d => (store.custom.some(c => c.id === d.id) ? 'Yours' : catOf(d.layout)) === cat);
+  for (const cat of [...Object.keys(LAYOUTS), 'yours']) {
+    const items = all.filter(d => (store.custom.some(c => c.id === d.id) ? 'yours' : d.layout) === cat);
     if (!items.length) continue;
     const sec = document.createElement('section');
-    sec.innerHTML = `<h2>${cat}</h2><div class="grid"></div>`;
-    const g = sec.querySelector('.grid');
+    sec.innerHTML = `<h2>${cat === 'yours' ? 'Yours' : LAYOUTS[cat]}${LAYOUT_NOTE[cat] ? ` <span>${LAYOUT_NOTE[cat]}</span>` : ''}</h2><div class="grid"></div>`;
     for (const d of items) {
       const b = document.createElement('button');
       b.className = 'card';
       b.innerHTML = `<div class="thumb"><img alt=""></div><div class="meta"><div class="n"></div><div class="d"></div></div>`;
-      fillCard(b, d);
       b.addEventListener('click', () => openViewer(d.id));
-      g.appendChild(b);
+      sec.querySelector('.grid').appendChild(b);
       cards.set(d.id, b);
+      fillCard(b, d);
     }
     gridEl.appendChild(sec);
   }
   queueThumbs(all.map(d => d.id));
 }
-function fillCard(b, d) {
-  b.querySelector('.n').innerHTML = `${escapeHtml(d.name)}${store.edits[d.id] ? '<i>edited</i>' : ''}`;
-  b.querySelector('.d').textContent = `${layoutName(d.layout)} · ${BODIES[d.body]} · ${MOUNTS[d.mount]}`;
+function fillCard(b, d, info) {
+  const fit = info ? (info.fails.length ? `<i class="bad">✗ ${info.fails[0]}</i>` : '<i class="ok">✓ fits</i>') : '';
+  b.querySelector('.n').innerHTML = `${escapeHtml(d.name)}${fit}`;
+  b.querySelector('.d').textContent = `${HULLS[d.hull]} · ${PODS[d.pod]} turret${info ? ` · ${info.overallW.toFixed(1)} in wide` : ''}`;
   b.querySelector('img').alt = `${d.name} concept render`;
 }
 const escapeHtml = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -897,18 +984,25 @@ function queueThumbs(ids) {
 function pumpThumbs() {
   const id = thumbQueue.shift();
   if (!id) { thumbBusy = false; document.body.dataset.thumbs = 'done'; return; }
-  thumbBusy = true;
-  const d = designs().find(x => x.id === id);
-  const card = cards.get(id);
+  thumbBusy = true; document.body.dataset.thumbs = 'busy';
+  const d = designs().find(x => x.id === id), card = cards.get(id);
   if (d && card) {
     const img = card.querySelector('img');
+    const { url, info } = shot({ ...d, xray: gridX });
     img.onload = () => { img.classList.add('on'); card.querySelector('.thumb').classList.add('ready'); };
-    img.src = shot(d);
+    img.src = url;
+    fillCard(card, d, info);
   }
   setTimeout(pumpThumbs, 0);
 }
+document.getElementById('gridMode').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  gridX = b.dataset.mode === 'xray';
+  document.querySelectorAll('#gridMode .chip').forEach(x => x.classList.toggle('on', x === b));
+  queueThumbs(designs().map(d => d.id));
+});
 
-/* ---------- viewer ---------- */
+/* ================= viewer ================= */
 
 const viewer = document.getElementById('viewer');
 const stageEl = document.getElementById('stage');
@@ -934,61 +1028,59 @@ function resize() {
 new ResizeObserver(resize).observe(stageEl);
 
 function rebuild(reframe = false) {
-  vStage.setRobot(buildRobot(cur), cur);
-  if (reframe) frame(vCam, vStage.robot, controls);
-  const u = vStage.robot.userData;
-  document.getElementById('readout').innerHTML = `Footprint <b>${u.overallL.toFixed(1)} × ${u.overallW.toFixed(1)} in</b>`;
-  document.getElementById('vtitle').innerHTML = `${escapeHtml(cur.name)}<span>${catOf(cur.layout)}</span>`;
+  const r = build(cur);
+  vStage.setRobot(r, cur);
+  if (reframe) frame(vCam, r, controls);
+  const u = r.userData;
+  const fit = u.fails.length ? `<span class="bad">Fit <b>✗ ${[...new Set(u.fails)].join(', ')}</b></span>` : `<span class="ok">Fit <b>✓ all systems</b></span>`;
+  const door = u.overallW <= 30 ? `<span class="ok">Door <b>✓ 32 in</b></span>` : `<span class="bad">Door <b>✗</b></span>`;
+  let html = `<span>Footprint <b>${u.overallL.toFixed(1)} × ${u.overallW.toFixed(1)} in</b></span><span>Height <b>${u.height.toFixed(1)} in</b></span>${door}${fit}<span>Air <b>${u.air} · 2.5 gal tank</b></span>`;
+  if (cur.xray) {
+    const key = [['Tank', '#cfd4dc'], ['Chambers', '#8f959e'], ['QEV', '#30343b'], ['Valves', '#c9a447'], ['Air', '#79b8ff'], ['Battery', '#3d434c'], ['Compressor', '#565c66'], ['Electronics', '#2e6b57'], ['Drive', '#7d858f']];
+    html += key.map(([k, col]) => `<span><i style="background:${col}"></i>${k}</span>`).join('');
+  }
+  document.getElementById('readout').innerHTML = html;
+  document.getElementById('vtitle').innerHTML = `${escapeHtml(cur.name)}<span>${LAYOUTS[cur.layout]}</span>`;
+  document.getElementById('xray').classList.toggle('on', !!cur.xray);
   draw();
 }
 
-function openViewer(id) {
+function openViewer(id, xray = false) {
   const d = designs().find(x => x.id === id);
   if (!d) return;
-  curId = id; cur = { ...d };
+  curId = id; cur = { ...d, xray };
   viewer.hidden = false;
   document.body.style.overflow = 'hidden';
-  buildPanel();
-  resize();
-  rebuild(true);
+  buildPanel(); resize(); rebuild(true);
 }
-function closeViewer() {
-  viewer.hidden = true; document.body.style.overflow = '';
-  stopSpin();
+function refreshCard() {
   if (cards.has(curId)) { fillCard(cards.get(curId), designs().find(x => x.id === curId)); queueThumbs([curId]); }
 }
+function closeViewer() { viewer.hidden = true; document.body.style.overflow = ''; stopSpin(); refreshCard(); }
 function step(dir) {
-  const ids = designs().map(d => d.id);
-  const i = ids.indexOf(curId);
-  persist();
-  if (cards.has(curId)) { fillCard(cards.get(curId), designs().find(x => x.id === curId)); queueThumbs([curId]); }
-  openViewer(ids[(i + dir + ids.length) % ids.length]);
+  const ids = designs().map(d => d.id), i = ids.indexOf(curId);
+  persist(); refreshCard();
+  openViewer(ids[(i + dir + ids.length) % ids.length], cur.xray);
 }
 
-const KEYS = Object.keys(BASE).concat(['name']);
+const KEYS = Object.keys(BASE).filter(k => k !== 'xray').concat(['name']);
+const pick = o => Object.fromEntries(KEYS.map(k => [k, o[k]]));
 function persist() {
   const custom = store.custom.find(c => c.id === curId);
   if (custom) { Object.assign(custom, pick(cur)); saveStore(); return; }
-  const preset = { ...BASE, ...PRESETS.find(p => p.id === curId) };
-  const diff = {};
+  const preset = { ...BASE, ...PRESETS.find(p => p.id === curId) }, diff = {};
   for (const k of KEYS) if (cur[k] !== preset[k]) diff[k] = cur[k];
   if (Object.keys(diff).length) store.edits[curId] = diff; else delete store.edits[curId];
   saveStore();
 }
-const pick = o => Object.fromEntries(KEYS.map(k => [k, o[k]]));
-
-function set(k, v, reframe = false) {
-  cur[k] = v;
-  persist();
-  rebuild(reframe);
-}
+function set(k, v, reframe = false) { cur[k] = v; if (k !== 'xray') persist(); rebuild(reframe); }
 
 const SLIDERS = [
-  ['L', 'Length', 24, 40, 0.5, 'in'], ['W', 'Width', 16, 24, 0.5, 'in'], ['H', 'Height', 7, 16, 0.5, 'in'],
-  ['barrelLen', 'Barrel', 18, 44, 1, 'in'], ['od', 'Bore', 2.5, 4.5, 0.25, 'in'],
-  ['elev', 'Elevation', 0, 90, 1, '°'], ['drumN', 'Chambers', 3, 10, 1, ''], ['glow', 'Glow', 0, 1.6, 0.05, '×'],
+  ['nose', 'Nose', 0, 1, 0.01, ''], ['flare', 'Flare', 0, 1, 0.01, ''], ['chine', 'Chine', 0, 1, 0.01, ''],
+  ['barrelLen', 'Barrel', 20, 34, 1, 'in'], ['elev', 'Elevation', 0, 90, 1, '°'], ['drumN', 'Drum', 5, 8, 1, ''],
+  ['glow', 'Glow', 0, 1.6, 0.05, '×'],
 ];
-const TOGGLES = [['sleeve', 'Clear sleeve'], ['underglow', 'Underglow'], ['bodyGlow', 'Panel glow'], ['rings', 'Barrel rings'], ['bumperStrip', 'Bumper strip'], ['skirts', 'Wheel skirts']];
+const TOGGLES = [['xray', 'X-ray'], ['band', 'Belt band'], ['skirtGlow', 'Skirt glow'], ['underglow', 'Underglow'], ['rings', 'Rings'], ['podBand', 'Slot glow']];
 
 function chips(label, opts, val, onPick) {
   const wrap = document.createElement('div'); wrap.className = 'grp';
@@ -1008,22 +1100,16 @@ function buildPanel() {
   const nameG = document.createElement('div'); nameG.className = 'grp';
   nameG.innerHTML = `<label for="name">Name</label><input id="name" maxlength="28">`;
   const nameIn = nameG.querySelector('input'); nameIn.value = cur.name;
-  nameIn.addEventListener('input', () => { cur.name = nameIn.value || 'Untitled'; persist(); document.getElementById('vtitle').innerHTML = `${escapeHtml(cur.name)}<span>${catOf(cur.layout)}</span>`; });
+  nameIn.addEventListener('input', () => { cur.name = nameIn.value || 'Untitled'; persist(); document.getElementById('vtitle').innerHTML = `${escapeHtml(cur.name)}<span>${LAYOUTS[cur.layout]}</span>`; });
   panel.appendChild(nameG);
-
-  const cat = catOf(cur.layout);
-  panel.appendChild(chips('Barrels', Object.fromEntries(Object.keys(LAYOUTS).map(k => [k, k])), cat, k => {
-    cur.layout = Object.keys(LAYOUTS[k])[0]; persist(); buildPanel(); rebuild(true);
-  }));
-  if (Object.keys(LAYOUTS[cat]).length > 1) panel.appendChild(chips('Layout', LAYOUTS[cat], cur.layout, k => { set('layout', k, true); buildPanel(); }));
-  panel.appendChild(chips('Body', BODIES, cur.body, k => set('body', k)));
-  panel.appendChild(chips('Mount', MOUNTS, cur.mount, k => set('mount', k)));
-  panel.appendChild(chips('Face', FACES, cur.face, k => set('face', k)));
+  panel.appendChild(chips('Barrels', LAYOUTS, cur.layout, k => { set('layout', k, true); buildPanel(); }));
+  panel.appendChild(chips('Hull', HULLS, cur.hull, k => set('hull', k, true)));
+  panel.appendChild(chips('Turret', PODS, cur.pod, k => set('pod', k)));
 
   const sg = document.createElement('div'); sg.className = 'grp';
   sg.innerHTML = `<div class="lbl">Shape</div>`;
   for (const [k, label, min, max, st, unit] of SLIDERS) {
-    if (k === 'drumN' && !isRevolving(cur.layout)) continue;
+    if (k === 'drumN' && cur.layout !== 'revolver') continue;
     const row = document.createElement('label'); row.className = 'slider';
     row.innerHTML = `<span>${label}</span><input type="range" min="${min}" max="${max}" step="${st}"><output></output>`;
     const inp = row.querySelector('input'), out = row.querySelector('output');
@@ -1035,10 +1121,10 @@ function buildPanel() {
   panel.appendChild(sg);
 
   const tg = document.createElement('div'); tg.className = 'grp';
-  tg.innerHTML = `<div class="lbl">Accents</div><div class="toggles"></div>`;
+  tg.innerHTML = `<div class="lbl">View & accents</div><div class="toggles"></div>`;
   for (const [k, label] of TOGGLES) {
     const row = document.createElement('label'); row.className = 'toggle';
-    row.innerHTML = `<input type="checkbox"><span>${label}</span>`;
+    row.innerHTML = `<input type="checkbox" data-k="${k}"><span>${label}</span>`;
     const inp = row.querySelector('input'); inp.checked = !!cur[k];
     inp.addEventListener('change', () => set(k, inp.checked));
     tg.querySelector('.toggles').appendChild(row);
@@ -1051,7 +1137,6 @@ function buildPanel() {
   col.addEventListener('input', () => set('led', col.value));
   cg.querySelector('#redReset').addEventListener('click', () => { col.value = RED; set('led', RED); });
   panel.appendChild(cg);
-
   panel.appendChild(chips('Backdrop', { dark: 'Dark', light: 'Light' }, cur.backdrop, k => set('backdrop', k)));
 
   const act = document.createElement('div'); act.className = 'grp';
@@ -1063,8 +1148,8 @@ function buildPanel() {
     </div>`;
   act.querySelector('#aPng').addEventListener('click', () => {
     const a = document.createElement('a');
-    a.href = shot(cur, 2400, 1600, 'image/png');
-    a.download = `mark5-${cur.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+    a.href = shot(cur, 2400, 1600, 'image/png').url;
+    a.download = `mark5-${cur.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}${cur.xray ? '-xray' : ''}.png`;
     a.click(); toast('PNG saved');
   });
   act.querySelector('#aJson').addEventListener('click', async () => {
@@ -1092,16 +1177,21 @@ function toast(msg) {
 
 let spinRaf = 0;
 function spinLoop() {
-  const a = 0.006, p = vCam.position.clone().sub(controls.target);
-  p.applyAxisAngle(V3(0, 1, 0), a);
+  const p = vCam.position.clone().sub(controls.target);
+  p.applyAxisAngle(V3(0, 1, 0), 0.006);
   vCam.position.copy(controls.target).add(p); controls.update();
   spinRaf = requestAnimationFrame(spinLoop);
 }
-function stopSpin() { spinning = false; cancelAnimationFrame(spinRaf); document.getElementById('spin').style.color = ''; }
+function stopSpin() { spinning = false; cancelAnimationFrame(spinRaf); document.getElementById('spin').classList.remove('on'); }
 document.getElementById('spin').addEventListener('click', () => {
   if (spinning) return stopSpin();
-  spinning = true; document.getElementById('spin').style.color = 'var(--red)'; spinLoop();
+  spinning = true; document.getElementById('spin').classList.add('on'); spinLoop();
 });
+function toggleXray() {
+  set('xray', !cur.xray);
+  const box = panel.querySelector('input[data-k="xray"]'); if (box) box.checked = cur.xray;
+}
+document.getElementById('xray').addEventListener('click', toggleXray);
 document.getElementById('home').addEventListener('click', () => { frame(vCam, vStage.robot, controls); draw(); });
 document.getElementById('close').addEventListener('click', closeViewer);
 document.getElementById('prev').addEventListener('click', () => step(-1));
@@ -1111,14 +1201,18 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') closeViewer();
   if (e.key === 'ArrowLeft') step(-1);
   if (e.key === 'ArrowRight') step(1);
+  if (e.key === 'x') toggleXray();
 });
 
 renderGrid();
 
-// hooks for batch export (used by the render script, harmless otherwise)
+// hooks for the batch export script (harmless otherwise)
 window.mk5 = {
-  designs, open: openViewer, THREE, buildRobot, makeStage, makeRenderer,
-  renderAll: (w = 1200, h = 800) => designs().map(d => ({ id: d.id, name: d.name, cat: catOf(d.layout), meta: `${layoutName(d.layout)} · ${BODIES[d.body]} · ${MOUNTS[d.mount]}`, url: shot(d, w, h) })),
+  designs, open: openViewer, THREE, build, makeStage, makeRenderer,
+  renderAll: (w = 1200, h = 800, xray = false) => designs().map(d => {
+    const { url, info } = shot({ ...d, xray }, w, h);
+    return { id: d.id, name: d.name, layout: d.layout, meta: `${LAYOUTS[d.layout]}${LAYOUT_NOTE[d.layout] ? ' ' + LAYOUT_NOTE[d.layout] : ''} · ${HULLS[d.hull]} · ${PODS[d.pod]} turret`, fails: info.fails, w: info.overallW, l: info.overallL, h: info.height, url };
+  }),
 };
 </script>
 </body>
