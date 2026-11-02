@@ -23,7 +23,10 @@ and checked to fit:
 LEDs are flat emissive textures (belt band, skirt glow, slot glow, rings, underglow decal):
 no lights, no bloom.
 
-- Open: `python3 -m http.server 8791` in this folder, then http://127.0.0.1:8791
+- Live: https://elmagoct.github.io/brophy-cannon-concepts/ (GitHub Pages, public repo
+  ElMagoCT/brophy-cannon-concepts, which holds only this folder). After committing changes
+  here, publish with `git subtree push --prefix docs/concepts concepts main` from the repo root.
+- Local: `python3 -m http.server 8791` in this folder, then http://127.0.0.1:8791
 - X-ray: the eye button in the viewer, `x` on the keyboard, or "X-ray" above the grid
 - Stills: `renders/01-spectre.jpg` … `renders/20-bulwark.jpg`, `renders/contact-sheet.jpg`,
   `renders/contact-sheet-xray.jpg`
