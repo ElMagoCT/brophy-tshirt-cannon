@@ -47,12 +47,12 @@ A reliable, good-looking, self-contained cannon that:
 | Subsystem | Status |
 |---|---|
 | Goals | Done — Google Doc (full text in Appendix A) |
-| Pneumatic architecture | Decided (Option A, 150 PSI) — parts not purchased |
-| Compressor | Candidate chosen, specs incomplete — not purchased |
+| Pneumatic architecture | Decided (Option A, 150 PSI); QEV size pending (3/4" Parker proposed, see Open questions) — parts not purchased |
+| Compressor | Closed 2026-11-01: ZHSYMX SQ420, 1.41 CFM free air, 100% duty @ 100 PSI (seller spec) — not purchased |
 | Sensors / ADC | Decided on paper |
 | Fog machine control | Interface planned (XLR remote jack) — pinout not yet measured |
 | Drive motors / control | Decided: FRC stash 12V motors on ESP32 PWM |
-| BOM | In `/bom/` (Micah's xlsx + CSV mirrors via `bom/xlsx_to_csv.py`). Pneumatics re-verification in progress |
+| BOM | In `/bom/` (Micah's xlsx + CSV mirrors via `bom/xlsx_to_csv.py`). Pneumatics + electronics re-verified live 2026-11-01: Tier A $1,213, A+B $2,283 (over the ceiling; cuts proposed in `docs/decisions.md`). Chassis/drive/aesthetics still Aug-2026 estimates |
 | Chassis | Not designed. Aluminum extrusion vs welded steel undecided |
 | Mecanum wheels | Want custom 3D printed. Not designed |
 | Elevation (0–90°) | Not designed |
@@ -77,14 +77,15 @@ A reliable, good-looking, self-contained cannon that:
 **Air supply**
 - Tank volume beats compressor CFM. A 12V compressor can't keep up with live firing; its job is recovery between volleys.
 - Reality check on the goals doc: "10 shots stored, refill 1 shot per 5 minutes" is backwards from what these pumps do. A ~2 CFM 12V compressor recovers roughly one shot every 30–60 seconds, indefinitely.
-- Candidate: **ZHSYMX 300 PSI ultra-quiet 12V, ~$128, Amazon ASIN B0D6ZYBT4T.** Confirmed: 69 dB, 300 PSI max, 20 A, 1/4" NPT outlet. **Unconfirmed: CFM, duty cycle, weight, dimensions.**
-- Pair the compressor with a Vixen tank kit (includes 170/200 PSI pressure switch + safety relief valve). Note the switch range vs the 150 PSI operating plan — see Open Questions.
+- Candidate: **ZHSYMX 300 PSI ultra-quiet 12V, ~$128, Amazon ASIN B0D6ZYBT4T.** Confirmed: 69 dB, 300 PSI max, 20 A, 1/4" NPT outlet. **Confirmed 2026-11-01 (seller spec chart): 1.41 CFM free air, 100% duty at 100 PSI, 242.7 × 127.9 × 181 mm; "300 PSI" is intermittent, 200 working. Weight still unlisted.**
+- Pair the compressor with a Vixen tank kit (includes 170/200 PSI pressure switch + safety relief valve). Note the switch range vs the 150 PSI operating plan — see Open Questions. *(2026-11-01: the Vixen kit didn't verify — a standalone Viair 91028 2.5 gal / 200 PSI tank is on the BOM instead; see `docs/decisions.md`.)*
 - Reference/benchmark pumps: Viair 400C / 444C (~$150–190, honest specs), HornBlasters HB-3Q (~$266, genuinely engineered quiet, published fill data).
 - Noise is solved at the system level, not by buying a premium pump: wide pressure-switch differential, remote/relocated intake, vibration isolation mounts (printed TPU is perfect), and pre-charging from a shop compressor before events.
 
 **Sensors & plumbing**
 - Stainless 0–300 PSI (tank) and 0–200 PSI (chambers) transducers, 0.5–4.5 V output, read through an **ADS1115 16-bit ADC** (ESP32's built-in ADC is too nonlinear).
 - Chamber side tubing: DOT nylon air-brake tubing, 1/4" OD (150 PSI working / 950 PSI burst), brass compression fittings.
+- (2026-11-01) Every chamber gets its own 150 PSI relief, bleed valve and gauge on a 2"×1/4" bushing service port: it is sealed behind its check valve and the QEV diaphragm, so the manifold relief and bleed can't reach it, and sun heating takes 150 PSIG to ~170. The tank → fill valve run is hard-plumbed brass; nylon only downstream of the fill valve. FRC stash pneumatics (~120–125 PSI rated) never go on the 150 side.
 
 **Electronics & drive**
 - **ESP32** is the brain. WebSocket control, no FRC control system ("no FRC nonsense").
@@ -100,7 +101,7 @@ A reliable, good-looking, self-contained cannon that:
 
 **Approach**
 - Off-the-shelf automotive / train-horn / air-ride pneumatics + custom 3D-printed everything-else.
-- Tiered BOM: Tier A minimum viable (~$900), Tier B recommended (~$1,700 total, ~$300 headroom), Tier C stretch / cut-first, Tier H FRC stash ($0).
+- Tiered BOM: Tier A minimum viable (~$900), Tier B recommended (~$1,700 total, ~$300 headroom), Tier C stretch / cut-first, Tier H FRC stash ($0). *(Verified 2026-11-01: Tier A $1,213.35 now includes one complete barrel; A+B $2,282.56.)*
 - Safety redundancy: hardware relief valves and caps in addition to software limits.
 
 ---
@@ -134,6 +135,8 @@ A reliable, good-looking, self-contained cannon that:
 3. **Re-verify every BOM line live**: in stock, current price, link, date checked, NPT confirmed. Hunt for cheaper substitutes, especially printable ones. Flag anything that changed.
 4. **Close the compressor question**: find CFM and duty cycle for the ZHSYMX (Amazon Q&A, seller, reviews, YouTube tests, sister listings of the same OEM pump). If you can't, compare against a Viair 400C/444C or a well-reviewed 480C clone and recommend.
 5. **Verify 1" NPT QEVs** that are actually in stock, rated ≥150 PSI, with real NPT threads.
+
+   *Steps 1–5 done 2026-11-01 (see `docs/decisions.md`). Before firmware: Micah's calls on the QEV size, pressure-switch scheme and budget cuts.*
 6. **Firmware skeleton** (PlatformIO, ESP32): WiFi AP mode, WebSocket server, serve the dashboard from flash, ADS1115 pressure reads, LEDC PWM drive outputs, a fire sequence state machine (meter → hold → arm → fire → vent), and a software pressure cap. Boot target < 3 s.
 7. **Dashboard v0**: drive controls with remappable keyboard/HID/gamepad bindings, per-tank pressure, battery, fire buttons, arm switch.
 8. **Then** the open subsystems: chassis, printed mecanum, elevation, LEDs, horn, video, fog. Propose clever, cheap options for each with live-verified parts.
@@ -145,13 +148,16 @@ A reliable, good-looking, self-contained cannon that:
 - **Chassis**: aluminum extrusion (T-slot accessorizing) vs welded steel? (Micah) — you can propose a hybrid, e.g. welded steel base with T-slot uprights.
 - **Barrel layout**: goals listed triple barrel / magazine / rotary / revolver. Pneumatics were designed for 3 fixed barrels. Confirm triple barrel is final. (Micah)
 - **Mecanum on grass/gravel**: mecanum is weak on soft and loose terrain; this was flagged in the BOM notes. Is gym + turf enough, or does it need a different drive? Custom printed mecanum with TPU rollers is the stated preference. (Micah, with your analysis)
-- **Pressure switch mismatch**: Vixen kit switch is 170/200 PSI but the plan is 150 PSI operating. Decide: lower-range switch, regulator between tank and fill side, or software-controlled compressor relay. (You propose, Micah decides)
+- **QEV size**: no 1" QEV is in stock, affordable, ≥150 PSI and NPT on all three ports (ROSS $486 backordered, AIGNEP $256, Mead quote-only). Proposed: Parker 0R75B 3/4" NPTF ($101–125, in stock); likely flows at least as well as those 1" valves (inferred). (Micah)
+- **Pressure switch mismatch**: Vixen kit switch is 170/200 PSI but the plan is 150 PSI operating. Decide: lower-range switch, regulator between tank and fill side, or software-controlled compressor relay. (You propose, Micah decides) — **Proposed 2026-11-01:** ESP32 relay off the tank transducer (quiet mode), a $23 120/150 switch in series with the relay coil as backstop, 165 PSI tank relief.
+- **Budget**: verified A+B is $2,282.56, $282.56 over the ceiling. Proposed cuts in `docs/decisions.md` (horn valves, stash wire/aluminum, printed rollers/brackets) bring it to ~$1,970. (Micah)
+- **Fittings**: DOT push-to-connect instead of the settled brass compression (same price, DOT-rated 250 PSI, easier service; the compression listing didn't confirm nylon-tube inserts). (Micah can veto)
 - **Which FRC stash motors** exactly (CIM? mini-CIM? 775?), which motor controllers, and how many? `[UNKNOWN]` (Micah)
-- **Which ESP32 variant**? An S3 gives native USB. Video livefeed may need a separate ESP32-CAM or a cheap USB camera + another board. `[UNKNOWN]` (You propose)
+- **Which ESP32 variant**? An S3 gives native USB. Video livefeed may need a separate ESP32-CAM or a cheap USB camera + another board. `[UNKNOWN]` (You propose) — **Proposed:** ESP32-S3-DevKitC-1-N8R8; video on a Pi Zero 2 W so it can't delay fire commands.
 - **Which fog machine model** Micah owns, and its measured XLR pinout. `[UNKNOWN]` (Micah)
 - **What's salvageable from Mark 4** (tanks, valves, barrels, battery)? `[UNKNOWN]` (Micah)
 - **Turret** (nice-to-have) and **cooling system** (purpose unclear: compressor cooling? electronics in heat?) `[UNKNOWN]` (Micah)
-- **Tank count/size**: architecture assumes a ~3-gallon reservoir; final tank not chosen.
+- **Tank count/size**: architecture assumes a ~3-gallon reservoir; final tank not chosen. — **2026-11-01:** Viair 91028 2.5 gal / 200 PSI on the BOM; second tank moved to Tier C (the three charged chambers are the burst).
 
 ---
 

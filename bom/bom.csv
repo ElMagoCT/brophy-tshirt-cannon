@@ -1,78 +1,108 @@
 Brophy T-Shirt Cannon - Mark 5 - Parts List (cheapest-path build)
-"TIER A = minimum viable cannon (drives, holds pressure, fires one variable-power shot). TIER B = recommended, gets you to the goals doc. TIER C = stretch / cut first. TIER H = already in the stash, $0."
-"All prices are Aug-2026 ballpark estimates for planning only - re-check before ordering. Edit only the yellow cells (Qty, Unit $). Everything else is a formula."
+"TIER A = minimum viable cannon (drives, holds pressure, fires one variable-power shot from ONE complete barrel). TIER B = recommended: barrels 2 and 3 plus the goals-doc extras. TIER C = stretch / cut first. TIER H = stash, $0."
+"Pneumatic and electronics lines re-verified live 2026-11-01: link, price, stock and thread for each. Chassis, drive and aesthetic lines are still Aug-2026 estimates and say so. Edit only the yellow cells (Qty, Unit $)."
+Verified from: page = read on the live listing; snippet = search-result price only; [UNVERIFIED] = could not be confirmed. Prices exclude tax and shipping.
 
-Item,Qty,Unit $,Line $,Tier,Where / spec,Notes
-AIR SYSTEM  -  the part that actually matters
-"12V compressor + 2.5 gal steel tank kit, 150 psi",1,110,110,A,Amazon/eBay 'onboard air 150 PSI 12V 2.5 gal',"Kit includes 120-150 psi pressure switch, 40A relay, 180 psi safety valve, drain cock, fittings. This is the whole 'self-sufficient air' goal for ~$110."
-"Second air tank, 2 gal, 150 psi rated",1,45,45,B,"Same sellers, 5-6 port 1/4 NPT",Doubles stored shots. See Design Notes for the shot-count math.
-"Firing chamber - 2in Sch 80 steel pipe nipple + 2 caps, ~1 L",1,30,30,A,Hardware store / McMaster,This is the secondary tank in your 'rapid actuator to secondary tank' idea. Steel or brass ONLY - never PVC.
-"1in QEV (quick exhaust valve), NPT",3,55,165,B,eBay / Amazon 'QEV 1 inch NPT',The fire valve. Opens in ~10 ms at full port - a 1in brass solenoid takes ~80 ms and chokes the shot. One QEV per barrel = triple shot. Drop to Qty 1 to save ~$110.
-1/4in 3-way 12V pilot solenoid (drives each QEV),3,20,60,B,'4V210-08' or '3V1-06' 12VDC,"Tiny valve, tiny current. Qty must match QEV qty."
-1/4in 2-way 12V fast solenoid (chamber fill valve),1,22,22,A,"Direct-acting, 12VDC, 150 psi rated","Meters reservoir -> firing chamber. Closed-loop against the transducer = your variable pressure, for $22 instead of $250 for a proportional regulator."
-"Pressure transducer 0-150 psi, 1/8 NPT, 0.5-4.5V",3,15,45,A,Automotive oil-pressure sender style,One per tank + one on the firing chamber. Feeds the dashboard AND the variable-pressure loop. Ratiometric 0.5-4.5V needs a divider into the ESP32 ADC.
-"Adjustable pressure relief valve, 150 psi, brass",1,18,18,A,1/4 or 1/2 NPT,"NON-NEGOTIABLE, in addition to the one in the compressor kit. One on the reservoir, one on the firing chamber."
-"Mechanical pressure gauge, 0-200 psi",2,9,18,A,"2in face, 1/4 NPT bottom mount",A gauge you can read with the power off. Do not trust the dashboard alone.
-"Manual bleed/dump ball valve, 1/4 NPT",1,12,12,A,"Brass, lever handle",Depressurize before anyone touches the barrel. Put it somewhere you can reach without opening a panel.
-"Check valve, 1/4 NPT brass",2,8,16,A,,"Compressor to reservoir, reservoir to chamber."
-"Brass fittings, nipples, tees, bushings (1/4 to 1in NPT)",1,75,75,A,"Hardware store, buy a bin","Always the sleeper cost on a pneumatics build. Budget high, return what you don't use."
-3/8in DOT air line + push-to-connect fittings,1,30,30,A,20 ft roll
-PTFE tape + pipe thread sealant,1,8,8,A,,"Sealant on tapered NPT, not just tape."
-LAUNCHER / BARREL
-"2.5in ID aluminum tube, 24in",3,22,66,B,Local metal supply or online cutoffs,"Aluminum, not PVC and not acrylic. Qty matches barrel count."
-"3in OD clear polycarbonate tube, 24in (cosmetic sleeve)",1,45,45,C,TAP Plastics / online,"Gets you the 'clear tube' look. Polycarbonate, NOT acrylic - acrylic shatters into shards. Non-structural sleeve outside the aluminum barrel."
-Breech / barrel-to-valve adapter stock (aluminum billet),1,40,40,A,Your own CNC,You have the CNC and waterjet - make these instead of buying reducers.
+Item,Qty,Unit $,Line $,Tier,Where / spec,Notes,Link,Stock (checked),Thread / rating,Verified from
+"AIR SUPPLY  -  compressor, tank, tank-zone safety"
+"Compressor, ZHSYMX SQ420 12V ultra-quiet (69 dB, 20 A)",1,127.99,127.99,A,Amazon B0D6ZYBT4T (sold by ZHSYMX),"CLOSED: 1.41 CFM free air (40 LPM) and 100% duty at 100 PSI, from the seller's own spec chart (no temperature given). '300 PSI' is the intermittent max; 200 working. 242.7 x 127.9 x 181 mm; weight not listed. In the box: braided leader hose with inline check valve, remote intake filter, vibration isolators. No switch or relay. Est. ~25-30 s to replace one 0.91 L chamber at 120 PSI. Honest-spec upgrade: Viair 444C $215.80.",https://www.amazon.com/dp/B0D6ZYBT4T,Only 19 left (2026-11-01),1/4in NPT male outlet,page
+"Air tank, Viair 91028 2.5 gal steel, 200 PSI rated",1,99.99,99.99,A,Summit Racing VAR-91028,"Six 1/4in NPT ports; 23.5 x 6 x 7.5 in; ~14 lb (snippet). Rated 200 so a 165 relief and 150 cut-out have margin. Replaces the $110 compressor+tank kit line: no kit had the right switch, a relief and a verified 200-PSI tank. A snippet says Viair discontinued it - buy while Summit still ships.",https://www.summitracing.com/parts/var-91028,Ships today (2026-11-01),six 1/4 in. NPT ports; 200 PSI,page
+"Pressure switch 120/150 PSI, FridayParts VXA7150L (hardware backstop)",1,23.09,23.09,A,FridayParts,"PROPOSED (Micah decides): the ESP32 runs the compressor relay from the tank transducer (enables a quiet mode); this switch is wired in series with the relay coil so the tank still stops at 150 if the software hangs. Switches the relay coil only, so the unlisted amp rating does not matter.",https://www.fridayparts.com/12v-120-150-psi-air-pressure-control-switch-vxa7150l-1-4-npt,In stock (2026-11-01),1/4in NPT; 120 on / 150 off,page
+"Tank relief valve, Conrader AS250165 165 PSI",1,6.95,6.95,A,Compressor Source,Tank zone. Above the 150 cut-out so it does not weep at the top of every fill; well under the 200 tank rating.,https://compressor-source.com/products/165-psi-1-4-male-npt-air-compressor-pressure-relief-safety-pop-off-valve-solid-brass,Available (2026-11-01),1/4in male NPT; 165 PSI; UV/NB stamped,page
+"Tank drain / bleed ball valve, BV-02-FF",1,5.29,5.29,A,Compressor Source,The Viair tank has no dedicated drain: use a bottom port. Doubles as the tank bleed.,https://compressor-source.com/products/1-4-female-female-npt-brass-ball-valve-water-moisture-air-tank-drain-shut-off,12 in stock (2026-11-01),1/4in female NPT both ends; 200 PSI,page
+"Tank gauge 0-200 PSI, 2B200",1,5.95,5.95,A,Compressor Source,Readable with the power off.,https://compressor-source.com/products/1-4-0-200-psi-air-pressure-gauge-center-back-mount-with-2-face,28 in stock (2026-11-01),1/4in male NPT center back,page
+"Tank fill valve (Schrader), Milton S-684-4W",1,7.04,7.04,A,Milton Industries,Pre-charge from a shop compressor before events so the onboard pump only does recovery.,https://miltonindustries.com/products/1-4-mnpt-male-tank-valve,Not stated,1/4in MNPT; 200 PSI,page
+"FILL + SENSING  -  metering valve, manifold, transducers"
+"Fill / metering valve, HornBlasters VA-4 12V NC",1,34.99,34.99,A,HornBlasters,"Meters tank -> manifold, closed-loop on the manifold transducer. Hard-plumbed to the tank in brass (no nylon on the high side). Same SKU as the dump valves. Direct vs pilot is not stated; fallback if it meters badly: Aignep 02F 2/2 direct-acting 1/4in NPTF, $62.04. No verified 200-PSI direct-acting valve exists at the planned $22.",https://www.hornblasters.com/products/hornblasters-brass-1-4-electric-air-valve,"Add to Cart, no stock count shown (2026-11-01)",1/4in NPT female both ports; 210 PSI; 2.5 mm orifice,page
+"Manifold relief valve, Conrader AS250150 150 PSI",1,6.95,6.95,A,Compressor Source,Manifold zone: catches a stuck-open fill valve.,https://compressor-source.com/products/150-psi-1-4-male-npt-air-compressor-pressure-relief-safety-pop-off-valve-solid-brass,23 in stock (2026-11-01),1/4in male NPT; 150 PSI +/-3%; UV/NB stamped,page
+"Pressure transducer 0-300 PSI, 5V 0.5-4.5V (tank)",1,15.58,15.58,A,eBay autopro-supply123,"316 stainless, +/-1% FS. Check the wire colours before powering up (a buyer burned out a sensor following listing wiring).",https://www.ebay.com/itm/146278584626,22 available (2026-11-01),1/8in-27 NPT,page
+"Pressure transducer 0-200 PSI, 5V 0.5-4.5V (manifold / chambers)",1,15.2,15.2,A,eBay speedreplace,"After a fill, chamber pressure = manifold pressure minus the check valve's cracking pressure.",https://www.ebay.com/itm/366075104018,21 available (2026-11-01),1/8in-27 NPT,page
+ADS1115 16-bit ADC breakout,1,14.95,14.95,A,Adafruit 1085,"Genuine board. A 5-pack of clones is $17.45 ($3.49 each, eBay snippet only).",https://www.adafruit.com/product/1085,In stock (2026-11-01),I2C,page
+"FIRING CHAIN  -  per barrel (Tier A = barrel 1, Tier B = barrels 2-3)"
+"QEV, Parker 0R75B 3/4in NPTF (barrel 1)",1,101.16,101.16,A,General Industrial (Parker distributor),"PROPOSED change from the settled 1in QEV, waiting on Micah. No 1in all-NPT QEV is both in stock and affordable (ROSS 1868A6005 $486 backordered; AIGNEP 82650-16 $256, maybe 2-port; Mead 6QEV quote-only). The 0R75B is the largest in Parker's 0R line (series Cv 2.7-10 / 150-550 SCFM), so it likely flows at least as well as those 1in valves (ROSS Cv 7.2, Mead 4.12) - inferred, Parker doesn't publish Cv per model. Rated exactly 150 PSI: software caps chambers below that.",https://generalindustrial.com/itemdetail/0R75B,2 in stock (2026-11-01),3/4in female NPT (all 3 ports NPTF per Amazon); 150 PSI max,page
+"Dump valve, HornBlasters VA-4 12V NC (barrel 1)",1,34.99,34.99,A,HornBlasters,"Fires the QEV by venting its inlet. Close-couple it to the QEV inlet with a 1/4in nipple (no tubing): the smaller the dump volume, the faster the QEV snaps. Normally closed + check valve = cannot fire on power loss. Same SKU as the fill valve. Replaces the Vixen VXA7164 ($19.08, and it is a horn-mount valve: 1/8in compression inlet).",https://www.hornblasters.com/products/hornblasters-brass-1-4-electric-air-valve,"Add to Cart, no stock count shown (2026-11-01)",1/4in NPT female both ports; 210 PSI; 2.5 mm orifice,page
+"Check valve, Midland 46510 brass (barrel 1)",1,22.48,22.48,A,AFT Fasteners,Manifold -> QEV inlet. Isolates the barrels so one dump does not vent the manifold or the other barrels.,https://www.aftfasteners.com/midland-industries-46510-high-pressure-check-valve-1-4-in-nominal-fip-x-fip-brass-body-import-qty-1,In stock (2026-11-01),1/4in FNPT x 1/4in FNPT; 1200 PSI,page
+"Chamber, 2in x 18in galvanized Sch 40 nipple (barrel 1)",1,26.11,26.11,A,SupplyHouse (Everflow PCGL2018),~0.91 L (2.067in ID = 55 mL per inch). 2in Sch 40 threaded is good for ~930 PSI. Galvanized for outdoor use. ,https://www.supplyhouse.com/Everflow-PCGL2018-2-x-18-Galvanized-Nipple,22 in stock (2026-11-01),2in NPT; Sch 40,page
+Chamber bushing 2in x 3/4in (QEV end) (barrel 1),1,10.74,10.74,A,Home Depot (Southland),Price is the verified 2in x 1in galvanized bushing; the 2in x 3/4in for the proposed QEV is [UNVERIFIED] (HD blocks fetching). Class 150 malleable iron: 300 PSI up to 150F - keep chambers out of direct sun.,https://www.homedepot.com/p/100587210,2x1 delivers tomorrow (2026-11-01); 2x3/4 [UNVERIFIED],2in MPT x 3/4in FPT,page (2x1) / [UNVERIFIED]
+"Chamber bushing 2in x 1/4in (service end, replaces the cap) (barrel 1)",1,10,10,A,Home Depot / Lowe's,"[UNVERIFIED] price - HD blocks fetching. Gives each chamber a 1/4in service port for its own relief, bleed and gauge.",,[UNVERIFIED],2in MPT x 1/4in FPT,[UNVERIFIED]
+"Close nipple 3/4in, galvanized (QEV to bushing) (barrel 1)",1,2.21,2.21,A,Home Depot (Southland),Verified price is the 1in close nipple; 3/4in is the same family [UNVERIFIED].,https://www.homedepot.com/p/304797397,"14 in store, Thomas Rd (2026-11-01)",NPT,page (1in)
+"Chamber relief valve, Conrader AS250150 150 PSI (barrel 1)",1,6.95,6.95,A,Compressor Source,"SAFETY: the chamber sits behind its check valve and the QEV diaphragm, so the manifold relief cannot protect it. A sun-baked chamber charged to 150 PSIG climbs to ~170 PSIG. Every pressure zone gets its own relief.",https://compressor-source.com/products/150-psi-1-4-male-npt-air-compressor-pressure-relief-safety-pop-off-valve-solid-brass,23 in stock (2026-11-01),1/4in male NPT; 150 PSI +/-3%; UV/NB stamped,page
+"Chamber bleed ball valve, BV-02-FF (barrel 1)",1,5.29,5.29,A,Compressor Source,"The manifold bleed cannot reach a chamber behind its check valve, so each chamber gets its own. Reachable without opening a panel.",https://compressor-source.com/products/1-4-female-female-npt-brass-ball-valve-water-moisture-air-tank-drain-shut-off,12 in stock (2026-11-01),1/4in female NPT both ends; 200 PSI,page
+"Chamber gauge 0-200 PSI, 2B200 (barrel 1)",1,5.95,5.95,A,Compressor Source,Read it with the power off before anyone touches the barrel.,https://compressor-source.com/products/1-4-0-200-psi-air-pressure-gauge-center-back-mount-with-2-face,28 in stock (2026-11-01),1/4in male NPT center back; 2in face,page
+"Barrel tube, 6061 3in OD x .125in wall, 24in (barrel 1)",1,43.22,43.22,A,Metals Depot (T3R3125),"2.75in bore for a rolled shirt. Aluminum, never PVC or acrylic.",https://www.metalsdepot.com/aluminum-products/aluminum-round-tube,IN STOCK (2026-11-01),n/a (not pressure-rated; downstream of the QEV),page
+"QEV, Parker 0R75B 3/4in NPTF (barrels 2-3)",2,124.95,249.9,B,Amazon (sold by Amazon),"Same valve as barrel 1. General Industrial only had 2 in stock, so price the extra two at Amazon; grab GI's second unit at $101.16 if it is still there.",https://www.amazon.com/dp/B003Q6CBHK,Only 14 left (2026-11-01),3/4in NPTF inlet x cylinder x exhaust; 3-150 PSI,page
+"Dump valve, HornBlasters VA-4 12V NC (barrels 2-3)",2,34.99,69.98,B,HornBlasters,"Fires the QEV by venting its inlet. Close-couple it to the QEV inlet with a 1/4in nipple (no tubing): the smaller the dump volume, the faster the QEV snaps. Normally closed + check valve = cannot fire on power loss. Same SKU as the fill valve. Replaces the Vixen VXA7164 ($19.08, and it is a horn-mount valve: 1/8in compression inlet).",https://www.hornblasters.com/products/hornblasters-brass-1-4-electric-air-valve,"Add to Cart, no stock count shown (2026-11-01)",1/4in NPT female both ports; 210 PSI; 2.5 mm orifice,page
+"Check valve, Midland 46510 brass (barrels 2-3)",2,22.48,44.96,B,AFT Fasteners,Manifold -> QEV inlet. Isolates the barrels so one dump does not vent the manifold or the other barrels.,https://www.aftfasteners.com/midland-industries-46510-high-pressure-check-valve-1-4-in-nominal-fip-x-fip-brass-body-import-qty-1,In stock (2026-11-01),1/4in FNPT x 1/4in FNPT; 1200 PSI,page
+"Chamber, 2in x 18in galvanized Sch 40 nipple (barrels 2-3)",2,23.34,46.68,B,SupplyHouse (Everflow PCGL2018),~0.91 L (2.067in ID = 55 mL per inch). 2in Sch 40 threaded is good for ~930 PSI. Galvanized for outdoor use. $23.34 each when bought as a 2-box.,https://www.supplyhouse.com/Everflow-PCGL2018-2-x-18-Galvanized-Nipple,22 in stock (2026-11-01),2in NPT; Sch 40,page
+Chamber bushing 2in x 3/4in (QEV end) (barrels 2-3),2,10.74,21.48,B,Home Depot (Southland),Price is the verified 2in x 1in galvanized bushing; the 2in x 3/4in for the proposed QEV is [UNVERIFIED] (HD blocks fetching). Class 150 malleable iron: 300 PSI up to 150F - keep chambers out of direct sun.,https://www.homedepot.com/p/100587210,2x1 delivers tomorrow (2026-11-01); 2x3/4 [UNVERIFIED],2in MPT x 3/4in FPT,page (2x1) / [UNVERIFIED]
+"Chamber bushing 2in x 1/4in (service end, replaces the cap) (barrels 2-3)",2,10,20,B,Home Depot / Lowe's,"[UNVERIFIED] price - HD blocks fetching. Gives each chamber a 1/4in service port for its own relief, bleed and gauge.",,[UNVERIFIED],2in MPT x 1/4in FPT,[UNVERIFIED]
+"Close nipple 3/4in, galvanized (QEV to bushing) (barrels 2-3)",2,2.21,4.42,B,Home Depot (Southland),Verified price is the 1in close nipple; 3/4in is the same family [UNVERIFIED].,https://www.homedepot.com/p/304797397,"14 in store, Thomas Rd (2026-11-01)",NPT,page (1in)
+"Chamber relief valve, Conrader AS250150 150 PSI (barrels 2-3)",2,6.95,13.9,B,Compressor Source,"SAFETY: the chamber sits behind its check valve and the QEV diaphragm, so the manifold relief cannot protect it. A sun-baked chamber charged to 150 PSIG climbs to ~170 PSIG. Every pressure zone gets its own relief.",https://compressor-source.com/products/150-psi-1-4-male-npt-air-compressor-pressure-relief-safety-pop-off-valve-solid-brass,23 in stock (2026-11-01),1/4in male NPT; 150 PSI +/-3%; UV/NB stamped,page
+"Chamber bleed ball valve, BV-02-FF (barrels 2-3)",2,5.29,10.58,B,Compressor Source,"The manifold bleed cannot reach a chamber behind its check valve, so each chamber gets its own. Reachable without opening a panel.",https://compressor-source.com/products/1-4-female-female-npt-brass-ball-valve-water-moisture-air-tank-drain-shut-off,12 in stock (2026-11-01),1/4in female NPT both ends; 200 PSI,page
+"Chamber gauge 0-200 PSI, 2B200 (barrels 2-3)",2,5.95,11.9,B,Compressor Source,Read it with the power off before anyone touches the barrel.,https://compressor-source.com/products/1-4-0-200-psi-air-pressure-gauge-center-back-mount-with-2-face,28 in stock (2026-11-01),1/4in male NPT center back; 2in face,page
+"Barrel tube, 6061 3in OD x .125in wall, 24in (barrels 2-3)",2,43.22,86.44,B,Metals Depot (T3R3125),"2.75in bore for a rolled shirt. Aluminum, never PVC or acrylic.",https://www.metalsdepot.com/aluminum-products/aluminum-round-tube,IN STOCK (2026-11-01),n/a (not pressure-rated; downstream of the QEV),page
+PLUMBING
+"DOT nylon air-brake tubing 1/4in OD, SAE J844, 50 ft",1,21.49,21.49,A,eBay Mytee,"Manifold and chamber side ONLY. It is rated 150 PSI working (1,200 burst) and nylon weakens when hot, so the tank side is hard-plumbed in brass.",https://www.ebay.com/itm/153495754001,>10 available (2026-11-01),1/4in OD; 0.040in wall; 150 PSI working,page
+"DOT push-to-connect 1/4in tube x 1/4in NPT, 10-pack (Boeray)",1,19.99,19.99,A,Amazon B0D8PX7Z94,"FLAG vs the settled 'brass compression': same $2/piece, DOT-rated, and the compression listing does not confirm nylon-tube inserts. Easier to service. Micah can veto.",https://www.amazon.com/dp/B0D8PX7Z94,In stock (2026-11-01),1/4in tube x 1/4in NPT; 250 PSI; FMVSS 571.106,page
+"Brass 1/4in NPT fitting kit, FloFlex 37-pc",1,42.99,42.99,A,Amazon B0D3FGYXVR,"Tees, street tees, elbows, 8 nipples, 1/4 x 1/8 bushings (for the transducers) and PTFE tape. Buying loose after the manifold is CAD'd is ~$25 (snippet prices).",https://www.amazon.com/dp/B0D3FGYXVR,Only 8 left (2026-11-01),1/4in NPT; 250 PSI,page
+"Pipe thread sealant, RectorSeal T Plus 2 (1.75 oz)",1,4.25,4.25,A,Home Depot,"Rated for compressed air. Sealant on tapered NPT, not just tape.",https://www.homedepot.com/p/100116773,46 in store (2026-11-01),n/a,page
+"Breech adapter stock (QEV exhaust -> barrel), aluminum billet",1,40,40,A,Your CNC,One billet makes all three adapters. Allowance: not re-verified. Not printed: it sits right behind the QEV.,,"Aug-2026 estimate, not re-verified",3/4in NPT tapped,estimate
+"DOT push-to-connect union tee, 2-pack (Boeray)",1,10.99,10.99,B,Amazon B0CFTZDWFS,Splits the manifold line to three barrels.,https://www.amazon.com/dp/B0CFTZDWFS,In stock (2026-11-01),1/4in tube x 3; 250 PSI,page
 "DRIVE  -  use the stash, spend nothing"
-Old 12V motors (CIM / Mini-CIM) + existing gearboxes,4,0,0,H,Mark 4 / FRC stash,"SEE DESIGN NOTES: use these, not Falcons. A 60 lb parade robot does not need 400W per corner."
-Existing PWM brushed ESCs (Victor 888 / Talon SR / SPARK),4,0,0,H,FRC stash,"ESP32 drives these directly with 1-2 ms servo PWM. No CAN, no library, no FRC anything."
-Falcon 500 (alternative to the above),4,0,0,H,FRC stash,"If you'd rather use Falcons: they accept plain 1-2 ms PWM on the same green/yellow leads, so the ESP32 still needs zero CAN. Cost is the Falcon-spline pinions below."
-BTS7960 43A H-bridge module (only if no ESCs in stash),4,9,36,C,Amazon/AliExpress,Fallback. Needs software current limiting - a CIM stalls at 130A+ and will smoke these.
-Falcon-spline pinion + gearbox adapter (only if using Falcons),4,18,72,C,VEXpro,"Old Toughboxes take a CIM shaft, not a Falcon spline. This is the hidden cost of the Falcon route."
-608ZZ bearings for mecanum rollers (bag of 20),3,12,36,B,Amazon,~10 rollers per wheel.
-"TPU filament for roller treads, 1 kg",1,28,28,B,,Print roller shells in TPU (95A) over printed cores. PLA rollers will not survive a gym floor.
-"PETG/ABS filament for wheel hubs, 1 kg",2,22,44,B,,Hubs and roller cores.
-"M4/M5 shoulder bolts, nyloc nuts, spacers for rollers",1,45,45,B,McMaster / bulk
-CHASSIS / BODY
-"1in x 1in x 0.065in mild steel square tube, 40 ft",1,90,90,A,"Local steel supply, Phoenix",Welded steel per the doc. Cheaper than 80/20 and you have the plasma cutter.
-"1/8in aluminum sheet, 24 x 48in (waterjet stock)",1,65,65,A,Local metal supply,"Motor plates, gussets, mounting brackets, panel frames."
-Bolt-on serviceability: weld-in threaded inserts / rivnuts,1,30,30,A,,"This is what keeps a welded chassis serviceable - every panel and every subassembly bolts to inserts, nothing is welded to a component."
-"1/8in frosted white acrylic, 24 x 48in",2,42,84,B,TAP Plastics Phoenix,Body panels only. Diffuses the LEDs nicely. Never in the air path.
-EVA foam / pool noodle + vinyl for bumpers,1,45,45,B,,White vinyl so the backlighting reads.
-"Fasteners, rivets, hinges, latches, misc hardware",1,60,60,A
-"Welding consumables (wire, gas, discs)",1,45,45,A
+Old 12V motors (CIM / Mini-CIM) + existing gearboxes,4,0,0,H,Mark 4 / FRC stash,"Use these, not Falcons. A 60 lb parade robot does not need 400 W per corner."
+Existing PWM brushed ESCs (Victor 888 / Talon SR / SPARK),4,0,0,H,FRC stash,ESP32 drives these directly with 1-2 ms servo PWM. No CAN.
+Falcon 500 (alternative to the above),4,0,0,H,FRC stash,Plain 1-2 ms PWM on the green/yellow leads. The cost is the Falcon-spline pinions below.
+BTS7960 43A H-bridge module (only if no ESCs in stash),4,9,36,C,Amazon/AliExpress,Needs software current limiting - a CIM stalls at 130A+.,,"Aug-2026 estimate, not re-verified",,estimate
+Falcon-spline pinion + gearbox adapter (only if using Falcons),4,18,72,C,VEXpro,Old Toughboxes take a CIM shaft.,,"Aug-2026 estimate, not re-verified",,estimate
+608ZZ bearings for mecanum rollers (bag of 20),3,12,36,B,Amazon,~10 rollers per wheel.,,"Aug-2026 estimate, not re-verified",,estimate
+"TPU 95A filament for roller treads, 1 kg",1,28,28,B,,"Rollers, bumper parts and vibration isolators.",,"Aug-2026 estimate, not re-verified",,estimate
+"PETG-CF / ASA filament for hubs and brackets, 1 kg",2,22,44,B,,No PLA on the robot: it creeps in Arizona heat.,,"Aug-2026 estimate, not re-verified",,estimate
+"M4/M5 shoulder bolts, nyloc nuts, spacers for rollers",1,45,45,B,McMaster / bulk,,,"Aug-2026 estimate, not re-verified",,estimate
+"CHASSIS / BODY  -  not designed yet, allowances"
+"1in x 1in x 0.065in mild steel square tube, 40 ft",1,90,90,A,"Local steel supply, Phoenix",ALLOWANCE: chassis not designed (welded steel vs extrusion still open).,,"Aug-2026 estimate, not re-verified",,estimate
+"1/8in aluminum sheet, 24 x 48in (waterjet stock)",1,65,65,A,Local metal supply,ALLOWANCE. Check the FRC stash for offcuts first.,,"Aug-2026 estimate, not re-verified",,estimate
+Rivnuts / weld-in threaded inserts,1,30,30,A,,Keeps a welded chassis serviceable.,,"Aug-2026 estimate, not re-verified",,estimate
+"Fasteners, rivets, hinges, latches, misc hardware",1,60,60,A,,"Print brackets, tank saddles and the valve/gauge panel instead of buying them.",,"Aug-2026 estimate, not re-verified",,estimate
+"Welding consumables (wire, gas, discs)",1,45,45,A,,,,"Aug-2026 estimate, not re-verified",,estimate
+"1/8in frosted white acrylic, 24 x 48in",2,42,84,B,TAP Plastics Phoenix,Body panels only. Never in the air path.,,"Aug-2026 estimate, not re-verified",,estimate
+EVA foam / pool noodle + white vinyl for bumpers,1,45,45,B,,,,"Aug-2026 estimate, not re-verified",,estimate
 ELEVATION / AIMING
-"12V linear actuator, 6in stroke, 200 lb, built-in limits",1,55,55,B,Amazon 'Progressive Automations style 12V actuator',"0-90 degrees for ~$55, self-locking so it holds angle with no power. Drive it with an H-bridge or two relays."
-Absolute angle sensor (AS5600 magnetic encoder board),1,8,8,C,,Only if you want the dashboard to show real elevation instead of dead reckoning.
-Turret rotation - lazy susan bearing + wiper motor,1,60,60,C,Salvage / Amazon,"You flagged this as 'might be doing too much'. It is. Cut it for Mark 5, leave the bolt pattern for Mark 6."
+"12V linear actuator, 6in stroke, 200 lb, built-in limits",1,55,55,B,Amazon,"Self-locking, holds angle with no power.",,"Aug-2026 estimate, not re-verified",,estimate
+AS5600 magnetic angle encoder board,1,8,8,C,,,,"Aug-2026 estimate, not re-verified",,estimate
+Turret rotation - lazy susan bearing + wiper motor,1,60,60,C,Salvage / Amazon,"Cut for Mark 5, leave the bolt pattern.",,"Aug-2026 estimate, not re-verified",,estimate
 ELECTRONICS / CONTROL
-ESP32-S3 dev board,2,9,18,A,DevKitC-1 or equivalent,Buy two - one spare that stays taped inside the robot.
-"12V -> 5V buck converter, 10A",1,14,14,A,,"Feeds ESP32, LEDs, Pi."
-"12V automotive relay + socket (solenoids, compressor, actuator)",8,3.5,28.0,A,40A SPDT,Cheaper and tougher than MOSFET boards for 1-2A solenoid coils. Flyback diode across every coil.
-Relay driver board / ULN2803 + protoboard,1,12,12,A,,ESP32 GPIO cannot drive a relay coil directly.
-"Mushroom-head E-stop, latching, 22 mm",1,14,14,A,,Wired to kill the fire and fill solenoids AND the drive enable. Not just a software flag.
+"ESP32-S3-DevKitC-1-N8R8 (8 MB flash, 8 MB PSRAM)",2,15,30,A,Mouser,Proposed variant: S3 for native USB. One spare taped inside the robot. DigiKey (0 stock) and Adafruit (sold out) were checked and excluded.,https://www.mouser.com/en/ProductDetail/Espressif-Systems/ESP32-S3-DevKitC-1-N8R8?qs=7D1LtPJG0i2PiuUUKucutQ%3D%3D,"1,830 in stock (snippet)",n/a,snippet
+"12V -> 5V buck converter (DFRobot 60W, adjustable)",1,9.9,9.9,A,DFRobot,"9-15V input; 18A only with active cooling. Check the 15V input ceiling against your charger; generic 10A unit ($10.83, Walmart snippet) as the alternative.",https://www.dfrobot.com/product-2662.html,Add to Cart (2026-11-01),n/a,page
+"12V 40A SPDT relays with sockets, 5-pack (compressor, fill, dump)",1,16.98,16.98,A,Parts Express 330-085,"Horn-valve coils pull several amps, so they get relays. Flyback diode across every coil.",https://www.parts-express.com/Waterproof-30-40A-12V-DC-5-Pin-SPDT-Relays-with-12-AWG-Power-Wire-Interlocking-Relay-Sockets-330-085,41 in stock (2026-11-01),40A NO at 14VDC; 12 AWG leads,page
+"12V 40A SPDT relays with sockets, 5-pack (dumps 2-3, actuator)",1,16.98,16.98,B,Parts Express 330-085,,https://www.parts-express.com/Waterproof-30-40A-12V-DC-5-Pin-SPDT-Relays-with-12-AWG-Power-Wire-Interlocking-Relay-Sockets-330-085,41 in stock (2026-11-01),,page
+ULN2803A Darlington driver (relay coils from 3.3V GPIO),1,3.84,3.84,A,DigiKey,Replaces the $12 driver board line; protoboard from the club stash. Add pull-downs so the dump relay cannot twitch at boot.,https://www.digikey.com/en/products/detail/stmicroelectronics/ULN2803A/599591,"76,298 in stock (2026-11-01)",DIP-18; 8 x 500 mA,page
+"Mushroom E-stop, latching, 22 mm, NC",1,12.17,12.17,A,Friday Parts,Wired to kill the fill and dump solenoids AND drive enable. Not just a software flag.,https://www.fridayparts.com/22mm-nc-n-c-red-mushroom-emergency-stop-push-button-switch-600v-10a-zb2-be102c-xb2-bs142,In stock (2026-11-01),1 NC; 10A,page
 Main breaker 120A + Anderson SB50 + 6 AWG lugs,1,0,0,H,FRC stash,Physical disconnect.
 12V SLA battery + charger,2,0,0,H,FRC stash,Two batteries so you can swap mid-event.
-"Blade fuse block, 6-circuit + fuses",1,18,18,A
-"Wire (10/14/18 AWG), lugs, heat shrink, loom, ferrules",1,70,70,A,,Buy more than you think.
-"SK6812/WS2812B LED strip, 5 m, IP65",2,20,40,B,60 LED/m,"Cannon, underglow, acrylic body, bumper foam. Level-shift the data line to 5V."
-1000 uF caps + 470 ohm data resistors for LED strips,1,8,8,B
-Raspberry Pi Zero 2 W + camera module + SD,1,38,38,B,,For the video livefeed. See Design Notes - do not put the camera on the ESP32.
-"12V PA horn speaker, 20-30W",1,22,22,B,,The 'speaker horn' goal.
-TDA7297 12V amp board + DFPlayer Mini + microSD,1,16,16,B,,"Tones, sirens, music, ESP32-controlled volume. Cheapest possible path to that whole bullet."
-40 mm 12V fans for Falcon cooling ports / electronics bay,4,5,20,C,,Your 'cooling system' bullet. Only needed if you go Falcons and run long.
-USB-C panel-mount pass-through (USB straight to robot),1,12,12,A,,Flush panel jack so nobody unplugs the dev board itself.
+6-way blade fuse block with cover + ATO fuse assortment,1,12.69,12.69,A,Del City ($5.70) + AutoZone Bussmann ($6.99),Both prices from search snippets.,https://www.delcity.net/store/fuses-fuse-accessories/blocks/ato-atc-blocks-6-way/raised-6-way/,[UNVERIFIED],ATO/ATC,snippet
+"Wire (10/14/18 AWG), lugs, heat shrink, loom, ferrules",1,70,70,A,,Check the FRC stash first: most of this is probably already in the shop.,,"Aug-2026 estimate, not re-verified",,estimate
+USB-C panel-mount extension (USB straight to robot),1,5.98,5.98,A,Parts Express 130-033,Flush panel jack so nobody unplugs the dev board itself. Far-end gender not stated; SparkFun 6in ($14.95) as backup.,https://www.parts-express.com/USB-C-Mountable-Extension-Cable-for-Power-Data-130-033,141 in stock (2026-11-01),17 mm M3 holes,page
+"SK6812/WS2812B LED strip, 5 m, IP65, 60 LED/m",2,20,40,B,,Level-shift the data line to 5V.,,"Aug-2026 estimate, not re-verified",,estimate
+1000 uF caps + 470 ohm data resistors for LED strips,1,8,8,B,,,,"Aug-2026 estimate, not re-verified",,estimate
+Raspberry Pi Zero 2 W + camera module + SD,1,38,38,B,,Video on its own board so it cannot delay a fire command.,,"Aug-2026 estimate, not re-verified",,estimate
+"12V PA horn speaker, 20-30W",1,22,22,B,,,,"Aug-2026 estimate, not re-verified",,estimate
+TDA7297 12V amp board + DFPlayer Mini + microSD,1,16,16,B,,,,"Aug-2026 estimate, not re-verified",,estimate
+40 mm 12V fans (electronics bay),4,5,20,C,,,,"Aug-2026 estimate, not re-verified",,estimate
 STRETCH / CUT FIRST
-Mini fog machine (400W) + 500W 12V inverter,1,85,85,C,,"WARNING: fog sets off gym smoke detectors. Check with facilities before this goes in a budget, let alone a gym. Also a ~40A draw on a battery that is also driving four motors."
-Magazine / revolver auto-indexing mechanism,1,120,120,C,,"Motor, index sensor, machined drum. Three fixed barrels does the same job for less money and far less that can jam."
+Fog trigger: Neutrik NC3FXX female XLR + opto relay module,1,15,15,C,,"Settled: use Micah's existing fog machine (3-pin XLR remote jack), not a new machine + inverter. Measure the pinout and pin voltages first. Fog can set off gym smoke detectors - clear it with facilities.",,"Aug-2026 estimate, not re-verified",,estimate
+Magazine / revolver auto-indexing mechanism,1,120,120,C,,Three fixed barrels does the same job with less to jam.,,"Aug-2026 estimate, not re-verified",,estimate
+"Second air tank, Viair 91028 2.5 gal 200 PSI",1,99.99,99.99,C,Summit Racing VAR-91028,"Moved from B: the old $45 150-PSI tank is not allowed under a 165 relief, and the three charged chambers already give you a three-shot burst.",https://www.summitracing.com/parts/var-91028,Ships today (2026-11-01),six 1/4 in. NPT ports; 200 PSI,page
+"3in OD clear polycarbonate tube, 24in (cosmetic sleeve)",1,45,45,C,TAP Plastics,"Polycarbonate, not acrylic. Non-structural sleeve outside the aluminum barrel.",,"Aug-2026 estimate, not re-verified",,estimate
 
-Tier A subtotal - minimum viable cannon,,,900.0
-Tier B subtotal - recommended additions,,,797
-Tier C subtotal - stretch / cut first,,,446
+Tier A subtotal - minimum viable cannon,,,1213.35
+Tier B subtotal - recommended additions,,,1069.21
+Tier C subtotal - stretch / cut first,,,475.99
 Already in the stash (Tier H),,,0
-RECOMMENDED BUILD (A + B),,,1697.0
-EVERYTHING (A + B + C),,,2143.0
+RECOMMENDED BUILD (A + B),,,2282.56
+EVERYTHING (A + B + C),,,2758.55
 
 Budget ceiling (stated),,,2000
-Headroom left on the recommended build,,,303.0
+Headroom left on the recommended build,,,-282.56
 
-"Assumptions: motors, ESCs, gearboxes, batteries, charger, main breaker and Anderson connectors come out of the FRC stash at $0 (per Micah). Prices are Aug-2026 planning estimates from retail listings, not quotes. Consumables (filament, welding gas, fasteners) assume nothing on hand. Labor, machine time and shipping are not included."
+"Assumptions: motors, ESCs, gearboxes, batteries, charger, main breaker and Anderson connectors come out of the FRC stash at $0 (per Micah). Consumables assume nothing on hand. Labor, machine time, tax and shipping are not included."
+"FRC stash pneumatics (Clippard tanks, Nason switches, 125 PSI reliefs, FRC tubing) are rated ~120-125 PSI: never mix them into the 150 PSI side."

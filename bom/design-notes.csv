@@ -29,3 +29,18 @@ Keeping a welded chassis serviceable
 
 Cut list if the budget gets tight
 "In order: fog machine, turret rotation, magazine/revolver mechanism, polycarbonate sleeve, angle encoder, cooling fans, second air tank, then drop from three barrels to one (saves roughly $220 across QEVs, pilots and barrel tube). Everything above that line is either structural, pneumatic or safety."
+
+Update 2026-11-01: compressor question closed
+"ZHSYMX SQ420: 1.41 CFM free air and 100% duty at 100 PSI, from the seller's spec chart (no temperature given). Flow at 100/150 PSI is unpublished; estimated ~0.8 / ~0.57 CFM, about 25% slower than a Viair 444C. Shot math with an 18in 2in chamber (0.91 L): a 120 PSI shot uses ~7.4 L of free air. The 2.5 gal tank going 150 -> 120 PSI refills ~2.6 chambers, so three charged chambers + the tank = ~5 full-power shots back to back, then one roughly every 25-30 s (estimate) for as long as the battery lasts. Tier A with one barrel: ~3-4 shots, then the same rate."
+
+Update 2026-11-01: per-barrel chambers supersede 'three QEVs off one shared chamber'
+"Option A (CLAUDE.md) gives each barrel its own check valve, chamber, QEV and dump valve. Chain per barrel: manifold -> check valve -> QEV inlet (dump valve tee'd right there) -> QEV -> chamber; QEV exhaust -> barrel. A 2-way normally-closed dump plus the check valve does what a 3-way pilot would, cannot fire on power loss, and keeps the dumped volume tiny so the QEV snaps open."
+
+"Update 2026-11-01: every pressure zone has its own relief, including each chamber"
+"Zones: tank (165 PSI relief, 120/150 switch), manifold (150 relief), and each chamber (150 relief, bleed valve, gauge). A chamber is sealed behind its check valve and the QEV diaphragm, so neither the manifold relief nor the manifold bleed can reach it. A chamber charged to 150 and parked in the sun reaches ~170 PSIG."
+
+"Update 2026-11-01: high side hard-plumbed, nylon only downstream"
+"SAE J844 nylon is rated 150 PSI working and weakens in heat. Tank -> fill valve is brass pipe; nylon DOT tubing only runs on the manifold/chamber side, which software caps below 150."
+
+Update 2026-11-01: 1in QEV not available - 3/4in Parker 0R75B proposed
+"Searched McMaster, Grainger, Zoro, AutomationDirect, Mead, Humphrey, Parker, Deltrol, Midwest Control, Pneumadyne, eBay and Amazon. The only 1in all-NPT QEVs are ROSS 1868A6005 ($486, backordered) and AIGNEP 82650-16 ($256, may be 2-port), and both are rated exactly 150 PSI. Most cheap '1 inch' QEVs are G/BSPP or do not state the thread. The Parker 0R75B is in stock at $101-125 with NPTF on all three ports. Micah decides."
