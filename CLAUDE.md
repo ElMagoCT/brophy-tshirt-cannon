@@ -23,7 +23,7 @@ You are the lead engineer on a high school robotics build. Think like the best h
 
 Mark 5 is a ground-up rebuild of Brophy College Prep's t-shirt cannon robot, built and operated by the Broncobots robotics club on behalf of student council for parades, games, and gym events. It's a three-barrel pneumatic cannon on a mecanum drive, controlled by an ESP32 over a WebSocket web UI so any laptop/phone can drive it with no special software.
 
-**Status:** Design phase. Pneumatic architecture is chosen (150 PSI, Option A). The "Glacis" body/chassis/drive/elevation design is fully modelled in `cad/glacis/` (CadQuery) and imported to Onshape ("Brophy Mark 5 - Glacis"); its parts list is the "Glacis BOM" tab ($2,102.30, 2026-11-02) and its decisions are in `docs/glacis/JUDGMENTS.md`, awaiting Micah's review. Nothing has been purchased or built. No firmware or dashboard code yet. Horn, video and fog are still goal-level only.
+**Status:** Design phase. Pneumatic architecture is chosen (150 PSI, Option A). The "Glacis" design (rev B, two barrels) is fully modelled in `cad/glacis/` (CadQuery) and imported to Onshape ("Brophy Mark 5 - Glacis"); its parts list is the "Glacis BOM" tab ($1,555.11, 2026-11-02) and its decisions are in `docs/glacis/JUDGMENTS.md`, awaiting Micah's review. Nothing has been purchased or built. No firmware or dashboard code yet. Horn, video and fog are still goal-level only.
 
 ---
 
@@ -49,15 +49,15 @@ A reliable, good-looking, self-contained cannon that:
 | Goals | Done — Google Doc (full text in Appendix A) |
 | Pneumatic architecture | Decided (Option A, 150 PSI); QEV size pending (3/4" Parker proposed, see Open questions) — parts not purchased |
 | Compressor | Closed 2026-11-01: ZHSYMX SQ420, 1.41 CFM free air, 100% duty @ 100 PSI (seller spec) — not purchased |
-| Sensors / ADC | Decided on paper |
+| Sensors / ADC | Glacis rev B proposal: four 0.5-4.5 V transducers (tank, fill, two chambers) and the arm-angle pot into the STM32 ADC; no dial gauges |
 | Fog machine control | Interface planned (XLR remote jack) — pinout not yet measured |
-| Drive motors / control | Decided: FRC stash 12V motors on ESP32 PWM |
+| Drive motors / control | Glacis rev B proposal: Falcon 500s on STM32 PWM through a safety-gated buffer; ESP32-S3 is the WiFi bridge only; ESP-NOW safety node + handheld remote |
 | BOM | In `/bom/` (Micah's xlsx + CSV mirrors via `bom/xlsx_to_csv.py`). Pneumatics + electronics re-verified live 2026-11-01: Tier A $1,213, A+B $2,283 (over the ceiling; cuts proposed in `docs/decisions.md`). Chassis/drive/aesthetics still Aug-2026 estimates |
-| Chassis | Glacis design (2026-11-02): 1x2/1x1 80/20 extrusion + 1/8 in plates, printed body frame, frosted acrylic. Awaiting Micah's review |
-| Mecanum wheels | Glacis design: 12 in printed, 16 rollers, Falcon two-stage belt 40:1. Not printed or tested |
-| Elevation (0–90°) | Glacis design: two STS3215 bus servos, 16T->56T 9 mm belt. Not built |
+| Chassis | Glacis rev B (2026-11-02): 1x2/1x1 x 1/16 aluminum box tube + 1/8 in gussets, printed body frame, recessed frosted acrylic with corner clips. Awaiting Micah's review |
+| Mecanum wheels | Glacis rev B: 10 in printed (14 rollers, aluminum side plates), Falcon one-stage belt 10:1 into the hub, 1/2 hex live axles. Not printed or tested |
+| Elevation (0–90°) | Glacis rev B: goBILDA 5203 99.5:1 on a Spark MAX, 16T->56T 9 mm belt, pot on the trunnion. Not built |
 | LEDs, horn, video, dashboard UI | Not designed |
-| Firmware | Not started |
+| Firmware | Not started (rev B splits it: STM32 main, ESP32 WiFi bridge, ESP32 safety node, ESP32 remote) |
 | CAD | `cad/glacis/` (CadQuery, checks clean) -> Onshape "Brophy Mark 5 - Glacis" (STEP import) |
 
 ---

@@ -1,16 +1,16 @@
-"""Body: frosted acrylic panels held in a printed frame that follows every panel edge.
+"""Body: frosted acrylic panels recessed into a printed frame that follows every panel edge.
 
 How the frame is made:
-1. The body is a polyhedron (side outline x/z extruded across the robot, minus the gun slot).
-2. The frame is that solid shelled inward by MEM_H, open at the bottom, with a "window"
-   cut through it wherever a panel shows (each panel inset by MEM_W). What stays is a
-   network of members along every panel edge and seam; their faces lie on the panel planes,
-   so every groove angle comes out right automatically.
-3. Each panel cuts its own groove (edge 8 mm deep, 2 mm lip in front) and an LED channel
-   behind its hidden edge, so the strip lights the frosted edge from behind.
-4. The network is split into printable pieces: a node block at every vertex and straight
-   segments of at most PRINT_MAX along each edge, joined by tapered mortise-and-tenon
-   joints with an M4 cross screw.
+1. The body is a polyhedron: the side outline (x/z) extruded across the robot, intersected with the
+   front-view trapezoid (side walls lean in by TUMBLE), minus the gun slot.
+2. The frame is that solid shelled inward by MEM_H, open at the bottom, with a "window" cut through
+   it wherever a panel shows (each panel inset by MEM_W). What stays is a network of members along every
+   panel edge; their faces lie on the panel planes.
+3. Each panel sits in a rebate REBATE_W wide and REBATE_D deep, CLIP_T below the outer face. A printed
+   clip in a flush pocket at every convex panel corner holds it (one M3 into a heat-set insert), so any
+   panel comes off with its clips. An LED slot right behind the panel lights its edge.
+4. The network is split into printable pieces: a node block at every vertex and straight segments of
+   at most PRINT_MAX along each edge, joined by tapered mortise-and-tenon joints with an M4 cross screw.
 """
 import math
 import cadquery as cq
@@ -22,11 +22,21 @@ EPS = 1e-6
 
 
 # ------------------------------------------------------------------ the body polyhedron
+def _tumble_prism(inset):
+    """Front-view trapezoid (walls leaning in by TUMBLE), inset perpendicular to the walls, extruded along x."""
+    t = math.tan(math.radians(P.TUMBLE))
+    y0 = P.Y_S - inset / math.cos(math.radians(P.TUMBLE))
+    z0, z1 = P.Z_WALL_BOT - 200.0, 1500.0
+    yb, yt = y0 + (P.Z_WALL_BOT - z0) * t, y0 - (z1 - P.Z_WALL_BOT) * t
+    pts = [(-yb, z0), (yb, z0), (yt, z1), (-yt, z1)]
+    return cq.Workplane("YZ", origin=(-2000, 0, 0)).polyline(pts).close().extrude(4000).val()
+
+
 def body_solid():
     pts = [(x, z) for x, z in P.SIDE_OUTLINE]
-    prism = (cq.Workplane("XZ", origin=(0, -P.Y_S, 0)).polyline(pts).close().extrude(-2 * P.Y_S)).val()
+    prism = (cq.Workplane("XZ", origin=(0, -P.Y_S - 200, 0)).polyline(pts).close().extrude(-2 * P.Y_S - 400)).val()
     slot = box(P.X_SLOT_REAR, 2000, -P.Y_SLOT, P.Y_SLOT, P.Z_SLOT_FLOOR, 3000)
-    return prism.cut(slot).clean()
+    return prism.intersect(_tumble_prism(0.0)).cut(slot).clean()
 
 
 def _offset_outline(pts, d, bottom_drop):
@@ -55,11 +65,10 @@ def _offset_outline(pts, d, bottom_drop):
 def inner_solid():
     """The body offset inward by MEM_H, open at the bottom (OCC's shell() output breaks booleans)."""
     ipts = _offset_outline(P.SIDE_OUTLINE, P.MEM_H, bottom_drop=40.0)
-    yi = P.Y_S - P.MEM_H
-    prism = (cq.Workplane("XZ", origin=(0, -yi, 0)).polyline(ipts).close().extrude(-2 * yi)).val()
+    prism = (cq.Workplane("XZ", origin=(0, -P.Y_S - 200, 0)).polyline(ipts).close().extrude(-2 * P.Y_S - 400)).val()
     g = P.MEM_H
     slot = box(P.X_SLOT_REAR, 2000, -P.Y_SLOT, P.Y_SLOT, P.Z_SLOT_FLOOR - g, 3000)
-    return prism.cut(slot).clean()
+    return prism.intersect(_tumble_prism(P.MEM_H)).cut(slot).clean()
 
 
 def face_info(solid):
@@ -120,16 +129,18 @@ def is_open_face(fi):
 
 
 def panels_for(fi):
-    """A body face as one panel, or two split at the tower line if it cannot fit one sheet."""
+    """A body face as one panel; the right side wall splits at SIDE_SPLIT_X (its rear panel is the
+    battery door) and anything bigger than one sheet splits once (deck along y = 0)."""
     n = fi["n"]
     if n.z < -0.99 or is_open_face(fi):
         return []
     poly = list(fi["verts"])
-    if _fits(poly, n):
+    right_wall = n.y < -0.9
+    if _fits(poly, n) and not right_wall:
         return [poly]
     out = []
     for sgn in (1, -1):
-        part = _clip3(poly, 0, P.TOWER_X, sgn) if abs(n.x) < 0.99 else _clip3(poly, 1, 0.0, sgn)
+        part = _clip3(poly, 0, P.SIDE_SPLIT_X, sgn) if abs(n.y) > 0.9 else _clip3(poly, 1, 0.0, sgn)
         if len(part) >= 3:
             out.append(part)
     assert all(_fits(p, n) for p in out), "panel still too big after one seam"
@@ -174,22 +185,6 @@ def slab(poly3, n, inset, depth0, thick):
     return wp.extrude(-thick).val()
 
 
-def _wall(p):
-    """Slot wall position and the direction from its surface into the body (away from the slot)."""
-    s = 1 if p["n"].y > 0 else -1
-    return -s * P.Y_SLOT, -s
-
-
-def ycyl(r, y0, y1, x=None, z=None):
-    lo, hi = min(y0, y1), max(y0, y1)
-    return cyl(r, hi - lo, (P.PIVOT[0] if x is None else x, lo, P.PIVOT[1] if z is None else z), (0, 1, 0))
-
-
-def xz_prism(pts, y0, y1):
-    lo, hi = min(y0, y1), max(y0, y1)
-    return cq.Workplane("XZ", origin=(0, lo, 0)).polyline(pts).close().extrude(-(hi - lo)).val()
-
-
 # ------------------------------------------------------------------ build
 def build(log=print):
     body = body_solid()
@@ -200,49 +195,58 @@ def build(log=print):
     panels = []
     for fi in face_info(body):
         for poly in panels_for(fi):
-            panels.append(dict(poly=poly, n=fi["n"], hole=None))
+            panels.append(dict(poly=poly, n=fi["n"]))
     log(f"{len(panels)} panels")
 
-    frame = shell
-    cuts = []
+    frame = shell.cut(union([slab(p["poly"], p["n"], P.MEM_W, -1.0, P.MEM_H + 2.0) for p in panels])).clean()
+    recess = []
     for p in panels:
-        w = slab(p["poly"], p["n"], P.MEM_W, -1.0, P.MEM_H + 2.0)
-        if p["hole"]:
-            w = w.cut(_ring_keep(p))
-        cuts.append(w)
-        if p["hole"]:
-            cuts.append(_hole_through(p))
-    frame = frame.cut(union(cuts)).clean()
-    grooves = []
-    for p in panels:
-        g = slab(p["poly"], p["n"], P.MEM_W - P.GROOVE_D, P.LIP, P.GROOVE_W)
-        # LED slot on the window edge: the strip stands on edge behind the groove and shines across
-        # the back of the panel (two flat channels met at every corner and cut the member in two)
-        led = slab(p["poly"], p["n"], P.MEM_W - P.LED_SLOT[0], P.LIP + P.GROOVE_W - 0.01, P.LED_SLOT[1])
-        if p["hole"]:
-            g = g.cut(_disc_region(p, P.DISC_HOLE_R + P.MEM_W - P.GROOVE_D))
-            led = led.cut(_disc_region(p, P.DISC_HOLE_R + P.MEM_W - P.LED_SLOT[0]))
-        grooves += [g, led]
-    frame = frame.cut(union(grooves)).clean()
-    log(f"frame network volume {frame.Volume() / 1e6:.2f} L")
+        recess.append(slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W, -1.0, P.REBATE_D + 1.0))
+        # LED slot on the window edge, right behind the panel: the strip stands on edge and lights its edge
+        recess.append(slab(p["poly"], p["n"], P.MEM_W - P.LED_SLOT[0], P.REBATE_D - 0.01, P.LED_SLOT[1]))
+        p["clips"] = corner_clips(p)
+        for c in p["clips"]:
+            recess += [c["pocket"], c["insert"]]
+    frame = frame.cut(union(recess)).clean()
+    log(f"frame network volume {frame.Volume() / 1e6:.2f} L, "
+        f"{sum(len(p['clips']) for p in panels)} corner clips")
     return body, frame, panels
 
 
-def _ring_keep(p):
-    """Material to keep around the slot-wall hole: annulus R..R+MEM_W through the shell depth."""
-    yw, out = _wall(p)
-    return ycyl(P.DISC_HOLE_R + P.MEM_W, yw - out * 2, yw + out * (P.MEM_H + 2)).cut(
-        ycyl(P.DISC_HOLE_R, yw - out * 3, yw + out * (P.MEM_H + 3)))
-
-
-def _hole_through(p):
-    yw, out = _wall(p)
-    return ycyl(P.DISC_HOLE_R, yw - out * 3, yw + out * (P.MEM_H + 3))
-
-
-def _disc_region(p, r):
-    yw, out = _wall(p)
-    return ycyl(r, yw - out * 20, yw + out * 40)
+def corner_clips(p, d_out=4.0):
+    """Printed clip in a flush pocket at every convex corner of the panel outline."""
+    n = p["n"]
+    pl, pts = _wp_on(p["poly"], n)
+    w = cq.Workplane(pl).polyline(pts).close().wires().val().offset2D(-(P.MEM_W - P.REBATE_W), "intersection")[0]
+    edges = [e for e in w.Edges()]
+    corners = []
+    for v in w.Vertices():
+        c = V(v.X, v.Y, v.Z)
+        adj = [e for e in edges if min((V(*x.toTuple()) - c).Length for x in (e.startPoint(), e.endPoint())) < 1e-3]
+        if len(adj) != 2:
+            continue
+        dirs = []
+        for e in adj:
+            a, b = V(*e.startPoint().toTuple()), V(*e.endPoint().toTuple())
+            o = b if (a - c).Length < 1e-3 else a
+            dirs.append((o - c).normalized())
+        bis = dirs[0] + dirs[1]
+        if bis.Length < 1e-6:
+            continue
+        bis = bis.normalized()
+        mid = c + bis * 3.0                           # convex corner: a point just inside lies in the panel
+        inside = slab(p["poly"], n, P.MEM_W - P.REBATE_W, 0.0, 1.0).isInside(mid - n * 0.5, 0.1)
+        if not inside:
+            continue
+        ctr = c - bis * d_out
+        disc = cyl(P.CLIP_R, P.CLIP_T, ctr.toTuple(), (n * -1).toTuple())
+        keep = slab(p["poly"], n, 4.0, 0.0, P.CLIP_T)
+        clip = disc.intersect(keep).cut(cyl(1.7, 10, (ctr + n).toTuple(), (n * -1).toTuple()))
+        pocket = cyl(P.CLIP_R + 0.2, P.CLIP_T + 1.0, (ctr + n).toTuple(), (n * -1).toTuple()).intersect(
+            slab(p["poly"], n, 3.8, -1.0, P.CLIP_T + 1.0))
+        insert = cyl(2.0, 6.0, (ctr - n * (P.CLIP_T - 0.1)).toTuple(), (n * -1).toTuple())
+        corners.append(dict(clip=clip, pocket=pocket, insert=insert))
+    return corners
 
 
 # ------------------------------------------------------------------ edges of the panel network
@@ -280,15 +284,26 @@ def edges_of(panels):
 
 
 def _inward_dir(panel, a, b):
-    """Unit vector in the panel plane, perpendicular to edge ab, pointing into the panel."""
+    """Unit vector in the panel plane, perpendicular to edge ab, pointing into the panel (point-in-polygon
+    test, so it also works on the U-shaped front panel whose centroid lies in the gun slot)."""
     n = panel["n"]
     e = (b - a).normalized()
     t = n.cross(e).normalized()
-    # make sure it points toward the panel centroid
-    c = V(*[sum(v[k] for v in panel["poly"]) / len(panel["poly"]) for k in range(3)])
-    if (c - a).dot(t) < 0:
+    pl, pts = _wp_on(panel["poly"], n)
+    q = (a + b) * 0.5 + t * 2.0 - pl.origin
+    if not _pip((q.dot(pl.xDir), q.dot(pl.yDir)), pts):
         t = t * -1
     return t
+
+
+def _pip(p, poly):
+    x, y = p
+    inside = False
+    for i in range(len(poly)):
+        (x0, y0), (x1, y1) = poly[i], poly[(i + 1) % len(poly)]
+        if (y0 > y) != (y1 > y) and x < x0 + (y - y0) * (x1 - x0) / (y1 - y0):
+            inside = not inside
+    return inside
 
 
 def _section_prism(edge, panels, t0, t1, margin=0.6):
@@ -377,35 +392,27 @@ def section(frame, panels, log=print, seg_max=215.0):
         for k in range(n):
             idx = len(regions)
             regions.append((f"E{ei:02d}S{k}", _section_prism(ed, panels, ts[k], ts[k + 1]), ed, ts[k], ts[k + 1]))
-    # ring segments around the slot-wall disc holes
-    for p in panels:
-        if not p["hole"]:
-            continue
-        yw, out = _wall(p)
-        for k in range(6):
-            a0 = math.radians(k * 60 + 15)
-            a1 = a0 + math.radians(60)
-            cx, cz = P.PIVOT
-            sector = xz_prism([(cx, cz), (cx + 300 * math.cos(a0), cz + 300 * math.sin(a0)),
-                               (cx + 300 * math.cos((a0 + a1) / 2), cz + 300 * math.sin((a0 + a1) / 2)),
-                               (cx + 300 * math.cos(a1), cz + 300 * math.sin(a1))],
-                              yw - out * 1.0, yw + out * (P.MEM_H + 1.0))
-            ann = ycyl(P.DISC_HOLE_R + P.MEM_W + 0.6, yw - out * 1.5, yw + out * (P.MEM_H + 1.5)).cut(
-                ycyl(P.DISC_HOLE_R - 1, yw - out * 2, yw + out * (P.MEM_H + 2)))
-            regions.append((f"R{'R' if yw < 0 else 'L'}{k}", sector.intersect(ann), None, None, None))
-
-    pieces, claimed = [], None
+    # each segment takes the frame inside its region minus the regions before it (only those it touches);
+    # the nodes are what is left after cutting every region out one at a time (one big fused region made
+    # OCC drop parts of the oblique front-slant edges)
+    pieces, done = [], []
     for name, reg, ed, t0, t1 in regions:
         piece = frame.intersect(reg)
-        if claimed is not None:
-            piece = piece.cut(claimed)
-        claimed = reg if claimed is None else claimed.fuse(reg)
+        rb = reg.BoundingBox()
+        for prev in done:
+            pb = prev.BoundingBox()
+            if rb.xmin < pb.xmax and pb.xmin < rb.xmax and rb.ymin < pb.ymax and pb.ymin < rb.ymax and \
+                    rb.zmin < pb.zmax and pb.zmin < rb.zmax:
+                piece = piece.cut(prev)
+        done.append(reg)
         sol = [s for s in piece.Solids() if s.Volume() > 50]
         if not sol:
             continue
         pieces.append(dict(name=name, shape=cq.Compound.makeCompound(sol) if len(sol) > 1 else sol[0],
                            edge=ed, t0=t0, t1=t1))
-    rest = frame.cut(claimed)
+    rest = frame
+    for reg in done:
+        rest = rest.cut(reg)
     nodes = [s for s in rest.Solids() if s.Volume() > 50]
     for k, s in enumerate(nodes):
         pieces.append(dict(name=f"N{k:02d}", shape=s, edge=None, t0=None, t1=None))

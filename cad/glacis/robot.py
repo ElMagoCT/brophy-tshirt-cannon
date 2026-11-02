@@ -1,4 +1,4 @@
-"""Build the whole Glacis robot, check it, and export it.
+"""Build the whole Glacis robot (rev B), check it, and export it.
 
     python robot.py            # build + checks + renders + STEP/BOM export into out/
     python robot.py --quick    # build + envelope only
@@ -51,7 +51,7 @@ def build(elev=P.ELEV_SHOW):
     gun.build(log)
     belt_len = misc.towers_and_pivot()
     log(f"elevation belt pitch length {belt_len:.0f} mm ({belt_len / 5:.1f} teeth)")
-    sol = misc.rear_air()
+    misc.air()
     misc.batteries_and_electronics()
     misc.compressor_spot()
     misc.bumpers()
@@ -61,15 +61,15 @@ def build(elev=P.ELEV_SHOW):
         if p["moving"]:
             p["local"] = p["shape"]
             p["shape"] = pose(p["shape"], elev)
-    # service loop: fill solenoid -> behind the slot -> up -> under the gun -> manifold inlet. The last three
-    # points ride with the gun (gun-local), dropping below the inlet port and running back clear of the chambers.
-    t_l = gun.GUN_INLET[0]
-    ride = [V(-60.0, -45.0, t_l.z - 15.0), V(t_l.x, -45.0, t_l.z - 15.0), V(t_l.x, -45.0, t_l.z), t_l]
-    ride = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in ride]
-    pts = [V(*sol), V(sol[0] + 30, -70, sol[2]), V(-190, -70, 300), V(-190, -70, 360), V(-150, -70, 375),
-           V(-110, -55, 380)] + ride
-    lib.add("Service loop tube (to gun)", misc.tube_path([p.toTuple() for p in pts]), "tube", "pneu",
-            bom="DOT nylon tube 1/4 OD (ft)", kind="stock")
+    # service loops: from each inline check valve, in beside the pivot, to the tube exit behind the left cradle
+    # plate. The exits ride with the gun; the loops are slack coils, so the sweep check skips them.
+    ex = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.GUN_EXITS]
+    a, b = misc.CHECKS
+    routes = {"A (top barrel)": [a, V(a.x - 20, a.y - 8, a.z + 20), V(-175.0, 92.0, 365.0), V(ex[0].x + 8, 74.0, ex[0].z), ex[0]],
+              "B (bottom barrel)": [b, V(b.x - 6, 200.0, b.z + 25), V(-212.0, 110.0, 372.0), V(ex[1].x + 2, 74.0, ex[1].z), ex[1]]}
+    for tag, pts in routes.items():
+        lib.add(f"Service loop {tag}", misc.tube_path([p.toTuple() for p in pts]), "tube", "pneu",
+                bom="DOT nylon tube 1/4 OD (ft)", kind="stock")
     log(f"built {len(PARTS)} parts in {time.time() - t:.0f} s")
     return PARTS
 
@@ -92,21 +92,22 @@ def common_volume(a, b):
 
 
 ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the design
-    ("Belt", "pulley"), ("Belt", "Pulley"), ("Belt", "Compound"), ("Belt", "Wheel hub inner"),
-    ("Elevation belt", "Servo pinion"), ("Elevation belt", "Elevation pulley"),
+    ("Belt", "pulley"), ("Belt", "Pulley"), ("Belt", "Wheel hub"),
+    ("Elevation belt", "pinion"), ("Elevation belt", "Elevation pulley"),
     ("Roller tread", "Roller core"),
     ("Compressor spot", "Compressor mount plate"),
-    ("Belt", "Wheel core inner"),
     ("Stub shaft", "Pivot bearing"),            # hex inner race turns with the shaft
-    ("Liner", "Liner"), ("Liner", "Body frame"),  # fabric overlaps and is clamped to the frame
     ("nipple", "manifold block"),               # threads into the block (modelled solid)
     ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Service loop", "push-to-connect"),
+    ("Tube tank", "elbow push-to-connect"), ("Tank elbow", "Air tank"),
     ("inlet nipple", "inlet nipple"), ("inlet nipple", "inlet Relief valve"),  # thread ends meet inside the
-                                                                              # port block / tee (cored)
+    ("inlet nipple", "inlet bushing 1/4x1/8"),                               # cross (cored)
 ]
 
 
 def allowed(n1, n2):
+    if " inlet " in n1 and " inlet " in n2 and n1.split(" inlet ")[0] == n2.split(" inlet ")[0]:
+        return True                             # one barrel's inlet pocket: threads meet inside the port block
     for a, b in ALLOWED:
         if (a in n1 and b in n2) or (a in n2 and b in n1):
             return True
@@ -134,7 +135,7 @@ def check_interference(parts, tol=30.0):
     return hits
 
 
-def check_sweep(parts, angles=range(0, 91, 15), tol=30.0):
+def check_sweep(parts, angles=range(0, 91, 5), tol=30.0):
     movers = [p for p in parts if p["moving"]]
     parts = [p for p in parts if not p["name"].startswith("Service loop")]   # flexible, follows the gun
     fixed = [p for p in parts if not p["moving"]]
@@ -164,7 +165,7 @@ def envelope(parts, elev):
 DENS = {"steel": 7.85, "galv": 7.85, "alu": 2.70, "extr": 2.70 * 0.55, "brass": 8.5, "print": 1.27 * 0.4,
         "print_d": 1.27 * 0.6, "tpu": 1.2 * 0.6, "acrylic": 1.19, "foam": 0.03, "fabric": 0.4, "belt": 1.2,
         "black": 1.5, "pcb": 1.8, "red": 1.5, "tube": 1.15 * 0.3, "tank": 1.4, "falcon": 2.6, "battery": 2.4,
-        "spot": 0.0, "led": 1.0}
+        "spot": 0.0, "led": 1.0, "pc": 1.2}
 
 
 def colour_key(rgba):
@@ -239,7 +240,7 @@ def _corner(name):
     return m.group(1) if m else None
 
 
-WHEEL_PARTS = ("Wheel core", "Wheel lug arc", "Roller", "Bearing FR8 wheel")
+WHEEL_PARTS = ("Wheel hub", "Wheel plate", "Roller")
 
 
 def tabs(parts):
@@ -249,15 +250,15 @@ def tabs(parts):
         g, n = p["group"], p["name"]
         c = _corner(n) if g == "drive" else None
         if g == "frame" or (g == "drive" and c is None):
-            out["Frame, pivot & front drive"].append(p)
+            out["Frame, pivot & drive"].append(p)
         elif g == "drive" and n.startswith(WHEEL_PARTS):
             out[f"Wheel {c}"].append(p)
         elif g == "drive":
-            out["Frame, pivot & front drive" if c in ("FL", "FR") else "Rear drive"].append(p)
+            out["Frame, pivot & drive"].append(p)
         elif g == "body":
-            out["Body frame" if n.startswith("Body frame") else "Panels, liners, standoffs & bumpers"].append(p)
+            out["Body frame" if n.startswith("Body frame") else "Panels, clips, standoffs & bumpers"].append(p)
         elif g == "bumper":
-            out["Panels, liners, standoffs & bumpers"].append(p)
+            out["Panels, clips, standoffs & bumpers"].append(p)
         elif g == "gun":
             out["Gun (at 20 deg)"].append(p)
         else:                                   # pneu, power, spot

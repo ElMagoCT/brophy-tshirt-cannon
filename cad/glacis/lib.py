@@ -26,6 +26,7 @@ C = {
     "pcb":     (0.12, 0.42, 0.30, 1.0),
     "tube":    (0.30, 0.55, 0.85, 1.0),
     "spot":    (0.95, 0.75, 0.20, 0.35),    # reserved volume (compressor spot)
+    "pc":      (0.88, 0.93, 0.98, 0.40),    # clear polycarbonate barrel
 }
 
 PARTS = []

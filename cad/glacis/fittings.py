@@ -82,8 +82,9 @@ class Chain:
         self.state, self.s = "M", s0 + hex_t + em + 2
         return self
 
-    def block(self, size="1/4", side=25.4, sides=((0, 1, 0), (0, -1, 0)), color="brass", bom=None):
-        """Brass port block on a male end: rear port continues the run, returns chains for side ports."""
+    def block(self, size="1/4", side=25.4, sides=((0, 1, 0), (0, -1, 0)), color="brass", bom=None, rear=True):
+        """Brass port block on a male end: rear port continues the run (unless rear=False), returns chains
+        for the side ports."""
         assert self.state == "M"
         e = ENG[size]
         s0 = self.s - e
@@ -91,7 +92,9 @@ class Chain:
         sh = _along(body, self.at(s0), self.d)
         c = self.at(s0 + side / 2)
         sh = sh.cut(_along(cyl(OD[size] / 2, e), self.at(s0), self.d))
-        sh = sh.cut(_along(cyl(OD[size] / 2, e), self.at(s0 + side - e), self.d))
+        if rear:
+            sh = sh.cut(_along(cyl(OD[size] / 2, e), self.at(s0 + side - e), self.d))
+        sh = sh.cut(cq.Solid.makeSphere(7.5, c, angleDegrees1=-90, angleDegrees2=90))   # drilled ports meet
         out = []
         for sd in sides:
             b = V(*sd).normalized()
@@ -102,7 +105,7 @@ class Chain:
             self.add(f"{self.prefix}port block {size}", sh, color, self.group,
                      bom=bom or f"{size} NPT brass port block (4-port)", moving=self.moving)
         self.items.append(sh)
-        self.state, self.s = "F", s0 + side
+        self.state, self.s = ("F" if rear else "end"), s0 + side
         return out
 
     # --- female parts onto a male end
@@ -167,6 +170,27 @@ class Chain:
         self.items.append(body)
         self.state, self.s = "F", s0 + run
         return Chain((bc + b * (run / 2)).toTuple(), b.toTuple(), "F", self.add, self.prefix, self.group, self.moving)
+
+    def cross(self, size, run, od, branch_dir, color="brass", bom=None):
+        """Cross on a male end; the run continues, returns Chains for the two opposite branches."""
+        assert self.state == "M"
+        e = ENG[size]
+        s0 = self.s - e
+        b = V(*branch_dir).normalized()
+        sh = _along(cyl(od / 2, run), self.at(s0), self.d)
+        bc = self.at(s0 + run / 2)
+        body = sh.fuse(cyl(od / 2, run, (bc - b * (run / 2)).toTuple(), b.toTuple()))
+        body = body.cut(_along(cyl(OD[size] / 2, e), self.at(s0), self.d))
+        body = body.cut(_along(cyl(OD[size] / 2, e), self.at(s0 + run - e), self.d))
+        for bb in (b, b * -1):
+            body = body.cut(cyl(OD[size] / 2, e, (bc + bb * (run / 2 - e)).toTuple(), bb.toTuple()))
+        if self.add:
+            self.add(f"{self.prefix}cross {size}", body, color, self.group, bom=bom or f"{size} NPT cross (brass)",
+                     moving=self.moving)
+        self.items.append(body)
+        self.state, self.s = "F", s0 + run
+        return [Chain((bc + bb * (run / 2)).toTuple(), bb.toTuple(), "F", self.add, self.prefix, self.group, self.moving)
+                for bb in (b, b * -1)]
 
 
 # ------------------------------------------------------------------ valve bodies (along +Z)

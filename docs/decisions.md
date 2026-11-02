@@ -200,3 +200,22 @@ decisions:
 - **Drive:** Falcons on a 40:1 two-stage HTD belt, not the stash CIMs. Micah specified Falcons for
   Glacis.
 - **Elevation:** two FEETECH STS3215 bus servos replace the linear actuator and the AS5600.
+
+## 2026-11-02 - Glacis rev B (proposed, waiting on Micah)
+
+Micah's second round of notes reshaped Glacis. Model, Onshape tabs and the "Glacis BOM" tab are all
+rev B now ($1,555.11 to buy; aluminum, acrylic, prints, Falcons and FRC stash parts at $0). Every call
+is in `docs/glacis/JUDGMENTS.md`. The ones that change earlier decisions:
+
+- **Two barrels, not three.** Clear polycarbonate 3 in x 1/8 wall barrels (McMaster 8585K38).
+- **Chambers:** 4 x 3/4 bushing straight into a 4 in cap (~0.4 L), still sideways off the QE5. PVC is
+  out (OSHA: shatters under air pressure); copper was not needed once the chambers got short.
+- **Per-chamber safety:** a 5-port brass block per barrel carries the dump, supply, 150 psi relief
+  (its pull ring is the manual bleed) and a transducer. Check valves moved to the fixed fill cross.
+- **Every pressure goes to the controller** (tank, fill line, both chambers); no dial gauges.
+- **Controls:** STM32 Nucleo-F446RE is the main controller; an ESP32-S3 is only the WiFi bridge. An
+  independent ESP32-S3 safety node and a handheld ESP32-S3 remote talk over ESP-NOW; the node holds the
+  valve-rail relay and the PWM gate, with the robot E-stop in series.
+- **Drive:** one-stage 10:1 belt into a 10 in printed hub, 1/2 hex live axles in FRC hex bearings.
+- **Elevation:** goBILDA 5203 on a Spark MAX with a pot, replacing the STS3215 servos.
+- **Power:** REV PDH replaces the fuse block; batteries on a sled behind a removable side panel.
