@@ -1,0 +1,8 @@
+.DS_Store
+~$*.xlsx
+.~lock.*
+__pycache__/
+.venv/
+# PlatformIO
+firmware/.pio/
+firmware/.vscode/

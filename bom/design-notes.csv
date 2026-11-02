@@ -1,0 +1,31 @@
+Mark 5 - decisions behind the parts list
+
+The Falcon / CAN question - you do not need CAN at all
+"The Talon FX inside a Falcon 500 auto-detects CAN or PWM on the same green/yellow pair. PWM spec: 1-2 ms pulse, 1.5 ms neutral, period anywhere from 2.9 to 100 ms. The center (red) servo wire is not used - the Talon FX is powered off its 12V input. CTRE explicitly says the Falcon works with any control system that can output PWM. So an ESP32 LEDC channel at 50-333 Hz drives a Falcon directly, no CAN transceiver, no reverse-engineered CTRE framing, no roboRIO enable heartbeat. Yellow = signal, green = ground (opposite of the usual white/black). Press the B/C CAL button and sweep your ESP32 output full forward then full reverse once to calibrate it to your pulse range. You lose Motion Magic, the encoder and current limiting, which is fine - you are driving a parade robot, not a swerve module."
+
+...but use the old 12V motors anyway
+"Falcons only pay off if you need the power density. Mark 5 is a slow, heavy, aim-and-fire robot. The old CIMs in their existing Toughboxes plus the old PWM Victors/Talons cost $0 and the ESP32 talks to them the exact same way it would talk to a Falcon. Going Falcon also means buying spline pinions and adapters because a Toughbox expects a CIM shaft. Keep the Falcons for the actual FRC robot. Same code either way, so this is reversible."
+
+"Variable pressure for $22, not $250"
+"Your 'rapid actuator to secondary tank' note is the right answer and it is the cheapest one. Reservoir sits at 150 psi. A small direct-acting 12V solenoid meters air into a ~1 L steel firing chamber while the ESP32 watches a $15 pressure transducer, closes at the target, then trips the fire valve. Shot power is a software number. An electronic proportional regulator that does the same job starts around $250."
+
+"Fire valve: QEV, not a big solenoid"
+"A 1in brass solenoid rated for this is ~$70, only rated to about 100-115 psi, and takes on the order of 80 ms to open - the shot dribbles. A 1in quick exhaust valve piloted by a $20 tiny 3-way solenoid opens full-port in roughly 10 ms and is rated well past 150 psi. Three QEVs off one shared chamber = triple barrel with no indexing mechanism, no drum, nothing to jam. That is the cheapest real multi-shot."
+
+Shot count and recovery - your 5 minute goal is pessimistic
+"4.5 gal of reservoir at 150 psi is roughly 190 L of free air. A 1 L chamber at 120 psi spends about 9 L per shot. Getting 10 full-power shots purely from stored air would mean the reservoir sagging below firing pressure, so the honest number is 4-5 full-power shots stored. The good news: a 2 CFM 12V compressor replaces those 9 L in well under a minute, so real-world you get a shot roughly every 30-60 s indefinitely, not every 5 minutes. Add the second tank if you want a burst of three back-to-back."
+
+Safety items that are not optional
+"Relief valve on every pressurized volume, set below the weakest component's rating. Two mechanical gauges you can read with the power off. A manual bleed valve you can reach without opening a panel. Steel or brass for anything that holds pressure - never PVC, never acrylic, and polycarbonate only as a cosmetic sleeve. Hardware E-stop that cuts the solenoids, not a software flag. Barrel gets a physical safety cap when not firing, and the robot never gets pressurized indoors without the barrel pointed up."
+
+"Video livefeed: put it on a Pi, not the ESP32"
+"An ESP32-CAM gives you low-frame-rate VGA and will fight the control WebSocket for radio time. A Pi Zero 2 W with a camera module is $38, streams MJPEG or WebRTC properly, and keeps the control path on its own microcontroller so a stalled video stream cannot delay a fire command. Your <3 s boot goal stays intact because the ESP32 boots in a second and does not wait on the Pi."
+
+Mecanum on gravel and grass will not work
+"This is worth knowing before you print four wheels. Mecanum needs the rollers to slip predictably against a hard flat surface. On turf the rollers dig in, on gravel they jam, and the whole vector-sum falls apart. Printed rollers make it worse. Suggestion: design the corner plates so the wheel module bolts on, print mecanum for gym floors, and keep four plain 6in pneumatic traction wheels on the same bolt pattern for outdoor use. Swapping four wheels takes ten minutes and saves you a Mark 5 that cannot leave the gym."
+
+Keeping a welded chassis serviceable
+"Weld the frame, then bolt everything else to weld-in threaded inserts. Nothing that can fail - no tank, valve, motor, controller or panel - should be captured by a weld. That single rule is what separates a welded chassis from a welded coffin, and it costs $30 in rivnuts."
+
+Cut list if the budget gets tight
+"In order: fog machine, turret rotation, magazine/revolver mechanism, polycarbonate sleeve, angle encoder, cooling fans, second air tank, then drop from three barrels to one (saves roughly $220 across QEVs, pilots and barrel tube). Everything above that line is either structural, pneumatic or safety."
