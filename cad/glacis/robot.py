@@ -49,11 +49,14 @@ def build(elev=P.ELEV_SHOW):
     t = time.time()
     drive.build(log)
     gun.build(log)
+    z_f, z_r = misc.B.set_slot_profile(gun.sweep_profile())
+    log(f"gun well: floor at z {z_f:.0f} where it meets the front, {z_r:.0f} at the back, "
+        f"{min(z for _, z in misc.B.SLOT_PTS):.0f} under the axle")
     belt_len = misc.towers_and_pivot()
     log(f"elevation belt pitch length {belt_len:.0f} mm ({belt_len / 5:.1f} teeth)")
     misc.air()
+    misc.fog()
     misc.batteries_and_electronics()
-    misc.compressor_spot()
     misc.bumpers()
     misc.wall_standoffs()
     misc.body_parts(log)
@@ -61,15 +64,20 @@ def build(elev=P.ELEV_SHOW):
         if p["moving"]:
             p["local"] = p["shape"]
             p["shape"] = pose(p["shape"], elev)
-    # service loops: from each inline check valve, in beside the pivot, to the tube exit behind the left cradle
-    # plate. The exits ride with the gun; the loops are slack coils, so the sweep check skips them.
+    # flexible lines to the gun: air from the two check valves, fog from the splitter. Their gun ends ride with
+    # the gun; the rest is a slack coil, so the sweep check skips them.
     ex = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.GUN_EXITS]
     a, b = misc.CHECKS
-    routes = {"A (top barrel)": [a, V(a.x - 20, a.y - 8, a.z + 20), V(-175.0, 92.0, 365.0), V(ex[0].x + 8, 74.0, ex[0].z), ex[0]],
-              "B (bottom barrel)": [b, V(b.x - 6, 200.0, b.z + 25), V(-212.0, 110.0, 372.0), V(ex[1].x + 2, 74.0, ex[1].z), ex[1]]}
+    routes = {"Service loop A (top cannon)": [a, V(a.x, 60.0, 245.0), V(-240.0, 20.0, 300.0), V(-335.0, -10.0, 380.0),
+                                               V(-335.0, -30.0, ex[0].z), ex[0]],
+              "Service loop B (bottom cannon)": [b, V(-260.0, -30.0, 250.0), V(-318.0, -30.0, 330.0), V(ex[1].x - 18.0, -30.0, ex[1].z), ex[1]]}
+    fx = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.FOG_EXITS]
+    for k, (f0, f1) in enumerate(zip(misc.FOG_OUT, fx)):
+        routes[f"Fog loop {'L' if k == 0 else 'R'} (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(f1.x + 20.0, f1.y, f1.z - 60.0), f1]
     for tag, pts in routes.items():
-        lib.add(f"Service loop {tag}", misc.tube_path([p.toTuple() for p in pts]), "tube", "pneu",
-                bom="DOT nylon tube 1/4 OD (ft)", kind="stock")
+        r = 11.0 if tag.startswith("Fog") else 3.175
+        lib.add(tag, misc.tube_path([p.toTuple() for p in pts], r=r), "tube", "pneu" if r < 5 else "power",
+                bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Fog tube (owner's flexible tube)", kind="stock")
     log(f"built {len(PARTS)} parts in {time.time() - t:.0f} s")
     return PARTS
 
@@ -95,13 +103,12 @@ ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the
     ("Belt", "pulley"), ("Belt", "Pulley"), ("Belt", "Wheel hub"),
     ("Elevation belt", "pinion"), ("Elevation belt", "Elevation pulley"),
     ("Roller tread", "Roller core"),
-    ("Compressor spot", "Compressor mount plate"),
-    ("Stub shaft", "Pivot bearing"),            # hex inner race turns with the shaft
+    ("Pivot axle", "Pivot bearing"),            # hex inner race turns with the axle
     ("nipple", "manifold block"),               # threads into the block (modelled solid)
-    ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Service loop", "push-to-connect"),
-    ("Tube tank", "elbow push-to-connect"), ("Tank elbow", "Air tank"),
-    ("inlet nipple", "inlet nipple"), ("inlet nipple", "inlet Relief valve"),  # thread ends meet inside the
-    ("inlet nipple", "inlet bushing 1/4x1/8"),                               # cross (cored)
+    ("nipple", "Chamber"),                      # 1 in close nipple in the tank's end port
+    ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Tube", "push-to-connect"),
+    ("Service loop", "push-to-connect"), ("Tank elbow", "Air tank"), ("Gun tube", "Service loop"),
+    ("Fog loop", "Fog vent"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
 ]
 
 
@@ -137,7 +144,7 @@ def check_interference(parts, tol=30.0):
 
 def check_sweep(parts, angles=range(0, 91, 5), tol=30.0):
     movers = [p for p in parts if p["moving"]]
-    parts = [p for p in parts if not p["name"].startswith("Service loop")]   # flexible, follows the gun
+    parts = [p for p in parts if not p["name"].startswith(("Service loop", "Fog loop"))]   # flexible, follow the gun
     fixed = [p for p in parts if not p["moving"]]
     fboxes = [bb(p["shape"]) for p in fixed]
     hits = defaultdict(set)
@@ -180,7 +187,9 @@ def mass_report(parts):
     by = defaultdict(float)
     for p in parts:
         ck = colour_key(p["color"])
-        if ck == "battery":
+        if p.get("mass") is not None:
+            m = p["mass"]
+        elif ck == "battery":
             m = 5.9
         elif ck == "falcon":
             m = 0.50

@@ -290,6 +290,8 @@ def build(log=print):
                 P.BELLY_Z - P.PLATE_T, P.BELLY_Z)
     for x in (-300, -200, 200, 300):
         belly = belly.cut(cyl(35, 10, (x, 0, P.BELLY_Z - 5)))
+    for sy in (1, -1):                                     # fog vents under the front bumper
+        belly = belly.cut(cyl(13.5, 10, (368.0, sy * 80.0, P.BELLY_Z - 5)))
     for x0, x1, tag in ((-P.FRAME_X + P.RAIL_W, 0.0, "rear"), (0.0, P.FRAME_X - P.RAIL_W, "front")):
         add(f"Bellypan {tag} (1/8 Al)", belly.intersect(box(x0, x1, -500, 500, -10, 500)), "alu", "frame",
             bom="Bellypan half (1/8 Al)", kind="stock", note="rivets to the inner rails")

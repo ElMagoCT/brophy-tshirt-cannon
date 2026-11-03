@@ -32,12 +32,13 @@ C = {
 PARTS = []
 
 
-def add(name, shape, color, group, bom=None, kind="cots", moving=False, note=""):
-    """Register one part. `bom` groups identical parts on the parts list."""
+def add(name, shape, color, group, bom=None, kind="cots", moving=False, note="", mass=None):
+    """Register one part. `bom` groups identical parts on the parts list; `mass` (kg) overrides the
+    density estimate for hollow or mixed-material parts."""
     if isinstance(shape, cq.Workplane):
         shape = shape.val() if len(shape.vals()) == 1 else cq.Compound.makeCompound(shape.vals())
     PARTS.append(dict(name=name, shape=shape, color=C[color] if isinstance(color, str) else color,
-                      group=group, bom=bom or name, kind=kind, moving=moving, note=note))
+                      group=group, bom=bom or name, kind=kind, moving=moving, note=note, mass=mass))
     return shape
 
 

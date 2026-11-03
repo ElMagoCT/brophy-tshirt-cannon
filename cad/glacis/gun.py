@@ -1,189 +1,275 @@
-"""The elevating gun: two stacked clear polycarbonate barrels, each with a Humphrey QE5 3/4 in NPT quick
-exhaust valve.
+"""The elevating gun (rev C): two in-line cannons stacked one above the other; the pivot axle passes
+between them.
 
-Gun-local frame (built at 0 deg, moved by robot.pose): origin on the pivot axis, +X along the barrels,
-+Z up, Y as the robot. The top barrel's QEV sits on the pivot axis; the bottom one is PITCH below.
-QE5 ports: inlet and exhaust on one axis (inlet at the back, exhaust forward to the barrel), cylinder
-port on the side -> each short steel chamber runs sideways (0.4 L: 4 x 3/4 bushing into a 4 in cap).
-The top chamber points left (+y) and lies on the pivot axis, so its cap carries the left trunnion; the
-right stub shaft passes above the bottom chamber and carries the 56T elevation pulley.
+Each cannon, back to front on one axis: chamber tank (1 gal, 200 psi ASME steel, 1 in NPT end port) ->
+1 in close nipple -> Atlantic Valves SZW-25 1 in stainless solenoid valve (12 V DC, normally closed, coil
+pointing outward) -> 1 in close nipple -> CNC breech adapter -> clear polycarbonate barrel.
+Gun-local frame: origin on the axle, +X along the barrels, +Z up. The cannons are built, their centre of
+mass is found from the parts' masses, and they are shifted so it lands on the axle: the gun balances in
+any pose. Each chamber carries a fill push-to-connect, a 110 psi relief (its pull ring is the manual
+bleed) and a transducer on its outward side.
 """
 import math
 import cadquery as cq
 from cadquery import Vector as V
 import params as P
-from lib import add, box, cyl, tube, hex_prism, union
+from lib import add, box, cyl, tube, hex_prism, union, C
 from fittings import Chain, OD, ENG, relief_cap
 
 IN = P.IN
-QEV = dict(L=93.0, H=55.4, R=29.0, BOSS=46.0, BOSS_R=19.0)   # Humphrey QE5 (3.66 x 2.18 x 2.95 in)
-CRADLE_T = P.PLATE_T
-CRADLE_Y0 = 47.0                                             # inner faces of the two cradle plates
-PARTS_LOCAL = []
-H = [0.0, -P.PITCH]                                          # barrel heights: top on the pivot, bottom below
-SIDES = [1, -1]                                              # chamber side per barrel
+R_CH = P.CH_D / 2
+CRADLE_Y0 = R_CH + 3.5                                       # inner faces of the two cradle plates
 TAGS = ["top", "bottom"]
-ZMAX, ZMIN = max(H), min(H)
+H = [P.PITCH / 2, -P.PITCH / 2]
+OUT = [1, -1]                                                # outward direction (coil, fittings) per cannon
+LOCAL = []                                                   # (name, shape, color, bom, kind, note, mass)
+DENS = {"steel": 7.85, "alu": 2.70, "brass": 8.5, "print": 1.27 * 0.4, "print_d": 1.27 * 0.6, "pc": 1.2,
+        "tube": 1.15 * 0.3, "black": 1.5, "tank": 7.85}
 
 
-def gadd(name, shape, color, group="gun", bom=None, kind="cots", note="", moving=True):
-    PARTS_LOCAL.append(shape)
-    return add(name, shape, color, "gun", bom=bom, kind=kind, moving=True, note=note)
+def gadd(name, shape, color, group="gun", bom=None, kind="cots", note="", moving=True, mass=None):
+    if isinstance(shape, cq.Workplane):
+        shape = shape.val()
+    LOCAL.append(dict(name=name, shape=shape, color=color, bom=bom or name, kind=kind, note=note, mass=mass))
+    return shape
 
 
-def qev_body():
-    body = cyl(QEV["R"], QEV["L"], (-QEV["L"] / 2, 0, 0), (1, 0, 0))
-    return body.intersect(box(-60, 60, -40, 40, -QEV["H"] / 2, QEV["H"] / 2))
+def _mass(p):
+    if p["mass"] is not None:
+        return p["mass"]
+    return p["shape"].Volume() / 1e6 * DENS.get(p["color"], 1.0)
 
 
-def qev(h, side):
-    s = qev_body().fuse(cyl(QEV["BOSS_R"], QEV["BOSS"], (0, 0, 0), (0, side, 0)))
-    for p, d in (((-QEV["L"] / 2, 0, 0), (1, 0, 0)), ((QEV["L"] / 2, 0, 0), (-1, 0, 0))):
-        s = s.cut(cyl(OD["3/4"] / 2, ENG["3/4"], p, d))
-    s = s.cut(cyl(OD["3/4"] / 2, ENG["3/4"], (0, side * QEV["BOSS"], 0), (0, -side, 0)))
-    return s.translate(V(0, 0, h))
+def valve(xv, h, s):
+    """Atlantic Valves SZW-25: stainless body (1 in NPT both ends), bonnet and 12 V coil toward `s`."""
+    v = P.VALVE
+    hl = v["L"] / 2
+    z0, z1 = sorted([h - s * (-v["BODY"][0]), h + s * v["BODY"][1]])
+    body = box(xv - hl, xv + hl, -v["W"] / 2, v["W"] / 2, z0, z1)
+    for x0, d in ((xv - hl, 1), (xv + hl, -1)):
+        body = body.cut(cyl(OD["1"] / 2, ENG["1"], (x0, 0, h), (d, 0, 0)))
+    ztop = h + s * v["BODY"][1]
+    coil = cyl(v["COIL_R"], v["COIL_TOP"] - v["BODY"][1], (xv, 0, ztop), (0, 0, s))
+    nut = hex_prism(19.0, 8.0, (xv, 0, h + s * v["COIL_TOP"]), (0, 0, s))
+    return union([body, coil, nut])
 
 
 def adapter():
-    """CNC breech adapter: 3/4 NPT female at the back, 3 in barrel socket at the front, split clamp
+    """CNC breech adapter: 1 in NPT female at the back, 3 in barrel socket at the front, split clamp
     (the polycarbonate is clamped, never drilled)."""
     L, od = 64.0, 84.0
     s = cyl(od / 2, L, (0, 0, 0), (1, 0, 0))
-    s = s.cut(cyl(OD["3/4"] / 2, ENG["3/4"] + 1, (-0.5, 0, 0), (1, 0, 0)))
-    s = s.cut(cyl(10.5, L, (0, 0, 0), (1, 0, 0)))
+    s = s.cut(cyl(OD["1"] / 2, ENG["1"] + 1, (-0.5, 0, 0), (1, 0, 0)))
+    s = s.cut(cyl(13.3, L, (0, 0, 0), (1, 0, 0)))
     s = s.cut(cyl(P.BARREL_OD / 2 + 0.15, 40.0, (L - 40.0, 0, 0), (1, 0, 0)))
     s = s.cut(box(L - 30, L + 1, -1.5, 1.5, 0, od))
-    s = s.cut(cyl(3.3, 30, (L - 15, -15, od / 2 - 8), (0, 1, 0)))
-    return s
+    return s.cut(cyl(3.3, 30, (L - 15, -15, od / 2 - 8), (0, 1, 0)))
 
 
-def va4_coil(sign):
-    """VA-4 coil standing off the valve body along local +/-Y; both barrels' coils point down."""
-    return lambda length: cyl(18.0, 50.0, (0, sign * 11.0, length / 2), (0, sign, 0))
+def chamber(x_front, h, s, fit_x):
+    """1 gal ASME tank lying on the cannon axis, its 1 in end port facing forward at x_front and three
+    1/4 NPT bosses on its outward side."""
+    L = P.CH_L - P.CH_BOSS
+    shell = cq.Workplane("YZ", origin=(x_front - P.CH_BOSS - L, 0, 0)).center(0, h).circle(R_CH).extrude(L) \
+        .edges().fillet(R_CH * 0.55).val()
+    parts = [shell, cyl(21.0, P.CH_BOSS, (x_front - P.CH_BOSS, 0, h), (1, 0, 0))]
+    parts += [cyl(9.0, 12.0, (x, 0, h + s * (R_CH - 4)), (0, 0, s)) for x in fit_x]
+    return union(parts).cut(cyl(OD["1"] / 2 + 0.3, ENG["1"], (x_front + 0.1, 0, h), (-1, 0, 0)))
 
 
-def build(log=print):
-    PARTS_LOCAL.clear()
-    chamber_end = {}
-    supply_tip = {}
-    for k, h in enumerate(H):
-        sd, tag, qx = SIDES[k], TAGS[k], P.QX[k]
-        gadd(f"QEV Humphrey QE5 {tag}", qev(h, sd).translate(V(qx, 0, 0)), "alu", bom="Humphrey QE5 3/4 NPT quick exhaust valve")
-        # barrel side: exhaust -> 3/4 close nipple -> CNC adapter -> polycarbonate barrel
-        ch = Chain((qx + QEV["L"] / 2, 0, h), (1, 0, 0), "F", gadd, f"{tag} ")
-        ch.nipple("3/4")
-        ax0 = ch.at(ch.s).x - ENG["3/4"]
-        gadd(f"Breech adapter {tag}", adapter().translate(V(ax0, 0, h)), "alu",
-             bom="Breech adapter (CNC 6061, stash bar)", kind="machined")
-        b0 = ax0 + 64.0 - 40.0
-        blen = P.BARREL_LEN - qx                       # muzzles flush
-        barrel = tube(P.BARREL_OD / 2, P.BARREL_OD / 2 - P.BARREL_WALL, blen, (b0, 0, h), (1, 0, 0))
-        gadd(f"Barrel {tag}", barrel, "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock",
-             note=f"{blen / IN:.1f} in")
-        mz = cyl(43.0, 25.0, (b0 + blen - 25.0, 0, h), (1, 0, 0)).cut(
-            cyl(P.BARREL_OD / 2 + 0.2, 30, (b0 + blen - 27.0, 0, h), (1, 0, 0)))
-        mz = mz.cut(tube(41.0, 39.0, 6.0, (b0 + blen - 15.0, 0, h), (1, 0, 0)))
-        gadd(f"Muzzle ring {tag}", mz, "print", bom="Muzzle ring (LED groove)", kind="print")
-        # chamber side: cylinder port -> 3/4 close nipple -> 4 x 3/4 bushing -> 4 in cap (about 0.4 L)
-        cc = Chain((qx, sd * QEV["BOSS"], h), (0, sd, 0), "F", gadd, f"{tag} chamber ")
-        cc.nipple("3/4")
-        cc.bushing_rev("4", "3/4", 124.5, 16.0, color="steel", bom="4 x 3/4 NPT hex bushing (malleable)")
-        cc.cap("4", 53.0, 128.0, bom="4 in NPT cap (Class 150 malleable)")
-        chamber_end[k] = cc.at(cc.s)
-        # inlet pocket: 3/4 x 1/4 bushing -> 1/4 close nipple -> 5-port brass block
-        #   chamber side: supply push-to-connect (check valve is on the fixed fill manifold)
-        #   other side:   VA-4 dump valve + muffler, coil standing outward
-        #   outward z:    150 psi relief with pull ring (doubles as the manual bleed)
-        #   inward z:     chamber transducer (5-port block: no rear port)
-        ic = Chain((qx - QEV["L"] / 2, 0, h), (-1, 0, 0), "F", gadd, f"{tag} inlet ")
-        ic.bushing("3/4", "1/4", 27.0, 10.0, color="brass", bom="3/4 x 1/4 NPT hex bushing (brass)")
-        ic.nipple("1/4", color="brass")
-        out_z = 1 if k == 0 else -1
-        sup, dump, rel, trans = ic.block(sides=((0, sd, 0), (0, -sd, 0), (0, 0, out_z), (0, 0, -out_z)), rear=False,
-                                         bom="1/4 NPT brass 5-port block (Interstate CPT44-5)")
-        sup.male_end("Push-to-connect supply", 22.0, 15.0, color="brass", bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-        supply_tip[k] = sup.at(sup.s)
-        dump.nipple("1/4", color="brass")
-        dump.ff("Dump valve VA-4", 38.0, 25.0, extra=va4_coil(-1 if k == 0 else 1), bom="HornBlasters VA-4 12 V 1/4 NPT valve (dump)")
-        dump.male_end("Muffler 1/4", 22.0, 16.0, color="brass", bom="1/4 NPT sintered muffler (compact)")
-        rel.male_end("Relief valve 150 psi", 46.0, 19.0, extra=relief_cap,
-                     bom="Relief valve 150 psi 1/4 NPT, pull ring (CAS250150)")
-        trans.bushing("1/4", "1/8", 14.0, 6.0, color="brass", bom="1/4 x 1/8 NPT hex bushing (brass)")
-        trans.male_end("Chamber transducer 0-200 psi", 48.0, 20.0, size="1/8", color="steel",
-                       bom="Pressure transducer 0-200 psi, 0.5-4.5 V, 1/8 NPT")
+def _cannon(k, xv):
+    """One cannon in gun-local coordinates with its valve centre at x = xv. Returns its tank-fill tip."""
+    h, s, tag = H[k], OUT[k], TAGS[k]
+    hl = P.VALVE["L"] / 2
+    gadd(f"Firing valve {tag} (Atlantic Valves SZW-25)", valve(xv, h, s), "steel",
+         bom="Firing valve: Atlantic Valves SZW-25 1 in NPT stainless solenoid, 12 V DC, NC", mass=1.0)
+    ch = Chain((xv + hl, 0, h), (1, 0, 0), "F", gadd, f"{tag} ")
+    ch.nipple("1", bom="1 in Sch 40 close nipple (1-1/2 in)")
+    ax0 = ch.at(ch.s).x - ENG["1"]
+    gadd(f"Breech adapter {tag}", adapter().translate(V(ax0, 0, h)), "alu",
+         bom="Breech adapter (CNC 6061, stash bar, 1 in NPT tap)", kind="machined")
+    b0 = ax0 + 24.0
+    gadd(f"Barrel {tag}", tube(P.BARREL_OD / 2, P.BARREL_OD / 2 - P.BARREL_WALL, P.BARREL_LEN, (b0, 0, h), (1, 0, 0)),
+         "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock", note=f"{P.BARREL_LEN / IN:.1f} in")
+    xe = b0 + P.BARREL_LEN
+    mz = cyl(43.0, 25.0, (xe - 25.0, 0, h), (1, 0, 0)).cut(cyl(P.BARREL_OD / 2 + 0.2, 30, (xe - 27.0, 0, h), (1, 0, 0)))
+    mz = mz.cut(tube(41.0, 39.0, 6.0, (xe - 15.0, 0, h), (1, 0, 0)))
+    gadd(f"Muzzle ring {tag}", mz, "print", bom="Muzzle ring (LED groove)", kind="print")
+    ci = Chain((xv - hl, 0, h), (-1, 0, 0), "F", gadd, f"{tag} chamber ")
+    ci.nipple("1", bom="1 in Sch 40 close nipple (1-1/2 in)")
+    x_front = ci.at(ci.s).x + ENG["1"]                      # tank port face takes the nipple
+    fit_x = [xf + (xv - P.X_VALVE) for xf in P.CH_FIT_X]
+    gadd(f"Chamber {tag} (1 gal tank)", chamber(x_front, h, s, fit_x), "tank",
+         bom="Chamber: 1 gal 200 psi ASME steel air tank, 1 in NPT end port", mass=2.7)
+    # outward fittings on the tank: fill push-to-connect elbow, 110 psi relief, transducer
+    zs = h + s * R_CH
+    tips = None
+    for i, (xf, kind) in enumerate(zip(P.CH_FIT_X, ("fill", "relief", "trans"))):
+        x = xf + (xv - P.X_VALVE)
+        z0 = zs + s * 8
+        if kind == "fill":
+            el = cyl(7.5, 14.0, (x, 0, z0), (0, 0, s)).fuse(cyl(7.0, 18.0, (x, 0, z0 + s * 7), (-1, 0, 0)))
+            gadd(f"{tag} chamber fill push-to-connect", el, "brass",
+                 bom="DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT", mass=0.03)
+            tips = V(x - 18.0, 0, z0 + s * 7)
+        elif kind == "relief":
+            r = cyl(9.5, 44.0, (x, 0, z0), (0, 0, s)).fuse(cyl(13.0, 2.0, (x, 0, z0 + s * 30), (0, 0, s)))
+            gadd(f"{tag} chamber relief 110 psi", r, "brass", bom="Relief valve 110 psi 1/4 MNPT, pull ring", mass=0.1)
+        else:
+            t = cyl(8.0, 6.0, (x, 0, z0), (0, 0, s)).fuse(cyl(10.0, 48.0, (x, 0, z0 + s * 6), (0, 0, s)))
+            gadd(f"{tag} chamber transducer 0-200 psi", t, "steel",
+                 bom="Pressure transducer 0-200 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)", mass=0.08)
+    return tips, x_front, ax0
 
-    # ---------------- cradle: two 1/8 in plates, QEV saddles and breech blocks between them
-    xb = -71.0 + P.QX[1]                                         # bottom inlet block x
+
+def _build(xv):
+    LOCAL.clear()
+    fills, fronts, ax0s = [], [], []
+    for k in range(2):
+        t, xf, ax0 = _cannon(k, xv)
+        fills.append(t)
+        fronts.append(xf)
+        ax0s.append(ax0)
+    xf, ax0 = fronts[0], ax0s[0]
+    hl = P.VALVE["L"] / 2
+    zo = P.PITCH / 2 + R_CH + 10.0
+    # cradle: two 1/8 in plates outside the tanks, from mid-tank to the breech blocks
+    x0, x1 = xf - 175.0, ax0 + 60.0
     for sy, tag in ((1, "left"), (-1, "right")):
-        y0 = sy * CRADLE_Y0 if sy > 0 else -CRADLE_Y0 - CRADLE_T
-        pts = [(-48, ZMIN - 60), (170, ZMIN - 60), (190, ZMIN - 30), (190, ZMAX + 30), (170, ZMAX + 60), (-48, ZMAX + 60)]
-        pl = cq.Workplane("XZ", origin=(0, y0, 0)).polyline(pts).close().extrude(-CRADLE_T).val()
-        pl = pl.cut(union([cyl(16.0, 20, (q, y0 - 5, h), (0, 1, 0)) for q, h, s in zip(P.QX, H, SIDES) if s == sy]))
-        if sy > 0:                                               # notch for the bottom VA-4 and its coil
-            pl = pl.cut(box(xb - 21, xb + 21, y0 - 5, y0 + 10, ZMIN - 70, H[1] + 13.0))
-        for (x, z) in ((-30, ZMAX + 45), (150, ZMAX + 45), (150, ZMIN - 45), (8, ZMIN - 45), (100, (ZMIN + ZMAX) / 2)):
+        y0 = CRADLE_Y0 if sy > 0 else -CRADLE_Y0 - P.PLATE_T
+        pts = [(x0, -zo), (x1 - 20, -zo), (x1, -zo + 20), (x1, zo - 20), (x1 - 20, zo), (x0, zo)]
+        pl = cq.Workplane("XZ", origin=(0, y0, 0)).polyline(pts).close().extrude(-P.PLATE_T).val()
+        pl = pl.cut(hex_prism(12.9, 20, (0, y0 - 5, 0), (0, 1, 0)))
+        for a in range(6):
+            pl = pl.cut(cyl(1.7, 10, (11.5 * math.cos(a * math.pi / 3), y0 - 2, 11.5 * math.sin(a * math.pi / 3)), (0, 1, 0)))
+        for (x, z) in ((x0 + 25, zo - 25), (x0 + 25, -zo + 25), (x1 - 25, zo - 40), (x1 - 25, -zo + 40),
+                       (xv, zo - 15), (xv, -zo + 15)):
             pl = pl.cut(cyl(3.3, 10, (x, y0 - 2, z), (0, 1, 0)))
-        if sy < 0:
-            for a in range(6):
-                pl = pl.cut(cyl(1.7, 10, (11.5 * math.cos(a * math.pi / 3), y0 - 2, 11.5 * math.sin(a * math.pi / 3)),
-                                (0, 1, 0)))
         gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al)", kind="stock")
     for k, h in enumerate(H):
-        qx = P.QX[k]
-        sad = box(qx - 34, qx + 34, -CRADLE_Y0, CRADLE_Y0, h - QEV["H"] / 2 - 8, h + QEV["H"] / 2 + 8)
-        sad = sad.cut(qev(h, SIDES[k]).translate(V(qx, 0, 0)).fuse(
-            cyl(QEV["R"] + 0.4, QEV["L"], (qx - QEV["L"] / 2, 0, h), (1, 0, 0))))
-        sad = sad.cut(cyl(OD["3/4"] / 2 + 1, 120, (qx, -60, h), (0, 1, 0)))
-        gadd(f"QEV saddle {TAGS[k]}", sad, "print", bom="QEV saddle", kind="print",
-             note="PETG-CF, bolts through both cradle plates")
-        bb = box(qx + 68, qx + 125, -CRADLE_Y0, CRADLE_Y0, h - P.PITCH / 2, h + 50 if k == 0 else h + P.PITCH / 2)
-        bb = bb.cut(cyl(42.4, 80, (qx + 60, 0, h), (1, 0, 0)))
+        s = OUT[k]
+        cyl_ch = cyl(R_CH + 0.5, 600, (xf - 590, 0, h), (1, 0, 0))
+        for xs in (xf - 40.0, xf - 160.0):                    # tank saddles, inward half (straps go round)
+            zlo, zhi = sorted([0.0, h])
+            sad = box(xs - 14, xs + 14, -CRADLE_Y0, CRADLE_Y0, zlo + (2.0 if h > 0 else -2.0), zhi).cut(cyl_ch)
+            sad = sad.intersect(box(xs - 14, xs + 14, -CRADLE_Y0, CRADLE_Y0, h if h < 0 else 2.0,
+                                    h if h > 0 else -2.0))
+            gadd(f"Chamber saddle {TAGS[k]} {xs:.0f}", sad, "print", bom="Chamber saddle", kind="print",
+                 note="PETG-CF, screws through both cradle plates; a strap closes the outer half")
+            gadd(f"Chamber strap {TAGS[k]} {xs:.0f}", tube(R_CH + 2.5, R_CH + 0.5, 20.0, (xs - 10, 0, h), (1, 0, 0)).intersect(
+                box(xs - 11, xs + 11, -200, 200, h + 0.5 if s > 0 else h - 200, h + 200 if s > 0 else h - 0.5)),
+                "black", bom="1 in cam-buckle strap")
+        vb = box(xv - hl + 4, xv + hl - 4, -CRADLE_Y0, CRADLE_Y0, h - 22, h + 22)
+        vb = vb.cut(box(xv - hl - 1, xv + hl + 1, -P.VALVE["W"] / 2 - 0.4, P.VALVE["W"] / 2 + 0.4, h - 40, h + 40))
+        for yy in (1, -1):
+            gadd(f"Valve side block {TAGS[k]} {'L' if yy > 0 else 'R'}",
+                 vb.intersect(box(-1000, 1000, 0 if yy > 0 else -500, 500 if yy > 0 else 0, -1000, 1000)), "print",
+                 bom="Valve side block", kind="print", note="clamps the valve body between the cradle plates")
+        bb = box(ax0 + 6, ax0 + 60, -CRADLE_Y0, CRADLE_Y0, h - 45 if s > 0 else h - 44, h + 44 if s > 0 else h + 45)
+        bb = bb.cut(cyl(42.4, 80, (ax0, 0, h), (1, 0, 0)))
         gadd(f"Breech block {TAGS[k]}", bb, "print", bom="Breech block", kind="print", note="clamps the adapter")
-    zc = (ZMIN + ZMAX) / 2
-    mz0, mz1 = 160.0, 210.0
-    span = ZMAX - ZMIN
-    w0 = cq.Workplane("YZ", origin=(mz0, 0, zc)).rect(150, span + 140).val()
-    w1 = cq.Workplane("YZ", origin=(mz1, 0, zc)).rect(120, span + 100).val()
+    # mantlet with two fog vents between the barrels
+    mz0, mz1 = ax0 + 64.0, ax0 + 112.0
+    span = P.PITCH
+    w0 = cq.Workplane("YZ", origin=(mz0, 0, 0)).rect(2 * CRADLE_Y0 - 4, span + 130).val()
+    w1 = cq.Workplane("YZ", origin=(mz1, 0, 0)).rect(2 * CRADLE_Y0 - 34, span + 90).val()
     man = cq.Solid.makeLoft([cq.Wire.assembleEdges(w0.Edges()), cq.Wire.assembleEdges(w1.Edges())], True)
-    i0 = cq.Workplane("YZ", origin=(mz0 - 1, 0, zc)).rect(150 - 12, span + 140 - 12).val()
-    i1 = cq.Workplane("YZ", origin=(mz1 - 6, 0, zc)).rect(120 - 12, span + 100 - 12).val()
+    i0 = cq.Workplane("YZ", origin=(mz0 - 1, 0, 0)).rect(2 * CRADLE_Y0 - 16, span + 118).val()
+    i1 = cq.Workplane("YZ", origin=(mz1 - 6, 0, 0)).rect(2 * CRADLE_Y0 - 46, span + 78).val()
     man = man.cut(cq.Solid.makeLoft([cq.Wire.assembleEdges(i0.Edges()), cq.Wire.assembleEdges(i1.Edges())], True))
     for h in H:
         man = man.cut(cyl(P.BARREL_OD / 2 + 1.0, 80, (mz0 - 5, 0, h), (1, 0, 0)))
-    for z0, z1, tag in ((ZMIN - 80, zc, "lower"), (zc, ZMAX + 80, "upper")):
-        gadd(f"Mantlet {tag}", man.intersect(box(mz0 - 2, mz1 + 2, -80, 80, z0, z1)), "print",
-             bom="Mantlet half (LED groove)", kind="print")
-
-    # ---------------- trunnions
-    y_hub = -CRADLE_Y0 - CRADLE_T
-    hub = cyl(16.0, 12.0, (0, y_hub, 0), (0, -1, 0)).cut(hex_prism(12.8, 14.0, (0, y_hub + 1, 0), (0, -1, 0)))
-    gadd("Trunnion hub right", hub, "print_d", bom="Trunnion hub", kind="print", note="PA-CF, 6 x M3 to the cradle plate")
-    y_end = P.ELEV_PULLEY_Y[1] + 1.0
-    gadd("Stub shaft right (1/2 hex)", hex_prism(12.7, y_end + y_hub, (0, y_hub, 0), (0, -1, 0)), "steel",
-         bom="1/2 in hex shaft, steel (trunnion stubs)", kind="stock")
+    fog_tips = []
+    yv = 56.0                                                # fog vents between the barrels, inside the mantlet sides
+    for yy in (1, -1):
+        man = man.cut(cyl(11.3, 80, (mz0 - 5, yy * yv, 0), (1, 0, 0)))
+        man = man.cut(cyl(11.3, 200, (mz0 + 10, yy * yv, 0), (0, 0, -1)))
+    for z0, z1, tag in ((-span / 2 - 70, 0, "lower"), (0, span / 2 + 70, "upper")):
+        gadd(f"Mantlet {tag}", man.intersect(box(mz0 - 2, mz1 + 2, -100, 100, z0, z1)), "print",
+             bom="Mantlet half (LED groove, fog vents)", kind="print")
+    zl = -(P.PITCH / 2 + 70.0)
+    for yy in (1, -1):
+        nz = union([cyl(11.0, mz1 + 10.0 - (mz0 + 10.0), (mz0 + 10.0, yy * yv, 0), (1, 0, 0)),
+                    cyl(11.0, -zl, (mz0 + 10.0, yy * yv, 0), (0, 0, -1)),
+                    cq.Solid.makeSphere(11.0, V(mz0 + 10.0, yy * yv, 0), angleDegrees1=-90, angleDegrees2=90)])
+        nz = nz.cut(union([cyl(9.0, 200, (mz0 + 10.0, yy * yv, 0), (1, 0, 0)), cyl(9.0, 200, (mz0 + 10.0, yy * yv, 0), (0, 0, -1)),
+                           cq.Solid.makeSphere(9.0, V(mz0 + 10.0, yy * yv, 0), angleDegrees1=-90, angleDegrees2=90)]))
+        gadd(f"Fog vent gun {'L' if yy > 0 else 'R'}", nz, "print", bom="Fog vent nozzle (gun)", kind="print",
+             note="PETG elbow: inlet out the bottom of the mantlet, outlet between the barrels")
+        fog_tips.append(V(mz0 + 10.0, yy * yv, zl))
+    # axle (through both plates, between the cannons), hubs, elevation pulley
+    ya = P.BEARING_BLOCK_Y[1] + 1.0
+    gadd("Pivot axle (1/2 hex)", hex_prism(12.7, 2 * ya + 12.0, (0, -ya, 0), (0, 1, 0)), "steel",
+         bom="1/2 in hex shaft, steel (pivot axle)", kind="stock", note=f"{(2 * ya + 12) / IN:.1f} in")
+    for sy, tag in ((1, "left"), (-1, "right")):
+        y_h = sy * (CRADLE_Y0 + P.PLATE_T)
+        hub = cyl(16.0, 10.0, (0, y_h, 0), (0, sy, 0)).cut(hex_prism(12.9, 14.0, (0, y_h - sy, 0), (0, sy, 0)))
+        gadd(f"Axle hub {tag}", hub, "print_d", bom="Axle hub", kind="print", note="PA-CF, 6 x M3 to the cradle plate")
     pul = elevation_pulley().translate(V(0, -P.ELEV_PULLEY_Y[1], 0))
     gadd("Elevation pulley 56T", pul, "print_d", bom="Elevation pulley 56T HTD 9 mm", kind="print", note="hex bore")
-    yc = chamber_end[0].y
-    caphub = tube(70.0, 64.4, 30.0, (0, yc - 30.0, 0), (0, 1, 0)).fuse(
-        cyl(70.0, 5.0, (0, yc, 0), (0, 1, 0))).cut(hex_prism(12.8, 7.0, (0, yc - 1, 0), (0, 1, 0)))
-    gadd("Trunnion cap hub left", caphub, "print_d", bom="Trunnion cap hub", kind="print",
-         note="PA-CF, clamps the 4 in cap, 2 x M5 pinch")
-    shaft_l = hex_prism(12.7, P.ELEV_PULLEY_Y[0] + 6.0 - yc - 5.0, (0, yc + 5.0, 0), (0, 1, 0))
-    gadd("Stub shaft left (1/2 hex)", shaft_l, "steel", bom="1/2 in hex shaft, steel (trunnion stubs)", kind="stock")
-
-    # ---------------- supply tubes inside the cradle, out the left side behind the plate (service loops go on)
-    t0, t1 = supply_tip[0], supply_tip[1]
-    paths = {0: [t0, V(t0.x, 44.0, -6.0), V(-75.0, 44.0, -30.0), V(-75.0, 62.0, -30.0)],
-             1: [t1, V(t1.x, -42.0, t1.z), V(-66.0, -42.0, t1.z), V(-66.0, 40.0, t1.z), V(-82.0, 40.0, -75.0),
-                 V(-82.0, 62.0, -52.0)]}
-    for k, pts in paths.items():
+    # supply tubes from each chamber's fill elbow, round the back of the cradle plate, out the left side
+    exits = []
+    for k, t in enumerate(fills):
+        s = OUT[k]
+        xb, yb = fronts[k] - P.CH_L - 14.0, -30.0
+        pts = [t, V(t.x, yb, t.z), V(xb, yb, t.z), V(xb, yb, s * 40.0)]
         gadd(f"Gun tube {TAGS[k]}", _tube_path(pts), "tube", bom="DOT nylon tube 1/4 OD (ft)", kind="stock")
-    GUN_EXITS[:] = [paths[0][-1], paths[1][-1]]
-    log("gun: built")
-    return chamber_end
+        exits.append(pts[-1])
+    return exits, fog_tips
 
 
-GUN_EXITS = []
+def build(log=print):
+    """Build once, find the centre of mass, shift the cannons so it sits on the axle, rebuild, register."""
+    xv = P.X_VALVE
+    for _ in range(3):
+        exits, fogs = _build(xv)
+        mtot = sum(_mass(p) for p in LOCAL)
+        cg = sum(_mass(p) * p["shape"].Center().x for p in LOCAL) / mtot
+        if abs(cg) < 1.0:
+            break
+        xv -= cg
+    cgz = sum(_mass(p) * p["shape"].Center().z for p in LOCAL) / mtot
+    BALANCE.update(xv=xv, cg_x=cg, cg_z=cgz, mass=mtot)
+    for p in LOCAL:
+        add(p["name"], p["shape"], p["color"], "gun", bom=p["bom"], kind=p["kind"], moving=True, note=p["note"],
+            mass=p["mass"])
+    GUN_EXITS[:] = exits
+    FOG_EXITS[:] = fogs
+    log(f"gun: valves at x {xv:.1f} from the axle, centre of mass ({cg:.1f}, {cgz:.1f}) mm, {mtot:.1f} kg")
+
+
+GUN_EXITS, FOG_EXITS, BALANCE = [], [], {}
+
+
+def sweep_profile(step=2.5, margin=10.0, ybins=None):
+    """Lowest world z the gun reaches at each x over 0-90 deg (parts inside the well width only)."""
+    px, pz = P.PIVOT
+    pts = []
+    for p in LOCAL:
+        b = p["shape"].BoundingBox()
+        if b.ymax < -P.Y_SLOT - 5 or b.ymin > P.Y_SLOT + 5:
+            continue
+        verts, tris = p["shape"].tessellate(2.0, 0.5)
+        vs = [(v.x, v.z) for v in verts]
+        pts += vs
+        for tri in tris:                                   # long cylinder facets: add points along the edges
+            for i0, i1 in ((tri[0], tri[1]), (tri[1], tri[2]), (tri[2], tri[0])):
+                (xa, za), (xb, zb) = vs[i0], vs[i1]
+                n = int(math.hypot(xb - xa, zb - za) // 15.0)
+                for j in range(1, n + 1):
+                    f = j / (n + 1)
+                    pts.append((xa + (xb - xa) * f, za + (zb - za) * f))
+    env = {}
+    a = 0.0
+    while a <= P.ELEV_RANGE[1] + 1e-6:
+        c, s_ = math.cos(math.radians(a)), math.sin(math.radians(a))
+        for x, z in pts:
+            wx, wz = px + x * c - z * s_, pz + x * s_ + z * c
+            kx = int(math.floor(wx / 10.0))
+            if kx not in env or wz < env[kx]:
+                env[kx] = wz
+        a += step
+    return {k * 10.0: v - margin for k, v in env.items()}
 
 
 def _tube_path(points, r=3.175):

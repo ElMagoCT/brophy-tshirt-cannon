@@ -8,7 +8,8 @@ How the frame is made:
    panel edge; their faces lie on the panel planes.
 3. Each panel sits in a rebate REBATE_W wide and REBATE_D deep, CLIP_T below the outer face. A printed
    clip in a flush pocket at every convex panel corner holds it (one M3 into a heat-set insert), so any
-   panel comes off with its clips. An LED slot right behind the panel lights its edge.
+   panel comes off with its clips. An LED channel runs through every member right under the panel's
+   overlap: the strip threads through it facing out and backlights the panel.
 4. The network is split into printable pieces: a node block at every vertex and straight segments of
    at most PRINT_MAX along each edge, joined by tapered mortise-and-tenon joints with an M4 cross screw.
 """
@@ -32,11 +33,35 @@ def _tumble_prism(inset):
     return cq.Workplane("YZ", origin=(-2000, 0, 0)).polyline(pts).close().extrude(4000).val()
 
 
+SLOT_PTS = []          # gun well side profile (x, z), set from the gun's swing by set_slot_profile()
+
+
+def set_slot_profile(env, step=20.0):
+    """Well floor from the gun's sweep envelope {x: lowest z}: flat where it meets the front and back
+    faces, following the swing in between (the floor is open, so its facets carry no panels)."""
+    px = P.PIVOT[0]
+    xs = sorted(env)
+    x_lo, x_hi = px - 290.0, px + 230.0
+    z_r = min(env[x] for x in xs if x <= x_lo)
+    z_f = min(env[x] for x in xs if x >= x_hi)
+    mid = []
+    x = x_hi
+    while x >= x_lo - 1e-6:
+        near = [env[q] for q in xs if abs(q - x) <= step]
+        mid.append((x, min(near + [z_f if x > px else z_r])))
+        x -= step
+    SLOT_PTS[:] = [(3000.0, z_f)] + mid + [(-3000.0, z_r), (-3000.0, 4000.0), (3000.0, 4000.0)]
+    return z_f, z_r
+
+
+def slot_prism():
+    return cq.Workplane("XZ", origin=(0, P.Y_SLOT, 0)).polyline(SLOT_PTS).close().extrude(2 * P.Y_SLOT).val()
+
+
 def body_solid():
     pts = [(x, z) for x, z in P.SIDE_OUTLINE]
     prism = (cq.Workplane("XZ", origin=(0, -P.Y_S - 200, 0)).polyline(pts).close().extrude(-2 * P.Y_S - 400)).val()
-    slot = box(P.X_SLOT_REAR, 2000, -P.Y_SLOT, P.Y_SLOT, P.Z_SLOT_FLOOR, 3000)
-    return prism.intersect(_tumble_prism(0.0)).cut(slot).clean()
+    return prism.intersect(_tumble_prism(0.0)).cut(slot_prism()).clean()
 
 
 def _offset_outline(pts, d, bottom_drop):
@@ -66,9 +91,7 @@ def inner_solid():
     """The body offset inward by MEM_H, open at the bottom (OCC's shell() output breaks booleans)."""
     ipts = _offset_outline(P.SIDE_OUTLINE, P.MEM_H, bottom_drop=40.0)
     prism = (cq.Workplane("XZ", origin=(0, -P.Y_S - 200, 0)).polyline(ipts).close().extrude(-2 * P.Y_S - 400)).val()
-    g = P.MEM_H
-    slot = box(P.X_SLOT_REAR, 2000, -P.Y_SLOT, P.Y_SLOT, P.Z_SLOT_FLOOR - g, 3000)
-    return prism.intersect(_tumble_prism(P.MEM_H)).cut(slot).clean()
+    return prism.intersect(_tumble_prism(P.MEM_H)).cut(slot_prism()).clean()
 
 
 def face_info(solid):
@@ -121,22 +144,19 @@ def _fits(poly3, n):
 
 
 def is_open_face(fi):
-    """Gun-slot walls and slot rear wall: left open (no panel, no frame)."""
-    n, c = fi["n"], fi["c"]
-    slot_wall = abs(n.y) > 0.99 and abs(abs(c.y) - P.Y_SLOT) < 1
-    slot_rear = n.x > 0.99 and abs(c.x - P.X_SLOT_REAR) < 1
-    return slot_wall or slot_rear
+    """Gun well walls and floor (every face lying inside the well's width): left open, no panel."""
+    return all(abs(v[1]) <= P.Y_SLOT + 0.5 for v in fi["verts"])
 
 
 def panels_for(fi):
-    """A body face as one panel; the right side wall splits at SIDE_SPLIT_X (its rear panel is the
-    battery door) and anything bigger than one sheet splits once (deck along y = 0)."""
+    """A body face as one panel; the side walls split at SIDE_SPLIT_X (their rear panels are the
+    battery doors) and anything bigger than one sheet splits once (deck along y = 0)."""
     n = fi["n"]
     if n.z < -0.99 or is_open_face(fi):
         return []
     poly = list(fi["verts"])
-    right_wall = n.y < -0.9
-    if _fits(poly, n) and not right_wall:
+    side_wall = abs(n.y) > 0.9
+    if _fits(poly, n) and not side_wall:
         return [poly]
     out = []
     for sgn in (1, -1):
@@ -202,8 +222,11 @@ def build(log=print):
     recess = []
     for p in panels:
         recess.append(slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W, -1.0, P.REBATE_D + 1.0))
-        # LED slot on the window edge, right behind the panel: the strip stands on edge and lights its edge
-        recess.append(slab(p["poly"], p["n"], P.MEM_W - P.LED_SLOT[0], P.REBATE_D - 0.01, P.LED_SLOT[1]))
+        # LED channel through the member, right under the panel's overlap: the strip lies flat facing out
+        # and backlights the panel edge band; a lip on the window side and the panel itself close it
+        a = slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + P.LED_CH[2], P.REBATE_D - 0.01, P.LED_CH[1])
+        b = slab(p["poly"], p["n"], P.MEM_W - P.LED_LIP, P.REBATE_D - 0.5, P.LED_CH[1] + 1.0)
+        recess.append(a.cut(b))
         p["clips"] = corner_clips(p)
         for c in p["clips"]:
             recess += [c["pocket"], c["insert"]]
@@ -339,8 +362,9 @@ def _section_prism(edge, panels, t0, t1, margin=0.6):
     return union(regs)
 
 
-def _core_point(edge, panels, at, depth=10.5):
+def _core_point(edge, panels, at, depth=None):
     """A point deep in the member's cross-section, clear of grooves and LED channels."""
+    depth = P.CORE_DEPTH if depth is None else depth
     a, b = edge["a"], edge["b"]
     ps = [panels[i] for i in edge["panels"]]
     if len(ps) == 1:

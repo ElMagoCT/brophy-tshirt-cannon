@@ -93,8 +93,8 @@ BUMP_Z = (GROUND_CLEAR, GROUND_CLEAR + 2 * NOODLE_D)
 # ------------------------------------------------------------------ body (printed frame + recessed acrylic)
 ACRYLIC_T = 0.125 * IN
 PANEL_MAX = (18 * IN, 36 * IN)
-MEM_W, MEM_H = 18.0, 22.0                   # printed member: width on each panel, depth inward
-REBATE_W = 8.0                              # panel edge overlaps the member by this much
+MEM_W, MEM_H = 26.0, 24.0                   # printed member: width on each panel, depth inward
+REBATE_W = 14.0                             # panel edge overlaps the member by this much
 CLIP_T = 2.5                                # printed corner clips sit flush, panel sits CLIP_T below the face
 REBATE_D = CLIP_T + ACRYLIC_T + 0.3
 CLIP_R = 10.0
@@ -102,27 +102,25 @@ NODE_SETBACK = 48.0
 PRINT_MAX = 240.0
 TENON = (6.5, 6.5, 12.0, 0.5)
 TENON_CLEAR = 0.15
-LED_SLOT = (2.6, 10.6)                      # 10 mm strip on edge, right behind the panel at the window edge
+LED_CH = (10.8, 4.2, 2.0)                   # LED channel under the panel overlap: width, depth, outer shoulder
+LED_LIP = 1.2                               # lip on the window side that keeps the strip in its channel
+CORE_DEPTH = 15.0                           # tenons sit this deep, below the LED channel
 
 Y_S = OUTER_RAIL_Y[1] + MEM_H               # side wall outer face at its bottom edge
-TUMBLE = 6.0                                # side walls lean in this much
+TUMBLE = 8.0                                # side walls lean in this much
 Z_WALL_BOT = BUMP_Z[1] + 1.5
-Z_TOP = 580.0                               # flat deck (the bottom chamber clears it at 90 deg)
-Y_SLOT = 85.0                               # gun slot half width (top and floor opening)
-
-PIVOT = (-130.0, 450.0)                     # pivot = axis of the top barrel
-Z_SLOT_FLOOR = 270.0
-X_SLOT_REAR = -228.0
-FRONT_ANGLE = 70.0                          # one front slant, from horizontal
+Z_TOP = 630.0                               # flat deck
+FRONT_ANGLE = 60.0                          # one front slant, from horizontal
+REAR_ANGLE = 80.0                           # the back leans in too
 X_TOP_FRONT = FRAME_X - (Z_TOP - Z_WALL_BOT) / math.tan(math.radians(FRONT_ANGLE))
+X_TOP_REAR = -FRAME_X + (Z_TOP - Z_WALL_BOT) / math.tan(math.radians(REAR_ANGLE))
 SIDE_OUTLINE = [
     (FRAME_X, Z_WALL_BOT),                  # nose, on the bumper
     (X_TOP_FRONT, Z_TOP),                   # front slant top
-    (-FRAME_X + 29.0, Z_TOP),               # flat deck
-    (-FRAME_X, Z_TOP - 29.0),               # rear chamfer
-    (-FRAME_X, Z_WALL_BOT),
+    (X_TOP_REAR, Z_TOP),                    # flat deck
+    (-FRAME_X, Z_WALL_BOT),                 # back slant
 ]
-SIDE_SPLIT_X = -160.0                       # right side wall: rear panel is the battery door
+SIDE_SPLIT_X = -150.0                       # both side walls split here: the rear panels are the battery doors
 
 
 def wall_y(z, inner=False):
@@ -131,42 +129,61 @@ def wall_y(z, inner=False):
     return y - MEM_H / math.cos(math.radians(TUMBLE)) if inner else y
 
 
+def rear_x(z, inner=False):
+    x = -FRAME_X + (z - Z_WALL_BOT) / math.tan(math.radians(REAR_ANGLE))
+    return x + MEM_H / math.sin(math.radians(REAR_ANGLE)) if inner else x
+
+
 def front_x(z, inner=False):
     x = FRAME_X - (z - Z_WALL_BOT) / math.tan(math.radians(FRONT_ANGLE))
     return x - MEM_H / math.sin(math.radians(FRONT_ANGLE)) if inner else x
 
 
-# ------------------------------------------------------------------ gun
+# ------------------------------------------------------------------ gun (rev C): two in-line cannons
+# Each cannon: chamber tank -> 1 in stainless solenoid valve -> polycarbonate barrel, all on one axis.
+# The two cannons stack; the pivot axle passes between them, at the gun's centre of mass.
 BARREL_OD, BARREL_WALL, BARREL_LEN = 3.0 * IN, 0.125 * IN, 22.5 * IN   # clear polycarbonate tube
 N_BARRELS = 2
-PITCH = 95.0                                # top barrel on the pivot axis, bottom one PITCH below
-QX = (0.0, 30.0)                            # QEV x per barrel: the bottom one sits 30 mm forward so the two
-                                            # inlet blocks don't face each other (its barrel is 30 mm shorter)
+VALVE = dict(L=82.6, W=66.0, BODY=(-28.0, 30.0), COIL_R=25.0, COIL_TOP=86.0)  # Atlantic Valves SZW-25 (1 in NPT)
+CH_D, CH_L = 6.0 * IN, 11.0 * IN            # chamber: 1 gal 200 psi ASME steel tank, 1 in NPT end port
+CH_BOSS = 15.0                              # end-port boss on the front dome
+GUN_GAP = 12.0                              # between the two chamber tanks
+PITCH = CH_D + GUN_GAP                      # cannons at z = +/- PITCH / 2 about the axle
+X_VALVE = 67.0                              # valve centre ahead of the axle (from the balance calc, see gun.py)
+CH_FIT_X = (-110.0, -170.0, -230.0)         # tank fittings along the top (bottom) of each tank, axle-relative:
+                                            # fill push-to-connect, 110 psi relief, transducer
 ELEV_RANGE = (0.0, 90.0)
 ELEV_SHOW = 20.0
-ELEV_T = (16, 56)                           # goBILDA pinion -> pulley on the right stub (HTD 5M 9 mm)
-ELEV_BELT_T = 145
-ELEV_PULLEY_Y = (158.0, 171.0)              # |y| of the elevation pulley (outboard of the bearing block)
+ELEV_T = (16, 56)                           # goBILDA pinion -> pulley on the right axle end (HTD 5M 9 mm)
+ELEV_BELT_T = 100
+ELEV_PULLEY_Y = (95.0, 108.0)               # |y| of the elevation pulley, just outside the gun
+Y_GUN = CH_D / 2 + 3.5 + PLATE_T            # half width of the gun over its cradle plates
 
-# towers: 1x1 on the inner rails; left one behind the pivot, right one ahead (clear of the chambers)
-TOWER_L_X = (PIVOT[0] - 40.0 - 12.7, PIVOT[0] - 40.0 + 12.7)
-TOWER_R_X = (PIVOT[0] + 85.0 - 12.7, PIVOT[0] + 85.0 + 12.7)
-BEARING_BLOCK_Y = (INNER_RAIL_Y[0] + 0.5, INNER_RAIL_Y[1])
-ELEV_MOTOR_Z = 225.0
+PIVOT = (-40.0, 572.0)                      # axle between the cannons; high enough that the gun's swing
+                                            # clears the Falcons' inboard ends
+Y_SLOT = 112.0                              # gun well half width (the elevation pulley turns inside it)
+X_SLOT_REAR = -2000.0                       # the well is open at the back: at 0 deg the chambers reach the rear face
+
+# towers: 1x1 on the inner rails behind the pivot (clear of the rear Falcons); a printed bearing block
+# runs forward from each to the axle
+TOWER_X = (-182.7, -157.3)
+TOWER_L_X = TOWER_R_X = TOWER_X
+BEARING_BLOCK_Y = (ELEV_PULLEY_Y[1] + 1.0, INNER_RAIL_Y[1])
+ELEV_MOTOR_Z = 490.0
 ELEV_C = centre_for_belt(ELEV_BELT_T, pd(ELEV_T[0]), pd(ELEV_T[1]))
 ELEV_MOTOR_X = PIVOT[0] + math.sqrt(ELEV_C ** 2 - (PIVOT[1] - ELEV_MOTOR_Z) ** 2)
 
 # ------------------------------------------------------------------ pneumatics / power
 TANK_D, TANK_L = 152.0, 360.0               # owner's AliExpress 6 L / 1.6 gal 200 psi tank (bare shell)
-TANK_LEFT = (125.0, 178.0, 366.0)           # lying along x, front left, above the front-left wheel
-TANK_REAR = (-307.0, 10.0, 107.6 + TANK_L / 2)   # standing, rear centre, on the bellypan
+TANK_SIDE = (66.0, 169.0, 364.0)            # (x, |y|, z): reservoirs lying along x, left and right, above the
+                                            # front wheels
 BATT = (7.13 * IN, 3.01 * IN, 6.57 * IN)    # FRC battery L, W, H
 BELLY_Z = RAIL_Z[0]
-BATT_Z = 287.8                              # battery bottoms on the sled (over the rear-right wheel)
-BATT_X = (-385.0, -229.0)                   # two batteries side by side along x
-BATT_Y = (-252.0, -252.0 + BATT[0])         # long side across, they slide out the right side
-COMP_BOX = (243.0, 128.0, 181.0)            # ZHSYMX SQ420, spot only
-COMP_SPOT = ((150.0, 331.0), (-121.5, 121.5), (BELLY_Z, BELLY_Z + 128.0))   # lying flat, front bay
+BATT_Z = 287.8                              # battery bottoms on their sleds (over the rear wheels)
+BATT_X = (-336.0, -336.0 + BATT[0])         # one battery each side, long axis along x
+BATT_Y = (160.0, 160.0 + BATT[1])           # |y|: they slide out the side walls
+ELEC_BAY = ((-380.0, -192.0), (-125.0, 125.0), (BELLY_Z, 250.0))   # back bottom
+FOG_BOX = ((200.0, 360.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # handheld fogger, front bay
 
 
 def summary():
