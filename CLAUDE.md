@@ -23,7 +23,7 @@ You are the lead engineer on a high school robotics build. Think like the best h
 
 Mark 5 is a ground-up rebuild of Brophy College Prep's t-shirt cannon robot, built and operated by the Broncobots robotics club on behalf of student council for parades, games, and gym events. It's a three-barrel pneumatic cannon on a mecanum drive, controlled by an ESP32 over a WebSocket web UI so any laptop/phone can drive it with no special software.
 
-**Status:** Design phase. Pneumatic architecture is chosen (150 PSI, Option A). The "Glacis" design (rev C, two in-line cannons balanced on a centre axle, reusing the old cannon's Atlantic Valves SZW-25 and 1 gal chamber) is fully modelled in `cad/glacis/` (CadQuery) and imported to Onshape ("Brophy Mark 5 - Glacis"); its parts list is the "Glacis BOM" tab ($1,888.23, 2026-11-02) and its decisions are in `docs/glacis/JUDGMENTS.md`, awaiting Micah's review. Nothing has been purchased or built. No firmware or dashboard code yet. Horn and video are still goal-level only.
+**Status:** Design phase. Pneumatic architecture is chosen (150 PSI, Option A). The "Glacis" design (rev C.1, two in-line cannons 3.8 mm apart balanced on a pivot axis between them, the old cannon's Atlantic Valves SZW-25 firing valves, 0.53 L 2 in pipe chambers) is fully modelled in `cad/glacis/` (CadQuery) and imported to Onshape ("Brophy Mark 5 - Glacis"); its parts list is the "Glacis BOM" tab and its decisions are in `docs/glacis/JUDGMENTS.md`, awaiting Micah's review. Nothing has been purchased or built. No firmware or dashboard code yet. Horn and video are still goal-level only.
 
 ---
 

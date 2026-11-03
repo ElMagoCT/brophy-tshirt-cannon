@@ -112,7 +112,7 @@ def _tank_shell(axis, c):
     return wp.circle(R).extrude(L).edges().fillet(30.0).val()
 
 
-REAR_MAN = (-347.0, 93.5, 275.0)             # rear manifold centre, back bottom, behind the rear panel
+REAR_MAN = (-347.0, 93.5, 255.0)             # rear manifold centre, back bottom, behind the rear panel
 FILL = (-248.6, 55.0, 200.0)                 # fill block centre (5-port), back bottom bay
 CHECKS = []                                  # outlets of the two inline check valves (service loops start here)
 FOG_OUT = []                                 # fog splitter barbs for the two gun lines
@@ -176,7 +176,7 @@ def air():
             xo = P.rear_x(mz) - 0.5
             vb = cyl(11.0, rear + 10.2 - (xo - 6), (rear + 10.2, yb, mz), (-1, 0, 0)).cut(
                 cyl(6.86, 10.2, (rear + 10.3, yb, mz), (-1, 0, 0)))
-            add(name, vb.fuse(box(xo - 6, xo - 2, yb - 3, yb + 3, mz, mz + 40)), "brass", "pneu",
+            add(name, vb.fuse(box(xo - 6, xo - 2, yb, yb + 40, mz - 3, mz + 3)), "brass", "pneu",          # lever lies sideways
                 bom="1/4 FNPT mini ball valve (manual bleed)", note="lever outside the rear panel")
     # fill valve + 5-port fill block (chamber zone: 110 psi software cap, 125 psi relief): transducer up, relief +y, two outlets through
     # inline check valves (one per cannon, so one shot can't vent the other chamber)
@@ -312,9 +312,9 @@ def batteries_and_electronics():
         bom="Panel-mount USB-C extension (to the STM32)")
 
 
-ESTOP = (-170.0, 268.0)     # (y, z) on the rear panel, bottom
-CHARGE = (-95.0, 262.0)
-USB = (182.0, 262.0)
+ESTOP = (-170.0, 255.0)     # (y, z) on the rear panel, bottom strip under the open middle
+CHARGE = (-95.0, 255.0)
+USB = (182.0, 255.0)
 
 
 # ------------------------------------------------------------------ bumpers

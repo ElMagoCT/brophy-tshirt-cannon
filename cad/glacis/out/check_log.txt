@@ -1,34 +1,22 @@
 drive: built
-gun: valves at x 60.9 from the axle, centre of mass (0.2, -0.1) mm, 13.5 kg
-gun well: floor at z 437 where it meets the front, 388 at the back, 232 under the axle
+gun: valves at x 70.6 from the axis, centre of mass (0.2, -0.0) mm, 11.3 kg; chambers 0.53 L each, barrels 3.8 mm apart
+gun well: floor at z 471 where it meets the front, 349 at the back, 206 under the axle
 elevation belt pitch length 500 mm (100.0 teeth)
-body: 36 faces, volume 107.3 L
-shell volume 23.82 L, 1 solid
+body: 34 faces, volume 113.4 L
+shell volume 24.45 L, 1 solid
 9 panels
-frame network volume 4.82 L, 40 corner clips
+frame network volume 4.86 L, 40 corner clips
 31 edges
-56 pieces (14 nodes)
+56 pieces (15 nodes)
 joints: 60 tapered tenons with M4 cross screws, 6 ends without a neighbour piece
-body: 56 frame pieces (6 slivers dropped), 9 panels, 40 clips, LED slot 12.4 m
-built 484 parts in 156 s
-envelope at  0 deg: 44.9 L x 27.8 W x 31.2 H in
-envelope at 90 deg: 37.8 L x 27.8 W x 50.1 H in
+body: 56 frame pieces (9 slivers dropped), 9 panels, 40 clips, LED slot 12.5 m
+built 495 parts in 61 s
+envelope at  0 deg: 46.0 L x 27.8 W x 27.8 H in
+envelope at 90 deg: 37.8 L x 27.8 W x 51.2 H in
 body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
-mass estimate 68.6 kg (151 lb): body 6.0, bumper 1.5, drive 15.1, frame 5.0, gun 13.5, pneu 9.5, power 18.0
-gun 13.5 kg, CG 0 mm ahead / -0 mm above the pivot -> 0.0 N*m at 0 deg
-interference: 0 pairs over 30 mm^3 (92 s)
-elevation sweep 0-90 deg: 0 clashes (5 s)
+mass estimate 66.6 kg (147 lb): body 6.1, bumper 1.5, drive 15.1, frame 5.0, gun 11.3, pneu 9.5, power 18.0
+gun 11.3 kg, CG 0 mm ahead / -0 mm above the pivot -> 0.0 N*m at 0 deg
+interference: 0 pairs over 30 mm^3 (38 s)
+elevation sweep 0-90 deg: 0 clashes (3 s)
 printed parts over a 256 mm bed: 0 []
 parts in more than one piece: 0 []
-exported Frame, pivot & drive: 87 parts, 6.6 MB
-exported Wheel FL: 35 parts, 6.8 MB
-exported Wheel FR: 35 parts, 7.5 MB
-exported Wheel RL: 35 parts, 6.8 MB
-exported Wheel RR: 35 parts, 7.5 MB
-exported Gun (at 20 deg): 46 parts, 2.2 MB
-exported Air, power & electronics: 72 parts, 1.9 MB
-exported Panels, clips, standoffs & bumpers: 83 parts, 2.1 MB
-exported Body frame 1 of 2: 28 parts, 7.8 MB
-exported Body frame 2 of 2: 28 parts, 7.7 MB
-BOM rollup: 145 distinct items -> /Users/user/Documents/Workspace/brophy-tshirt-cannon-wheel/cad/glacis/out/parts_from_cad.csv
-renders written

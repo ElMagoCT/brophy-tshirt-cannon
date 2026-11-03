@@ -258,4 +258,20 @@ the biggest hub the bed takes, and an integrated 15 mm HTD 5M pulley 1.25 in off
 - **Three flat 1/8 in aluminum plates per wheel** on 8 x 1/4-20 through-bolts.
 - **Wheels are 120 mm wide (was 94)**: the inner rails and Falcons moved 26.5 mm inboard; the
   electronics shelf, fill block and tank lines were refit around them.
-- Parts list +$60.85, now $1,888.23. Wheels +0.9 kg each.
+- Parts list +$60.85 for the wheel hardware. Wheels +0.9 kg each.
+
+## 2026-11-02 - Glacis rev C.1: pipe chambers, barrels together (proposed, waiting on Micah)
+
+- **Chambers: 2 in Sch 40 x 8 in nipple between two 2 x 1 malleable reducing couplings (0.53 L)**,
+  instead of the old 1 gal tank plus a $397 McMaster twin.
+  - A shot simulation (`cad/glacis/shot_model.py`) shows the slow SZW-25 limits the shot: 0.53 L gives
+    78% of the 1 gal's exit speed and about 20 shots per charge instead of 4.
+  - Longer nipples were modelled. They swing the chambers low enough at the back to open the rear face
+    down through its controls.
+  - A pair costs about $82 in pipe.
+  - The old grey tank is a spare.
+- **Barrels 3.8 mm apart** (80 mm between axes, was 164). The breech adapter is now a spigot the barrel
+  slips over, and one printed breech block clamps both barrels.
+- **Pivot on two hex stubs**, one per cradle plate. The axis still runs between the cannons, but there's
+  no room for a through-shaft between the chambers' couplings.
+- **Chamber fittings move to a 5-port block on the back of each chamber**, so nothing is drilled.

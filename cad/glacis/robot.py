@@ -68,12 +68,13 @@ def build(elev=P.ELEV_SHOW):
     # the gun; the rest is a slack coil, so the sweep check skips them.
     ex = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.GUN_EXITS]
     a, b = misc.CHECKS
-    routes = {"Service loop A (top cannon)": [a, V(a.x, 60.0, 245.0), V(-240.0, 20.0, 300.0), V(-335.0, -10.0, 380.0),
-                                               V(-335.0, -30.0, ex[0].z), ex[0]],
-              "Service loop B (bottom cannon)": [b, V(-260.0, -30.0, 250.0), V(-318.0, -30.0, 330.0), V(ex[1].x - 18.0, -30.0, ex[1].z), ex[1]]}
+    routes = {}
+    for tag, c, e, yl in (("A (top cannon)", a, ex[0], -62.0), ("B (bottom cannon)", b, ex[1], -80.0)):   # up through the open well floor
+        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 260.0), V(-300.0, yl, 400.0), V(e.x + 15.0, yl, e.z), V(e.x, yl, e.z), e]
     fx = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.FOG_EXITS]
     for k, (f0, f1) in enumerate(zip(misc.FOG_OUT, fx)):
-        routes[f"Fog loop {'L' if k == 0 else 'R'} (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(f1.x + 20.0, f1.y, f1.z - 60.0), f1]
+        routes[f"Fog loop {'L' if k == 0 else 'R'} (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(180.0, f1.y, 420.0),
+                                                                  V(f1.x - 10.0, f1.y, f1.z - 60.0), f1]   # into the well from below
     for tag, pts in routes.items():
         r = 11.0 if tag.startswith("Fog") else 3.175
         lib.add(tag, misc.tube_path([p.toTuple() for p in pts], r=r), "tube", "pneu" if r < 5 else "power",
