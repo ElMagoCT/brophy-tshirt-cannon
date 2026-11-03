@@ -140,24 +140,27 @@ def front_x(z, inner=False):
 
 
 # ------------------------------------------------------------------ gun (rev C): two in-line cannons
-# Each cannon: chamber tank -> 1 in stainless solenoid valve -> polycarbonate barrel, all on one axis.
-# The two cannons stack; the pivot axle passes between them, at the gun's centre of mass.
+# Each cannon: pipe chamber -> 1 in stainless solenoid valve -> polycarbonate barrel, all on one axis.
+# The two cannons stack as close as the barrels allow; the pivot axis runs between them, at the gun's centre of
+# mass, on two hex stubs (one per cradle plate) so nothing has to pass between the cannons.
 BARREL_OD, BARREL_WALL, BARREL_LEN = 3.0 * IN, 0.125 * IN, 22.5 * IN   # clear polycarbonate tube
 N_BARRELS = 2
 VALVE = dict(L=82.6, W=66.0, BODY=(-28.0, 30.0), COIL_R=25.0, COIL_TOP=86.0)  # Atlantic Valves SZW-25 (1 in NPT)
-CH_D, CH_L = 6.0 * IN, 11.0 * IN            # chamber: 1 gal 200 psi ASME steel tank, 1 in NPT end port
-CH_BOSS = 15.0                              # end-port boss on the front dome
-GUN_GAP = 12.0                              # between the two chamber tanks
-PITCH = CH_D + GUN_GAP                      # cannons at z = +/- PITCH / 2 about the axle
-X_VALVE = 67.0                              # valve centre ahead of the axle (from the balance calc, see gun.py)
-CH_FIT_X = (-110.0, -170.0, -230.0)         # tank fittings along the top (bottom) of each tank, axle-relative:
-                                            # fill push-to-connect, 125 psi relief, transducer
+# chamber: 2 in Sch 40 x 8 in nipple between two 2 x 1 black malleable reducing couplings (about 0.53 L; a longer
+# nipple swings the chamber low enough at the back to open the rear face down through its controls)
+CH_PIPE, CH_NIPPLE_L = "2", 8.0 * IN
+RED = dict(L=71.0, OD_IN=44.0, OD_OUT=76.0, BAND_IN=16.0, BAND_OUT=26.0, MASS=0.31)   # 2 x 1 (CNSD4005, 10.9 oz)
+GUN_GAP = 3.8                               # between the barrels (and between the reducers' wide ends)
+PITCH = BARREL_OD + GUN_GAP                 # cannons at z = +/- PITCH / 2 about the axis
+CRADLE_Y0 = 79.7                            # inner faces of the two cradle plates (room for the smoke vents)
+X_VALVE = 83.0                              # valve centre ahead of the axis (from the balance calc, see gun.py)
+CH_SADDLE_S = (110.0, 205.0)                # chamber saddles, distance behind the valve's rear face
 ELEV_RANGE = (0.0, 90.0)
 ELEV_SHOW = 20.0
 ELEV_T = (16, 56)                           # goBILDA pinion -> pulley on the right axle end (HTD 5M 9 mm)
 ELEV_BELT_T = 100
 ELEV_PULLEY_Y = (95.0, 108.0)               # |y| of the elevation pulley, just outside the gun
-Y_GUN = CH_D / 2 + 3.5 + PLATE_T            # half width of the gun over its cradle plates
+Y_GUN = CRADLE_Y0 + PLATE_T                 # half width of the gun over its cradle plates
 
 PIVOT = (-40.0, 572.0)                      # axle between the cannons; high enough that the gun's swing
                                             # clears the Falcons' inboard ends

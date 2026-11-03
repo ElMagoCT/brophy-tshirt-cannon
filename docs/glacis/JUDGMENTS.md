@@ -2,8 +2,9 @@
 
 Rev C (2026-11-02) is the redesign from your third round of notes:
 - both chambers on the back of their cannons, in line;
-- the gun balanced on an axle that runs between the two cannons;
-- the old cannon's firing valve and chamber, plus one more of each;
+- the gun balanced on a pivot axis that runs between the two cannons;
+- the old cannon's firing valve, plus one more;
+- small, cheap 2 in pipe chambers (0.53 L), sized by a shot simulation, with the barrels as close as they go;
 - the back tank moved to the right, and no room left for a pump;
 - a 60 deg front, with the sides and back leaning more;
 - the rear-panel controls at the bottom of the panel, and the electronics in the back bottom;
@@ -37,16 +38,10 @@ are all at $0.
    - Same-spec Amazon option: U.S. Solid USS2-01023, $59.80
      ([B0CXWR76GT](https://www.amazon.com/dp/B0CXWR76GT)). Its listing contradicts itself on pressure.
    - **Check the old valve's coil label.** It has to be the 12 V DC one.
-2. **Chamber: a grey primed-steel ASME air tank with a 1 in NPT end port.** The "Tighten All Plugs"
-   label is the kind these tanks ship with. Confidence is low to medium.
-   - I sized it from video frames as the 1 gal, 6 x 11 in, 200 psi tank (Manchester 304978 class).
-     The research pass guessed 8 in across, which would be 2-3 gal.
-   - The buyable twin is **McMaster 9888K9, $397.34**: 1 gal, 6 x 11-3/4 in, 200 psi. It has one 1 in,
-     four 3/4 and two 1/2 NPT ports, plugs included ([link](https://www.mcmaster.com/9888K9/)).
-   - **Read the old tank's nameplate before ordering.** The same tank from a compressor dealer, or used,
-     should be far cheaper; I found no live price for the Manchester.
-   - If it turns out to be bigger, change `CH_D`/`CH_L` and its mass. The gun re-balances itself, and
-     the checks will show whether the well still clears.
+2. **Old chamber: a grey primed-steel ASME air tank with a 1 in NPT end port**, probably 1 gal. It's no
+   longer used; see item 6 for the new chambers.
+   - Its buyable twin was McMaster 9888K9 at $397.34
+     ([link](https://www.mcmaster.com/9888K9/)), which is what pushed me to look for something better.
 3. **Longacre 5 gal polished aluminum tank:** rated 125 psi
    ([52-50305](https://toolsid.com/longacre/5-gal-horizontal-silver-lightweight-air-tank-mpn-52-50305.html)).
    It can't go on the 200 psi tank side, so it's a spare.
@@ -56,41 +51,73 @@ are all at $0.
    side.
 
 ## Gun
-6. **Two cannons stacked, the axle between them.** Each one, back to front: chamber tank -> 1 in close
-   nipple -> SZW-25 -> close nipple -> CNC breech adapter -> clear polycarbonate barrel.
-   - The breech adapter is stash 6061 bar with a 1 in NPT tap ($16.99 tap on the list).
-   - The chambers sit on the back of the cannons, in line, as you asked. Their axes are 164 mm apart.
-7. **Balanced on the axle.** The model takes every part's mass, finds the gun's centre of mass and
-   slides both cannons along the barrel axis until it lands on the axle.
-   - Result: valves 61 mm ahead of the axle, centre of mass within 0.2 mm.
-   - The gun weighs 13.6 kg, so it needs **0 N*m to hold at any angle**.
-   - The valve (1.0 kg) and tank (2.7 kg) masses are estimates. Weigh yours, update them in `gun.py`,
-     and re-run before cutting the cradle plates.
-8. **Pressures: 110 psi software cap on the chambers, 125 psi relief, tanks at 200.**
-   - 110 psi sits just under the valve's 115 psi DC rating. Above that, the coil may not lift the
-     valve; it fails closed, not open.
-   - **Milton 1090-125** ASME reliefs ($16.87) go on each chamber and on the fill block. Their pull
-     ring is the manual bleed.
-   - 125 psi is above the cap, so they never simmer, and well under the tanks' and transducers' 200.
-   - This replaces the settled "150 psi chambers" for this valve.
-9. **The trade-off you're taking on.** CLAUDE.md lists "big direct-acting solenoid as the firing
-   valve: too slow vs a piloted QEV" as a dead end.
-   - The SZW-25 is semi-direct, so it opens slower than a QEV: tens of ms against about 10.
-   - You said it worked on the old cannon, and you asked for the same valves, so it's in.
-   - The 1 gal chamber holds about 7 times the air of rev B's 0.4 L at 150 psi, which makes up range.
-   - If the shots fall short, a QE5 QEV ($51.75) can go between the chamber and the barrel later and use
-     the SZW-25 as its pilot.
-10. **Air budget.**
-    - Each refill of a 1 gal chamber from empty to 110 psi takes about 35 psi out of the two 6 L tanks.
-      Starting at 200 psi, that's 2-3 refills before the tanks drop below 110.
-    - That's about **4-5 full-power shots per shop-compressor charge**: 2 loaded, plus 2-3 refills.
-      Lower settings give more.
-    - The old cannon's 5 gal tank at 125 psi held about the same air.
-11. **Chamber fittings, on each tank's outward side:**
-    - fill push-to-connect elbow;
-    - 125 psi relief;
-    - 0-200 psi transducer;
-    - each on a 3/4 x 1/4 bushing, with the spare ports plugged.
+6. **Chamber size, from a shot simulation.** I modelled a shot: the chamber, the valve opening over its
+   real time (Cv 12), the air behind the shirt and the shirt itself (250 g with friction). Then I ran it
+   against chamber size at 110 psi
+   (`cad/glacis/shot_model.py`; numbers below are for a 50 ms valve opening):
+
+   | Chamber | Exit speed | Shots per charge |
+   |---|---|---|
+   | **0.53 L (2 in x 8 in, picked)** | **22.7 m/s** | **about 20** |
+   | 0.64 L (2 in x 10 in) | 24.0 m/s | about 17 |
+   | 0.75 L (2 in x 12 in) | 24.9 m/s | about 15 |
+   | 1.25 L | 27.0 m/s | about 9 |
+   | 3.8 L (1 gal) | 29.0 m/s | about 4 |
+
+   - With this slow a valve, the valve sets the shot, not the chamber. The 1 gal tank gives 28% more speed
+     than 0.53 L, and you get a fifth of the shots.
+   - The 10 in and 12 in nipples were modelled too. They swing the chambers low enough at the back to
+     open the rear face down through the fill, bleed and charge port. The 8 in keeps the rear controls
+     where you asked for them.
+   - If the valve opened in 10 ms like a QEV, the same chamber would give about 38 m/s. That's the case
+     for adding a QE5 later (item 9).
+7. **Chamber: 2 in Sch 40 x 8 in steel nipple between two 2 x 1 malleable reducing couplings, about
+   0.53 L.**
+   - About $41 per chamber in pipe ($15 nipple and two $13 couplings), against $397 for the McMaster
+     twin of the old tank.
+   - The couplings are UL/FM listed, 150 lb class and factory pressure tested; the pipe is rated well over
+     1,000 psi. Everything sits behind the 125 psi relief.
+   - At 3 in across the couplings, the chambers are no wider than the barrels, which is what lets the
+     barrels sit close.
+8. **Two cannons stacked 3.8 mm apart** (80 mm between axes, was 164).
+   - Each one, back to front:
+     1. port block;
+     2. 1 x 1/4 bushing;
+     3. reducing coupling;
+     4. 2 in nipple;
+     5. reducing coupling;
+     6. 1 in close nipple;
+     7. SZW-25;
+     8. 1 in close nipple;
+     9. CNC breech adapter;
+     10. polycarbonate barrel.
+   - The breech adapter is stash 6061 with a 1 in NPT tap ($16.99 on the list). The barrel slips over its
+     spigot, so it's no wider than the barrel.
+   - One printed breech block in two halves clamps both barrels onto their spigots. The muzzle collar is
+     two halves meeting between the barrels.
+   - **Balanced on the pivot.** The model finds the gun's centre of mass and slides both cannons along the
+     barrel axis until it lands on the pivot axis. Valves end up 71 mm ahead of the axis, centre of mass
+     within 0.3 mm, gun 11.4 kg: **0 N*m to hold at any angle.**
+   - The valve (1.0 kg) and coupling (0.31 kg) masses are estimates; the pipe is computed. Weigh yours,
+     update `gun.py`, and re-run before cutting the cradle plates.
+9. **Pressures and the valve trade-off.**
+   - 110 psi software cap on the chambers, just under the valve's 115 psi DC rating. Above that, the coil
+     may not lift the valve; it fails closed, not open.
+   - **Milton 1090-125** ASME reliefs ($16.87) go on each chamber and on the fill block. Their pull ring is
+     the manual bleed. 125 psi is above the cap, so they never simmer, and under the tanks' and
+     transducers' 200. This replaces the settled "150 psi chambers" for this valve.
+   - CLAUDE.md lists "big direct-acting solenoid as the firing valve: too slow vs a piloted QEV" as a dead
+     end. The SZW-25 is semi-direct, so it's slower. It's in because you asked for the old valves and it
+     worked on the old cannon.
+   - The simulation says a QE5 QEV ($51.75) between the chamber and the barrel, with the SZW-25 as its
+     pilot, would be the biggest single gain if you want more range later.
+10. **Air budget:** each 0.53 L refill takes about 5 psi out of the two 6 L tanks, so a 200 psi charge
+    gives **about 20 full-power shots** (2 loaded plus about 18 refills). Lower settings give more.
+11. **Chamber fittings: a 5-port brass block on the back of each chamber**, so nothing is drilled.
+    - fill push-to-connect straight out the back;
+    - 125 psi relief pointing outward;
+    - 0-200 psi transducer to the side;
+    - a plug in the last port.
 12. **Check valves stay on the fill block**, one per cannon, so one shot can't vent the other chamber.
     Two nylon service loops run from there up to the gun and flex as it elevates. The sweep check skips
     them; give them slack when you route them.
@@ -98,19 +125,24 @@ are all at $0.
     flyback diode on each coil.
 14. **Cradle:**
     - two 1/8 aluminum plates either side of the stack;
-    - printed chamber saddles and straps, valve side blocks and breech blocks;
-    - a printed mantlet carrying the smoke vents and an LED groove;
-    - LED-groove muzzle rings.
+    - printed chamber saddles (one block between both pipes at each station) with a strap round each
+      outer half;
+    - valve side blocks and the two-piece breech block;
+    - a printed mantlet carrying the smoke vents beside the barrels and an LED groove;
+    - a two-piece LED-groove muzzle collar.
 
 ## Elevation
 15. **The 60 rpm motor is the goBILDA 5203 99.5:1.** It drives a 16T -> 56T HTD 9 mm belt (100T) to
-    the right end of the axle.
+    the right pivot stub.
     - That's about 17 rpm at the gun, so 0-90 deg takes about 0.9 s at full speed.
     - The gun is balanced, so the motor only fights friction and inertia. It has 46 N*m stall at the
-      axle.
-16. **One 1/2 hex steel axle** runs through both cradle plates, between the cannons.
-    - It sits in four flanged hex bearings, in two PA-CF blocks on 1x1 towers on the inner rails.
-    - The arm-angle pot is on the left end through a printed coupler.
+      pivot.
+16. **Two 1/2 hex steel stubs carry the pivot**, one per cradle plate, each through a printed hub
+    bolted to the plate's outside face. The pivot axis still runs between the two cannons.
+    - With the barrels 3.8 mm apart, there's no room for a shaft between the chambers' couplings.
+    - The stubs sit in four flanged hex bearings, in two PA-CF blocks on 1x1 towers on the inner rails.
+    - The pulley is on the right stub; the arm-angle pot is on the left stub through a printed coupler.
+    - The two plates are tied together by the saddles, valve blocks, breech block and mantlet.
 17. **The gun well follows the gun.** The model sweeps the gun 0-90 deg and cuts the well floor to that
     envelope plus 10 mm, so the body stays as closed as it can.
     - The floor is 437 mm high at the front, 388 at the back and 232 under the axle.

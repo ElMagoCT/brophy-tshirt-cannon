@@ -11,9 +11,9 @@ from cadquery import Vector as V
 from lib import cyl, tube, hex_prism, union
 
 IN = 25.4
-OD = {"1/8": 10.29, "1/4": 13.72, "3/4": 26.67, "1": 33.4, "4": 114.3}
-ENG = {"1/8": 6.7, "1/4": 10.2, "3/4": 13.9, "1": 17.3, "4": 33.0}
-BORE = {"1/8": 6.0, "1/4": 9.2, "3/4": 20.9, "1": 26.6, "4": 97.2}      # Sch 80 small sizes, Sch 40 for 4"
+OD = {"1/8": 10.29, "1/4": 13.72, "3/4": 26.67, "1": 33.4, "2": 60.33, "4": 114.3}
+ENG = {"1/8": 6.7, "1/4": 10.2, "3/4": 13.9, "1": 17.3, "2": 18.0, "4": 33.0}
+BORE = {"1/8": 6.0, "1/4": 9.2, "3/4": 20.9, "1": 26.6, "2": 52.5, "4": 97.2}   # Sch 80 small sizes, Sch 40 from 1"
 CLOSE_NIPPLE = {"1/4": 22.2, "3/4": 34.9, "1": 38.1, "4": 73.0}
 
 
@@ -108,6 +108,28 @@ class Chain:
         self.state, self.s = ("F" if rear else "end"), s0 + side
         return out
 
+    def reducer(self, size_in, size_out, length, od_in, od_out, band_in, band_out, color="steel", bom=None, mass=None):
+        """Malleable reducing coupling (bell reducer) on a male end: female size_in here, female size_out at the far
+        end, a cone between the two bands. Returns the inside volume (cm^3) between the two threaded ends."""
+        assert self.state == "M"
+        ei, eo = ENG[size_in], ENG[size_out]
+        s0 = self.s - ei
+        ri, ro = BORE[size_in] / 2, BORE[size_out] / 2
+        prof = [(0, 0), (od_in / 2, 0), (od_in / 2, band_in), (od_out / 2, length - band_out), (od_out / 2, length),
+                (0, length)]
+        body = cq.Workplane("XZ").polyline(prof).close().revolve(360, (0, 0, 0), (0, 1, 0)).val()
+        z0, z1 = ei, length - eo
+        cav = [(0, z0 - 0.01), (ri, z0 - 0.01), (ro, z1 + 0.01), (0, z1 + 0.01)]
+        body = body.cut(cq.Workplane("XZ").polyline(cav).close().revolve(360, (0, 0, 0), (0, 1, 0)).val())
+        body = body.cut(cyl(OD[size_in] / 2 + 0.3, ei + 0.5, (0, 0, -0.5))).cut(cyl(OD[size_out] / 2 + 0.3, eo + 0.5, (0, 0, z1)))
+        sh = _along(body, self.at(s0), self.d)
+        if self.add:
+            self.add(f"{self.prefix}reducer {size_in}x{size_out}", sh, color, self.group, bom=bom or f"{size_in} x {size_out} reducing coupling",
+                     moving=self.moving, mass=mass)
+        self.items.append(sh)
+        self.state, self.s = "F", s0 + length
+        return math.pi * (z1 - z0) / 3 * (ri * ri + ri * ro + ro * ro) / 1000.0
+
     # --- female parts onto a male end
     def coupling(self, size, length, od, color="steel", bom=None):
         assert self.state == "M"
@@ -143,7 +165,7 @@ class Chain:
         assert self.state == "F"
         e = ENG[size]
         s0 = self.s - e
-        body = cyl(OD[size] / 2, e).fuse(cyl(od / 2, length - e, (0, 0, e)))
+        body = tube(OD[size] / 2, BORE[size] / 2, e).fuse(cyl(od / 2, length - e, (0, 0, e)))   # threads are hollow
         if extra is not None:
             body = body.fuse(extra(length))
         self._put(name, body, s0, color, bom or name)

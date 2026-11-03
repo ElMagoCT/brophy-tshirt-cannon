@@ -1,7 +1,7 @@
 Name,Seller,Amount,Individual Price,Price,Link,Type,Purpose,Alternative/Notes
 "FROM THE OLD CANNON - reused, $0"
 "Atlantic Valves SZW-25 1 in NPT stainless solenoid valve, NC, Viton (old cannon)",Owned,1,0.00,0.00,https://www.electricsolenoidvalves.com/1-inch-12-volt-dc-stainless-steel-electric-solenoid-valve/,Motion,"Firing valve, top cannon",From the old cannon. Read its coil: the 12 V DC coil is rated 0-115 psi (AC coils 0-145)
-Grey 1 gal steel ASME air tank with a 1 in NPT end port (old cannon),Owned,1,0.00,0.00,,Motion,"Chamber, top cannon","From the old cannon. Read its nameplate (maker, MAWP, ports) before ordering the second one"
+Grey 1 gal steel ASME air tank with a 1 in NPT end port (old cannon),Owned,0,0.00,0.00,,Motion,Not used: the chambers are now 0.53 L pipe chambers,From the old cannon; spare
 "Longacre 5 gal aluminum tank, 125 psi (old cannon)",Owned,0,0.00,0.00,https://toolsid.com/longacre/5-gal-horizontal-silver-lightweight-air-tank-mpn-52-50305.html,Motion,Not used: 125 psi is below the 200 psi tank zone,From the old cannon; spare
 "PRESSURE SIDE - tanks, rear manifold, fill valve (200 psi)"
 "Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT (your pick)",Aliexpress,2,56.31,112.62,https://www.aliexpress.us/item/3256804024554756.html,Motion,"Left and right, lying over the front wheels","(2026-11-02, L)"
@@ -11,24 +11,25 @@ Grey 1 gal steel ASME air tank with a 1 in NPT end port (old cannon),Owned,1,0.0
 Mini ball valve 1/4 FNPT (Nigo 240),Amazon,1,12.29,12.29,https://www.amazon.com/dp/B08LV6KBN1,Motion,"Manual tank bleed, lever out the bottom of the rear panel","600 WOG (2026-11-02, L)"
 "Fill / metering valve, Aignep 02F 2/2 NC direct-acting 12 V DC, 1/4 NPTF",Hose Warehouse,1,41.36,41.36,https://www.hosewarehouse.com/search?q=02F03102N0N10201,Electrical,Meters tank air into the fill block (580 psi body),"Confirm the coil + DIN plug are included (2026-11-02, L); link is a store search"
 "1/4 NPT brass cross (4-way), 3-pack (ChillWaves)",Amazon,1,12.99,12.99,https://www.amazon.com/dp/B0FCMV6ML9,Motion,Rear manifold,"NPT, 1200 psi (2026-11-02, L)"
-"1/4 NPT brass close nipple 7/8 in, 5-pack (Legines)",Amazon,1,7.99,7.99,https://www.amazon.com/dp/B07L5G7CN3,Motion,"Rear manifold, fill valve to fill block","NPT, 1200 psi (2026-11-02, L)"
+"1/4 NPT brass close nipple 7/8 in, 5-pack (Legines)",Amazon,2,7.99,15.98,https://www.amazon.com/dp/B07L5G7CN3,Motion,"Rear manifold, fill valve to fill block, chamber bushings to their port blocks","NPT, 1200 psi (2026-11-02, L)"
 "1/4 NPT brass nipple 1-1/2 in, 5-pack (Legines)",Amazon,1,10.99,10.99,https://www.amazon.com/dp/B07L5HNKQC,Motion,Fill port and bleed through the rear panel,"NPT, 1200 psi (2026-11-02, L)"
-"1/4 NPT brass hex plug, 5-pack (Legines)",Amazon,1,7.99,7.99,https://www.amazon.com/dp/B0757HRRX9,Motion,4 used: spare tank ports,"1200 psi (2026-11-02, L)"
+"1/4 NPT brass hex plug, 5-pack (Legines)",Amazon,2,7.99,15.98,https://www.amazon.com/dp/B0757HRRX9,Motion,"6 used: spare tank ports (4), chamber port blocks (2)","1200 psi (2026-11-02, L)"
 "1/4 x 1/8 NPT brass hex bushing, 2-pack (Legines)",Amazon,2,6.49,12.98,https://www.amazon.com/dp/B0747CJ2LV,Motion,4 transducers,"1200 psi (2026-11-02, L)"
 "DOT nylon air-brake tube 1/4 in OD, SAE J844, 50 ft",eBay,1,21.49,21.49,https://www.ebay.com/itm/153495754001,Motion,"Every air line, including the two service loops to the gun",">10 available (2026-11-01, L)"
-"DOT push-to-connect 1/4 tube x 1/4 NPT, straight, 10-pack (Boeray)",Amazon,1,19.99,19.99,https://www.amazon.com/dp/B0D8PX7Z94,Motion,"6 used: rear manifold (3), fill valve, both check valves","In stock (2026-11-01, L)"
-"DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT, 5-pack (Boeray)",Amazon,1,17.99,17.99,https://www.amazon.com/dp/B0D8Q2618F,Motion,"4 used: tank outlets (2), chamber fill ports (2)","SAE J1131, 250 psi, NPT (2026-11-02, L)"
+"DOT push-to-connect 1/4 tube x 1/4 NPT, straight, 10-pack (Boeray)",Amazon,1,19.99,19.99,https://www.amazon.com/dp/B0D8PX7Z94,Motion,"8 used: rear manifold (3), fill valve, both check valves, chamber fill ports (2)","In stock (2026-11-01, L)"
+"DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT, 5-pack (Boeray)",Amazon,1,17.99,17.99,https://www.amazon.com/dp/B0D8Q2618F,Motion,2 used: tank outlets,"SAE J1131, 250 psi, NPT (2026-11-02, L)"
 "Pipe thread sealant, RectorSeal T Plus 2",Other,1,4.25,4.25,https://www.homedepot.com/p/100116773,Tool,Every NPT joint,"Home Depot (2026-11-01, L)"
-"1 in cam-buckle strap 4 ft, 4-pack",Amazon,2,8.99,17.98,https://www.amazon.com/dp/B0GVS7RGTB,Structure,"8 used: side tanks (4), chambers (4)","1,100 lb (2026-11-02, L)"
-"GUN - two in-line cannons, 1 gal chambers, 110 psi cap"
+"1 in cam-buckle strap 4 ft, 4-pack",Amazon,2,8.99,17.98,https://www.amazon.com/dp/B0GVS7RGTB,Structure,"8 used: side tanks (4), chamber saddles (4)","1,100 lb (2026-11-02, L)"
+"GUN - two in-line cannons 3.8 mm apart, 0.53 L pipe chambers, 110 psi cap"
 "Firing valve: Atlantic Valves SZW-25-12VDC, 1 in NPT stainless, NC (one more like the old one)",Other,1,127.56,127.56,https://www.electricsolenoidvalves.com/1-inch-12-volt-dc-stainless-steel-electric-solenoid-valve/,Electrical,"Firing valve, bottom cannon (the old one is the top)","electricsolenoidvalves.com, 29 in stock. Semi-direct, Cv 12, 16 W coil, 0-115 psi on 12 V DC. Same-spec Amazon option: U.S. Solid USS2-01023 $59.80 (B0CXWR76GT) (2026-11-02, L)"
-"Chamber: 1 gal primed steel ASME tank, 200 psi, 6 x 11-3/4 in, 1 in + 4 x 3/4 + 1/2 NPT ports (McMaster 9888K9)",McMaster,1,397.34,397.34,https://www.mcmaster.com/9888K9/,Motion,"Chamber, bottom cannon (one more like the old one)","Plugs included, delivers tomorrow. Read the old tank's nameplate first: a Manchester 304978 (same 6 x 11 in, 200 psi) from a compressor dealer is likely far cheaper, but I found no live price (2026-11-02, L)"
+"Chamber: 2 x 1 black malleable reducing coupling, 150 lb, UL/FM (Supply Giant CNSD4005)",Amazon,4,12.99,51.96,https://www.amazon.com/dp/B016F1LLOG,Motion,"Both ends of each chamber (1 in to the valve, 1 in to the port block)","Factory pressure tested; 18 left (2026-11-02, L)"
+Chamber: 2 in Sch 40 black steel nipple x 8 in (Supply Giant OQCM2080),Amazon,2,14.99,29.98,https://www.amazon.com/dp/B016Y8BZ32,Motion,Chamber body: 0.53 L each with the couplings,"4.4 stars (2026-11-02, S)"
+1 x 1/4 NPT black malleable hex bushing (Supply Giant CNCV3003),Amazon,2,8.99,17.98,https://www.amazon.com/dp/B016Y8R05Y,Motion,Back of each chamber to its port block,"(2026-11-02, S)"
 1 in NPT black Sch 40 close nipple,Amazon,4,4.05,16.20,https://www.amazon.com/dp/B007IBN8T4,Motion,"Chamber to valve, valve to breech adapter (2 per cannon)","Check the seller's stock (2026-11-02, S)"
 1 in - 11-1/2 NPT pipe tap,Amazon,1,16.99,16.99,https://www.amazon.com/dp/B0BB3H8ZHP,Tool,Threads the two CNC breech adapters (stash 6061 bar),"4.6 stars (2026-11-02, S)"
-"3/4 MNPT x 1/4 FNPT brass hex bushing, 2-pack",Amazon,3,7.99,23.97,https://www.amazon.com/dp/B0DQLBHBTH,Motion,"Chamber 3/4 ports down to the fill elbow, relief and transducer (3 per chamber)","1200 psi (2026-11-02, L)"
 "Relief valve 125 psi, 1/4 MNPT, ASME, pull ring (Milton 1090-125)",Milton,3,16.87,50.61,https://miltonindustries.com/products/1-4-mnpt-asme-safety-valve-125-psi-pop-off-pressure,Motion,Each chamber + the fill block; the ring is the manual bleed,"National Board certified, 120 SCFM. Sits above the 110 psi software cap so it never simmers (2026-11-02, L)"
 "Pressure transducer 0-200 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)",Amazon,3,17.69,53.07,https://www.amazon.com/dp/B0CRQVDJJ7,Electrical,Both chambers + the fill line to the STM32,"316 stainless, harness included (2026-11-02, L)"
-"5-port brass block, 1/4 FNPT (Interstate Pneumatics CPT44-5)",Amazon,1,17.97,17.97,https://www.amazon.com/dp/B01N9JJYG0,Motion,"Fill block: fill valve in, transducer, 125 psi relief, two check-valve outlets","Rated 1000 psi. Listing says 5 pieces: may be a 5-pack, so check (2026-11-02, L)"
+"5-port brass block, 1/4 FNPT (Interstate Pneumatics CPT44-5)",Amazon,3,17.97,53.91,https://www.amazon.com/dp/B01N9JJYG0,Motion,"Fill block + one on the back of each chamber (fill push-to-connect, 125 psi relief, transducer, plug)","Rated 1000 psi. Listing says 5 pieces: if it's a 5-pack, buy just one (2026-11-02, L)"
 "Check valve 1/4 FNPT brass, 250 psi (Conrader)",Amazon,2,24.90,49.80,https://www.amazon.com/dp/B0DXLD81BC,Motion,"One per cannon on the fill block, so one shot can't vent the other chamber","Horizontal mounting only (both are horizontal) (2026-11-02, L)"
 "MOSFET switch module 5-36 V 15 A, 6-pack",Amazon,1,5.49,5.49,https://www.amazon.com/dp/B0D9VWWLCB,Electrical,"Firing valves (2), smoke heater, smoke pump: faster than a relay for firing","Add a flyback diode across each valve coil (2026-11-02, S)"
 "Barrels: clear polycarbonate tube 3 in OD x 2-3/4 ID x 1/8 wall, 4 ft (McMaster 8585K38)",McMaster,1,84.48,84.48,https://www.mcmaster.com/8585K38/,Structure,Two 22.5 in barrels from one 4 ft stick,"No pressure rating published; clamp it, never drill it (2026-11-02, L)"
@@ -41,16 +42,16 @@ Falcon 500 (owned),Stash,4,0.00,0.00,,Motion,"One per wheel, PWM through the saf
 12T HTD 15 mm Falcon pulley (WCP-0319),Stash,4,0.00,0.00,https://wcproducts.com/products/wcp-0319,Motion,Falcon 12T -> 120T printed into the hub (10:1),Standard FRC stash part; buy only if the stash is out ($7.99 at WCP)
 "HTD 5M 15 mm belt, 140T",WCP,4,15.99,63.96,https://wcproducts.com/products/htd-timing-belts-15mm-width,Motion,"Falcon to wheel, fixed centres","In stock (2026-11-02, L)"
 "Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)",Stash,12,0.00,0.00,https://wcproducts.com/products/wcp-0783,Motion,"2 per wheel axle (inner + outer rail), 4 at the pivot",Standard FRC stash part; buy only if the stash is out ($2.99 each)
-1/2 in hex shaft: 4 wheel axles (6 in) + the pivot axle,Stash,1,0.00,0.00,,Motion,Live axles tapped 10-32 both ends; one steel pivot axle between the two cannons,Standard FRC stash part; buy only if the stash is out
+1/2 in hex shaft: 4 wheel axles (6 in) + 2 pivot stubs,Stash,1,0.00,0.00,,Motion,Live axles tapped 10-32 both ends; one steel stub per cradle plate on the pivot axis,Standard FRC stash part; buy only if the stash is out
 "685ZZ bearing 5 x 11 x 5 mm, 40-pack",Amazon,3,9.99,29.97,https://www.amazon.com/dp/B0G2XHXQCH,Motion,2 per roller x 56 rollers = 112,"Backup uxcell 20-pack B07FW26QBV (2026-11-02, L)"
 "M5 x 100 socket head cap screw 12.9, 20-pack (SVLING)",Amazon,4,7.70,30.80,https://www.amazon.com/dp/B0GHNNYVDH,Motion,56 roller axles + 24 hub through-bolts,"In stock (2026-11-02, L)"
 "M5 nylon lock nut, 100-pack",Amazon,1,4.99,4.99,https://www.amazon.com/dp/B0F1MQKZ4M,Motion,Roller axles and hub bolts,"In stock (2026-11-02, L)"
 "Printed drive parts: 4 hubs + 120T (PETG), 56 roller cores (PETG), 56 treads (TPU 95A)",Owned,1,0.00,0.00,,Motion,"Hub prints in one piece, 243 x 246 mm",Filament assumed owned
 "ELEVATION - 60 rpm FTC motor on a Spark MAX, pot for the angle"
-"goBILDA 5203-2402-0100 Yellow Jacket 99.5:1 (60 rpm), 8 mm REX",goBILDA,1,54.99,54.99,https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-99-5-1-ratio-24mm-length-8mm-rex-shaft-60-rpm-3-3-5v-encoder/,Motion,"16T -> 56T belt to the pivot axle (3.5:1, about 17 rpm at the gun)","$0 if it's yours. 13.1 N*m stall (2026-11-02, L)"
+"goBILDA 5203-2402-0100 Yellow Jacket 99.5:1 (60 rpm), 8 mm REX",goBILDA,1,54.99,54.99,https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-99-5-1-ratio-24mm-length-8mm-rex-shaft-60-rpm-3-3-5v-encoder/,Motion,"16T -> 56T belt to the right pivot stub (3.5:1, about 17 rpm at the gun)","$0 if it's yours. 13.1 N*m stall (2026-11-02, L)"
 REV Spark MAX (owned),Stash,1,0.00,0.00,,Electrical,Drives the goBILDA in brushed mode from PWM,Owned
 "HTD 5M 9 mm belt, 100T",WCP,1,7.99,7.99,https://wcproducts.com/products/htd-timing-belts-9mm-width,Motion,Pinion to the pivot pulley (CAD loop is exactly 500 mm),"(2026-11-02, L)"
-"10k pot, 1/4 in shaft (Bourns 81A1A-B28-A15)",Amazon,1,10.70,10.70,https://www.amazon.com/dp/B0CCBWM242,Electrical,"Gun angle on the left end of the pivot axle, to the STM32 ADC","Confirm >= 270 deg travel (2026-11-02, L)"
+"10k pot, 1/4 in shaft (Bourns 81A1A-B28-A15)",Amazon,1,10.70,10.70,https://www.amazon.com/dp/B0CCBWM242,Electrical,"Gun angle on the end of the left pivot stub, to the STM32 ADC","Confirm >= 270 deg travel (2026-11-02, L)"
 "FRAME + BODY - box tube, printed frame, recessed acrylic, backlit edges"
 "3/16 in aluminum blind rivet, 0.126-0.25 grip, 100-pack (McMaster 97447A050)",McMaster,2,10.23,20.46,https://www.mcmaster.com/97447A050/,Structure,"Gussets, drive plates, posts (1/8 gusset + 1/16 wall)","#11 drill (2026-11-02, L)"
 "Heat-set inserts M2-M6, 400 pcs (Ktehloy)",Amazon,1,15.97,15.97,https://www.amazon.com/dp/B0CLKDPN65,Structure,"40 M3 for panel clips, M4 for frame joints and standoffs","In stock (2026-11-02, L)"
@@ -80,4 +81,4 @@ Safety remote: LiPo 3.7 V 1200 mAh (Adafruit 258),Adafruit,1,9.95,9.95,https://w
 "LATER - not designed in yet, not in the total"
 "Speaker horn + amp, video (from your list)",Other,0,0.00,0.00,,Other,Not designed in yet,See the Parts List Template tab
 
-Total,,,,1827.38
+Total,,,,1557.91
