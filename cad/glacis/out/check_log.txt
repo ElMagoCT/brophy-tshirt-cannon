@@ -10,14 +10,14 @@ frame network volume 4.82 L, 40 corner clips
 56 pieces (14 nodes)
 joints: 60 tapered tenons with M4 cross screws, 6 ends without a neighbour piece
 body: 56 frame pieces (8 slivers dropped), 9 panels, 40 clips, LED slot 12.4 m
-built 468 parts in 40 s
+built 468 parts in 47 s
 envelope at  0 deg: 44.9 L x 27.8 W x 31.2 H in
 envelope at 90 deg: 37.8 L x 27.8 W x 50.1 H in
 body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
 mass estimate 66.0 kg (146 lb): body 6.0, bumper 1.5, drive 11.8, frame 5.5, gun 13.6, pneu 9.5, power 18.0
 gun 13.6 kg, CG 0 mm ahead / -0 mm above the pivot -> 0.0 N*m at 0 deg
-interference: 0 pairs over 30 mm^3 (19 s)
-elevation sweep 0-90 deg: 0 clashes (2 s)
+interference: 0 pairs over 30 mm^3 (25 s)
+elevation sweep 0-90 deg: 0 clashes (4 s)
 printed parts over a 256 mm bed: 0 []
 parts in more than one piece: 0 []
 exported Frame, pivot & drive: 87 parts, 6.7 MB

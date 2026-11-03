@@ -151,7 +151,7 @@ GUN_GAP = 12.0                              # between the two chamber tanks
 PITCH = CH_D + GUN_GAP                      # cannons at z = +/- PITCH / 2 about the axle
 X_VALVE = 67.0                              # valve centre ahead of the axle (from the balance calc, see gun.py)
 CH_FIT_X = (-110.0, -170.0, -230.0)         # tank fittings along the top (bottom) of each tank, axle-relative:
-                                            # fill push-to-connect, 110 psi relief, transducer
+                                            # fill push-to-connect, 125 psi relief, transducer
 ELEV_RANGE = (0.0, 90.0)
 ELEV_SHOW = 20.0
 ELEV_T = (16, 56)                           # goBILDA pinion -> pulley on the right axle end (HTD 5M 9 mm)
@@ -183,7 +183,7 @@ BATT_Z = 287.8                              # battery bottoms on their sleds (ov
 BATT_X = (-336.0, -336.0 + BATT[0])         # one battery each side, long axis along x
 BATT_Y = (160.0, 160.0 + BATT[1])           # |y|: they slide out the side walls
 ELEC_BAY = ((-380.0, -192.0), (-125.0, 125.0), (BELLY_Z, 250.0))   # back bottom
-FOG_BOX = ((200.0, 360.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # handheld fogger, front bay
+FOG_BOX = ((200.0, 360.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # 12 V automotive smoke machine, front bay (placeholder box)
 
 
 def summary():

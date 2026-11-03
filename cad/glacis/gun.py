@@ -6,7 +6,7 @@ Each cannon, back to front on one axis: chamber tank (1 gal, 200 psi ASME steel,
 pointing outward) -> 1 in close nipple -> CNC breech adapter -> clear polycarbonate barrel.
 Gun-local frame: origin on the axle, +X along the barrels, +Z up. The cannons are built, their centre of
 mass is found from the parts' masses, and they are shifted so it lands on the axle: the gun balances in
-any pose. Each chamber carries a fill push-to-connect, a 110 psi relief (its pull ring is the manual
+any pose. Each chamber carries a fill push-to-connect, a 125 psi relief (its pull ring is the manual
 bleed) and a transducer on its outward side.
 """
 import math
@@ -101,7 +101,7 @@ def _cannon(k, xv):
     fit_x = [xf + (xv - P.X_VALVE) for xf in P.CH_FIT_X]
     gadd(f"Chamber {tag} (1 gal tank)", chamber(x_front, h, s, fit_x), "tank",
          bom="Chamber: 1 gal 200 psi ASME steel air tank, 1 in NPT end port", mass=2.7)
-    # outward fittings on the tank: fill push-to-connect elbow, 110 psi relief, transducer
+    # outward fittings on the tank: fill push-to-connect elbow, 125 psi relief, transducer
     zs = h + s * R_CH
     tips = None
     for i, (xf, kind) in enumerate(zip(P.CH_FIT_X, ("fill", "relief", "trans"))):
@@ -114,7 +114,7 @@ def _cannon(k, xv):
             tips = V(x - 18.0, 0, z0 + s * 7)
         elif kind == "relief":
             r = cyl(9.5, 44.0, (x, 0, z0), (0, 0, s)).fuse(cyl(13.0, 2.0, (x, 0, z0 + s * 30), (0, 0, s)))
-            gadd(f"{tag} chamber relief 110 psi", r, "brass", bom="Relief valve 110 psi 1/4 MNPT, pull ring", mass=0.1)
+            gadd(f"{tag} chamber relief 125 psi", r, "brass", bom="Relief valve 125 psi 1/4 MNPT, ASME, pull ring (Milton 1090-125)", mass=0.1)
         else:
             t = cyl(8.0, 6.0, (x, 0, z0), (0, 0, s)).fuse(cyl(10.0, 48.0, (x, 0, z0 + s * 6), (0, 0, s)))
             gadd(f"{tag} chamber transducer 0-200 psi", t, "steel",

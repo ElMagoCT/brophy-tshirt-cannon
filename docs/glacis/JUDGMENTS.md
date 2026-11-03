@@ -1,141 +1,196 @@
-# Glacis rev B: judgment calls
+# Glacis rev C: judgment calls
 
-Rev B (2026-11-02) is the redesign from your second round of notes: aluminum box tube, two barrels,
-10 in wheels at 3 in clearance, a one-stage belt, a flat deck with leaning sides and one front slant,
-the turret pushed back and lower, one tank on the left and one standing at the back, smaller
-chambers, polycarbonate barrels, an FTC motor on a Spark MAX with a pot, the PDH, an STM32 with an
-independent radio failsafe, every pressure read by the controller, recessed panels with corner clips,
-and no liner. Each item says what I picked and why. Numbers come from `cad/glacis/params.py` and the
-last clean run (`cad/glacis/out/check_log.txt`).
+Rev C (2026-11-02) is the redesign from your third round of notes:
+- both chambers on the back of their cannons, in line;
+- the gun balanced on an axle that runs between the two cannons;
+- the old cannon's firing valve and chamber, plus one more of each;
+- the back tank moved to the right, and no room left for a pump;
+- a 60 deg front, with the sides and back leaning more;
+- the rear-panel controls at the bottom of the panel, and the electronics in the back bottom;
+- a 60 rpm pivot motor;
+- a 12 V smoke machine with printed ducts;
+- LED strips run through the frame to backlight the panels.
 
-**Checks on the final model:** no part overlaps another, nothing hits anything as the gun sweeps 0-90
-deg (checked every 5 deg), every printed part fits a 256 mm bed, and every part is a single solid.
+Each item says what I picked and why. Numbers come from `cad/glacis/params.py` and the last clean run
+(`cad/glacis/out/check_log.txt`).
 
-**Where it is:** Onshape "Brophy Mark 5 - Glacis" (rev B tabs and the "Glacis rev B (whole robot)"
-assembly). The parts list is the "Glacis BOM" tab: **$1,555.11** to buy (rev A was $2,102.30), with aluminum, acrylic, prints,
-Falcons and standard FRC stash parts at $0.
+**Checks on the final model:**
+- no part overlaps another;
+- nothing hits anything as the gun sweeps 0-90 deg, checked every 5 deg;
+- every printed part fits a 256 mm bed;
+- every part is a single solid.
 
-## Size and shape
-1. **37.7 L x 27.7 W in over the bumpers, deck 22.8 in high** (it was 29.3 in at the turret). With the
-   gun level the muzzles reach 39.4 in overall; at 90 deg it is 37.8 x 27.8 x 43.3 in.
-2. **One front slant at 70 deg** from the nose bumper straight up to the deck, as you asked. 70 is as
-   shallow as it can be: the left tank's front end sits right behind it.
-3. **Flat deck at one height, sides leaning in 6 deg.** The deck is 21 in wide at the top, so it is
-   two panels split down the middle (each 25.7 x 10.4 in, L-shaped round the gun slot).
-4. **9 panels total.** Front (one U-shaped sheet round the slot), deck x2, slot floor, left wall, right
-   wall x2 (the rear one is the battery door), rear face, rear chamfer. The slot walls inside the turret
-   have no panels.
-5. **Turret pushed back 6.7 in** (pivot at x = -130 mm, was +40) and its top lowered from 29.3 in to
-   the 22.8 in deck. At 0 deg the whole gun sits inside the slot, below the deck.
+**Where it is:** Onshape "Brophy Mark 5 - Glacis" holds the rev C tabs and the "Glacis rev C (whole
+robot)" assembly (468 parts). The parts list is the "Glacis BOM" tab: **$1,827.38** to buy (rev B was
+$1,555.11). Aluminum, acrylic, prints, Falcons, FRC stash parts and the old cannon's valve and chamber
+are all at $0.
 
-## Body frame (printed)
-6. **Panels sit in a recess, not a groove.** Each 1/8 in panel drops into an 8 mm wide rebate, 2.5 mm
-   below the face, and a printed clip in a flush pocket at every convex corner holds it (one M3 into a
-   heat-set insert). 42 clips. Any panel comes off with its clips, which is also how the battery door
-   works. Only corners are clipped, as you said; if a long edge rattles, add a mid-edge clip.
-7. **LEDs:** a 2.6 mm slot right behind each panel at the window edge, 14.8 m in all (three 5 m reels).
-8. **72 frame pieces with 81 tapered mortise-and-tenon joints** (6.5 mm tenons, M4 cross screws). Every
-   piece fits a 256 mm bed. Where two recesses meet at a corner they leave thin strips; I delete those.
-9. **Wall frame to chassis:** printed standoffs on the outer rails; the side-wall frame sits on their lip
-   and screws down into them. Posts can't go up the outer rails any more because the walls lean in.
+## What I identified on the old cannon
+1. **Firing valve: Atlantic Valves SZW-25.** The plate says SZW-25, not S2W.
+   - It's a 1 in NPT stainless solenoid valve, normally closed, with a Viton seal.
+   - It's semi-direct acting, with a 25 mm orifice and Cv 12. The 12 V DC coil is 16 W.
+   - Rated **0-115 psi on the 12 V DC coil** (0-145 on the AC coils).
+   - It's sold at electricsolenoidvalves.com, not Amazon: SZW-25-12VDC, **$127.56**, 29 in stock
+     ([page](https://www.electricsolenoidvalves.com/1-inch-12-volt-dc-stainless-steel-electric-solenoid-valve/),
+     [spec sheet](https://www.electricsolenoidvalves.com/content/Atlantic_Valves_SZW_Spec_Sheet.pdf)).
+   - The old one is reused and one more is on the list.
+   - Same-spec Amazon option: U.S. Solid USS2-01023, $59.80
+     ([B0CXWR76GT](https://www.amazon.com/dp/B0CXWR76GT)). Its listing contradicts itself on pressure.
+   - **Check the old valve's coil label.** It has to be the 12 V DC one.
+2. **Chamber: a grey primed-steel ASME air tank with a 1 in NPT end port.** The "Tighten All Plugs"
+   label is the kind these tanks ship with. Confidence is low to medium.
+   - I sized it from video frames as the 1 gal, 6 x 11 in, 200 psi tank (Manchester 304978 class).
+     The research pass guessed 8 in across, which would be 2-3 gal.
+   - The buyable twin is **McMaster 9888K9, $397.34**: 1 gal, 6 x 11-3/4 in, 200 psi. It has one 1 in,
+     four 3/4 and two 1/2 NPT ports, plugs included ([link](https://www.mcmaster.com/9888K9/)).
+   - **Read the old tank's nameplate before ordering.** The same tank from a compressor dealer, or used,
+     should be far cheaper; I found no live price for the Manchester.
+   - If it turns out to be bigger, change `CH_D`/`CH_L` and its mass. The gun re-balances itself, and
+     the checks will show whether the well still clears.
+3. **Longacre 5 gal polished aluminum tank:** rated 125 psi
+   ([52-50305](https://toolsid.com/longacre/5-gal-horizontal-silver-lightweight-air-tank-mpn-52-50305.html)).
+   It can't go on the 200 psi tank side, so it's a spare.
+4. **The screw-set regulator is gone.** The fill valve meters air into the chambers against their
+   transducers, so the pressure is set in software.
+5. **Red "5 in ONE Universal" couplers:** brand and rating not confirmed, so they stay off the pressure
+   side.
 
-## Frame and drive
-10. **1x2 and 1x1 x 1/16 aluminum box tube, 1/8 in gussets, 3/16 aluminum rivets** (McMaster 97447A050).
-    U-shaped gussets top and bottom round each wheel end. Aluminum isn't on the parts list (you have it).
-11. **One-stage belt, 10:1:** Falcon 12T (WCP-0319) on a 140T belt straight to a 120T printed into the
-    wheel hub. The 120T is the biggest that leaves 1.1 in under the belt at the floor.
-    - **Free speed is 27.8 ft/s**, so cap the drive in firmware (about 40% output gives 11 ft/s) and set
-      a Talon FX supply current limit. Torque is plenty, as you said.
-12. **10 in fully printed mecanum, 14 rollers** (78 mm long, 15 mm max radius; 6.9 mm between rollers,
-    contact overlap +8%).
-    - The hub is one PETG print, 243 x 246 mm, with the 120T pulley, both lug rings and a 1/2 hex bore.
-    - **Two 1/8 in aluminum plates sandwich it** on 6 x M5 through-bolts; the inner plate is the belt's
-      inboard flange.
-    - Rollers: PETG core, TPU 95A tread, two 685ZZ bearings on an M5 x 100 axle each.
-13. **Standard FRC axles:** a 1/2 in hex live axle per wheel in two flanged hex bearings (WCP-0783), one
-    in the inner rail, one in the outer rail. Tapped 10-32 ends with button heads. Ground clearance is
-    3 in at the bumpers; the bellypan is at 3.9 in.
-
-## Gun and pneumatics
-14. **Two stacked barrels, clear polycarbonate 3 in OD x 1/8 wall** (McMaster 8585K38, one 4 ft stick).
-    - McMaster gives no pressure rating for it. Hoop stress from its 8,900 psi tensile is about 740 psi
-      burst; the barrel only sees pressure for a few milliseconds behind the shirt.
-    - The adapter clamps it; never drill polycarbonate.
-15. **Smaller chambers, same place:** each chamber is now just a 4 x 3/4 bushing threaded into a 4 in cap
-    (about 0.4 L, was 1.0 L), still sideways off the QE5. That drops the coupling and nipple, so each
-    chamber is about $36 and much lighter. It stores about 40% of the old chamber's air, so bench-test
-    the range; if shots fall short, a 4 in coupling and close nipple between bushing and cap doubles it.
-16. **Why not copper or PVC:** PVC shatters into shrapnel under air pressure (OSHA has warned against it
-    for compressed air since 1988), so it can't be on the pressure side. Copper works (2 in Type L
-    soldered with 95/5 is rated well over 200 psi), but with the short chambers there's no long tube
-    left to replace, so I kept threaded steel. Every air line is DOT nylon tube.
-17. **The bottom barrel's QEV sits 30 mm ahead of the top one** (its barrel is 30 mm shorter so the
-    muzzles line up). That keeps the two inlet blocks from facing each other.
-18. **Each barrel's inlet pocket is one 5-port brass block** (Interstate CPT44-5, rated 1000 psi) right
-    behind its QE5: VA-4 dump on one side, supply push-to-connect on the other, 150 psi relief outward,
-    transducer inward. The gun now reaches only 3.5 in behind the pivot at 0 deg (it was 6.5 in), which
-    is what lets the rear tank stand behind it.
-19. **The relief's pull ring is each chamber's manual bleed** (Interstate V150-4, ASME). That replaces
-    the separate ball valve and muffler per barrel.
-20. **Check valves moved off the gun** to the fixed fill cross beside the pivot, inline in each barrel's
-    tube (Conrader 250 psi; both lie horizontal, as that valve needs). Two flexible tubes run from there
-    to the gun.
-21. **Every pressure goes to the controller:** tank (0-300 psi), fill line (0-200 psi) and both chambers
-    (0-200 psi), all 0.5-4.5 V into the STM32's ADC through dividers. The dial gauge is gone; with the
-    power off, open the rear bleed and pull both chamber rings before working on it.
-22. **150 psi at the chambers, 200 psi in the tanks.** The QE5 is rated 150 psi. McMaster lists its
-    Class 150 malleable cap at 150 psi (ASME B16.3 rates Class 150 at 300 psi up to 150 F).
-23. **Tanks:** your two AliExpress 6 L / 200 psi tanks.
-    - Left: lying along the left side above the front-left wheel, on two cantilevered 1x1 arms with
-      printed saddles and straps. Its front port is the future pump inlet.
-    - Rear: standing in the rear centre on a printed cup on the bellypan, held by a half clamp and strap
-      to the back of the left tower.
-24. **Rear manifold** (left rear corner): tank lines, 200 psi relief, tank transducer, Schrader fill port
-    and manual bleed through the rear panel, and the line to the fill valve.
-25. **No onboard pump.** Its spot is in the front bay, lying flat (ZHSYMX, 243 x 128 x 181 mm).
+## Gun
+6. **Two cannons stacked, the axle between them.** Each one, back to front: chamber tank -> 1 in close
+   nipple -> SZW-25 -> close nipple -> CNC breech adapter -> clear polycarbonate barrel.
+   - The breech adapter is stash 6061 bar with a 1 in NPT tap ($16.99 tap on the list).
+   - The chambers sit on the back of the cannons, in line, as you asked. Their axes are 164 mm apart.
+7. **Balanced on the axle.** The model takes every part's mass, finds the gun's centre of mass and
+   slides both cannons along the barrel axis until it lands on the axle.
+   - Result: valves 61 mm ahead of the axle, centre of mass within 0.2 mm.
+   - The gun weighs 13.6 kg, so it needs **0 N*m to hold at any angle**.
+   - The valve (1.0 kg) and tank (2.7 kg) masses are estimates. Weigh yours, update them in `gun.py`,
+     and re-run before cutting the cradle plates.
+8. **Pressures: 110 psi software cap on the chambers, 125 psi relief, tanks at 200.**
+   - 110 psi sits just under the valve's 115 psi DC rating. Above that, the coil may not lift the
+     valve; it fails closed, not open.
+   - **Milton 1090-125** ASME reliefs ($16.87) go on each chamber and on the fill block. Their pull
+     ring is the manual bleed.
+   - 125 psi is above the cap, so they never simmer, and well under the tanks' and transducers' 200.
+   - This replaces the settled "150 psi chambers" for this valve.
+9. **The trade-off you're taking on.** CLAUDE.md lists "big direct-acting solenoid as the firing
+   valve: too slow vs a piloted QEV" as a dead end.
+   - The SZW-25 is semi-direct, so it opens slower than a QEV: tens of ms against about 10.
+   - You said it worked on the old cannon, and you asked for the same valves, so it's in.
+   - The 1 gal chamber holds about 7 times the air of rev B's 0.4 L at 150 psi, which makes up range.
+   - If the shots fall short, a QE5 QEV ($51.75) can go between the chamber and the barrel later and use
+     the SZW-25 as its pilot.
+10. **Air budget.**
+    - Each refill of a 1 gal chamber from empty to 110 psi takes about 35 psi out of the two 6 L tanks.
+      Starting at 200 psi, that's 2-3 refills before the tanks drop below 110.
+    - That's about **4-5 full-power shots per shop-compressor charge**: 2 loaded, plus 2-3 refills.
+      Lower settings give more.
+    - The old cannon's 5 gal tank at 125 psi held about the same air.
+11. **Chamber fittings, on each tank's outward side:**
+    - fill push-to-connect elbow;
+    - 125 psi relief;
+    - 0-200 psi transducer;
+    - each on a 3/4 x 1/4 bushing, with the spare ports plugged.
+12. **Check valves stay on the fill block**, one per cannon, so one shot can't vent the other chamber.
+    Two nylon service loops run from there up to the gun and flex as it elevates. The sweep check skips
+    them; give them slack when you route them.
+13. **Firing valves switch on MOSFET modules, not relays,** to take the relay's ms off the shot. Add a
+    flyback diode on each coil.
+14. **Cradle:**
+    - two 1/8 aluminum plates either side of the stack;
+    - printed chamber saddles and straps, valve side blocks and breech blocks;
+    - a printed mantlet carrying the smoke vents and an LED groove;
+    - LED-groove muzzle rings.
 
 ## Elevation
-26. **goBILDA 5203 Yellow Jacket 99.5:1 on a Spark MAX** (brushed mode, PWM from the STM32), 16T -> 56T
-    on a 9 mm 145T belt (WCP), 3.5:1. About 17 rpm at the trunnion and 46 N*m stall; the gun needs at
-    most about 10 N*m.
-27. **Arm angle from a 10k pot** on the end of the left trunnion stub, read by the STM32 (it closes the
-    position loop and sends the Spark MAX a PWM command).
-28. **Towers are 1x1 on the inner rails**, the left one behind the pivot and the right one ahead of it,
-    each with a printed bearing block and two flanged hex bearings.
+15. **The 60 rpm motor is the goBILDA 5203 99.5:1.** It drives a 16T -> 56T HTD 9 mm belt (100T) to
+    the right end of the axle.
+    - That's about 17 rpm at the gun, so 0-90 deg takes about 0.9 s at full speed.
+    - The gun is balanced, so the motor only fights friction and inertia. It has 46 N*m stall at the
+      axle.
+16. **One 1/2 hex steel axle** runs through both cradle plates, between the cannons.
+    - It sits in four flanged hex bearings, in two PA-CF blocks on 1x1 towers on the inner rails.
+    - The arm-angle pot is on the left end through a printed coupler.
+17. **The gun well follows the gun.** The model sweeps the gun 0-90 deg and cuts the well floor to that
+    envelope plus 10 mm, so the body stays as closed as it can.
+    - The floor is 437 mm high at the front, 388 at the back and 232 under the axle.
+    - The well is 224 mm wide; the elevation pulley turns inside it.
 
-## Electronics and power
-29. **Batteries reachable:** both FRC batteries ride a printed sled over the rear-right wheel. Take the
-    four clips off the right wall's rear panel and slide the sled out the side.
-30. **Your PDH** in the middle bay with the 120 A main breaker; the fuse block is gone.
-31. **STM32 Nucleo-F446RE is the main controller.** It does everything time-critical: drive mixing and
-    PWM to the Falcons and Spark MAX, the valves, fill metering from the transducers, and the elevation
-    loop. An ESP32-S3 is only the WiFi bridge for the web UI (WebSocket), talking to the STM32 over UART.
-32. **Failsafe, independent of WiFi:**
-    - A handheld safety remote (Adafruit ESP32-S3 Feather, E-stop button, dead-man trigger) talks to a
-      separate ESP32-S3 safety node on the robot over ESP-NOW: direct radio between the two boards, no
-      router or network.
-    - The safety node holds the safety relay that feeds the 12 V valve rail, and the 74AHCT125 gate that
-      passes PWM to the Falcons and the Spark MAX. No OK from it means no air valves and no drive.
-    - It drops both if the remote's heartbeat stops for 200 ms, the remote's E-stop is pressed, the
-      STM32's heartbeat line stops toggling, or the tank transducer reads over 210 psi.
-    - The robot E-stop is wired in series with the safety relay coil, so it works with no software.
-    - Firing needs two people: the web UI asks, and the remote's trigger must be held.
-33. **ESP-NOW is still 2.4 GHz radio.** If you'd rather nothing wireless at all, the remote can use a
-    tether cable on the same pins.
+## Body
+18. **Front slant 60 deg** (was 70), the back leans 80 deg, and the sides lean in 8 deg (was 6). The deck
+    is flat at 24.8 in.
+19. **Size:**
+    - 37.7 x 27.7 in over the bumpers.
+    - With the gun level, the muzzles reach 44.9 in overall and the chambers stand 31.2 in tall.
+    - At 90 deg it is 37.8 L x 50.1 H.
+    - To get through a 40 in door, drive with the gun raised.
+20. **9 panels.** Both side walls split at the battery bay; their rear panels are the battery doors.
+21. **LEDs backlight the panels.**
+    - A channel runs down the middle of every frame member, right under the panel's overlap.
+    - The strip lies flat in it, facing out, and shines straight into the back of the panel's edge band.
+    - A 1.2 mm lip on the window side and the panel itself close the channel.
+    - 12.4 m in all, so three 5 m reels.
+22. **Frame:** 56 printed pieces, 60 tapered tenons with M4 cross screws, 40 corner clips. Six piece
+    ends have no neighbour; they're open ends at the well.
+
+## Layout
+23. **The back tank moved to the right.** I read that as mirroring the left one, so both tanks lie along
+    the sides over the front wheels, on cantilevered 1x1 arms with printed saddles and straps. No pump
+    spot.
+24. **Bottom of the rear panel:**
+    - E-stop;
+    - Schrader fill port (air in);
+    - tank bleed lever;
+    - SB50 charge port, to run or charge on standby power with the batteries in;
+    - USB-C to the STM32.
+25. **Rear manifold** (back bottom, left): tank lines, 200 psi relief, 0-300 psi transducer, and the line
+    to the fill valve. The fill and bleed go straight out through the rear panel.
+26. **Electronics in the back bottom bay:**
+    - PDH and main breaker on the bellypan;
+    - STM32, both ESP32-S3s, the PWM gate, the drivers, the buck and the Spark MAX on a printed shelf;
+    - the fill valve and fill block beside them.
+27. **Batteries:** one per side, each on its own sled over a rear wheel. Each slides out through its
+    side's rear panel.
+
+## Smoke
+28. **Pick: AutoLine Pro HyperSmoke, a 12 V automotive EVAP smoke machine, $47.99**
+    ([B0DNRY9NCV](https://www.amazon.com/dp/B0DNRY9NCV), 4.6 stars from 1.1K reviews, 2 bottles of fluid
+    included).
+    - Mains foggers need a ~$60 inverter and draw 35-40 A at 12 V, with a 4 min warm-up
+      ([VIRFUN](https://www.amazon.com/dp/B081YNQG29) + [Ampeak](https://www.amazon.com/dp/B07PWDR869)
+      = $99).
+    - The $40 battery "foggers" are 80 g tabletop units
+      ([StageFogger](https://www.amazon.com/dp/B0GVP7X53X)).
+    - A car smoke tester is built to run off a 12 V battery. It warms up instantly, has its own air pump
+      and pushes dense smoke down a hose, which is what the ducts need.
+    - It's $8 over your $40. The in-budget option is the M-T at $39.99, rated 3.7 stars.
+29. **The 12 V hack.**
+    - Power it from a fused PDH channel.
+    - Open it and put its heater and pump on two MOSFET channels from the STM32: the heater pre-heats,
+      and the pump puffs on command.
+    - Keep its thermal cutout.
+    - Measure its current first; the MOSFET modules are rated 15 A.
+30. **Fluid:** EVAP smoke is mineral-oil based, and baby oil is the cheap refill. Like any fogger, it can
+    trip gym smoke detectors, and it leaves a film in tight spaces, so check with each venue.
+31. **Ducts:**
+    - A printed outlet adapter feeds a printed 1-to-4 splitter, then your four flexible tubes.
+    - Two tubes go up to the vents in the gun's mantlet, between the barrels. They're service loops that
+      flex with elevation.
+    - Two go to vents under the front bumper, through holes in the bellypan.
+    - The smoker's box in the CAD is a placeholder. Measure the real one and its outlet before printing
+      the cradle and adapter.
 
 ## Things I'd flag
-34. **Cost: $1,555.11**, inside the $2,500 cap but still over the $1,000 aim.
-    - By section: gun $595, pressure side $376, controls and failsafe $198, drive $130, frame and body
-      $92, bumpers $89, elevation $76.
-    - The biggest lines are the two tanks ($113), the QE5s ($104) and the polycarbonate tube ($84).
-    - Most parts come from Amazon or McMaster. Three don't: the QE5 (TECO, because Amazon's Parker 0R75B
-      is $125), the Aignep fill valve (Hose Warehouse; no 12 V, 200 psi direct-acting valve at McMaster or
-      Amazon), and the safety-remote Feather and LiPo (Adafruit).
-    - Check before ordering: the CPT44-5 port block listing may be a 5-pack, and the Bourns pot's travel.
-35. **Weight is about 144 lb** (65 kg), down from 211. The gun is 17 kg.
-36. **Fitting sizes are catalog-typical** and the 4 in listings publish no OD, so check the cap and
-    bushing in hand before printing the trunnion cap hub.
-37. **The Onshape model is imported STEP** (dumb solids). To change it, edit `cad/glacis` and re-run
-    `python robot.py --export`, then replace the changed tabs. The gun is posed at 20 deg.
-38. **Old T-shirt cannon:** once you send its parts list, anything it has (tanks, valves, gauges,
-    fittings) comes off this list.
+32. **Cost: $1,827.38.**
+    - By section: gun $843, pressure side $344, controls $208, drive $130, frame and body $92, bumpers
+      $89, elevation $74, smoke $48.
+    - The chamber ($397) is the biggest line. The old tank's nameplate and a compressor-dealer or used
+      price could cut most of it.
+33. **Weight is about 146 lb** (66 kg); the gun is 13.6 kg.
+34. **Check before ordering:**
+    - the old valve's coil voltage and the old tank's nameplate;
+    - the CPT44-5 pack count;
+    - the Aignep coil and plug;
+    - the smoker's size, current and outlet.
+35. **The Onshape model is imported STEP** (dumb solids), with the gun posed at 20 deg. To change it,
+    edit `cad/glacis`, run `python robot.py`, and replace the changed tabs.

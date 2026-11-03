@@ -219,3 +219,27 @@ is in `docs/glacis/JUDGMENTS.md`. The ones that change earlier decisions:
 - **Drive:** one-stage 10:1 belt into a 10 in printed hub, 1/2 hex live axles in FRC hex bearings.
 - **Elevation:** goBILDA 5203 on a Spark MAX with a pot, replacing the STS3215 servos.
 - **Power:** REV PDH replaces the fuse block; batteries on a sled behind a removable side panel.
+
+## 2026-11-02 - Glacis rev C (proposed, waiting on Micah)
+
+Micah's third round of notes reshaped the gun and reused the old cannon's pneumatics. Model, Onshape
+tabs ("Glacis rev C (whole robot)") and the "Glacis BOM" tab are all rev C now ($1,827.38 to buy).
+Every call is in `docs/glacis/JUDGMENTS.md`. The ones that change earlier decisions:
+
+- **Firing valve: the old cannon's Atlantic Valves SZW-25** (1 in NPT stainless, semi-direct, 12 V DC
+  rated 0-115 psi) plus one more ($127.56), instead of a QEV. This is the CLAUDE.md dead end ("big
+  direct-acting solenoid ... too slow vs a piloted QEV"); Micah asked for the old valves. A QE5 can be
+  added later between the chamber and the barrel, with the SZW-25 as its pilot.
+- **Chamber side: 110 psi software cap, 125 psi ASME relief** (Milton 1090-125), set by the valve's
+  rating. The tanks stay at 200 psi.
+- **Chambers: the old 1 gal steel ASME tank plus one more** (McMaster 9888K9 is the twin at $397.34;
+  the old tank's nameplate is still unread), on the back of each cannon in line. The gun is balanced on
+  a 1/2 hex axle that runs between the two cannons.
+- **Fog: a 12 V automotive EVAP smoke machine** (AutoLine Pro HyperSmoke, $47.99) on STM32 MOSFETs,
+  with printed ducts to the gun mantlet and under the front bumper. This replaces the XLR-remote stage
+  fogger plan.
+- **Layout:** both tanks lie along the sides (the back tank moved to the right), and there is no pump
+  spot. The electronics, rear manifold, E-stop, fill, bleed and SB50 charge port are all at the back
+  bottom.
+- **Body:** 60 deg front, more lean on the sides and back. The LED strips run in a channel through every
+  frame member, backlighting the panels.

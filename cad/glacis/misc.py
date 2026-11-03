@@ -1,5 +1,5 @@
 """Everything else: towers and pivot bearings, the elevation motor, belt and angle pot, both reservoir tanks,
-the rear manifold and fill block, the battery sleds, the back-bottom electronics bay, the fogger and its
+the rear manifold and fill block, the battery sleds, the back-bottom electronics bay, the smoke machine and its
 ducts, FRC-style bumpers, wall standoffs, the recessed acrylic panels with their corner clips, and the
 printed body-frame pieces."""
 import math
@@ -178,7 +178,7 @@ def air():
                 cyl(6.86, 10.2, (rear + 10.3, yb, mz), (-1, 0, 0)))
             add(name, vb.fuse(box(xo - 6, xo - 2, yb - 3, yb + 3, mz, mz + 40)), "brass", "pneu",
                 bom="1/4 FNPT mini ball valve (manual bleed)", note="lever outside the rear panel")
-    # fill valve + 5-port fill block (chamber zone, 110 psi): transducer up, relief +y, two outlets through
+    # fill valve + 5-port fill block (chamber zone: 110 psi software cap, 125 psi relief): transducer up, relief +y, two outlets through
     # inline check valves (one per cannon, so one shot can't vent the other chamber)
     fx, fy, fz = FILL
     sx1 = fx - 12.7 - 1.8
@@ -191,8 +191,8 @@ def air():
         bom="1/4 NPT brass 5-port block (Interstate CPT44-5)", note="close nipple from the fill valve")
     add("Fill transducer 0-200 psi", cyl(10.0, 55.0, (fx, fy, fz + 12.7), (0, 0, 1)), "steel", "pneu",
         bom="Pressure transducer 0-200 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)")
-    add("Fill relief valve 110 psi", cyl(9.5, 44.0, (fx, fy + 12.7, fz), (0, 1, 0)), "brass", "pneu",
-        bom="Relief valve 110 psi 1/4 MNPT, pull ring")
+    add("Fill relief valve 125 psi", cyl(9.5, 44.0, (fx, fy + 12.7, fz), (0, 1, 0)), "brass", "pneu",
+        bom="Relief valve 125 psi 1/4 MNPT, ASME, pull ring (Milton 1090-125)")
     CHECKS.clear()
     for d, tag in ((V(1, 0, 0), "A (top cannon)"), (V(0, -1, 0), "B (bottom cannon)")):
         a0 = V(fx, fy, fz) + d * 12.7
@@ -217,11 +217,11 @@ def air():
 
 # ------------------------------------------------------------------ fog
 def fog():
-    """Handheld 12 V-hacked fogger in the front bay, printed 1 -> 4 splitter: two lines to vents under the
+    """12 V automotive (EVAP) smoke machine in the front bay, printed 1 -> 4 splitter: two lines to vents under the
     front bumper, two flexible lines up to the vents in the gun's mantlet."""
     (x0, x1), (y0, y1), (z0, z1) = P.FOG_BOX
-    add("Fog machine (handheld, 12 V hack)", box(x0, x1, y0, y1, z0, z1), "black", "power",
-        bom="Fog machine: battery handheld fogger, run from 12 V through a buck", note="pump button on a MOSFET from the STM32")
+    add("Smoke machine (12 V EVAP smoker)", box(x0, x1, y0, y1, z0, z1), "black", "power",
+        bom="Smoke machine: AutoLine Pro HyperSmoke 12 V EVAP smoker", note="heater and pump on MOSFETs from the STM32; box is a placeholder")
     add("Fog machine cradle", box(x0 - 6, x1 + 6, y0 - 6, y1 + 6, P.BELLY_Z, z0 + 20).cut(box(x0, x1, y0, y1, z0, z0 + 21)).cut(
         box(x0 + 20, x1 - 20, y0 + 15, y1 - 15, P.BELLY_Z - 1, z0 + 1)),
         "print", "power", bom="Fog machine cradle", kind="print")
