@@ -60,6 +60,7 @@ def build(elev=P.ELEV_SHOW):
     misc.bumpers()
     misc.wall_standoffs()
     misc.body_parts(log)
+    misc.speakers()
     for p in PARTS:
         if p["moving"]:
             p["local"] = p["shape"]
@@ -259,7 +260,9 @@ def tabs(parts):
     for p in parts:
         g, n = p["group"], p["name"]
         c = _corner(n) if g == "drive" else None
-        if g == "frame" or (g == "drive" and c is None):
+        if n.startswith(("LED ", "Speaker")):
+            out["Lights & speakers"].append(p)
+        elif g == "frame" or (g == "drive" and c is None):
             out["Frame, pivot & drive"].append(p)
         elif g == "drive" and n.startswith(WHEEL_PARTS):
             out[f"Wheel {c}"].append(p)

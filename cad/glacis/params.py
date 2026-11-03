@@ -116,14 +116,27 @@ MEM_W, MEM_H = 26.0, 24.0                   # printed member: width on each pane
 REBATE_W = 14.0                             # panel edge overlaps the member by this much
 CLIP_T = 2.5                                # printed corner clips sit flush, panel sits CLIP_T below the face
 REBATE_D = CLIP_T + ACRYLIC_T + 0.3
-CLIP_R = 10.0
+CLIP_LEG = 27.0                             # corner clip legs along the frame (rev C.1 discs reached ~14)
 NODE_SETBACK = 48.0
 PRINT_MAX = 240.0
 TENON = (6.5, 6.5, 12.0, 0.5)
 TENON_CLEAR = 0.15
-LED_CH = (10.8, 4.2, 2.0)                   # LED channel under the panel overlap: width, depth, outer shoulder
-LED_LIP = 1.2                               # lip on the window side that keeps the strip in its channel
-CORE_DEPTH = 15.0                           # tenons sit this deep, below the LED channel
+LED_RAIL = (2.5, 21.0, 43.0, 15.0)          # panel light rail: wall, from/to depth, lean toward the panel (deg)
+LED_RAIL_INSET = (42.0, 29.0)               # the rail's panel-side face is this far in from a panel edge at the strip's
+                                            # centre depth: (edge shared with another panel, open or coplanar edge).
+                                            # Every corner here is 91-100 deg: 42 keeps each panel's strip on its own
+                                            # side of the corner; 29 keeps the bottom runs under the rear controls.
+                                            # A flange at the member's inner face carries the rail
+LED_CORNER = 45.0                           # rail and loop corners round off at this radius (less where a panel is
+                                            # too narrow)
+LED_LOOP = (10.0, 1.6, 35.0)                # 60/m strip on the rail: width, thickness, centre depth (1.15 in
+                                            # behind the panel's back face)
+FRAME_STRIP = (5.0, 1.0)                    # 100/m strip in each frame tunnel: width, thickness
+TUNNEL = (6.0, 2.6)                         # frame light: tunnel for a 5 mm strip (width, height), LEDs facing out
+TUNNEL_GAP = 7.05                           # tunnel centre this far outward of the tenon centre (2.5 mm of wall)
+FEED = (12.0, 33.0)                         # feed slot from the inside at each end of a tunnel, from the vertex
+TUNNEL_SKIN = 9.5                           # slots and tunnel ends stop this far under any outer face
+CORE_DEPTH = 18.5                           # tenons sit this deep, inward of the light tunnel
 
 Y_S = OUTER_RAIL_Y[1] + MEM_H               # side wall outer face at its bottom edge
 TUMBLE = 8.0                                # side walls lean in this much
@@ -158,6 +171,15 @@ def front_x(z, inner=False):
     return x - MEM_H / math.sin(math.radians(FRONT_ANGLE)) if inner else x
 
 
+# ------------------------------------------------------------------ speakers (rev C.2)
+SPEAKER = (140.0, 146.0, 51.0)              # slim 100 W siren speaker: width, height, depth (UBL 100W Slim, 5.5 x 5.75 x 2 in)
+SPK_CLEAR, SPK_WALL, SPK_GRILLE = 4.0, 4.0, 4.0   # pocket clearance round it, printed cup wall, grille thickness
+SPEAKERS = [  # (tag, end of the front-side corner edge, distance along it, aim out from straight, aim up, seat depth,
+              #  slid inboard). A bottom pair (22.5 out, 15 up) doesn't fit: see JUDGMENTS
+    ("top", "top", 90.0, 45.0, 30.0, 55.0, 0.0),
+]
+
+
 # ------------------------------------------------------------------ gun (rev C): two in-line cannons
 # Each cannon: pipe chamber -> 1 in stainless solenoid valve -> polycarbonate barrel, all on one axis.
 # The two cannons stack as close as the barrels allow; the pivot axis runs between them, at the gun's centre of
@@ -169,7 +191,7 @@ VALVE = dict(L=82.6, W=66.0, BODY=(-28.0, 30.0), COIL_R=25.0, COIL_TOP=86.0)  # 
 # nipple swings the chamber low enough at the back to open the rear face down through its controls)
 CH_PIPE, CH_NIPPLE_L = "2", 8.0 * IN
 RED = dict(L=71.0, OD_IN=44.0, OD_OUT=76.0, BAND_IN=16.0, BAND_OUT=26.0, MASS=0.31)   # 2 x 1 (CNSD4005, 10.9 oz)
-GUN_GAP = 3.8                               # between the barrels (and between the reducers' wide ends)
+GUN_GAP = 8.0                               # between the barrels (and between the reducers' wide ends)
 PITCH = BARREL_OD + GUN_GAP                 # cannons at z = +/- PITCH / 2 about the axis
 CRADLE_Y0 = 79.7                            # inner faces of the two cradle plates (room for the smoke vents)
 X_VALVE = 83.0                              # valve centre ahead of the axis (from the balance calc, see gun.py)
@@ -191,21 +213,21 @@ X_SLOT_REAR = -2000.0                       # the well is open at the back: at 0
 TOWER_X = (-182.7, -157.3)
 TOWER_L_X = TOWER_R_X = TOWER_X
 BEARING_BLOCK_Y = (ELEV_PULLEY_Y[1] + 1.0, INNER_RAIL_Y[1])
-ELEV_MOTOR_Z = 490.0
+ELEV_MOTOR_Z = 468.0                        # under the top speaker's LED rail, over the side tank
 ELEV_C = centre_for_belt(ELEV_BELT_T, pd(ELEV_T[0]), pd(ELEV_T[1]))
 ELEV_MOTOR_X = PIVOT[0] + math.sqrt(ELEV_C ** 2 - (PIVOT[1] - ELEV_MOTOR_Z) ** 2)
 
 # ------------------------------------------------------------------ pneumatics / power
 TANK_D, TANK_L = 152.0, 360.0               # owner's AliExpress 6 L / 1.6 gal 200 psi tank (bare shell)
-TANK_SIDE = (66.0, 169.0, 364.0)            # (x, |y|, z): reservoirs lying along x, left and right, above the
+TANK_SIDE = (46.0, 163.0, 364.0)            # (x, |y|, z): reservoirs lying along x, left and right, above the
                                             # front wheels
 BATT = (7.13 * IN, 3.01 * IN, 6.57 * IN)    # FRC battery L, W, H
 BELLY_Z = RAIL_Z[0]
 BATT_Z = 287.8                              # battery bottoms on their sleds (over the rear wheels)
 BATT_X = (-336.0, -336.0 + BATT[0])         # one battery each side, long axis along x
-BATT_Y = (160.0, 160.0 + BATT[1])           # |y|: they slide out the side walls
+BATT_Y = (145.0, 145.0 + BATT[1])           # |y|: they slide out the side walls
 ELEC_BAY = ((-380.0, -192.0), (-100.0, 100.0), (BELLY_Z, 250.0))   # back bottom
-FOG_BOX = ((200.0, 360.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # custom 12 V fogger (2 x 200 W cores), front bay
+FOG_BOX = ((190.0, 350.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # custom 12 V fogger (2 x 200 W cores), front bay
 
 
 def summary():

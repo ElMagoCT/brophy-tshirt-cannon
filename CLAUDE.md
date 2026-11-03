@@ -23,7 +23,7 @@ You are the lead engineer on a high school robotics build. Think like the best h
 
 Mark 5 is a ground-up rebuild of Brophy College Prep's t-shirt cannon robot, built and operated by the Broncobots robotics club on behalf of student council for parades, games, and gym events. It's a three-barrel pneumatic cannon on a mecanum drive, controlled by an ESP32 over a WebSocket web UI so any laptop/phone can drive it with no special software.
 
-**Status:** Design phase. Pneumatic architecture is chosen (150 PSI, Option A). The "Glacis" design (rev C.1, two in-line cannons 3.8 mm apart balanced on a pivot axis between them, the old cannon's Atlantic Valves SZW-25 firing valves, 0.53 L 2 in pipe chambers) is fully modelled in `cad/glacis/` (CadQuery) and imported to Onshape ("Brophy Mark 5 - Glacis"); its parts list is the "Glacis BOM" tab ($1,707.39, 2026-11-03) and its decisions are in `docs/glacis/JUDGMENTS.md`, awaiting Micah's review. Nothing has been purchased or built. No firmware or dashboard code yet. Horn and video are still goal-level only.
+**Status:** Design phase. Pneumatic architecture is chosen (150 PSI, Option A). The "Glacis" design (rev C.2, two in-line cannons 8 mm apart balanced on a pivot axis between them, the old cannon's Atlantic Valves SZW-25 firing valves, 0.53 L 2 in pipe chambers, a main valve then one in valve per chamber with no check valves) is fully modelled in `cad/glacis/` (CadQuery) and imported to Onshape ("Brophy Mark 5 - Glacis"); its parts list is the "Glacis BOM" tab ($1,512.44, 2026-11-03) and its decisions are in `docs/glacis/JUDGMENTS.md`, awaiting Micah's review. Nothing has been purchased or built. No firmware or dashboard code yet. Video is still goal-level only.
 
 ---
 
@@ -49,14 +49,14 @@ A reliable, good-looking, self-contained cannon that:
 | Goals | Done — Google Doc (full text in Appendix A) |
 | Pneumatic architecture | Decided (Option A, 150 PSI); QEV size pending (3/4" Parker proposed, see Open questions) — parts not purchased |
 | Compressor | Closed 2026-11-01: ZHSYMX SQ420, 1.41 CFM free air, 100% duty @ 100 PSI (seller spec) — not purchased |
-| Sensors / ADC | Glacis rev C proposal: four 0.5-4.5 V transducers (tank, fill, two chambers) and the arm-angle pot into the STM32 ADC; no dial gauges |
+| Sensors / ADC | Glacis rev C.2 proposal: three 0.5-4.5 V transducers (tank, two chambers) and the arm-angle pot into the STM32 ADC; no dial gauges |
 | Fog machine control | Glacis rev C.1 proposal (2026-11-03): custom 12 V fogger, two 200 W cast fog heater cores (AliExpress, $22.42 each) with peristaltic pumps, MAX6675 thermocouples, KSD301 250 C cutouts and a relay per core, a 5015 blower; printed splitter to a smoke collar over holes in both barrels and trail vents front and rear. Replaces the XLR-remote plan if Micah agrees |
 | Drive motors / control | Glacis rev C proposal: Falcon 500s on STM32 PWM through a safety-gated buffer; ESP32-S3 is the WiFi bridge only; ESP-NOW safety node + handheld remote |
 | BOM | In `/bom/` (Micah's xlsx + CSV mirrors via `bom/xlsx_to_csv.py`). Pneumatics + electronics re-verified live 2026-11-01: Tier A $1,213, A+B $2,283 (over the ceiling; cuts proposed in `docs/decisions.md`). Chassis/drive/aesthetics still Aug-2026 estimates |
-| Chassis | Glacis rev C (2026-11-02): 1x2/1x1 x 1/16 aluminum box tube + 1/8 in gussets, printed body frame (60 deg front, leaning sides and back), recessed frosted acrylic with corner clips, LED channel in every member backlighting the panels. Awaiting Micah's review |
+| Chassis | Glacis rev C (2026-11-02): 1x2/1x1 x 1/16 aluminum box tube + 1/8 in gussets, printed body frame (60 deg front, leaning sides and back), recessed frosted acrylic with chamfered corner clips; rev C.2: a 60/m LED loop on a leaning rail 1.15 in behind each panel, a 100/m strip through a tunnel in every frame member so the frame glows, and two slim 100 W siren speakers in notches high in the front-side corners. Awaiting Micah's review |
 | Mecanum wheels | Glacis rev C (2026-11-02, from Micah's TTB-0010 vector wheel): 10 in vector-style printed mecanum, 10 rollers (42 mm) on 608 2RS + fixed M8 rods, two-half PETG-CF hub with a 116T pulley (flange 1.27 in off the floor), three flat 1/8 in aluminum plates; Falcon 12T one-stage belt 9.67:1, 1/2 hex live axles. Not printed or tested |
 | Elevation (0–90°) | Glacis rev C: gun balanced on a 1/2 hex axle between the two cannons; goBILDA 5203 99.5:1 (60 rpm) on a Spark MAX, 16T->56T 9 mm belt, pot on the axle. Not built |
-| LEDs, horn, video, dashboard UI | Not designed |
+| LEDs, horn, video, dashboard UI | Glacis rev C.2: LEDs and horn speakers modelled (see Chassis); video and dashboard UI not designed |
 | Firmware | Not started (rev B splits it: STM32 main, ESP32 WiFi bridge, ESP32 safety node, ESP32 remote) |
 | CAD | `cad/glacis/` (CadQuery, checks clean) -> Onshape "Brophy Mark 5 - Glacis" (STEP import) |
 
@@ -71,6 +71,7 @@ A reliable, good-looking, self-contained cannon that:
 - Why 150 not 200: every 1" QEV found is rated 150 PSI max, and a 1" QEV at 150 PSI moves roughly 3x the air of a 1/2" QEV at 200 PSI. Valve bore limits shot performance more than pressure does.
 - Why QEV: opens full-port in ~10 ms vs ~80 ms for a big direct solenoid, and it's cheap.
 - Variable pressure: meter air from the reservoir into each firing chamber with a ~$22 direct-acting solenoid, closed-loop against a pressure transducer. Rejected a ~$250 proportional regulator.
+- (2026-11-03, Micah, Glacis rev C.2) The shared fill solenoid, fill-manifold sensor and per-barrel check valves are replaced by a main valve (tank shut-off) and one direct-acting in valve per chamber, each metering against its own chamber transducer. No manual bleed valve: the relief pull rings are the hand dump.
 - 200 PSI is a future upgrade path (swap tank + valves, reuse chambers, sensors, electronics).
 - Option A was estimated at roughly $455–545 for the full 3-barrel pneumatic system (pre-verification).
 

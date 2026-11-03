@@ -93,7 +93,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
 
 <div class="wrap">
   <header>
-    <div class="kicker">Brophy Mark 5 · Glacis rev C.1</div>
+    <div class="kicker">Brophy Mark 5 · Glacis rev C.2</div>
     <h1>Glacis air &amp; wiring</h1>
     <p class="lede">How air, smoke and power move through the cannon. Pick a step to light up the parts it uses on both drawings, or tap a pressure sensor to find it on both.</p>
   </header>
@@ -106,6 +106,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     <button type="button" id="s-smoke" data-step="smoke" aria-pressed="false">4 · Smoke</button>
     <button type="button" id="s-drive" data-step="drive" aria-pressed="false">5 · Drive &amp; aim</button>
     <button type="button" id="s-safe" data-step="safe" aria-pressed="false">6 · Safety trips</button>
+    <button type="button" id="s-horn" data-step="horn" aria-pressed="false">7 · Horn</button>
   </nav>
   <p class="note" id="note" aria-live="polite"></p>
 
@@ -122,16 +123,16 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     </div>
     <figure>
       <div class="scroll">
-        <svg class="dg" id="pneu" viewBox="0 0 1200 580" role="img" aria-label="Pneumatic diagram: shop air fills two 200 psi tanks through a rear manifold; a 12 V fill valve meters air through a fill block and two check valves into the two 0.53 L chambers; each chamber's Atlantic SZW-25 valve fires into its barrel; four pressure sensors PT1 to PT4 watch the tanks, fill line and chambers; smoke runs from the 12 V smoke machine to a collar on the barrels and vents front and rear.">
+        <svg class="dg" id="pneu" viewBox="0 0 1200 580" role="img" aria-label="Pneumatic diagram: shop air fills two 200 psi tanks through a rear manifold; a 12 V main valve feeds a brass cross and one 12 V in valve per chamber meters air into each 0.53 L chamber; each chamber's Atlantic SZW-25 valve fires into its barrel; three pressure sensors watch the tanks (PT1) and the two chambers (PT2, PT3); smoke runs from the 12 V smoke machine to a collar on the barrels and vents front and rear.">
           <defs>
             <marker id="ma" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-air" d="M0 0L10 5L0 10z"/></marker>
             <marker id="ms" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-smk" d="M0 0L10 5L0 10z"/></marker>
           </defs>
           <!-- zones -->
-          <rect class="zone z200" x="140" y="38" width="262" height="340" rx="10"/>
+          <rect class="zone z200" x="140" y="38" width="462" height="402" rx="10"/>
           <text class="ztxt" x="152" y="58">Tanks · 200 psi</text>
-          <rect class="zone z110" x="412" y="38" width="523" height="402" rx="10"/>
-          <text class="ztxt" x="424" y="58">Chambers · 110 psi cap</text>
+          <rect class="zone z110" x="602" y="38" width="333" height="402" rx="10"/>
+          <text class="ztxt" x="614" y="58">Chambers · 110 psi cap</text>
           <rect class="zone zbar" x="935" y="38" width="250" height="402" rx="10"/>
           <text class="ztxt" x="947" y="58">Barrels · open air</text>
 
@@ -158,48 +159,39 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <path class="air" d="M225 247V290"/>
             <rect class="sym" x="215" y="290" width="20" height="24"/><path class="sg" d="M219 310L231 294M231 294l-5 1M231 294l-1 5"/>
             <text x="225" y="332" text-anchor="middle">Relief</text><text class="t-s" x="225" y="346" text-anchor="middle">200 psi</text>
+            <text class="t-s" x="225" y="360" text-anchor="middle">ring = hand dump</text>
           </g>
           <g class="pt" data-k="PT1" data-s="charge safe">
             <path class="ptl" d="M291 247V290"/>
             <circle cx="291" cy="304" r="14"/><text class="id" x="291" y="308" text-anchor="middle">PT1</text>
             <text class="t-s" x="291" y="334" text-anchor="middle">0–300 psi</text>
           </g>
-          <g data-s="safe charge">
-            <path class="air" d="M358 247V292"/>
-            <circle class="sym" cx="358" cy="302" r="10"/><path class="sg" d="M351 302H365"/>
-            <text x="358" y="332" text-anchor="middle">Bleed</text><text class="t-s" x="358" y="346" text-anchor="middle">rear panel</text>
-          </g>
-          <!-- fill valve + fill block -->
+          <!-- main valve + cross -->
           <g data-s="fill">
             <path class="air" d="M377 240H428"/>
             <path class="sym" d="M428 230L452 250V230L428 250Z"/>
             <rect class="sym" x="433" y="212" width="14" height="14"/><text class="t-s" x="440" y="223" text-anchor="middle">S</text>
             <path class="sg" d="M440 226V230"/>
-            <text x="440" y="276" text-anchor="middle">Fill valve</text><text class="t-s" x="440" y="290" text-anchor="middle">12 V NC · meters</text>
-            <path class="air" d="M452 240H488"/>
-            <rect class="solid" x="488" y="226" width="72" height="28" rx="2"/>
-            <text x="524" y="216" text-anchor="middle">Fill block</text>
-          </g>
-          <g class="pt" data-k="PT2" data-s="fill">
-            <path class="ptl" d="M500 254V292"/>
-            <circle cx="500" cy="306" r="14"/><text class="id" x="500" y="310" text-anchor="middle">PT2</text>
-            <text class="t-s" x="500" y="336" text-anchor="middle">0–200 psi</text>
+            <text x="440" y="276" text-anchor="middle">Main valve</text><text class="t-s" x="440" y="290" text-anchor="middle">12 V NC · shut-off</text>
+            <path class="air" d="M452 240H490"/>
+            <rect class="solid" x="490" y="228" width="26" height="24" rx="2"/>
+            <text x="503" y="218" text-anchor="middle">Cross</text>
+            <path class="air" d="M516 240H560V150H590M560 240V330H590"/>
           </g>
           <g data-s="safe fill">
-            <path class="air" d="M548 254V292"/>
-            <rect class="sym" x="538" y="292" width="20" height="24"/><path class="sg" d="M542 312L554 296M554 296l-5 1M554 296l-1 5"/>
-            <text x="560" y="334" text-anchor="middle">Relief</text><text class="t-s" x="560" y="348" text-anchor="middle">125 psi</text>
+            <path class="air" d="M503 252V292"/>
+            <rect class="sym" x="493" y="292" width="20" height="24"/><path class="sg" d="M497 312L509 296M509 296l-5 1M509 296l-1 5"/>
+            <text x="503" y="334" text-anchor="middle">Relief</text><text class="t-s" x="503" y="348" text-anchor="middle">200 psi</text>
           </g>
-          <!-- check valves + flex loops -->
+          <!-- in valves (one per chamber) + flex loops -->
           <g data-s="fill">
-            <path class="air" d="M560 240H590V150H608M590 240V330H608"/>
-            <path class="sym" d="M608 141L626 150L608 159Z"/><path class="sg" d="M629 140V160" style="stroke-width:2"/>
-            <path class="sym" d="M608 321L626 330L608 339Z"/><path class="sg" d="M629 320V340" style="stroke-width:2"/>
-            <text x="618" y="132" text-anchor="middle">Check A</text>
-            <text x="618" y="362" text-anchor="middle">Check B</text>
-            <path class="flex" d="M630 150H720M630 330H720"/>
-            <text class="t-s" x="675" y="172" text-anchor="middle">flex loop</text>
-            <text class="t-s" x="675" y="318" text-anchor="middle">flex loop</text>
+            <path class="sym" d="M590 140L614 160V140L590 160Z"/><rect class="sym" x="595" y="118" width="14" height="14"/><text class="t-s" x="602" y="129" text-anchor="middle">S</text><path class="sg" d="M602 132V140"/>
+            <path class="sym" d="M590 320L614 340V320L590 340Z"/><rect class="sym" x="595" y="348" width="14" height="14"/><text class="t-s" x="602" y="359" text-anchor="middle">S</text><path class="sg" d="M602 340V348"/>
+            <text x="602" y="96" text-anchor="middle">In valve A</text><text class="t-s" x="602" y="110" text-anchor="middle">meters to PT2</text>
+            <text x="602" y="382" text-anchor="middle">In valve B</text><text class="t-s" x="602" y="396" text-anchor="middle">meters to PT3</text>
+            <path class="flex" d="M614 150H720M614 330H720"/>
+            <text class="t-s" x="667" y="172" text-anchor="middle">flex loop</text>
+            <text class="t-s" x="667" y="318" text-anchor="middle">flex loop</text>
           </g>
           <!-- chamber blocks, sensors, reliefs, chambers -->
           <g data-s="fill fire">
@@ -209,14 +201,14 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <rect class="sym" x="790" y="136" width="112" height="28" rx="3"/><text x="846" y="154" text-anchor="middle">Chamber 0.53 L</text>
             <rect class="sym" x="790" y="316" width="112" height="28" rx="3"/><text x="846" y="334" text-anchor="middle">Chamber 0.53 L</text>
           </g>
-          <g class="pt" data-k="PT3" data-s="fill fire">
+          <g class="pt" data-k="PT2" data-s="fill fire">
             <path class="ptl" d="M732 136V102"/>
-            <circle cx="732" cy="88" r="14"/><text class="id" x="732" y="92" text-anchor="middle">PT3</text>
+            <circle cx="732" cy="88" r="14"/><text class="id" x="732" y="92" text-anchor="middle">PT2</text>
             <text class="t-s" x="732" y="68" text-anchor="middle">0–200 psi</text>
           </g>
-          <g class="pt" data-k="PT4" data-s="fill fire">
+          <g class="pt" data-k="PT3" data-s="fill fire">
             <path class="ptl" d="M732 344V378"/>
-            <circle cx="732" cy="392" r="14"/><text class="id" x="732" y="396" text-anchor="middle">PT4</text>
+            <circle cx="732" cy="392" r="14"/><text class="id" x="732" y="396" text-anchor="middle">PT3</text>
             <text class="t-s" x="732" y="424" text-anchor="middle">0–200 psi</text>
           </g>
           <g data-s="safe fill">
@@ -265,7 +257,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           </g>
         </svg>
       </div>
-      <figcaption>Air enters at the rear fill port and only reaches a barrel when its SZW-25 opens. The fill valve meters the chambers up to the software setpoint (110 psi max). The check valves keep one shot from emptying the other chamber. Every pressure zone has its own relief.</figcaption>
+      <figcaption>Air enters at the rear fill port and only reaches a barrel when its SZW-25 opens. The main valve opens only while a chamber fills; each in valve meters its own chamber to its own setpoint (110 psi max), and its closed seat keeps a shot from reaching the other chamber, so there are no check valves. Every pressure zone has its own relief, and the pull rings are the hand dump.</figcaption>
     </figure>
   </section>
 
@@ -283,7 +275,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     </div>
     <figure>
       <div class="scroll">
-        <svg class="dg" id="elec" viewBox="0 0 1200 720" role="img" aria-label="Electrical diagram: two FRC batteries and a standby charge port feed a 120 A breaker and the REV PDH; the PDH powers the Falcons, the Spark MAX, a 5 V buck, the smoke machine and, through the safety relay, the 12 V valve rail; the STM32 reads PT1 to PT4 and the gun-angle pot, drives the motors through a PWM gate, the firing valves and smoke through MOSFETs and the fill valve through a relay; an ESP32-S3 WiFi bridge serves the web UI and an ESP32-S3 safety node, linked by ESP-NOW to a handheld remote, holds the safety relay and the PWM gate enable, with the rear E-stop in series.">
+        <svg class="dg" id="elec" viewBox="0 0 1200 720" role="img" aria-label="Electrical diagram (with the audio chain: the WiFi bridge sends I2S to a DAC, and a TPA3116 amp on a 24 V boost drives two siren speakers): two FRC batteries and a standby charge port feed a 120 A breaker and the REV PDH; the PDH powers the Falcons, the Spark MAX, a 5 V buck, the smoke machine and, through the safety relay, the 12 V valve rail; the STM32 reads PT1 to PT3 and the gun-angle pot, drives the motors through a PWM gate, the firing valves, in valves and smoke through MOSFETs and the main valve through a relay; an ESP32-S3 WiFi bridge serves the web UI and an ESP32-S3 safety node, linked by ESP-NOW to a handheld E-stop remote, holds the safety relay and the PWM gate enable, with the rear E-stop in series.">
           <defs>
             <marker id="mp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-pw" d="M0 0L10 5L0 10z"/></marker>
             <marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-sg" d="M0 0L10 5L0 10z"/></marker>
@@ -319,7 +311,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <text class="t-s" x="398" y="300" text-anchor="end">5 V</text><text class="t-s" x="398" y="312" text-anchor="end">to sensors</text>
           </g>
           <g data-s="drive">
-            <rect class="box" x="1000" y="214" width="176" height="36" rx="3"/><text x="1088" y="230" text-anchor="middle">WS2812 LEDs</text><text class="t-s" x="1088" y="243" text-anchor="middle">frame 12.4 m · collars</text>
+            <rect class="box" x="1000" y="214" width="176" height="36" rx="3"/><text x="1088" y="230" text-anchor="middle">WS2812 LEDs</text><text class="t-s" x="1088" y="243" text-anchor="middle">panel loops 60/m · frame 100/m</text>
           </g>
           <!-- wifi bridge -->
           <g data-s="drive fire fill">
@@ -328,31 +320,35 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <path class="rf" d="M700 158H998"/>
             <rect class="ext" x="1000" y="144" width="176" height="30" rx="3"/><text x="1088" y="163" text-anchor="middle">Any browser · WebSocket</text>
           </g>
+          <!-- audio: bridge -> I2S DAC -> two amps on 24 V -> four siren speakers -->
+          <g data-s="horn">
+            <path class="sg" d="M700 168H760"/><text class="t-s" x="730" y="162" text-anchor="middle">I2S</text>
+            <rect class="box" x="760" y="160" width="84" height="26" rx="3"/><text x="802" y="177" text-anchor="middle">DAC</text>
+            <path class="sg" marker-end="url(#mg)" d="M844 173H950V281H998"/>
+            <rect class="box" x="1000" y="266" width="176" height="30" rx="3"/><text x="1088" y="280" text-anchor="middle">Amp · TPA3116, 2 ch</text><text class="t-s" x="1088" y="292" text-anchor="middle">24 V boost off the PDH</text>
+            <path class="pw" marker-end="url(#mp)" d="M1088 296V308"/>
+            <rect class="box" x="1000" y="310" width="176" height="40" rx="3"/><text x="1088" y="327" text-anchor="middle">Siren speakers ×2</text><text class="t-s" x="1088" y="341" text-anchor="middle">100 W slim · front corners</text>
+          </g>
           <!-- sensors -->
           <g class="pt" data-k="PT1" data-s="charge safe">
             <circle cx="448" cy="290" r="13"/><text class="id" x="448" y="294" text-anchor="middle">PT1</text>
             <text class="t-s" x="420" y="284" text-anchor="end">tank 0–300</text>
             <path class="ptl" marker-end="url(#mt)" d="M461 290H518"/><rect class="sym" x="478" y="285" width="18" height="10"/>
           </g>
-          <g class="pt" data-k="PT2" data-s="fill">
+          <g class="pt" data-k="PT2" data-s="fill fire">
             <circle cx="448" cy="330" r="13"/><text class="id" x="448" y="334" text-anchor="middle">PT2</text>
-            <text class="t-s" x="420" y="334" text-anchor="end">fill 0–200</text>
+            <text class="t-s" x="420" y="334" text-anchor="end">top chamber</text>
             <path class="ptl" marker-end="url(#mt)" d="M461 330H518"/><rect class="sym" x="478" y="325" width="18" height="10"/>
           </g>
           <g class="pt" data-k="PT3" data-s="fill fire">
             <circle cx="448" cy="370" r="13"/><text class="id" x="448" y="374" text-anchor="middle">PT3</text>
-            <text class="t-s" x="420" y="374" text-anchor="end">top chamber</text>
+            <text class="t-s" x="420" y="374" text-anchor="end">bottom chamber</text>
             <path class="ptl" marker-end="url(#mt)" d="M461 370H518"/><rect class="sym" x="478" y="365" width="18" height="10"/>
           </g>
-          <g class="pt" data-k="PT4" data-s="fill fire">
-            <circle cx="448" cy="410" r="13"/><text class="id" x="448" y="414" text-anchor="middle">PT4</text>
-            <text class="t-s" x="420" y="414" text-anchor="end">bottom chamber</text>
-            <path class="ptl" marker-end="url(#mt)" d="M461 410H518"/><rect class="sym" x="478" y="405" width="18" height="10"/>
-          </g>
           <g data-s="drive">
-            <circle class="sym" cx="448" cy="450" r="12"/><path class="sg" d="M440 456L456 444"/>
-            <text class="t-s" x="420" y="454" text-anchor="end">gun-angle pot</text>
-            <path class="sg" marker-end="url(#mg)" d="M460 450H518"/>
+            <circle class="sym" cx="448" cy="410" r="12"/><path class="sg" d="M440 416L456 404"/>
+            <text class="t-s" x="420" y="414" text-anchor="end">gun-angle pot</text>
+            <path class="sg" marker-end="url(#mg)" d="M460 410H518"/>
           </g>
           <g data-s="drive">
             <rect class="ext" x="330" y="482" width="92" height="28" rx="3"/><text x="376" y="500" text-anchor="middle">USB-C · rear</text>
@@ -364,11 +360,11 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <rect class="box" x="520" y="260" width="180" height="262" rx="4" style="stroke-width:2"/>
             <text class="t-b" x="610" y="282" text-anchor="middle">STM32 Nucleo-F446RE</text>
             <text class="t-s" x="610" y="296" text-anchor="middle">main controller</text>
-            <text class="t-s" x="528" y="294">A0</text><text class="t-s" x="528" y="334">A1</text><text class="t-s" x="528" y="374">A2</text><text class="t-s" x="528" y="414">A3</text><text class="t-s" x="528" y="454">A4</text><text class="t-s" x="528" y="500">USB</text>
+            <text class="t-s" x="528" y="294">A0</text><text class="t-s" x="528" y="334">A1</text><text class="t-s" x="528" y="374">A2</text><text class="t-s" x="528" y="414">A3</text><text class="t-s" x="528" y="500">USB</text>
             <text class="t-s" x="692" y="294" text-anchor="end">PWM ×5</text><text class="t-s" x="692" y="314" text-anchor="end">LED data</text>
-            <text class="t-s" x="692" y="390" text-anchor="end">fire T · fire B</text><text class="t-s" x="692" y="430" text-anchor="end">fog heat · pump · fan</text>
+            <text class="t-s" x="692" y="390" text-anchor="end">fire T · fire B</text><text class="t-s" x="692" y="414" text-anchor="end">in A · in B</text><text class="t-s" x="692" y="434" text-anchor="end">fog heat · pump · fan</text>
             <text class="t-s" x="610" y="462" text-anchor="middle">SPI ← fog core temps</text>
-            <text class="t-s" x="692" y="480" text-anchor="end">fill</text>
+            <text class="t-s" x="692" y="507" text-anchor="end">main</text>
             <text class="t-s" x="610" y="516" text-anchor="middle">heartbeat ↓</text>
           </g>
           <!-- PWM gate -->
@@ -379,24 +375,27 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <path class="sg" marker-end="url(#mg)" d="M844 296H912V136"/>
             <path class="sg" marker-end="url(#mg)" d="M844 312H986V250"/>
           </g>
-          <!-- MOSFET bank, fill relay -->
-          <g data-s="fire smoke">
-            <path class="sg" d="M700 386H760M700 426H760"/>
-            <rect class="box" x="760" y="370" width="84" height="72" rx="3"/><text x="802" y="398" text-anchor="middle">MOSFET ×9</text><text class="t-s" x="802" y="412" text-anchor="middle">15 A each</text>
+          <!-- MOSFET bank, main-valve relay -->
+          <g data-s="fire fill smoke">
+            <path class="sg" d="M700 386H760M700 410H760M700 430H760"/>
+            <rect class="box" x="760" y="368" width="84" height="84" rx="3"/><text x="802" y="404" text-anchor="middle">MOSFET ×11</text><text class="t-s" x="802" y="418" text-anchor="middle">15 A each</text>
           </g>
           <g data-s="fire">
-            <path class="sg" marker-end="url(#mg)" d="M844 380H998M844 392H950V420H998"/>
-            <rect class="box" x="1000" y="364" width="176" height="30" rx="3"/><text x="1088" y="383" text-anchor="middle">Firing valve top</text>
-            <rect class="box" x="1000" y="406" width="176" height="30" rx="3"/><text x="1088" y="425" text-anchor="middle">Firing valve bottom</text>
+            <path class="sg" marker-end="url(#mg)" d="M844 375H998M844 387H950V407H998"/>
+            <rect class="box" x="1000" y="362" width="176" height="26" rx="3"/><text x="1088" y="379" text-anchor="middle">Firing valve top</text>
+            <rect class="box" x="1000" y="394" width="176" height="26" rx="3"/><text x="1088" y="411" text-anchor="middle">Firing valve bottom</text>
           </g>
           <g data-s="fill">
-            <path class="sg" d="M700 476H760"/>
-            <rect class="box" x="760" y="462" width="84" height="30" rx="3"/><text x="802" y="481" text-anchor="middle">ULN + relay</text>
-            <path class="sg" marker-end="url(#mg)" d="M844 476H998"/>
-            <rect class="box" x="1000" y="462" width="176" height="30" rx="3"/><text x="1088" y="481" text-anchor="middle">Fill valve</text>
+            <path class="sg" marker-end="url(#mg)" d="M844 399H940V439H998M844 411H930V471H998"/>
+            <rect class="box" x="1000" y="426" width="176" height="26" rx="3"/><text x="1088" y="443" text-anchor="middle">In valve A · top</text>
+            <rect class="box" x="1000" y="458" width="176" height="26" rx="3"/><text x="1088" y="475" text-anchor="middle">In valve B · bottom</text>
+            <path class="sg" d="M700 503H760"/>
+            <rect class="box" x="760" y="488" width="84" height="30" rx="3"/><text x="802" y="507" text-anchor="middle">ULN + relay</text>
+            <path class="sg" marker-end="url(#mg)" d="M844 503H998"/>
+            <rect class="box" x="1000" y="490" width="176" height="26" rx="3"/><text x="1088" y="507" text-anchor="middle">Main valve</text>
           </g>
           <g data-s="smoke">
-            <path class="sg" marker-end="url(#mg)" d="M844 420H930V540H998M844 432H922V552H998"/>
+            <path class="sg" marker-end="url(#mg)" d="M844 428H918V540H998M844 440H910V552H998"/>
             <path class="pw" marker-end="url(#mp)" d="M290 660H960V566H998"/>
             <rect class="box" x="1000" y="528" width="176" height="44" rx="3"/><text x="1088" y="546" text-anchor="middle">Fogger · 2 cores</text><text class="t-s" x="1088" y="560" text-anchor="middle">heaters · pumps · blower</text>
             <text class="t-s" x="640" y="654" text-anchor="middle">2 × 30 A · relay per core, 250 °C cutout in its coil</text>
@@ -405,7 +404,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           <g data-s="fire fill safe">
             <path class="pw" d="M290 620H330"/>
             <rect class="box" x="330" y="604" width="92" height="32" rx="3"/><text x="376" y="619" text-anchor="middle">Safety relay</text><text class="t-s" x="376" y="631" text-anchor="middle">40 A</text>
-            <path class="pw" d="M422 620H984V372M984 372H998M984 414H998M984 470H998"/>
+            <path class="pw" d="M422 620H984V367M984 367H998M984 399H998M984 431H998M984 463H998M984 495H998"/>
             <text class="t-s" x="700" y="638" text-anchor="middle">12 V valve rail · dead unless the safety node says OK</text>
           </g>
           <!-- safety node, remote, E-stop -->
@@ -418,7 +417,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <path class="sg" marker-end="url(#mg)" d="M436 568H376V604"/>
             <path class="sg" marker-end="url(#mg)" d="M700 560H880V256H802V272"/><text class="t-s" x="884" y="250">gate enable</text>
             <path class="rf" d="M700 576H998"/>
-            <rect class="ext" x="1000" y="584" width="176" height="44" rx="3" style="stroke:var(--rf)"/><text x="1088" y="602" text-anchor="middle">Handheld remote</text><text class="t-s" x="1088" y="616" text-anchor="middle">E-stop · dead-man trigger</text>
+            <rect class="ext" x="1000" y="584" width="176" height="44" rx="3" style="stroke:var(--rf)"/><text x="1088" y="602" text-anchor="middle">Handheld remote</text><text class="t-s" x="1088" y="616" text-anchor="middle">E-stop · link LED</text>
             <path class="rf" d="M998 576H1088V584"/>
           </g>
           <g class="pt" data-k="PT1" data-s="safe">
@@ -427,7 +426,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           </g>
         </svg>
       </div>
-      <figcaption>The STM32 does everything time-critical. The safety node is the only thing that can power the valve rail and enable the motor PWM, so losing the remote, a dead STM32 heartbeat, the E-stop or PT1 over 210 psi each stop the valves and drive. The fill-valve relay is cut at the rail too.</figcaption>
+      <figcaption>The STM32 does everything time-critical. The safety node is the only thing that can power the valve rail and enable the motor PWM, so losing the remote, a dead STM32 heartbeat, the E-stop or PT1 over 210 psi each stop the valves and drive. The main and in valves are on that rail too, so a trip also stops any fill.</figcaption>
     </figure>
   </section>
 
@@ -435,9 +434,8 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     <h2>Pressure sensors</h2>
     <div class="sensors">
       <div class="sensor"><button type="button" id="b-PT1" data-k="PT1" aria-pressed="false">PT1 · tank</button><span class="rng">0–300 psi · 0.5–4.5 V</span><p>Rear manifold, shared by both tanks. Read by the STM32 (A0) and the safety node, which trips everything above 210 psi.</p></div>
-      <div class="sensor"><button type="button" id="b-PT2" data-k="PT2" aria-pressed="false">PT2 · fill line</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Fill block, after the fill valve. The STM32 (A1) pulses the fill valve against it.</p></div>
-      <div class="sensor"><button type="button" id="b-PT3" data-k="PT3" aria-pressed="false">PT3 · top chamber</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Port block behind the top chamber. Sets that cannon's shot pressure (A2).</p></div>
-      <div class="sensor"><button type="button" id="b-PT4" data-k="PT4" aria-pressed="false">PT4 · bottom chamber</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Port block behind the bottom chamber (A3). Each chamber is sealed by its check valve, so it needs its own sensor.</p></div>
+      <div class="sensor"><button type="button" id="b-PT2" data-k="PT2" aria-pressed="false">PT2 · top chamber</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Port block behind the top chamber (A1). In valve A meters that chamber against it, so it sets the top cannon's shot pressure.</p></div>
+      <div class="sensor"><button type="button" id="b-PT3" data-k="PT3" aria-pressed="false">PT3 · bottom chamber</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Port block behind the bottom chamber (A2). In valve B meters against it, so each cannon has its own pressure.</p></div>
     </div>
   </section>
 </div>
@@ -446,12 +444,13 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
 (() => {
   const notes = {
     "": "Everything at once. Pick a step to see which parts it uses.",
-    charge: "<b>Charge.</b> A shop compressor fills both 6 L tanks to 200 psi through the rear fill port. PT1 reports tank pressure; the 200 psi relief and the bleed valve sit on the same manifold.",
-    fill: "<b>Fill.</b> The STM32 pulses the fill valve (through the ULN and relay, on the safety-powered valve rail) until PT3 and PT4 read the setpoint, never above 110 psi. The check valves keep each chamber's air in it.",
-    fire: "<b>Fire.</b> The web UI asks, the remote's dead-man trigger must be held, and the safety node keeps the valve rail live. The STM32 switches one SZW-25 through its MOSFET; the chamber dumps into the barrel and the shirt goes.",
+    charge: "<b>Charge.</b> A shop compressor fills both 6 L tanks to 200 psi through the rear fill port. PT1 reports tank pressure. The 200 psi relief on the same manifold has its pull ring at the rear panel: pull it to dump the tanks by hand. There's no bleed valve.",
+    fill: "<b>Fill.</b> The STM32 opens the main valve, then pulses one chamber's in valve until that chamber's sensor (PT2 or PT3) reads its own setpoint, never above 110 psi. It closes the in valve first, then the main valve, so tank pressure on the inlet side holds each in valve shut. No check valves: a closed in valve is what keeps one shot from emptying the other chamber.",
+    fire: "<b>Fire.</b> The web UI asks and the safety node keeps the valve rail live (the remote is a second E-stop with a link LED). The STM32 switches one SZW-25 through its MOSFET; the chamber dumps into the barrel and the shirt goes.",
     smoke: "<b>Smoke.</b> The STM32 holds two 200 W fog cores at 220–240 °C (5–8 min to warm up), then runs their pumps and the blower through MOSFETs. A 250 °C cutout drops each core's relay on its own. One splitter feeds the barrel collar (smoke fills each barrel ahead of the shirt and spills out of the muzzle) and the trail vents front and rear.",
     drive: "<b>Drive and aim.</b> The STM32 sends PWM through the gate to the four Falcons and the Spark MAX; the gate only passes it while the safety node enables it. The pot closes the elevation loop. LEDs and the web UI ride along.",
-    safe: "<b>Safety trips.</b> Remote heartbeat lost for 200 ms, remote or rear E-stop, the STM32 heartbeat stopping, or PT1 over 210 psi: the safety node opens the relay (valves dead) and disables the gate (motors stop). The reliefs work with no power at all: 200 psi on the tanks, 125 psi on the fill block and each chamber."
+    horn: "<b>Horn.</b> The web UI sends a sound. The ESP32-S3 bridge streams it over I2S to a PCM5102A DAC, and a TPA3116 amp (24 V from a boost converter, about 26 W a channel) drives the two 100 W slim siren speakers high in the front corners, aimed 45 deg out and 30 deg up.",
+    safe: "<b>Safety trips.</b> Remote heartbeat lost for 200 ms, remote or rear E-stop, the STM32 heartbeat stopping, or PT1 over 210 psi: the safety node opens the relay (valves dead) and disables the gate (motors stop). The reliefs work with no power at all: 200 psi on the tanks and on the valve cross, 125 psi on each chamber. Their pull rings are the hand dump."
   };
   const note = document.getElementById("note");
   const parts = document.querySelectorAll(".dg [data-s]");

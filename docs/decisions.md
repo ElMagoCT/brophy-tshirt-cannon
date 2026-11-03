@@ -281,3 +281,58 @@ the biggest hub the bed takes, and an integrated 15 mm HTD 5M pulley 1.25 in off
 - **Wheels are 120 mm wide (was 94)**: the inner rails and Falcons moved 26.5 mm inboard; the
   electronics shelf, fill block and tank lines were refit around them.
 - Parts list +$60.85, now $1,888.23. Wheels +0.9 kg each.
+
+## 2026-11-03 - Glacis rev C.2: in valves, LED loops and glowing frame, chamfered clips, corner speakers (proposed, waiting on Micah)
+
+Micah's notes on the rev C.1 diagrams and follow-ups in the same session. Details in `docs/glacis/JUDGMENTS.md`.
+
+- **Air:** drop the check valves and go from the tanks to each chamber through a valve that opens and closes
+  on the target pressure, with no bleed valve, keeping the valve between the tanks and the firing system.
+  - Built as main valve (kept) -> brass cross -> one Aignep 02F in valve per chamber, each metering against
+    its own chamber sensor.
+  - The check valves, fill block, fill sensor (PT2), its 125 relief and the rear ball-valve bleed are gone.
+  - Sensors are now PT1 tank, PT2 top chamber, PT3 bottom chamber.
+  - **Kept against the circle:** a 200 psi relief on the cross, because the brass between the main valve and
+    the in valves is its own pressure zone (hardware relief on every zone). The hand dump is the relief pull
+    rings; the tank relief now points out through the rear panel.
+  - **Fill order:** close the in valve before the main valve, so tank pressure holds the in valves' seats
+    shut.
+- **Panel light:** Micah first asked for LEDs pointing along the panels, then for a 60/m loop 1-1.5 in behind
+  each panel at a slight angle toward it, one complete loop per panel so light doesn't leak between panels,
+  with a spot on the bottom.
+  - Each window gets a printed rail on a flange, leaning 15 deg toward the panel. A 10 mm 60/m strip on it
+    sits 1.15 in behind the acrylic, 42 mm in from edges shared with another panel (so neighbours' strips
+    don't cross at the 91-100 deg corners) and 29 mm in from open edges.
+  - To make room for the loops and the speaker notches: batteries (and their SB50s) 15 mm inboard, side
+    tanks 6 mm inboard and 20 mm back, elevation motor 22 mm lower, smoke box 10 mm back, the pot
+    bracket's top lower, the rear smoke tube raised, and the rear manifold 5 mm lower with its transducer underneath.
+- **Frame light:** a centred rectangular tunnel down every member, missing the screws, so the frame glows.
+  - It's 6 x 2.6 mm, 100/m 5 mm strip, 2.5 mm outward of the tenons, which moved deeper (18.5 mm).
+  - Feed slots from the inside at each node.
+- **Corner clips:** chamfered instead of round and twice the size (27 mm legs).
+- **Speakers:** loud enough for a crowd, replacing the horn, two a side at the top and bottom of the front
+  corners. Top: 45 deg out, 30 up. Bottom: 22.5 out, 15 up. Chamfer the panels to fit, with a printed mesh
+  grille (3 walls, no top/bottom, 12% gyroid).
+  - Built with two UBL 100W Slim siren speakers (11 ohm, 120-130 dB, 2 in deep), one high in each corner, in
+    printed cups in notches cut into the body shape.
+  - Driven by an I2S DAC from the ESP32-S3 bridge and one TPA3116D2 on a 24 V boost.
+  - **The bottom pair doesn't fit** with 6 in speakers: the side panels pinch in two, the cups hit the front
+    wheels, or the grilles push the width past 28 in. Micah allowed two ("if you go for 4"); a 4 in speaker
+    would fit the bottom.
+  - The old list's 20-30 W PA horn and TDA7297 are dropped.
+- **Barrels 8 mm apart** (was 3.8), Micah's call; the gun rebalances on the pivot by itself.
+- **Strip sourcing:** Micah prefers Amazon or AliExpress for LEDs. The 5 mm strip is AliExpress
+  ($15.79 per 5 m at 100/m) and the 10 mm loop strip is BTF-LIGHTING on Amazon.
+- Frame: 89 printed pieces, 101 tenons, 40 clips, 2 door latches. Parts list $1,512.44 after the savings. Onshape version
+  "Glacis rev C.2".
+- **Savings (Micah's picks from a list of 20, same pressure and air capacity):**
+  - U.S. Solid USS2-01023 for the second firing valve (0.8 MPa = 116 psi, above the 110 cap).
+  - STM32F411 Black Pill instead of the Nucleo; his own two ESP32-S3s; his own goBILDA 5203; Loctite owned.
+  - Brass crosses instead of the 5-port chamber blocks; printed chamber caps instead of cam straps.
+  - Dollar-store noodles; heavy-duty 12 oz canvas; a 5 A boost module; Zoro M8 rod; 25 ft of DOT tube.
+  - Remote: an ESP32-S3 Super Mini with the E-stop and a link LED; the dead-man trigger and screen are gone.
+  - One fog core now, room left for a second. Two battery spots kept (live swap). The battery doors latch
+    at the top. Wheel plates get 8 more lightening holes; the frame prints at 15% infill.
+  - Not changed: 1/4 NPT transducers (FUSCH 200 psi is 1/8 NPT only); HornBlasters VA-4 in valves (no
+    cheaper than the Aignep, and not confirmed direct-acting); the VA-4 can't be a firing valve (Cv about
+    0.15 against 12).

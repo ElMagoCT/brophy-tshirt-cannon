@@ -1,10 +1,10 @@
 """The elevating gun (rev C.1): two in-line cannons stacked one above the other; the pivot axis passes
 between them.
 
-Each cannon, back to front on one axis: 5-port brass block (fill push-to-connect at the back, 125 psi relief
+Each cannon, back to front on one axis: 1/4 NPT brass cross (fill push-to-connect at the back, 125 psi relief
 outward, transducer to the side) -> 1 x 1/4 bushing -> chamber (2 x 1 reducing coupling, 2 in Sch 40 x 8 in
-nipple, 2 x 1 reducing coupling, about 0.53 L) -> 1 in close nipple -> Atlantic Valves SZW-25 1 in stainless
-solenoid valve (12 V DC, normally closed, coil pointing outward) -> 1 in close nipple -> CNC breech adapter (the
+nipple, 2 x 1 reducing coupling, about 0.53 L) -> 1 in close nipple -> 1 in solenoid valve (the old Atlantic
+Valves SZW-25 on top, a U.S. Solid USS2-01023 below; 12 V DC, normally closed, coil pointing outward) -> 1 in close nipple -> CNC breech adapter (the
 barrel slips over its spigot) -> clear polycarbonate barrel. The barrels sit GUN_GAP apart.
 Gun-local frame: origin on the pivot axis, +X along the barrels, +Z up. The cannons are built, their centre of
 mass is found from the parts' masses, and they are shifted so it lands on the axis: the gun balances in any
@@ -111,15 +111,14 @@ def _cannon(k, xv):
     CH_VOL[:] = [vol]
     ci.bushing("1", "1/4", 34.9, 7.0, bom="1 x 1/4 NPT black malleable hex bushing (Supply Giant CNCV3003)")
     ci.nipple("1/4", color="brass", bom="1/4 NPT brass close nipple 7/8 in")
-    ports = ci.block("1/4", side=32.0, sides=((0, 0, s), (0, 1, 0), (0, -1, 0)),     # transducer left, tubes run right
-                     bom="1/4 NPT brass 5-port block (Interstate CPT44-5)")
+    ports = ci.block("1/4", side=32.0, sides=((0, 0, s), (0, 1, 0)),     # transducer left, tubes run right
+                     bom="1/4 NPT brass cross (ChillWaves)")
     ci.male_end("fill push-to-connect", 22.0, 15.0, bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     tip = ci.at(ci.s)
     ports[0].male_end("relief 125 psi", 44.0, 19.0, bom="Relief valve 125 psi 1/4 MNPT, ASME, pull ring (Milton 1090-125)",
                       extra=relief_cap)
     ports[1].male_end("transducer 0-200 psi", 56.0, 20.0, color="steel",
                       bom="Pressure transducer 0-200 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)")
-    ports[2].male_end("plug", 12.0, 17.0, bom="1/4 NPT brass plug")
     return tip, ax0
 
 
@@ -150,17 +149,23 @@ def _build(xv):
                        (xv, zo - 12), (xv, -zo + 12)):
             pl = pl.cut(cyl(3.3, 10, (x, y0 - 2, z), (0, 1, 0)))
         gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al)", kind="stock")
-    # chamber saddles: one block between the two nipples at each station, a strap round each outer half
+    # chamber saddles: one block between the two nipples at each station, a printed cap bolted over each outer half
     cyls = [cyl(R_PIPE + 0.5, 1200, (xr - 1100, 0, h), (1, 0, 0)) for h in H]
     for xs in xs_list:
         sad = box(xs - 14, xs + 14, -CRADLE_Y0, CRADLE_Y0, H[1], H[0]).cut(cyls[0]).cut(cyls[1])
         gadd(f"Chamber saddle {xs:.0f}", sad, "print", bom="Chamber saddle", kind="print",
-             note="PETG-CF, screws through both cradle plates; straps close the outer halves")
+             note="PETG-CF, screws through both cradle plates; caps close the outer halves")
         for k, h in enumerate(H):
             s = OUT[k]
-            gadd(f"Chamber strap {TAGS[k]} {xs:.0f}", tube(R_PIPE + 2.5, R_PIPE + 0.5, 20.0, (xs - 10, 0, h), (1, 0, 0)).intersect(
-                box(xs - 11, xs + 11, -200, 200, h + 0.5 if s > 0 else h - 200, h + 200 if s > 0 else h - 0.5)),
-                "black", bom="1 in cam-buckle strap")
+            z0, z1 = (h + 0.5, h + 200) if s > 0 else (h - 200, h - 0.5)
+            cap = tube(R_PIPE + 6.0, R_PIPE + 0.5, 20.0, (xs - 10, 0, h), (1, 0, 0)).intersect(box(xs - 11, xs + 11, -200, 200, z0, z1))
+            fz0, fz1 = (h + 0.5, h + 6.5) if s > 0 else (h - 6.5, h - 0.5)
+            for sy in (1, -1):                                  # flanges onto the saddle, one M5 each into an insert
+                fl = box(xs - 10, xs + 10, min(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)),
+                         max(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)), fz0, fz1)
+                cap = cap.fuse(fl.cut(cyl(2.75, 20, (xs, sy * (R_PIPE + 26.0), fz0 - 1), (0, 0, 1))))
+            gadd(f"Chamber cap {TAGS[k]} {xs:.0f}", cap.clean(), "print", bom="Chamber cap", kind="print",
+                 note="PETG-CF, 2 x M5 into heat-set inserts in the saddle")
     for k, h in enumerate(H):
         vb = box(xv - hl + 4, xv + hl - 4, -CRADLE_Y0, CRADLE_Y0, h - 18, h + 18)
         vb = vb.cut(box(xv - hl - 1, xv + hl + 1, -P.VALVE["W"] / 2 - 0.4, P.VALVE["W"] / 2 + 0.4, h - 40, h + 40))

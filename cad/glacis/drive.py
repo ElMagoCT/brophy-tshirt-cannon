@@ -316,8 +316,11 @@ def wheel_parts(hand):
     for tag, (y0, y1), r in (("inner", P.W_INNER_PLATE, P.FLANGE_R), ("centre", P.W_CENTRE_PLATE, 83.0),
                              ("outer", P.W_OUTER_PLATE, None)):
         pl = (cyl(r, y1 - y0, (0, y0, 0), (0, 1, 0)) if r else _scallop(_lobes(hand, True), y0, y1 - y0))
-        pl = pl.cut(hexb).cut(bolts).cut(light)
-        out.append((f"Wheel plate {tag} (1/8 Al)", pl, f"Mecanum {tag} plate (1/8 Al)", "waterjet; 1/2 hex + 8 x 1/4-20"))
+        plate_light = union([cyl(10.0, 400, (66 * math.cos(_ang(k, 8)), -200, 66 * math.sin(_ang(k, 8))), (0, 1, 0))
+                             for k in range(8)])          # plates only: between the bolts, 12 mm of web each side
+        pl = pl.cut(hexb).cut(bolts).cut(light).cut(plate_light)
+        out.append((f"Wheel plate {tag} (1/8 Al)", pl, f"Mecanum {tag} plate (1/8 Al)",
+                    "waterjet; 1/2 hex + 8 x 1/4-20 + 14 lightening holes"))
     return out
 
 

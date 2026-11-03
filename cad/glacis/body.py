@@ -8,8 +8,11 @@ How the frame is made:
    panel edge; their faces lie on the panel planes.
 3. Each panel sits in a rebate REBATE_W wide and REBATE_D deep, CLIP_T below the outer face. A printed
    clip in a flush pocket at every convex panel corner holds it (one M3 into a heat-set insert), so any
-   panel comes off with its clips. An LED channel runs through every member right under the panel's
-   overlap: the strip threads through it facing out and backlights the panel.
+   panel comes off with its clips. Two lights: a printed rail hangs inside each window edge, tilted toward
+   the panel, and carries a closed 60/m strip loop about 1.25 in behind the panel, aimed across it (its back
+   shades the next panel); and a rectangular tunnel down the middle of every member (outward of the tenons,
+   so the joint screws miss it) takes a 100/m strip pushed in from a feed slot on the inside at each end,
+   LEDs facing out, so the frame glows.
 4. The network is split into printable pieces: a node block at every vertex and straight segments of
    at most PRINT_MAX along each edge, joined by tapered mortise-and-tenon joints with an M4 cross screw.
 """
@@ -17,6 +20,7 @@ import math
 import cadquery as cq
 from cadquery import Vector as V
 import params as P
+import speakers as SPK
 from lib import add, box, cyl, union
 
 EPS = 1e-6
@@ -58,10 +62,14 @@ def slot_prism():
     return cq.Workplane("XZ", origin=(0, P.Y_SLOT, 0)).polyline(SLOT_PTS).close().extrude(2 * P.Y_SLOT).val()
 
 
-def body_solid():
+def body_solid(notched=True):
+    """The body polyhedron; notched=True also cuts the four speaker pockets out of the front-side corners."""
     pts = [(x, z) for x, z in P.SIDE_OUTLINE]
     prism = (cq.Workplane("XZ", origin=(0, -P.Y_S - 200, 0)).polyline(pts).close().extrude(-2 * P.Y_S - 400)).val()
-    return prism.intersect(_tumble_prism(0.0)).cut(slot_prism()).clean()
+    solid = prism.intersect(_tumble_prism(0.0)).cut(slot_prism())
+    if notched and SPK.cuts():
+        solid = solid.cut(union(SPK.cuts()))
+    return solid.clean()
 
 
 def _offset_outline(pts, d, bottom_drop):
@@ -87,11 +95,12 @@ def _offset_outline(pts, d, bottom_drop):
     return out
 
 
-def inner_solid():
-    """The body offset inward by MEM_H, open at the bottom (OCC's shell() output breaks booleans)."""
-    ipts = _offset_outline(P.SIDE_OUTLINE, P.MEM_H, bottom_drop=40.0)
+def inner_solid(d=None):
+    """The body offset inward by d (MEM_H), open at the bottom (OCC's shell() output breaks booleans)."""
+    d = P.MEM_H if d is None else d
+    ipts = _offset_outline(P.SIDE_OUTLINE, d, bottom_drop=40.0)
     prism = (cq.Workplane("XZ", origin=(0, -P.Y_S - 200, 0)).polyline(ipts).close().extrude(-2 * P.Y_S - 400)).val()
-    return prism.intersect(_tumble_prism(P.MEM_H)).cut(slot_prism()).clean()
+    return prism.intersect(_tumble_prism(d)).cut(slot_prism()).clean()
 
 
 def face_info(solid):
@@ -144,8 +153,11 @@ def _fits(poly3, n):
 
 
 def is_open_face(fi):
-    """Gun well walls and floor (every face lying inside the well's width): left open, no panel."""
-    return all(abs(v[1]) <= P.Y_SLOT + 0.5 for v in fi["verts"])
+    """Gun well walls and floor (every face lying inside the well's width) and the speaker notches: left open,
+    no panel."""
+    if all(abs(v[1]) <= P.Y_SLOT + 0.5 for v in fi["verts"]):
+        return True
+    return any(all(c.isInside(V(*v), 0.6) for v in fi["verts"]) for c in SPK.cuts())
 
 
 def panels_for(fi):
@@ -208,6 +220,7 @@ def slab(poly3, n, inset, depth0, thick):
 # ------------------------------------------------------------------ build
 def build(log=print):
     body = body_solid()
+    FACES[:] = face_info(body)
     log(f"body: {len(body.Faces())} faces, volume {body.Volume() / 1e6:.1f} L")
     shell = body.cut(inner_solid()).clean()
     log(f"shell volume {shell.Volume() / 1e6:.2f} L, {len(shell.Solids())} solid")
@@ -220,29 +233,187 @@ def build(log=print):
 
     frame = shell.cut(union([slab(p["poly"], p["n"], P.MEM_W, -1.0, P.MEM_H + 2.0) for p in panels])).clean()
     recess = []
+    mark_shared_edges(panels)
     for p in panels:
         recess.append(slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W, -1.0, P.REBATE_D + 1.0))
-        # LED channel through the member, right under the panel's overlap: the strip lies flat facing out
-        # and backlights the panel edge band; a lip on the window side and the panel itself close it
-        a = slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + P.LED_CH[2], P.REBATE_D - 0.01, P.LED_CH[1])
-        b = slab(p["poly"], p["n"], P.MEM_W - P.LED_LIP, P.REBATE_D - 0.5, P.LED_CH[1] + 1.0)
-        recess.append(a.cut(b))
         p["clips"] = corner_clips(p)
         for c in p["clips"]:
             recess += [c["pocket"], c["insert"]]
     frame = frame.cut(union(recess)).clean()
-    log(f"frame network volume {frame.Volume() / 1e6:.2f} L, "
-        f"{sum(len(p['clips']) for p in panels)} corner clips")
+    # panel light: the tilted rail round each window, then the frame tunnels (their feed slots cut through it)
+    frame = frame.fuse(union([led_rail(p) for p in panels])).clean()
+    loop = 0.0
+    for p in panels:
+        p["led"], length = led_loop(p)
+        loop += length
+    tunnels, frame_strips, frame_strip = strip_tunnels(panels, body.cut(inner_solid(P.TUNNEL_SKIN)))
+    frame = frame.cut(union(tunnels)).clean()
+    log(f"frame network volume {frame.Volume() / 1e6:.2f} L, {sum(len(p['clips']) for p in panels)} corner clips, "
+        f"strip {loop / 1000:.1f} m in {len(panels)} panel loops + {frame_strip / 1000:.1f} m in {len(frame_strips)} frame tunnels")
+    build.strips, build.tunnels, build.frame_strips = (loop, frame_strip), tunnels, frame_strips
     return body, frame, panels
 
 
-def corner_clips(p, d_out=4.0):
-    """Printed clip in a flush pocket at every convex corner of the panel outline."""
+def _rail_inset(d):
+    """Inset from a shared panel edge of the rail's panel-side face at depth d (it leans toward the panel)."""
+    return P.LED_RAIL_INSET[0] + (d - P.LED_LOOP[2]) * math.tan(math.radians(P.LED_RAIL[3]))
+
+
+def mark_shared_edges(panels):
+    """p["shared"][k]: edge k of the panel outline meets another panel at a corner (not coplanar)."""
+    for i, p in enumerate(panels):
+        poly = [V(*q) for q in p["poly"]]
+        flags = []
+        for k in range(len(poly)):
+            a, b = poly[k], poly[(k + 1) % len(poly)]
+            hit = False
+            for j, o in enumerate(panels):
+                if j == i or abs(o["n"].dot(p["n"])) > 0.99:
+                    continue
+                oq = [V(*q) for q in o["poly"]]
+                for m in range(len(oq)):
+                    c, d = oq[m], oq[(m + 1) % len(oq)]
+                    cd = d - c
+                    for f in (0.25, 0.5, 0.75):
+                        x = a + (b - a) * f
+                        t = max(0.0, min(1.0, (x - c).dot(cd) / cd.dot(cd)))
+                        if (c + cd * t - x).Length < 0.5:
+                            hit = True
+            flags.append(hit)
+        p["shared"] = flags
+
+
+def _drafted(p, d0, d1, i0, radii):
+    """Region behind the panel from depth d0 to d1, inside the outline inset by i0 at d0 (i0 is measured from
+    shared edges; open and coplanar edges sit LED_RAIL_INSET[0] - [1] closer), drafted inward at the rail's lean
+    as it goes deeper. Corners round off at the first radius in radii the outline can take. Returns
+    (region(extra) -> solid inset a further `extra`, radius)."""
+    pl, pts = _wp_on(p["poly"], p["n"])
     n = p["n"]
+    pl2 = cq.Plane(origin=pl.origin - n * d0, xDir=pl.xDir, normal=n)
+    outline = cq.Workplane(pl2).polyline(pts).close().wires().val()
+    shared = p.get("shared") or [True] * len(pts)
+    poly = [V(*q) - n * d0 for q in p["poly"]]
+    gap = P.LED_RAIL_INSET[0] - P.LED_RAIL_INSET[1]
+    for r in radii:                            # a narrow neck by a speaker notch can't take the full radius
+        try:
+            base = outline.offset2D(-(i0 + r - gap), "intersection")
+            if len(base) != 1:
+                continue
+            # pull the shared edges in by the extra gap: cut a band along each out of the base face
+            face = cq.Workplane(pl2).add(base[0]).toPending().extrude(-1.0).val()
+            w = i0 + r
+            for k, sh in enumerate(shared):
+                if not sh:
+                    continue
+                a, b = poly[k], poly[(k + 1) % len(poly)]
+                e = (b - a).normalized()
+                t = _inward_dir(p, a + n * d0, b + n * d0)
+                side = 1.0 if t.dot(n.cross(e)) > 0 else -1.0
+                L = (b - a).Length + 2 * w
+                plb = cq.Plane(origin=(a - e * w + n * 5.0).toTuple(), xDir=e.toTuple(), normal=n.toTuple())
+                band = cq.Workplane(plb).polyline([(0, 0), (L, 0), (L, side * w), (0, side * w)]).close().extrude(-20.0).val()
+                face = face.cut(band)
+            sols = face.Solids()
+            if len(sols) != 1:
+                continue
+            wire0 = max(sols[0].Faces(), key=lambda f: (f.Center() - pl2.origin).dot(n)).outerWire()
+
+            def region(extra, wire0=wire0, r=r):
+                wire = wire0.offset2D(r - extra, "arc")[0]
+                return cq.Solid.extrudeLinear(wire, [], n * -(d1 - d0), taper=P.LED_RAIL[3])
+            region(0.0)
+            return region, r
+        except Exception:
+            continue
+    raise ValueError("panel outline too narrow for its LED rail")
+
+
+def led_rail(p):
+    """Printed rail inside the window, leaning toward the panel's centre, hung from a flange on the member's inner
+    face: a closed loop, so each panel's strip lights only its own panel."""
+    t, d0, d1, _ = P.LED_RAIL
+    region, p["rail_r"] = _drafted(p, d0, d1, _rail_inset(d0) - t, (P.LED_CORNER, 30.0, 20.0, 10.0, 2.0))
+    rail = region(0.0).cut(region(t))
+    inner, _ = _drafted(p, d0, d0 + 6.0, _rail_inset(d0) - t + 1.0, (p["rail_r"],))
+    flange = slab(p["poly"], p["n"], P.MEM_W - 4.0, d0, 6.0).cut(inner(0.0))
+    return rail.fuse(flange)
+
+
+def led_loop(p):
+    """Simplified 60/m strip stuck to the rail's panel-side face, LEDs aimed across the panel and slightly at it;
+    its corners follow the rail face's (shrinking) corner radius exactly."""
+    w, th, dc = P.LED_LOOP
+    t, r0 = P.LED_RAIL[0], P.LED_RAIL[1]
+    h = w / 2 * math.cos(math.radians(P.LED_RAIL[3]))
+    if "rail_r" not in p:
+        led_rail(p)
+    r = max(0.5, p["rail_r"] - t - (dc - h - r0) * math.tan(math.radians(P.LED_RAIL[3])))
+    region, _ = _drafted(p, dc - h, dc + h, _rail_inset(dc - h), (r,))
+    ring = region(0.0).cut(region(th))
+    pl, pts = _wp_on(p["poly"], p["n"])
+    wire = cq.Workplane(pl).polyline(pts).close().wires().val().offset2D(-P.LED_RAIL_INSET[1], "intersection")[0]
+    return ring, sum(e.Length() for e in wire.Edges())
+
+
+def _bar(o, e, u, w, length, w0, w1, u0, u1):
+    """Box from o along e for length, spanning w0..w1 along w and u0..u1 along u (Plane yDir = e x w = -u)."""
+    pl = cq.Plane(origin=o, xDir=w, normal=e)
+    pts = [(w0, -u0), (w1, -u0), (w1, -u1), (w0, -u1)]
+    return cq.Workplane(pl).polyline(pts).close().extrude(length).val()
+
+
+def strip_tunnels(panels, skin):
+    """Frame light: a rectangular tunnel down the middle of every member, TUNNEL_GAP outward of the tenon line so
+    the joint screws stop short of it, and a feed slot from the inside at each end where the strip goes in and
+    the next edge's strip is joined. Slots and tunnel ends are trimmed TUNNEL_SKIN under every outer face and
+    kept out of every joint. Also returns a simplified strip lying on each tunnel's inner wall, LEDs out."""
+    tw, th = P.TUNNEL
+    s0, s1 = P.FEED
+    cuts, strips, total = [], [], 0.0
+    # keep slots out of every joint: tenon, mortise and the screw boss inward of them
+    keep = []
+    for ed in edges_of(panels):
+        a, b = ed["a"], ed["b"]
+        e, u, w = _axes(ed, panels)
+        for t in _joint_ts((b - a).Length):
+            at = a + (b - a) * t
+            c = _core_point(ed, panels, at)
+            c = c - e * e.dot(c - at)
+            keep.append(_bar(c - e * 14.5, e, u, w, 29.0, -5.5, 5.5, -5.5, 30.0))
+    skin = skin.fuse(union(keep))
+    for k, ed in enumerate(edges_of(panels)):
+        a, b = ed["a"], ed["b"]
+        L = (b - a).Length
+        if L < 2 * s1 + 30.0:
+            continue
+        e, u, w = _axes(ed, panels)
+        c = _core_point(ed, panels, a) - u * P.TUNNEL_GAP
+        c = c - e * e.dot(c - a)
+        tun = _bar(c + e * s0, e, u, w, L - 2 * s0, -tw / 2, tw / 2, -th / 2, th / 2)
+        fa = _bar(c + e * s0, e, u, w, s1 - s0, -tw / 2, tw / 2, -th / 2, 45.0)
+        fb = _bar(c + e * (L - s1), e, u, w, s1 - s0, -tw / 2, tw / 2, -th / 2, 45.0)
+        cuts += [x.cut(skin) for x in (tun, fa, fb)]
+        ws, ts = P.FRAME_STRIP
+        strip = _bar(c + e * (s1 + 10.0), e, u, w, L - 2 * s1 - 20.0, -ws / 2, ws / 2, th / 2 - ts, th / 2).intersect(cuts[-3])
+        strips.append((f"E{k:02d}", strip))
+        total += L - 2 * s0
+    return cuts, strips, total
+
+
+def corner_clips(p):
+    """Printed clip in a flush pocket at every convex corner of the panel outline: a corner plate with a straight
+    chamfer across the panel corner, legs CLIP_LEG along the frame, one M3 into a heat-set insert. A battery door
+    keeps only its bottom clips (they act as hooks) and gets a quarter-turn latch at the middle of its top edge:
+    turn it, tip the door out from the top and lift it off the hooks."""
+    n = p["n"]
+    door = abs(n.y) > 0.9 and max(q[0] for q in p["poly"]) < P.SIDE_SPLIT_X + 1
+    zmid = sum(q[2] for q in p["poly"]) / len(p["poly"])
     pl, pts = _wp_on(p["poly"], n)
-    w = cq.Workplane(pl).polyline(pts).close().wires().val().offset2D(-(P.MEM_W - P.REBATE_W), "intersection")[0]
+    reb = P.MEM_W - P.REBATE_W
+    w = cq.Workplane(pl).polyline(pts).close().wires().val().offset2D(-reb, "intersection")[0]
     edges = [e for e in w.Edges()]
-    corners = []
+    corners, ks = [], []
     for v in w.Vertices():
         c = V(v.X, v.Y, v.Z)
         adj = [e for e in edges if min((V(*x.toTuple()) - c).Length for x in (e.startPoint(), e.endPoint())) < 1e-3]
@@ -258,18 +429,58 @@ def corner_clips(p, d_out=4.0):
             continue
         bis = bis.normalized()
         mid = c + bis * 3.0                           # convex corner: a point just inside lies in the panel
-        inside = slab(p["poly"], n, P.MEM_W - P.REBATE_W, 0.0, 1.0).isInside(mid - n * 0.5, 0.1)
+        inside = slab(p["poly"], n, reb, 0.0, 1.0).isInside(mid - n * 0.5, 0.1)
         if not inside:
             continue
-        ctr = c - bis * d_out
-        disc = cyl(P.CLIP_R, P.CLIP_T, ctr.toTuple(), (n * -1).toTuple())
-        keep = slab(p["poly"], n, 4.0, 0.0, P.CLIP_T)
-        clip = disc.intersect(keep).cut(cyl(1.7, 10, (ctr + n).toTuple(), (n * -1).toTuple()))
-        pocket = cyl(P.CLIP_R + 0.2, P.CLIP_T + 1.0, (ctr + n).toTuple(), (n * -1).toTuple()).intersect(
-            slab(p["poly"], n, 3.8, -1.0, P.CLIP_T + 1.0))
+        cos_h = dirs[0].dot(bis)
+        sin_h = max(0.2, math.sqrt(max(0.0, 1 - cos_h ** 2)))
+        k = c - bis * ((reb - 4.0) / sin_h)          # corner of the clip's outline, 4 mm in from the face edges
+        if door and k.z > zmid:
+            continue                                  # the latch holds the door's top
+        ks.append((k, bis, cos_h, sin_h))
+    for k, bis, cos_h, sin_h in ks:
+        gap = min([(k - k2).Length for k2, *_ in ks if k2 is not k] + [1e9])
+        leg = min(P.CLIP_LEG, gap / 2 - 2.0)          # never into the next corner's clip
+        reach = max(leg * cos_h, (reb - 4.0) / sin_h + 6.0)   # chamfer line, at least 6 mm past the panel
+        ctr = k + bis * (4.0 / sin_h)                 # screw 8 mm in from both face edges
+
+        def plate(r, i, d0, d1):
+            half = cq.Workplane(cq.Plane(origin=k + n * 1.0, xDir=bis, normal=n)).polyline(
+                [(r, -150), (r, 150), (r - 300, 150), (r - 300, -150)]).close().extrude(-(d1 + 1.0)).val()
+            return slab(p["poly"], n, i, d0, d1 - d0).intersect(half)
+
+        near = cyl(min(reach / cos_h + 4.0, gap / 2 - 1.0), 40.0, (k + n * 20.0).toTuple(), (n * -1).toTuple())   # own corner only
+        clip = plate(reach, 4.0, 0.0, P.CLIP_T).intersect(near).cut(cyl(1.7, 10, (ctr + n).toTuple(), (n * -1).toTuple()))
+        pocket = plate(reach + 0.2, 3.8, -1.0, P.CLIP_T).intersect(near)
         insert = cyl(2.0, 6.0, (ctr - n * (P.CLIP_T - 0.1)).toTuple(), (n * -1).toTuple())
         corners.append(dict(clip=clip, pocket=pocket, insert=insert))
+    if door:
+        corners.append(_door_latch(p))
     return corners
+
+
+def _door_latch(p):
+    """Quarter-turn latch: a printed tab on an M4 pivot 10 mm in from the door's top edge, across the panel's
+    edge when locked; turn it 90 deg to open."""
+    n = p["n"]
+    poly = [V(*q) for q in p["poly"]]
+    edges = [(poly[i], poly[(i + 1) % len(poly)]) for i in range(len(poly))]
+    a, b = max(edges, key=lambda e: e[0].z + e[1].z)
+    e = (b - a).normalized()
+    t = n.cross(e).normalized()
+    m = (a + b) * 0.5
+    if sum((q - m).dot(t) for q in poly) < 0:
+        t = t * -1                                    # t points down the door, into the panel
+    piv = m + t * 10.0
+
+    def tab(x0, x1, w, d0, d1):
+        pl = cq.Plane(origin=(piv - n * d0).toTuple(), xDir=t.toTuple(), normal=n.toTuple())
+        return cq.Workplane(pl).center((x0 + x1) / 2, 0).rect(x1 - x0, 2 * w).extrude(-(d1 - d0)).val()
+
+    clip = tab(-6.0, 18.0, 8.0, 0.0, P.CLIP_T).cut(cyl(2.2, 10, (piv + n).toTuple(), (n * -1).toTuple()))
+    pocket = tab(-6.3, 18.3, 8.3, -1.0, P.CLIP_T)
+    insert = cyl(2.6, 6.0, (piv - n * (P.CLIP_T - 0.1)).toTuple(), (n * -1).toTuple())
+    return dict(clip=clip, pocket=pocket, insert=insert, latch=True)
 
 
 # ------------------------------------------------------------------ edges of the panel network
@@ -342,7 +553,8 @@ def _section_prism(edge, panels, t0, t1, margin=0.6):
         o = pa - t * margin + n * margin
         L = (pb - pa).Length
         pl = cq.Plane(origin=o, xDir=t, normal=e)
-        w, h = P.MEM_W + 2 * margin, P.MEM_H + 2 * margin
+        w = max(P.MEM_W, _rail_inset(P.LED_RAIL[2])) + 2 * margin   # the member plus its LED rail (and its flange)
+        h = P.LED_RAIL[2] + 2 * margin
         pts = []                                   # in-plane t (0..w) x inward -n (0..h)
         for (u, v) in [(0, 0), (w, 0), (w, h), (0, h)]:
             q = o + t * u - n * v
@@ -362,14 +574,35 @@ def _section_prism(edge, panels, t0, t1, margin=0.6):
     return union(regs)
 
 
+FACES = []          # body faces, set by build(): single-panel members look up the open face beside them
+
+
+def _open_angle(edge, p):
+    """cos, sin of the interior angle between a single-panel member's panel and the open face (bottom, gun
+    well) along the same edge."""
+    a, b = edge["a"], edge["b"]
+    for f in FACES:
+        m = f["n"]
+        if abs(m.dot(p["n"])) > 0.999:
+            continue
+        if abs((a - f["c"]).dot(m)) < 0.2 and abs((b - f["c"]).dot(m)) < 0.2:
+            c = max(-1.0, min(1.0, -m.dot(p["n"])))
+            return c, math.sqrt(1 - c * c)
+    return 0.0, 1.0
+
+
 def _core_point(edge, panels, at, depth=None):
-    """A point deep in the member's cross-section, clear of grooves and LED channels."""
+    """A point deep in the member's cross-section, clear of the light tunnel. On a single-panel
+    member it moves in from the edge until a tenon there keeps 2 mm of wall to an acute open face."""
     depth = P.CORE_DEPTH if depth is None else depth
     a, b = edge["a"], edge["b"]
     ps = [panels[i] for i in edge["panels"]]
     if len(ps) == 1:
         p = ps[0]
-        return at + _inward_dir(p, a, b) * 7.0 - p["n"] * depth
+        c, s = _open_angle(edge, p)
+        h = P.TENON[0] / 2
+        inset = max(7.0, h + (2.0 + (P.CORE_DEPTH + h) * c) / max(s, 0.3))
+        return at + _inward_dir(p, a, b) * inset - p["n"] * depth
     n1, n2 = ps[0]["n"], ps[1]["n"]
     c = max(-0.3, min(1.0, n1.dot(n2)))
     k = depth / (1 + c)
@@ -400,19 +633,26 @@ def _frustum(base_c, e, u, w, size, length, taper):
     return cq.Solid.makeLoft([w0, w1], True)
 
 
+def _joint_ts(L, seg_max=215.0):
+    """Edge parameters of the cuts between a member's node ends and its straight segments ([] if none). Short
+    edges (round the speaker notches) set back less, so their node ends don't merge into one oversize piece."""
+    setback = min(P.NODE_SETBACK, max(14.0, (L - 30.0) / 2))
+    s = setback / L
+    m = L - 2 * setback
+    if m < 20:
+        return []
+    n = max(1, math.ceil(m / seg_max))
+    return [s + (1 - 2 * s) * k / n for k in range(n + 1)]
+
+
 def section(frame, panels, log=print, seg_max=215.0):
     """Split the frame network into printable pieces with tapered mortise-tenon joints."""
     edges = edges_of(panels)
     log(f"{len(edges)} edges")
     regions, joints = [], []          # regions: (name, solid); joints: (seg_index, end, edge, point, outward dir)
     for ei, ed in enumerate(edges):
-        L = (ed["b"] - ed["a"]).Length
-        s = P.NODE_SETBACK / L
-        m = L - 2 * P.NODE_SETBACK
-        if m < 40:
-            continue
-        n = max(1, math.ceil(m / seg_max))
-        ts = [s + (1 - 2 * s) * k / n for k in range(n + 1)]
+        ts = _joint_ts((ed["b"] - ed["a"]).Length, seg_max)
+        n = len(ts) - 1
         for k in range(n):
             idx = len(regions)
             regions.append((f"E{ei:02d}S{k}", _section_prism(ed, panels, ts[k], ts[k + 1]), ed, ts[k], ts[k + 1]))
@@ -438,10 +678,37 @@ def section(frame, panels, log=print, seg_max=215.0):
     for reg in done:
         rest = rest.cut(reg)
     nodes = [s for s in rest.Solids() if s.Volume() > 50]
+    split = 0
     for k, s in enumerate(nodes):
-        pieces.append(dict(name=f"N{k:02d}", shape=s, edge=None, t0=None, t1=None))
-    log(f"{len(pieces)} pieces ({len(nodes)} nodes)")
+        parts = _split_to_bed(s)
+        split += len(parts) - 1
+        for j, part in enumerate(parts):
+            pieces.append(dict(name=f"N{k:02d}" + (chr(97 + j) if len(parts) > 1 else ""), shape=part, edge=None, t0=None,
+                               t1=None))
+    log(f"{len(pieces)} pieces ({len(nodes)} nodes, {split} extra glued splits to fit the bed)")
     return pieces, edges
+
+
+def _split_to_bed(s, bed=245.0):
+    """Halve a node along its longest side until it fits the bed (the nodes round the speaker pockets join up
+    into one big piece); the halves are glued."""
+    bb = s.BoundingBox()
+    dims = sorted([bb.xlen, bb.ylen, bb.zlen])
+    if dims[1] <= bed and dims[2] <= 330.0:
+        return [s]
+    k = max(range(3), key=lambda i: (bb.xlen, bb.ylen, bb.zlen)[i])
+    c = bb.center
+    lo = [bb.xmin - 1, bb.ymin - 1, bb.zmin - 1]
+    hi = [bb.xmax + 1, bb.ymax + 1, bb.zmax + 1]
+    out = []
+    for half in ((lo[k], c.toTuple()[k]), (c.toTuple()[k], hi[k])):
+        a, b = list(lo), list(hi)
+        a[k], b[k] = half
+        cut = s.intersect(box(a[0], b[0], a[1], b[1], a[2], b[2]))
+        for sol in cut.Solids():
+            if sol.Volume() > 50:
+                out += _split_to_bed(sol, bed)
+    return out
 
 
 def add_joints(pieces, panels, log=print):
@@ -470,17 +737,24 @@ def add_joints(pieces, panels, log=print):
             # lower segment on an edge owns the tenon between two segments
             if nb["edge"] is ed and end == "lo":
                 continue
-            ten = _frustum(core, out, u, w, tw, tl, tt)
-            if ten.intersect(shapes[nb["name"]]).Volume() < 0.95 * ten.Volume():
-                ten = _frustum(core, out, u, w, 5.0, 10.0, 0.4)
-                if ten.intersect(shapes[nb["name"]]).Volume() < 0.95 * ten.Volume():
+            def fits(size, length, taper):        # tested 0.3 mm off the joint plane: coincident faces upset OCC
+                t_ = _frustum(core + out * 0.3, out, u, w, size, length - 0.3, taper)
+                return t_.intersect(shapes[nb["name"]]).Volume() >= 0.95 * t_.Volume()
+            size, length, taper = tw, tl, tt
+            ten = _frustum(core, out, u, w, size, length, taper)
+            if not fits(size, length, taper):
+                size, length, taper = 5.0, 10.0, 0.4
+                ten = _frustum(core, out, u, w, size, length, taper)
+                if not fits(size, length, taper):
                     skipped += 1
                     continue
             mort = _frustum(core - out * 0.01, out, u, w, tw + 2 * P.TENON_CLEAR, tl + 0.5, tt)
             mid = core + out * (tl / 2)
             clear_h = cyl(2.25, 45, (mid - u * 2).toTuple(), u.toTuple())
             pilot = cyl(1.65, 45, (mid - u * 3).toTuple(), u.toTuple())
-            shapes[p["name"]] = shapes[p["name"]].fuse(ten).cut(pilot).clean()
+            # the fused tenon starts 0.5 mm inside its own piece: OCC doesn't always merge solids that only touch
+            root = _frustum(core - out * 0.5, out, u, w, size, length + 0.5, taper)
+            shapes[p["name"]] = shapes[p["name"]].fuse(root).cut(pilot).clean()
             shapes[nb["name"]] = shapes[nb["name"]].cut(mort.fuse(ten)).cut(clear_h).clean()
             ok += 1
     for p in pieces:
