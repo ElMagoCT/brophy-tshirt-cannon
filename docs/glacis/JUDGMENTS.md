@@ -359,8 +359,8 @@ The pneumatic and electrical diagrams are in the "Glacis air & wiring" artifact
     - The outboard plate is lobed, the same shape as the rim.
     - 8 x 1/4-20 x 5-1/2 in bolts clamp the stack (M6 x 130 fits the same holes). The plates' hex holes
       put the wheel load on the axle through aluminum, not plastic.
-    - Each plate also has 14 lightening holes: the hub's 6, plus 8 x 20 mm between the bolts, with 12 mm
-      of web on each side (your savings pick).
+    - Each plate also has 12 lightening holes: the hub's 6, plus 6 x 16 mm between the bolts (your
+      savings pick). None at 0 and 180 deg, where they'd meet the hub's holes; >= 7.7 mm of web everywhere.
 41. **Pulley: 116T HTD 5M, 15 mm, printed into the inboard half.**
     - Its flange is 1.27 in off the floor. 118T would be 1.20 in.
     - 9.67:1 from the Falcon's 12T (was 10:1); free speed 28.8 ft/s.

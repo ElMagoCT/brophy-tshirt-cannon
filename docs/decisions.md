@@ -332,7 +332,7 @@ Micah's notes on the rev C.1 diagrams and follow-ups in the same session. Detail
   - Dollar-store noodles; heavy-duty 12 oz canvas; a 5 A boost module; Zoro M8 rod; 25 ft of DOT tube.
   - Remote: an ESP32-S3 Super Mini with the E-stop and a link LED; the dead-man trigger and screen are gone.
   - One fog core now, room left for a second. Two battery spots kept (live swap). The battery doors latch
-    at the top. Wheel plates get 8 more lightening holes; the frame prints at 15% infill.
+    at the top. Wheel plates get 6 more lightening holes; the frame prints at 15% infill.
   - Not changed: 1/4 NPT transducers (FUSCH 200 psi is 1/8 NPT only); HornBlasters VA-4 in valves (no
     cheaper than the Aignep, and not confirmed direct-acting); the VA-4 can't be a firing valve (Cv about
     0.15 against 12).
