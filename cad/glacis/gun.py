@@ -58,6 +58,7 @@ def valve(xv, h, s):
 
 
 AD_BODY, AD_SHOULDER, AD_SPIGOT = 30.0, 10.0, 40.0              # breech adapter lengths along the axis
+SMOKE_HOLE_X = AD_SPIGOT + 165.0                             # from the barrel's breech end: just past a 6 in rolled shirt
 
 
 def adapter():
@@ -84,8 +85,13 @@ def _cannon(k, xv):
     gadd(f"Breech adapter {tag}", adapter().translate(V(ax0, 0, h)), "alu",
          bom="Breech adapter (CNC 6061, stash bar, 1 in NPT tap)", kind="machined")
     b0 = ax0 + AD_BODY + AD_SHOULDER
-    gadd(f"Barrel {tag}", tube(P.BARREL_OD / 2, P.BARREL_OD / 2 - P.BARREL_WALL, P.BARREL_LEN, (b0, 0, h), (1, 0, 0)),
-         "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock", note=f"{P.BARREL_LEN / IN:.1f} in")
+    bar = tube(P.BARREL_OD / 2, P.BARREL_OD / 2 - P.BARREL_WALL, P.BARREL_LEN, (b0, 0, h), (1, 0, 0))
+    xh = b0 + SMOKE_HOLE_X
+    for i in range(6):                                       # smoke holes just ahead of where the shirt sits
+        a = math.radians(30 + 60 * i)
+        bar = bar.cut(cyl(2.5, 20, (xh, 0, h), (0, math.cos(a), math.sin(a))))
+    gadd(f"Barrel {tag}", bar, "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock",
+         note=f"{P.BARREL_LEN / IN:.1f} in; 6 x 5 mm smoke holes {SMOKE_HOLE_X:.0f} mm from the breech end")
     xe = b0 + P.BARREL_LEN
     mz = cyl(46.0, 25.0, (xe - 25.0, 0, h), (1, 0, 0)).cut(cyl(P.BARREL_OD / 2 + 0.2, 30, (xe - 27.0, 0, h), (1, 0, 0)))
     mz = mz.cut(tube(44.0, 42.0, 6.0, (xe - 15.0, 0, h), (1, 0, 0)))
@@ -124,6 +130,7 @@ def _build(xv):
         t, ax0 = _cannon(k, xv)
         fills.append(t)
         ax0s.append(ax0)
+    b0s = [a + AD_BODY + AD_SHOULDER for a in ax0s]
     ax0 = ax0s[0]
     hl = P.VALVE["L"] / 2
     xr = xv - hl                                             # valve rear face
@@ -169,7 +176,7 @@ def _build(xv):
     for z0, z1, tag in ((0.0, bz, "upper"), (-bz, 0.0, "lower")):
         gadd(f"Breech block {tag}", bb.intersect(box(-1000, 1000, -500, 500, z0 + (0.5 if z0 == 0 else 0), z1 - (0.5 if z1 == 0 else 0))),
              "print", bom="Breech block half", kind="print", note="the halves clamp both barrels onto their spigots")
-    # mantlet with two fog vents beside the barrels
+    # mantlet (LED groove), then the smoke collar round both barrels over their smoke holes
     mz0, mz1 = xb1 + 2.0, xb1 + 50.0
     span = P.PITCH
     w0 = cq.Workplane("YZ", origin=(mz0, 0, 0)).rect(2 * CRADLE_Y0 - 4, span + 130).val()
@@ -180,24 +187,29 @@ def _build(xv):
     man = man.cut(cq.Solid.makeLoft([cq.Wire.assembleEdges(i0.Edges()), cq.Wire.assembleEdges(i1.Edges())], True))
     for h in H:
         man = man.cut(cyl(P.BARREL_OD / 2 + 1.0, 80, (mz0 - 5, 0, h), (1, 0, 0)))
-    fog_tips = []
-    yv = 56.0                                                # fog vents beside the barrels, inside the mantlet sides
-    for yy in (1, -1):
-        man = man.cut(cyl(11.3, 80, (mz0 - 5, yy * yv, 0), (1, 0, 0)))
-        man = man.cut(cyl(11.3, 200, (mz0 + 10, yy * yv, 0), (0, 0, -1)))
     for z0, z1, tag in ((-span / 2 - 70, 0, "lower"), (0, span / 2 + 70, "upper")):
         gadd(f"Mantlet {tag}", man.intersect(box(mz0 - 2, mz1 + 2, -100, 100, z0, z1)), "print",
-             bom="Mantlet half (LED groove, fog vents)", kind="print")
-    zl = -(P.PITCH / 2 + 70.0)
+             bom="Mantlet half (LED groove)", kind="print")
+    # smoke collar: two printed halves clamped round both barrels; one plenum (the two ring grooves meet between
+    # the barrels) over the six holes in each barrel, fed by a barb on each side
+    xc = b0s[0] + SMOKE_HOLE_X
+    rb = P.BARREL_OD / 2
+    cz = P.PITCH / 2 + rb + 8.0
+    col = box(xc - 16, xc + 16, -(rb + 9.0), rb + 9.0, -cz, cz)
+    for h in H:
+        col = col.cut(cyl(rb + 0.3, 40, (xc - 20, 0, h), (1, 0, 0))).cut(tube(rb + 5.0, rb, 14.0, (xc - 7, 0, h), (1, 0, 0)))
+    fog_tips = []
+    zb = -10.0                                               # barbs and side channels sit in the lower half
     for yy in (1, -1):
-        nz = union([cyl(11.0, mz1 + 10.0 - (mz0 + 10.0), (mz0 + 10.0, yy * yv, 0), (1, 0, 0)),
-                    cyl(11.0, -zl, (mz0 + 10.0, yy * yv, 0), (0, 0, -1)),
-                    cq.Solid.makeSphere(11.0, V(mz0 + 10.0, yy * yv, 0), angleDegrees1=-90, angleDegrees2=90)])
-        nz = nz.cut(union([cyl(9.0, 200, (mz0 + 10.0, yy * yv, 0), (1, 0, 0)), cyl(9.0, 200, (mz0 + 10.0, yy * yv, 0), (0, 0, -1)),
-                           cq.Solid.makeSphere(9.0, V(mz0 + 10.0, yy * yv, 0), angleDegrees1=-90, angleDegrees2=90)]))
-        gadd(f"Fog vent gun {'L' if yy > 0 else 'R'}", nz, "print", bom="Fog vent nozzle (gun)", kind="print",
-             note="PETG elbow: inlet out the bottom of the mantlet, outlet beside the barrels")
-        fog_tips.append(V(mz0 + 10.0, yy * yv, zl))
+        col = col.cut(cyl(4.5, rb + 10.0, (xc, 0, zb), (0, yy, 0)))
+    for z0, z1, tag in ((0.25, cz, "upper"), (-cz, -0.25, "lower")):
+        half = col.intersect(box(xc - 20, xc + 20, -100, 100, z0, z1))
+        if tag == "lower":
+            for yy in (1, -1):
+                half = half.fuse(tube(7.5, 4.5, 16.0, (xc, yy * (rb + 9.0), zb), (0, yy, 0)))
+                fog_tips.append(V(xc, yy * (rb + 25.0), zb))
+        gadd(f"Smoke collar {tag}", half, "print", bom="Smoke collar half (printed)", kind="print",
+             note="seals on the barrels with a bead of RTV; barbs take the flexible smoke tubes")
     # pivot: a 1/2 hex stub per side, through a hub on the plate's outer face, flush with its inner face
     ya = P.BEARING_BLOCK_Y[1] + 1.0
     for sy, tag, y_lo, y_hi in ((1, "left", CRADLE_Y0, ya + 12.0), (-1, "right", -ya, -CRADLE_Y0)):
@@ -211,7 +223,7 @@ def _build(xv):
     # supply tube from each chamber's fill push-to-connect: straight back, then to the side of the well
     exits = []
     for k, t in enumerate(fills):
-        pts = [t, V(t.x - 15.0, 0, t.z), V(t.x - 15.0, -50.0, t.z)]          # clear of the other chamber
+        pts = [t, V(t.x - 25.0, 0, t.z)]                     # straight back on the centreline (the Falcons sit outboard)
         gadd(f"Gun tube {TAGS[k]}", _tube_path(pts), "tube", bom="DOT nylon tube 1/4 OD (ft)", kind="stock")
         exits.append(pts[-1])
     return exits, fog_tips

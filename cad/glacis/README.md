@@ -11,11 +11,12 @@ The whole Glacis robot as a parametric CadQuery model. Every shared number is in
 | File | What it builds |
 |---|---|
 | `params.py` | Layout: frame bands, belts, rollers, body outline, pivot, gun, tanks, smoke machine |
-| `drive.py` | 1x2/1x1 box-tube frame, gussets, drive plates, Falcons, belts, printed mecanum (hub, aluminum side plates, rollers), hex axles |
-| `gun.py` | Two in-line cannons (1 gal chamber -> Atlantic Valves SZW-25 -> breech adapter -> polycarbonate barrel), balanced on the axle between them; cradle, mantlet with smoke vents, pivot axle, elevation pulley, its sweep envelope |
+| `drive.py` | 1x2/1x1 box-tube frame, gussets, drive plates, Falcons, belts, vector-style printed mecanum (two-half hub with the 116T, 3 flat aluminum plates, rollers on 608s and fixed M8 rods), hex axles |
+| `gun.py` | Two in-line cannons 3.8 mm apart (0.53 L 2 in pipe chamber -> Atlantic Valves SZW-25 -> spigot breech adapter -> polycarbonate barrel with smoke holes), balanced on the pivot axis between them; cradle, breech block, mantlet, smoke collar, pivot stubs, elevation pulley, its sweep envelope |
+| `shot_model.py` | Lumped shot model (chamber, valve opening time, barrel, shirt) used to size the chambers |
 | `fittings.py` | NPT fittings placed along a run with real thread make-up |
 | `body.py` | Body shell (60 deg front, flat deck, leaning sides and back, gun well cut to the sweep envelope), panels, printed frame, panel recesses, corner clips, LED channels, sectioning, tapered tenons |
-| `misc.py` | Towers, bearing blocks, elevation motor and pot, side tanks, rear manifold, fill block, smoke machine and ducts, battery sleds, back-bottom electronics, rear-panel controls, bumpers, standoffs |
+| `misc.py` | Towers, bearing blocks, elevation motor and pot, side tanks, rear manifold, fill block, custom 12 V fogger and smoke ducts, battery sleds, back-bottom electronics, rear-panel controls, bumpers, standoffs |
 | `robot.py` | Assembly, checks, export |
 
 **Checks** (written to `out/check_log.txt`):

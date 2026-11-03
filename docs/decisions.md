@@ -259,3 +259,25 @@ Every call is in `docs/glacis/JUDGMENTS.md`. The ones that change earlier decisi
 - **Pivot on two hex stubs**, one per cradle plate. The axis still runs between the cannons, but there's
   no room for a through-shaft between the chambers' couplings.
 - **Chamber fittings move to a 5-port block on the back of each chamber**, so nothing is drilled.
+- **Smoke: a custom 12 V fogger with two 200 W cast fog heater cores** (pumps, thermocouples, 250 C
+  cutouts, a relay per core, a blower) replaces the EVAP smoker, which makes too little smoke for trails.
+  - Each barrel gets six 5 mm holes just past the shirt, under a printed smoke collar, so smoke fills the
+    barrel and spills out before a shot.
+  - Trail vents go under the front bumper and low in the rear panel.
+- **Merged with the rev C wheel branch** (glacis-wheel-c, 9ded015) into one update: Onshape version
+  "Glacis rev C.1" and the Glacis BOM tab at $1,707.39.
+## 2026-11-02 - Glacis rev C wheels: vector style on 608s (proposed, waiting on Micah)
+
+Micah sent a small 3D-printed vector wheel (TTB-0010) and asked for the same style, much larger and able
+to carry a lot of weight: aluminum-reinforced but with flat parts, 608 2RS bearings and M8 threaded rod,
+the biggest hub the bed takes, and an integrated 15 mm HTD 5M pulley 1.25 in off the floor. Details are in
+`docs/glacis/JUDGMENTS.md` (Wheels).
+
+- **10 rollers, 42 mm x 104 mm** (was 14 at 30 mm), each on two 608 2RS turning on a fixed M8 rod held
+  by a captured nyloc in the outboard cup. Barrel profile kept (not the TTB's straight cylinders).
+- **Hub in two PETG-CF halves, 242 mm across**, split at the roller centre plane; the inboard half
+  carries a **116T** pulley (flange 1.27 in off the floor). Ratio 9.67:1 (was 10:1).
+- **Three flat 1/8 in aluminum plates per wheel** on 8 x 1/4-20 through-bolts.
+- **Wheels are 120 mm wide (was 94)**: the inner rails and Falcons moved 26.5 mm inboard; the
+  electronics shelf, fill block and tank lines were refit around them.
+- Parts list +$60.85, now $1,888.23. Wheels +0.9 kg each.

@@ -44,21 +44,39 @@ AX_X = WB / 2
 RAIL_Z = (AXLE_Z - RAIL_H / 2, AXLE_Z + RAIL_H / 2)   # rails centred on the axles (1/2 hex live axles)
 GROUND_CLEAR = 3 * IN                       # bumper bottom; the bellypan sits at 3.9 in
 
-N_ROLL, ROLL_L, ROLL_R0 = 14, 78.0, 15.0    # rollers per wheel, length, max radius (coverage +8%)
-ROLL_BRG = (11.0, 5.0)                      # 685ZZ (5 x 11 x 5) in each roller end, M5 axle
+# rev C wheel, vector style (after the TTB-0010 Micah sent): 10 big rollers, each on two 608 2RS and a
+# fixed M8 threaded rod held in printed cups; hub in two PETG halves (the inboard one carries the 116T
+# pulley) clamped between three flat 1/8 in aluminum plates by 8 x 1/4-20 through-bolts.
+N_ROLL, ROLL_L, ROLL_R0 = 10, 104.0, 21.0   # rollers per wheel, length, max radius (coverage +6%)
 ROLL_ANGLE = 45.0
-LUG_OFF = ROLL_L / 2 + 4.0                  # roller axle-end point from the roller centre, along its axis
-LUG_R, LUG_T = 6.5, 7.0                     # printed boss round each axle end
-WPLATE_T = 0.125 * IN                       # aluminum side plates on the hub
 C45 = math.cos(math.radians(ROLL_ANGLE))
-A_LUG = LUG_OFF * C45                       # axial offset of the lug planes from the roller centre plane
+ROLL_A = WHEEL_R - ROLL_R0                  # roller axis radius
+ROLL_BRG = (22.0, 7.0)                      # 608 2RS (8 x 22 x 7)
+BRG_IN = 8.0                                # bearing outer face this far inside the roller end
+RECESS_R = 11.3                             # roller end recess the cup stub sits in
+TREAD_T = (3.0, 1.8)                        # TPU tread: middle, ends
+ROD_D = 8.0
+CUP_R, CUP_IN, CUP_OUT = 10.5, 7.0, 6.0     # printed cup on each rod end: radius, stub depth inside the
+                                            # roller end, length beyond it
+HUB_R = WHEEL_R - 6.0                       # cups, face webs and the outboard plate stop 6 mm inside the tread
+FACE_T = 6.0                                # printed face web on each hub half
+HUB_BOLT_R, N_HUB_BOLT = 68.0, 8            # 1/4-20 x 5-1/2 through-bolts (6.6 mm holes; M6 x 130 fits too)
+WPLATE_T = 0.125 * IN                       # aluminum plates
+
+
+def _wheel_face():
+    t = ROLL_L / 2
+    rend = math.sqrt(WHEEL_R ** 2 - (t * C45) ** 2) - ROLL_A
+    return round(max(t * C45 + rend * C45, (t + CUP_OUT) * C45 + CUP_R * C45) + 0.5, 1)
+
+
 # wheel-local axial stations (from the roller centre plane, + = outboard)
-W_OUTER_PLATE = (A_LUG + 3.5, A_LUG + 3.5 + WPLATE_T)
-W_LUG = (A_LUG - 3.5, A_LUG + 3.5)          # lug plate (inner one mirrored)
-W_FLANGE = (-A_LUG - 3.5 - 4.0, -A_LUG - 3.5)          # printed outboard belt flange
-W_PULLEY = (W_FLANGE[0] - 15.0, W_FLANGE[0])           # 15 mm HTD teeth, integrated in the hub
-W_INNER_PLATE = (W_PULLEY[0] - WPLATE_T, W_PULLEY[0])  # aluminum plate = inboard belt flange
-W_OUT = A_LUG + 2.47 + LUG_R * C45          # outermost point (lug bosses)
+W_FACE = _wheel_face()                      # both hub faces
+W_OUTER_PLATE = (W_FACE, W_FACE + WPLATE_T)
+W_CENTRE_PLATE = (-WPLATE_T / 2, WPLATE_T / 2)
+W_PULLEY = (-W_FACE - 16.0, -W_FACE)        # 15 mm belt on 16 mm of printed teeth; the face web is its flange
+W_INNER_PLATE = (W_PULLEY[0] - WPLATE_T, W_PULLEY[0])  # aluminum inboard belt flange
+W_OUT = W_OUTER_PLATE[1]                    # outermost point
 
 OUTER_RAIL_Y = (FW / 2 - RAIL_W, FW / 2)
 YMID = OUTER_RAIL_Y[0] - 3.0 - W_OUT        # roller centre plane of the wheel (left side)
@@ -66,10 +84,11 @@ WHEEL_Y = (YMID + W_INNER_PLATE[0], YMID + W_OUT)
 DRIVE_PLATE_Y = (WHEEL_Y[0] - 1.5 - PLATE_T, WHEEL_Y[0] - 1.5)
 INNER_RAIL_Y = (DRIVE_PLATE_Y[0] - RAIL_W, DRIVE_PLATE_Y[0])
 
-# one stage HTD 5M 15 mm: Falcon 12T -> 120T printed into the wheel hub (10:1)
-T_PIN, T_WHEEL = 12, 120
+# one stage HTD 5M 15 mm: Falcon 12T -> 116T printed into the wheel hub (9.67:1)
+T_PIN, T_WHEEL = 12, 116
 BELT_T = 140
 RATIO = T_WHEEL / T_PIN
+FLANGE_R = pd(T_WHEEL) / 2 + 2.5           # inboard flange, 1.27 in off the floor
 C1 = centre_for_belt(BELT_T, pd(T_PIN), pd(T_WHEEL))
 THETA1 = 30.0                               # Falcon sits up and inboard of the axle
 
@@ -185,8 +204,8 @@ BELLY_Z = RAIL_Z[0]
 BATT_Z = 287.8                              # battery bottoms on their sleds (over the rear wheels)
 BATT_X = (-336.0, -336.0 + BATT[0])         # one battery each side, long axis along x
 BATT_Y = (160.0, 160.0 + BATT[1])           # |y|: they slide out the side walls
-ELEC_BAY = ((-380.0, -192.0), (-125.0, 125.0), (BELLY_Z, 250.0))   # back bottom
-FOG_BOX = ((200.0, 360.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # 12 V automotive smoke machine, front bay (placeholder box)
+ELEC_BAY = ((-380.0, -192.0), (-100.0, 100.0), (BELLY_Z, 250.0))   # back bottom
+FOG_BOX = ((200.0, 360.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # custom 12 V fogger (2 x 200 W cores), front bay
 
 
 def summary():

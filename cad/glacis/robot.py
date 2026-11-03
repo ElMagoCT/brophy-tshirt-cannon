@@ -109,7 +109,7 @@ ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the
     ("nipple", "Chamber"),                      # 1 in close nipple in the tank's end port
     ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Tube", "push-to-connect"),
     ("Service loop", "push-to-connect"), ("Tank elbow", "Air tank"), ("Gun tube", "Service loop"),
-    ("Fog loop", "Fog vent"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
+    ("Fog loop", "Fog vent"), ("Fog loop", "Smoke collar"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
 ]
 
 

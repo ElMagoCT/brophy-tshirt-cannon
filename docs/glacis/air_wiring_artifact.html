@@ -1,0 +1,481 @@
+<title>Glacis Air &amp; Wiring</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;800&family=Chivo+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a drafting-sheet page, two full-width schematics stacked, one step rail that drives both */
+:root {
+  --bg: #eef1ef; --sheet: #f8faf9; --ink: #1c2522; --muted: #5a6762; --line: #33403b;
+  --grid: rgba(51, 64, 59, .07);
+  --z200: #dde7f3; --z110: #f4ead9; --zbar: #e6ece9;
+  --air: #1f5fa8; --sensor: #b45f00; --power: #b3261e; --p5: #8a5a00; --sig: #2e3a36; --smoke: #6b7280; --rf: #6d4fb3;
+  --on: #0b7a69;
+  --display: "Chivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Chivo Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111715; --sheet: #161e1b; --ink: #e2eae7; --muted: #94a39d; --line: #c4d0cb;
+  --grid: rgba(196, 208, 203, .06);
+  --z200: #1b2a3b; --z110: #33291a; --zbar: #1f2925;
+  --air: #6ea8eb; --sensor: #f0a43c; --power: #f2766c; --p5: #e0b44f; --sig: #c9d5d0; --smoke: #a6adb9; --rf: #b49cf2;
+  --on: #3cc6b0; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111715; --sheet: #161e1b; --ink: #e2eae7; --muted: #94a39d; --line: #c4d0cb;
+  --grid: rgba(196, 208, 203, .06);
+  --z200: #1b2a3b; --z110: #33291a; --zbar: #1f2925;
+  --air: #6ea8eb; --sensor: #f0a43c; --power: #f2766c; --p5: #e0b44f; --sig: #c9d5d0; --smoke: #a6adb9; --rf: #b49cf2;
+  --on: #3cc6b0; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--display); line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 22px }
+header { display: grid; gap: 6px }
+.kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+h1 { font-weight: 800; font-size: clamp(26px, 4vw, 38px); line-height: 1.1; margin: 0; text-wrap: balance }
+.lede { margin: 0; max-width: 68ch; color: var(--muted) }
+h2 { font-weight: 800; font-size: 20px; margin: 0; text-wrap: balance }
+.steps { display: flex; flex-wrap: wrap; gap: 8px }
+.steps button, .sensors button { font: 600 13px/1 var(--display); color: var(--ink); background: var(--sheet); border: 1.5px solid var(--line);
+  border-radius: 999px; padding: 9px 14px; cursor: pointer }
+.steps button[aria-pressed="true"] { background: var(--on); border-color: var(--on); color: var(--sheet) }
+.steps button:focus-visible, .sensors button:focus-visible { outline: 3px solid var(--on); outline-offset: 2px }
+.note { min-height: 3em; margin: 0; max-width: 80ch; font-size: 15px }
+.note b { font-weight: 800 }
+.sheet { background: var(--sheet); border: 1px solid color-mix(in srgb, var(--line) 25%, transparent); border-radius: 6px;
+  padding: 16px; display: grid; gap: 10px; min-width: 0 }
+.sheet .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--mono); font-size: 12px; color: var(--muted) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.legend i { display: inline-block; width: 22px; height: 0; border-top: 2.5px solid currentColor }
+.scroll { overflow-x: auto; -webkit-overflow-scrolling: touch }
+.scroll svg { display: block; min-width: 900px; width: 100%; height: auto;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 20px 20px }
+figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-width: 90ch }
+/* drawing */
+.dg { color: var(--line) }
+.dg text { font-family: var(--mono); font-size: 11px; fill: var(--ink) }
+.dg .t-s { font-size: 10px; fill: var(--muted) }
+.dg .t-b { font-weight: 600; font-size: 12px }
+.dg .zone { stroke: none } .z200 { fill: var(--z200) } .z110 { fill: var(--z110) } .zbar { fill: var(--zbar) }
+.dg .ztxt { font-family: var(--display); font-weight: 800; font-size: 12px; fill: var(--muted); letter-spacing: .04em; text-transform: uppercase }
+.dg .box { fill: var(--sheet); stroke: var(--line); stroke-width: 1.5 }
+.dg .ext { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 5 4 }
+.dg .sym { fill: var(--sheet); stroke: var(--line); stroke-width: 1.5 }
+.dg .solid { fill: var(--line); stroke: none }
+.dg .air { fill: none; stroke: var(--air); stroke-width: 3 }
+.dg .flex { fill: none; stroke: var(--air); stroke-width: 3; stroke-dasharray: 7 5 }
+.dg .smk { fill: none; stroke: var(--smoke); stroke-width: 3; stroke-dasharray: 2 5; stroke-linecap: round }
+.dg .pw { fill: none; stroke: var(--power); stroke-width: 3.5 }
+.dg .p5 { fill: none; stroke: var(--p5); stroke-width: 2 }
+.dg .sg { fill: none; stroke: var(--sig); stroke-width: 1.4 }
+.dg .rf { fill: none; stroke: var(--rf); stroke-width: 1.8; stroke-dasharray: 3 4 }
+.dg .pt circle { fill: var(--sheet); stroke: var(--sensor); stroke-width: 2.5 }
+.dg .pt text.id { fill: var(--sensor); font-weight: 600; font-size: 11px }
+.dg .ptl { fill: none; stroke: var(--sensor); stroke-width: 2 }
+.dg .shirt { fill: color-mix(in srgb, var(--air) 30%, var(--sheet)); stroke: var(--line); stroke-width: 1 }
+.dg .barrel { fill: none; stroke: var(--line); stroke-width: 1.8 }
+.dg .hole { fill: var(--smoke) }
+.dg [data-k] { cursor: pointer }
+.dg g, .dg path, .dg line, .dg rect, .dg polyline { transition: opacity .25s ease }
+.dim { opacity: .14 }
+.dg .pick circle { stroke-width: 5; fill: color-mix(in srgb, var(--sensor) 18%, var(--sheet)) }
+.dg .pick .ptl, .dg .ptl.pick { stroke-width: 4 }
+.mk-air { fill: var(--air) } .mk-pw { fill: var(--power) } .mk-sg { fill: var(--sig) } .mk-smk { fill: var(--smoke) } .mk-pt { fill: var(--sensor) }
+/* sensor table */
+.sensors { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px }
+.sensor { background: var(--sheet); border: 1px solid color-mix(in srgb, var(--line) 25%, transparent); border-radius: 6px; padding: 12px; display: grid; gap: 6px; min-width: 0 }
+.sensor button { justify-self: start; color: var(--sensor); border-color: var(--sensor) }
+.sensor button[aria-pressed="true"] { background: var(--sensor); color: var(--sheet) }
+.sensor p { margin: 0; font-size: 13px; color: var(--muted) }
+.sensor .rng { font-family: var(--mono); font-size: 12px; color: var(--ink); font-variant-numeric: tabular-nums }
+@media (prefers-reduced-motion: reduce) { .dg g, .dg path, .dg line, .dg rect { transition: none } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">Brophy Mark 5 · Glacis rev C.1</div>
+    <h1>Glacis air &amp; wiring</h1>
+    <p class="lede">How air, smoke and power move through the cannon. Pick a step to light up the parts it uses on both drawings, or tap a pressure sensor to find it on both.</p>
+  </header>
+
+  <nav class="steps" aria-label="Steps">
+    <button type="button" id="s-all" data-step="" aria-pressed="true">Everything</button>
+    <button type="button" id="s-charge" data-step="charge" aria-pressed="false">1 · Charge tanks</button>
+    <button type="button" id="s-fill" data-step="fill" aria-pressed="false">2 · Fill chambers</button>
+    <button type="button" id="s-fire" data-step="fire" aria-pressed="false">3 · Fire</button>
+    <button type="button" id="s-smoke" data-step="smoke" aria-pressed="false">4 · Smoke</button>
+    <button type="button" id="s-drive" data-step="drive" aria-pressed="false">5 · Drive &amp; aim</button>
+    <button type="button" id="s-safe" data-step="safe" aria-pressed="false">6 · Safety trips</button>
+  </nav>
+  <p class="note" id="note" aria-live="polite"></p>
+
+  <!-- ===================================================== PNEUMATIC -->
+  <section class="sheet">
+    <div class="head">
+      <h2>Pneumatic</h2>
+      <div class="legend">
+        <span style="color:var(--air)"><i></i>air line</span>
+        <span style="color:var(--air)"><i style="border-top-style:dashed"></i>flex loop to the gun</span>
+        <span style="color:var(--smoke)"><i style="border-top-style:dotted"></i>smoke tube</span>
+        <span style="color:var(--sensor)"><i></i>pressure sensor</span>
+      </div>
+    </div>
+    <figure>
+      <div class="scroll">
+        <svg class="dg" id="pneu" viewBox="0 0 1200 580" role="img" aria-label="Pneumatic diagram: shop air fills two 200 psi tanks through a rear manifold; a 12 V fill valve meters air through a fill block and two check valves into the two 0.53 L chambers; each chamber's Atlantic SZW-25 valve fires into its barrel; four pressure sensors PT1 to PT4 watch the tanks, fill line and chambers; smoke runs from the 12 V smoke machine to a collar on the barrels and vents front and rear.">
+          <defs>
+            <marker id="ma" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-air" d="M0 0L10 5L0 10z"/></marker>
+            <marker id="ms" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-smk" d="M0 0L10 5L0 10z"/></marker>
+          </defs>
+          <!-- zones -->
+          <rect class="zone z200" x="140" y="38" width="262" height="340" rx="10"/>
+          <text class="ztxt" x="152" y="58">Tanks · 200 psi</text>
+          <rect class="zone z110" x="412" y="38" width="523" height="402" rx="10"/>
+          <text class="ztxt" x="424" y="58">Chambers · 110 psi cap</text>
+          <rect class="zone zbar" x="935" y="38" width="250" height="402" rx="10"/>
+          <text class="ztxt" x="947" y="58">Barrels · open air</text>
+
+          <!-- shop compressor + fill port -->
+          <g data-s="charge">
+            <rect class="ext" x="18" y="215" width="96" height="50" rx="4"/>
+            <text x="66" y="236" text-anchor="middle">Shop</text><text x="66" y="251" text-anchor="middle">compressor</text>
+            <path class="air" d="M114 240H153"/>
+            <path class="sym" d="M153 232L175 248V232L153 248Z"/>
+            <text x="164" y="276" text-anchor="middle">Fill port</text><text class="t-s" x="164" y="290" text-anchor="middle">Schrader · rear</text>
+            <path class="air" d="M175 240H205"/>
+          </g>
+          <!-- rear manifold + tanks -->
+          <g data-s="charge fill">
+            <rect class="solid" x="205" y="233" width="172" height="14" rx="2"/>
+            <text x="291" y="224" text-anchor="middle">Rear manifold</text>
+          </g>
+          <g data-s="charge fill">
+            <path class="air" d="M240 233V121M342 233V121"/>
+            <rect class="sym" x="200" y="82" width="80" height="38" rx="19"/><text x="240" y="105" text-anchor="middle">Tank L 6 L</text>
+            <rect class="sym" x="302" y="82" width="80" height="38" rx="19"/><text x="342" y="105" text-anchor="middle">Tank R 6 L</text>
+          </g>
+          <g data-s="safe charge">
+            <path class="air" d="M225 247V290"/>
+            <rect class="sym" x="215" y="290" width="20" height="24"/><path class="sg" d="M219 310L231 294M231 294l-5 1M231 294l-1 5"/>
+            <text x="225" y="332" text-anchor="middle">Relief</text><text class="t-s" x="225" y="346" text-anchor="middle">200 psi</text>
+          </g>
+          <g class="pt" data-k="PT1" data-s="charge safe">
+            <path class="ptl" d="M291 247V290"/>
+            <circle cx="291" cy="304" r="14"/><text class="id" x="291" y="308" text-anchor="middle">PT1</text>
+            <text class="t-s" x="291" y="334" text-anchor="middle">0–300 psi</text>
+          </g>
+          <g data-s="safe charge">
+            <path class="air" d="M358 247V292"/>
+            <circle class="sym" cx="358" cy="302" r="10"/><path class="sg" d="M351 302H365"/>
+            <text x="358" y="332" text-anchor="middle">Bleed</text><text class="t-s" x="358" y="346" text-anchor="middle">rear panel</text>
+          </g>
+          <!-- fill valve + fill block -->
+          <g data-s="fill">
+            <path class="air" d="M377 240H428"/>
+            <path class="sym" d="M428 230L452 250V230L428 250Z"/>
+            <rect class="sym" x="433" y="212" width="14" height="14"/><text class="t-s" x="440" y="223" text-anchor="middle">S</text>
+            <path class="sg" d="M440 226V230"/>
+            <text x="440" y="276" text-anchor="middle">Fill valve</text><text class="t-s" x="440" y="290" text-anchor="middle">12 V NC · meters</text>
+            <path class="air" d="M452 240H488"/>
+            <rect class="solid" x="488" y="226" width="72" height="28" rx="2"/>
+            <text x="524" y="216" text-anchor="middle">Fill block</text>
+          </g>
+          <g class="pt" data-k="PT2" data-s="fill">
+            <path class="ptl" d="M500 254V292"/>
+            <circle cx="500" cy="306" r="14"/><text class="id" x="500" y="310" text-anchor="middle">PT2</text>
+            <text class="t-s" x="500" y="336" text-anchor="middle">0–200 psi</text>
+          </g>
+          <g data-s="safe fill">
+            <path class="air" d="M548 254V292"/>
+            <rect class="sym" x="538" y="292" width="20" height="24"/><path class="sg" d="M542 312L554 296M554 296l-5 1M554 296l-1 5"/>
+            <text x="560" y="334" text-anchor="middle">Relief</text><text class="t-s" x="560" y="348" text-anchor="middle">125 psi</text>
+          </g>
+          <!-- check valves + flex loops -->
+          <g data-s="fill">
+            <path class="air" d="M560 240H590V150H608M590 240V330H608"/>
+            <path class="sym" d="M608 141L626 150L608 159Z"/><path class="sg" d="M629 140V160" style="stroke-width:2"/>
+            <path class="sym" d="M608 321L626 330L608 339Z"/><path class="sg" d="M629 320V340" style="stroke-width:2"/>
+            <text x="618" y="132" text-anchor="middle">Check A</text>
+            <text x="618" y="362" text-anchor="middle">Check B</text>
+            <path class="flex" d="M630 150H720M630 330H720"/>
+            <text class="t-s" x="675" y="172" text-anchor="middle">flex loop</text>
+            <text class="t-s" x="675" y="318" text-anchor="middle">flex loop</text>
+          </g>
+          <!-- chamber blocks, sensors, reliefs, chambers -->
+          <g data-s="fill fire">
+            <rect class="solid" x="720" y="136" width="50" height="28" rx="2"/>
+            <rect class="solid" x="720" y="316" width="50" height="28" rx="2"/>
+            <path class="air" d="M770 150H790M770 330H790"/>
+            <rect class="sym" x="790" y="136" width="112" height="28" rx="3"/><text x="846" y="154" text-anchor="middle">Chamber 0.53 L</text>
+            <rect class="sym" x="790" y="316" width="112" height="28" rx="3"/><text x="846" y="334" text-anchor="middle">Chamber 0.53 L</text>
+          </g>
+          <g class="pt" data-k="PT3" data-s="fill fire">
+            <path class="ptl" d="M732 136V102"/>
+            <circle cx="732" cy="88" r="14"/><text class="id" x="732" y="92" text-anchor="middle">PT3</text>
+            <text class="t-s" x="732" y="68" text-anchor="middle">0–200 psi</text>
+          </g>
+          <g class="pt" data-k="PT4" data-s="fill fire">
+            <path class="ptl" d="M732 344V378"/>
+            <circle cx="732" cy="392" r="14"/><text class="id" x="732" y="396" text-anchor="middle">PT4</text>
+            <text class="t-s" x="732" y="424" text-anchor="middle">0–200 psi</text>
+          </g>
+          <g data-s="safe fill">
+            <path class="air" d="M762 136V104M762 344V376"/>
+            <rect class="sym" x="752" y="80" width="20" height="24"/><path class="sg" d="M756 100L768 84M768 84l-5 1M768 84l-1 5"/>
+            <rect class="sym" x="752" y="376" width="20" height="24"/><path class="sg" d="M756 396L768 380M768 380l-5 1M768 380l-1 5"/>
+            <text x="780" y="90">Relief 125 psi</text><text class="t-s" x="780" y="104">pull ring = bleed</text>
+            <text x="780" y="386">Relief 125 psi</text><text class="t-s" x="780" y="400">pull ring = bleed</text>
+          </g>
+          <!-- firing valves -->
+          <g data-s="fire">
+            <path class="air" d="M902 150H920M902 330H920"/>
+            <path class="sym" d="M920 140L950 160V140L920 160Z"/><rect class="sym" x="928" y="118" width="14" height="14"/><text class="t-s" x="935" y="129" text-anchor="middle">S</text><path class="sg" d="M935 132V140"/>
+            <path class="sym" d="M920 320L950 340V320L920 340Z"/><rect class="sym" x="928" y="348" width="14" height="14"/><text class="t-s" x="935" y="359" text-anchor="middle">S</text><path class="sg" d="M935 340V348"/>
+            <text class="t-b" x="935" y="108" text-anchor="middle">SZW-25</text>
+            <text class="t-b" x="935" y="380" text-anchor="middle">SZW-25</text>
+          </g>
+          <!-- barrels -->
+          <g data-s="fire smoke">
+            <path class="air" d="M950 150H958M950 330H958"/>
+            <rect class="barrel" x="958" y="139" width="214" height="22"/>
+            <rect class="barrel" x="958" y="319" width="214" height="22"/>
+            <rect class="shirt" x="962" y="142" width="52" height="16" rx="3"/><text class="t-s" x="988" y="154" text-anchor="middle">shirt</text>
+            <rect class="shirt" x="962" y="322" width="52" height="16" rx="3"/><text class="t-s" x="988" y="334" text-anchor="middle">shirt</text>
+            <text x="1065" y="128" text-anchor="middle">Barrel · 3 in polycarbonate</text>
+            <text x="1065" y="362" text-anchor="middle">Barrel · 3 in polycarbonate</text>
+          </g>
+          <g data-s="fire">
+            <path class="air" marker-end="url(#ma)" d="M1172 150H1194M1172 330H1194"/>
+          </g>
+          <!-- smoke -->
+          <g data-s="smoke">
+            <rect class="box" x="300" y="470" width="168" height="44" rx="4"/>
+            <text class="t-b" x="384" y="489" text-anchor="middle">12 V fogger</text>
+            <text class="t-s" x="384" y="504" text-anchor="middle">2 × 200 W cores + blower</text>
+            <path class="smk" d="M468 492H520"/>
+            <circle class="sym" cx="528" cy="492" r="8"/><text x="528" y="476" text-anchor="middle">1→4 splitter</text>
+            <path class="smk" marker-end="url(#ms)" d="M536 498Q560 530 600 530"/><text x="606" y="534">Front vent · under the bumper</text>
+            <path class="smk" marker-end="url(#ms)" d="M532 500Q548 556 600 556"/><text x="606" y="560">Rear vent · bottom of the rear panel</text>
+            <path class="smk" d="M536 488H1036V350"/><text class="t-s" x="790" y="480" text-anchor="middle">two tubes up to the gun</text>
+            <rect class="ext" x="1028" y="131" width="16" height="218" rx="3" style="stroke:var(--smoke)"/>
+            <circle class="hole" cx="1036" cy="139" r="3"/><circle class="hole" cx="1036" cy="161" r="3"/>
+            <circle class="hole" cx="1036" cy="319" r="3"/><circle class="hole" cx="1036" cy="341" r="3"/>
+            <text x="1052" y="236">Smoke collar</text><text class="t-s" x="1052" y="250">holes just past the shirt</text>
+            <path class="smk" marker-end="url(#ms)" d="M1046 150H1166M1046 330H1166"/>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Air enters at the rear fill port and only reaches a barrel when its SZW-25 opens. The fill valve meters the chambers up to the software setpoint (110 psi max). The check valves keep one shot from emptying the other chamber. Every pressure zone has its own relief.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ===================================================== ELECTRICAL -->
+  <section class="sheet">
+    <div class="head">
+      <h2>Electrical</h2>
+      <div class="legend">
+        <span style="color:var(--power)"><i></i>12 V power</span>
+        <span style="color:var(--p5)"><i></i>5 V</span>
+        <span style="color:var(--sig)"><i style="border-top-width:1.5px"></i>signal</span>
+        <span style="color:var(--sensor)"><i></i>sensor signal</span>
+        <span style="color:var(--rf)"><i style="border-top-style:dotted"></i>radio</span>
+      </div>
+    </div>
+    <figure>
+      <div class="scroll">
+        <svg class="dg" id="elec" viewBox="0 0 1200 720" role="img" aria-label="Electrical diagram: two FRC batteries and a standby charge port feed a 120 A breaker and the REV PDH; the PDH powers the Falcons, the Spark MAX, a 5 V buck, the smoke machine and, through the safety relay, the 12 V valve rail; the STM32 reads PT1 to PT4 and the gun-angle pot, drives the motors through a PWM gate, the firing valves and smoke through MOSFETs and the fill valve through a relay; an ESP32-S3 WiFi bridge serves the web UI and an ESP32-S3 safety node, linked by ESP-NOW to a handheld remote, holds the safety relay and the PWM gate enable, with the rear E-stop in series.">
+          <defs>
+            <marker id="mp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-pw" d="M0 0L10 5L0 10z"/></marker>
+            <marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-sg" d="M0 0L10 5L0 10z"/></marker>
+            <marker id="mt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-pt" d="M0 0L10 5L0 10z"/></marker>
+          </defs>
+          <!-- sources -->
+          <g data-s="drive fill fire smoke safe charge">
+            <rect class="box" x="20" y="52" width="100" height="40" rx="3"/><text x="70" y="70" text-anchor="middle">Battery 1</text><text class="t-s" x="70" y="84" text-anchor="middle">FRC 12 V 18 Ah</text>
+            <rect class="box" x="20" y="108" width="100" height="40" rx="3"/><text x="70" y="126" text-anchor="middle">Battery 2</text><text class="t-s" x="70" y="140" text-anchor="middle">in parallel, SB50</text>
+            <rect class="ext" x="20" y="176" width="100" height="40" rx="3"/><text x="70" y="194" text-anchor="middle">Charge port</text><text class="t-s" x="70" y="208" text-anchor="middle">SB50 · rear panel</text>
+            <path class="pw" d="M120 72H140V196H120M120 128H140M140 110H160"/>
+            <rect class="box" x="160" y="96" width="70" height="28" rx="3"/><text x="195" y="114" text-anchor="middle">120 A</text>
+            <text class="t-s" x="195" y="140" text-anchor="middle">main breaker</text>
+            <path class="pw" d="M230 110H268"/>
+            <rect class="solid" x="268" y="40" width="22" height="650" rx="3"/>
+            <text class="t-b" x="279" y="32" text-anchor="middle">REV PDH</text>
+          </g>
+          <!-- PDH feeds -->
+          <g data-s="drive">
+            <path class="pw" marker-end="url(#mp)" d="M290 70H998"/>
+            <rect class="box" x="1000" y="52" width="176" height="38" rx="3"/><text x="1088" y="69" text-anchor="middle">Falcon 500 ×4</text><text class="t-s" x="1088" y="83" text-anchor="middle">drive · 40 A each</text>
+            <path class="pw" d="M290 120H858"/>
+            <rect class="box" x="858" y="104" width="78" height="32" rx="3"/><text x="897" y="124" text-anchor="middle">Spark MAX</text>
+            <path class="pw" marker-end="url(#mp)" d="M936 120H998"/>
+            <rect class="box" x="1000" y="104" width="176" height="32" rx="3"/><text x="1088" y="119" text-anchor="middle">goBILDA 60 rpm</text><text class="t-s" x="1088" y="131" text-anchor="middle">gun elevation</text>
+          </g>
+          <g data-s="drive fill fire smoke safe charge">
+            <path class="pw" d="M290 200H330"/>
+            <rect class="box" x="330" y="184" width="92" height="32" rx="3"/><text x="376" y="199" text-anchor="middle">Buck</text><text class="t-s" x="376" y="211" text-anchor="middle">12 → 5 V 20 A</text>
+            <path class="p5" d="M422 200H476V232H998"/>
+            <text class="t-s" x="740" y="226" text-anchor="middle">5 V rail · STM32, ESP32s, sensors, LEDs</text>
+            <path class="p5" d="M610 232V260M640 232V176M434 232V446"/>
+            <text class="t-s" x="398" y="300" text-anchor="end">5 V</text><text class="t-s" x="398" y="312" text-anchor="end">to sensors</text>
+          </g>
+          <g data-s="drive">
+            <rect class="box" x="1000" y="214" width="176" height="36" rx="3"/><text x="1088" y="230" text-anchor="middle">WS2812 LEDs</text><text class="t-s" x="1088" y="243" text-anchor="middle">frame 12.4 m · collars</text>
+          </g>
+          <!-- wifi bridge -->
+          <g data-s="drive fire fill">
+            <rect class="box" x="520" y="140" width="180" height="36" rx="3"/><text x="610" y="156" text-anchor="middle">ESP32-S3 WiFi bridge</text><text class="t-s" x="610" y="169" text-anchor="middle">serves the web UI</text>
+            <path class="sg" d="M580 176V260" marker-end="url(#mg)"/><text class="t-s" x="574" y="214" text-anchor="end">UART</text>
+            <path class="rf" d="M700 158H998"/>
+            <rect class="ext" x="1000" y="144" width="176" height="30" rx="3"/><text x="1088" y="163" text-anchor="middle">Any browser · WebSocket</text>
+          </g>
+          <!-- sensors -->
+          <g class="pt" data-k="PT1" data-s="charge safe">
+            <circle cx="448" cy="290" r="13"/><text class="id" x="448" y="294" text-anchor="middle">PT1</text>
+            <text class="t-s" x="420" y="284" text-anchor="end">tank 0–300</text>
+            <path class="ptl" marker-end="url(#mt)" d="M461 290H518"/><rect class="sym" x="478" y="285" width="18" height="10"/>
+          </g>
+          <g class="pt" data-k="PT2" data-s="fill">
+            <circle cx="448" cy="330" r="13"/><text class="id" x="448" y="334" text-anchor="middle">PT2</text>
+            <text class="t-s" x="420" y="334" text-anchor="end">fill 0–200</text>
+            <path class="ptl" marker-end="url(#mt)" d="M461 330H518"/><rect class="sym" x="478" y="325" width="18" height="10"/>
+          </g>
+          <g class="pt" data-k="PT3" data-s="fill fire">
+            <circle cx="448" cy="370" r="13"/><text class="id" x="448" y="374" text-anchor="middle">PT3</text>
+            <text class="t-s" x="420" y="374" text-anchor="end">top chamber</text>
+            <path class="ptl" marker-end="url(#mt)" d="M461 370H518"/><rect class="sym" x="478" y="365" width="18" height="10"/>
+          </g>
+          <g class="pt" data-k="PT4" data-s="fill fire">
+            <circle cx="448" cy="410" r="13"/><text class="id" x="448" y="414" text-anchor="middle">PT4</text>
+            <text class="t-s" x="420" y="414" text-anchor="end">bottom chamber</text>
+            <path class="ptl" marker-end="url(#mt)" d="M461 410H518"/><rect class="sym" x="478" y="405" width="18" height="10"/>
+          </g>
+          <g data-s="drive">
+            <circle class="sym" cx="448" cy="450" r="12"/><path class="sg" d="M440 456L456 444"/>
+            <text class="t-s" x="420" y="454" text-anchor="end">gun-angle pot</text>
+            <path class="sg" marker-end="url(#mg)" d="M460 450H518"/>
+          </g>
+          <g data-s="drive">
+            <rect class="ext" x="330" y="482" width="92" height="28" rx="3"/><text x="376" y="500" text-anchor="middle">USB-C · rear</text>
+            <path class="sg" marker-end="url(#mg)" d="M422 496H518"/>
+          </g>
+          <text class="t-s" x="487" y="278" text-anchor="middle">÷</text>
+          <!-- STM32 -->
+          <g data-s="drive fill fire smoke charge safe">
+            <rect class="box" x="520" y="260" width="180" height="262" rx="4" style="stroke-width:2"/>
+            <text class="t-b" x="610" y="282" text-anchor="middle">STM32 Nucleo-F446RE</text>
+            <text class="t-s" x="610" y="296" text-anchor="middle">main controller</text>
+            <text class="t-s" x="528" y="294">A0</text><text class="t-s" x="528" y="334">A1</text><text class="t-s" x="528" y="374">A2</text><text class="t-s" x="528" y="414">A3</text><text class="t-s" x="528" y="454">A4</text><text class="t-s" x="528" y="500">USB</text>
+            <text class="t-s" x="692" y="294" text-anchor="end">PWM ×5</text><text class="t-s" x="692" y="314" text-anchor="end">LED data</text>
+            <text class="t-s" x="692" y="390" text-anchor="end">fire T · fire B</text><text class="t-s" x="692" y="430" text-anchor="end">fog heat · pump · fan</text>
+            <text class="t-s" x="610" y="462" text-anchor="middle">SPI ← fog core temps</text>
+            <text class="t-s" x="692" y="480" text-anchor="end">fill</text>
+            <text class="t-s" x="610" y="516" text-anchor="middle">heartbeat ↓</text>
+          </g>
+          <!-- PWM gate -->
+          <g data-s="drive safe">
+            <path class="sg" d="M700 290H760M700 310H760"/>
+            <rect class="box" x="760" y="274" width="84" height="48" rx="3"/><text x="802" y="294" text-anchor="middle">PWM gate</text><text class="t-s" x="802" y="308" text-anchor="middle">74AHCT125</text>
+            <path class="sg" marker-end="url(#mg)" d="M844 284H968V80H998"/>
+            <path class="sg" marker-end="url(#mg)" d="M844 296H912V136"/>
+            <path class="sg" marker-end="url(#mg)" d="M844 312H986V250"/>
+          </g>
+          <!-- MOSFET bank, fill relay -->
+          <g data-s="fire smoke">
+            <path class="sg" d="M700 386H760M700 426H760"/>
+            <rect class="box" x="760" y="370" width="84" height="72" rx="3"/><text x="802" y="398" text-anchor="middle">MOSFET ×9</text><text class="t-s" x="802" y="412" text-anchor="middle">15 A each</text>
+          </g>
+          <g data-s="fire">
+            <path class="sg" marker-end="url(#mg)" d="M844 380H998M844 392H950V420H998"/>
+            <rect class="box" x="1000" y="364" width="176" height="30" rx="3"/><text x="1088" y="383" text-anchor="middle">Firing valve top</text>
+            <rect class="box" x="1000" y="406" width="176" height="30" rx="3"/><text x="1088" y="425" text-anchor="middle">Firing valve bottom</text>
+          </g>
+          <g data-s="fill">
+            <path class="sg" d="M700 476H760"/>
+            <rect class="box" x="760" y="462" width="84" height="30" rx="3"/><text x="802" y="481" text-anchor="middle">ULN + relay</text>
+            <path class="sg" marker-end="url(#mg)" d="M844 476H998"/>
+            <rect class="box" x="1000" y="462" width="176" height="30" rx="3"/><text x="1088" y="481" text-anchor="middle">Fill valve</text>
+          </g>
+          <g data-s="smoke">
+            <path class="sg" marker-end="url(#mg)" d="M844 420H930V540H998M844 432H922V552H998"/>
+            <path class="pw" marker-end="url(#mp)" d="M290 660H960V566H998"/>
+            <rect class="box" x="1000" y="528" width="176" height="44" rx="3"/><text x="1088" y="546" text-anchor="middle">Fogger · 2 cores</text><text class="t-s" x="1088" y="560" text-anchor="middle">heaters · pumps · blower</text>
+            <text class="t-s" x="640" y="654" text-anchor="middle">2 × 30 A · relay per core, 250 °C cutout in its coil</text>
+          </g>
+          <!-- valve rail -->
+          <g data-s="fire fill safe">
+            <path class="pw" d="M290 620H330"/>
+            <rect class="box" x="330" y="604" width="92" height="32" rx="3"/><text x="376" y="619" text-anchor="middle">Safety relay</text><text class="t-s" x="376" y="631" text-anchor="middle">40 A</text>
+            <path class="pw" d="M422 620H984V372M984 372H998M984 414H998M984 470H998"/>
+            <text class="t-s" x="700" y="638" text-anchor="middle">12 V valve rail · dead unless the safety node says OK</text>
+          </g>
+          <!-- safety node, remote, E-stop -->
+          <g data-s="safe fire drive fill">
+            <rect class="box" x="520" y="548" width="180" height="40" rx="3"/><text x="610" y="565" text-anchor="middle">ESP32-S3 safety node</text><text class="t-s" x="610" y="579" text-anchor="middle">ESP-NOW · trips</text>
+            <path class="sg" marker-end="url(#mg)" d="M610 522V546"/>
+            <path class="sg" d="M520 568H456"/>
+            <circle class="sym" cx="446" cy="568" r="10" style="stroke:var(--power)"/><path class="sg" d="M440 568H452" style="stroke:var(--power)"/>
+            <text class="t-s" x="446" y="552" text-anchor="middle">E-stop</text>
+            <path class="sg" marker-end="url(#mg)" d="M436 568H376V604"/>
+            <path class="sg" marker-end="url(#mg)" d="M700 560H880V256H802V272"/><text class="t-s" x="884" y="250">gate enable</text>
+            <path class="rf" d="M700 576H998"/>
+            <rect class="ext" x="1000" y="584" width="176" height="44" rx="3" style="stroke:var(--rf)"/><text x="1088" y="602" text-anchor="middle">Handheld remote</text><text class="t-s" x="1088" y="616" text-anchor="middle">E-stop · dead-man trigger</text>
+            <path class="rf" d="M998 576H1088V584"/>
+          </g>
+          <g class="pt" data-k="PT1" data-s="safe">
+            <path class="ptl" marker-end="url(#mt)" d="M506 290V556H518"/>
+            <text class="t-s" x="502" y="540" text-anchor="end">PT1 · trip at 210</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>The STM32 does everything time-critical. The safety node is the only thing that can power the valve rail and enable the motor PWM, so losing the remote, a dead STM32 heartbeat, the E-stop or PT1 over 210 psi each stop the valves and drive. The fill-valve relay is cut at the rail too.</figcaption>
+    </figure>
+  </section>
+
+  <section style="display:grid;gap:10px">
+    <h2>Pressure sensors</h2>
+    <div class="sensors">
+      <div class="sensor"><button type="button" id="b-PT1" data-k="PT1" aria-pressed="false">PT1 · tank</button><span class="rng">0–300 psi · 0.5–4.5 V</span><p>Rear manifold, shared by both tanks. Read by the STM32 (A0) and the safety node, which trips everything above 210 psi.</p></div>
+      <div class="sensor"><button type="button" id="b-PT2" data-k="PT2" aria-pressed="false">PT2 · fill line</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Fill block, after the fill valve. The STM32 (A1) pulses the fill valve against it.</p></div>
+      <div class="sensor"><button type="button" id="b-PT3" data-k="PT3" aria-pressed="false">PT3 · top chamber</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Port block behind the top chamber. Sets that cannon's shot pressure (A2).</p></div>
+      <div class="sensor"><button type="button" id="b-PT4" data-k="PT4" aria-pressed="false">PT4 · bottom chamber</button><span class="rng">0–200 psi · 0.5–4.5 V</span><p>Port block behind the bottom chamber (A3). Each chamber is sealed by its check valve, so it needs its own sensor.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const notes = {
+    "": "Everything at once. Pick a step to see which parts it uses.",
+    charge: "<b>Charge.</b> A shop compressor fills both 6 L tanks to 200 psi through the rear fill port. PT1 reports tank pressure; the 200 psi relief and the bleed valve sit on the same manifold.",
+    fill: "<b>Fill.</b> The STM32 pulses the fill valve (through the ULN and relay, on the safety-powered valve rail) until PT3 and PT4 read the setpoint, never above 110 psi. The check valves keep each chamber's air in it.",
+    fire: "<b>Fire.</b> The web UI asks, the remote's dead-man trigger must be held, and the safety node keeps the valve rail live. The STM32 switches one SZW-25 through its MOSFET; the chamber dumps into the barrel and the shirt goes.",
+    smoke: "<b>Smoke.</b> The STM32 holds two 200 W fog cores at 220–240 °C (5–8 min to warm up), then runs their pumps and the blower through MOSFETs. A 250 °C cutout drops each core's relay on its own. One splitter feeds the barrel collar (smoke fills each barrel ahead of the shirt and spills out of the muzzle) and the trail vents front and rear.",
+    drive: "<b>Drive and aim.</b> The STM32 sends PWM through the gate to the four Falcons and the Spark MAX; the gate only passes it while the safety node enables it. The pot closes the elevation loop. LEDs and the web UI ride along.",
+    safe: "<b>Safety trips.</b> Remote heartbeat lost for 200 ms, remote or rear E-stop, the STM32 heartbeat stopping, or PT1 over 210 psi: the safety node opens the relay (valves dead) and disables the gate (motors stop). The reliefs work with no power at all: 200 psi on the tanks, 125 psi on the fill block and each chamber."
+  };
+  const note = document.getElementById("note");
+  const parts = document.querySelectorAll(".dg [data-s]");
+  const stepBtns = document.querySelectorAll(".steps button");
+  function setStep(step) {
+    stepBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.step === step)));
+    parts.forEach(el => {
+      const on = !step || el.dataset.s.split(" ").includes(step);
+      el.classList.toggle("dim", !on);
+    });
+    note.innerHTML = notes[step] || notes[""];
+    try { localStorage.setItem("glacis-step", step); } catch (e) {}
+  }
+  stepBtns.forEach(b => b.addEventListener("click", () => setStep(b.dataset.step)));
+  let picked = null;
+  function pick(k) {
+    picked = picked === k ? null : k;
+    document.querySelectorAll(".dg [data-k]").forEach(el => el.classList.toggle("pick", el.dataset.k === picked));
+    document.querySelectorAll(".sensor button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === picked)));
+  }
+  document.querySelectorAll(".dg [data-k]").forEach(el => el.addEventListener("click", () => pick(el.dataset.k)));
+  document.querySelectorAll(".sensor button").forEach(b => b.addEventListener("click", () => pick(b.dataset.k)));
+  let saved = "";
+  try { saved = localStorage.getItem("glacis-step") || ""; } catch (e) {}
+  setStep(notes[saved] !== undefined ? saved : "");
+})();
+</script>

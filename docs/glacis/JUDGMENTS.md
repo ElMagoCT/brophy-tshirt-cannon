@@ -1,16 +1,18 @@
-# Glacis rev C: judgment calls
+# Glacis rev C.1: judgment calls
 
-Rev C (2026-11-02) is the redesign from your third round of notes:
-- both chambers on the back of their cannons, in line;
+Rev C (2026-11-02) and C.1 (2026-11-03) are the redesign from your third and fourth rounds of notes:
+- both chambers on the back of their cannons, in line, with the barrels as close together as they go
+  (3.8 mm apart);
 - the gun balanced on a pivot axis that runs between the two cannons;
 - the old cannon's firing valve, plus one more;
-- small, cheap 2 in pipe chambers (0.53 L), sized by a shot simulation, with the barrels as close as they go;
+- small, cheap 2 in pipe chambers (0.53 L), sized by a shot simulation;
 - the back tank moved to the right, and no room left for a pump;
-- a 60 deg front, with the sides and back leaning more;
+- a 60 deg front, with the sides and back leaning more, and the open middle kept;
 - the rear-panel controls at the bottom of the panel, and the electronics in the back bottom;
 - a 60 rpm pivot motor;
-- a 12 V smoke machine with printed ducts;
-- LED strips run through the frame to backlight the panels.
+- a custom 12 V fogger: smoke into both barrels ahead of the shirt, plus trail vents front and back;
+- LED strips run through the frame to backlight the panels;
+- the vector-style wheels from your TTB file.
 
 Each item says what I picked and why. Numbers come from `cad/glacis/params.py` and the last clean run
 (`cad/glacis/out/check_log.txt`).
@@ -21,10 +23,11 @@ Each item says what I picked and why. Numbers come from `cad/glacis/params.py` a
 - every printed part fits a 256 mm bed;
 - every part is a single solid.
 
-**Where it is:** Onshape "Brophy Mark 5 - Glacis" holds the rev C tabs and the "Glacis rev C (whole
-robot)" assembly (468 parts). The parts list is the "Glacis BOM" tab: **$1,827.38** to buy (rev B was
-$1,555.11). Aluminum, acrylic, prints, Falcons, FRC stash parts and the old cannon's valve and chamber
-are all at $0.
+**Where it is:** Onshape "Brophy Mark 5 - Glacis", saved as version "Glacis rev C.1"; the assembly is
+"Glacis rev C (whole robot)". The parts list is the "Glacis BOM" tab: **$1,707.39** to buy (rev B was
+$1,555.11). Aluminum, acrylic, prints, Falcons, FRC stash parts and the old cannon's valve are all at $0.
+The pneumatic and electrical diagrams are in the "Glacis air & wiring" artifact
+(source `docs/glacis/air_wiring_artifact.html`).
 
 ## What I identified on the old cannon
 1. **Firing valve: Atlantic Valves SZW-25.** The plate says SZW-25, not S2W.
@@ -185,44 +188,111 @@ are all at $0.
     side's rear panel.
 
 ## Smoke
-28. **Pick: AutoLine Pro HyperSmoke, a 12 V automotive EVAP smoke machine, $47.99**
-    ([B0DNRY9NCV](https://www.amazon.com/dp/B0DNRY9NCV), 4.6 stars from 1.1K reviews, 2 bottles of fluid
-    included).
-    - Mains foggers need a ~$60 inverter and draw 35-40 A at 12 V, with a 4 min warm-up
-      ([VIRFUN](https://www.amazon.com/dp/B081YNQG29) + [Ampeak](https://www.amazon.com/dp/B07PWDR869)
-      = $99).
-    - The $40 battery "foggers" are 80 g tabletop units
-      ([StageFogger](https://www.amazon.com/dp/B0GVP7X53X)).
-    - A car smoke tester is built to run off a 12 V battery. It warms up instantly, has its own air pump
-      and pushes dense smoke down a hose, which is what the ducts need.
-    - It's $8 over your $40. The in-budget option is the M-T at $39.99, rated 3.7 stars.
-29. **The 12 V hack.**
-    - Power it from a fused PDH channel.
-    - Open it and put its heater and pump on two MOSFET channels from the STM32: the heater pre-heats,
-      and the pump puffs on command.
-    - Keep its thermal cutout.
-    - Measure its current first; the MOSFET modules are rated 15 A.
-30. **Fluid:** EVAP smoke is mineral-oil based, and baby oil is the cheap refill. Like any fogger, it can
-    trip gym smoke detectors, and it leaves a film in tight spaces, so check with each venue.
-31. **Ducts:**
-    - A printed outlet adapter feeds a printed 1-to-4 splitter, then your four flexible tubes.
-    - Two tubes go up to the vents in the gun's mantlet, between the barrels. They're service loops that
-      flex with elevation.
-    - Two go to vents under the front bumper, through holes in the bellypan.
-    - The smoker's box in the CAD is a placeholder. Measure the real one and its outlet before printing
-      the cradle and adapter.
+28. **Custom 12 V fogger with two 200 W fog heater cores**, instead of the EVAP smoker. About $96 of parts
+    plus fluid; the HyperSmoke was $48.
+    - **Why not the EVAP smoker:** it burns about 0.3 mL of oil a minute; a 400 W fogger moves 13-16 mL.
+      That class can't make outdoor trails or fill two barrels.
+    - **Why not a mains fogger:** a $30 400 W fogger plus a 500 W inverter draws about 40 A, puts mains
+      wiring on the robot, and the inverter doesn't fit the bay
+      ([BORGOVA](https://www.amazon.com/dp/B0F4XJMNFR) + [BESTEK](https://www.amazon.com/dp/B086SSRRZ7)).
+    - **The core:** a cast fog-machine heat exchanger made for 12 V
+      ([AliExpress, $22.42](https://www.aliexpress.us/item/3256805556610953.html)), 97 x 32 x 36 mm,
+      about 17.5 A. Two make about as much fog as a 400 W mains fogger. Each gets its own 30 A PDH channel.
+    - **Parts:**
+      - a Kamoer 12 V peristaltic pump per core, fed from a printed 400 mL tank;
+      - a MAX6675 thermocouple amp and K probe per core, read by the STM32;
+      - a KSD301 250 C cutout and a 40 A relay per core;
+      - a 5015 blower to push the fog into the splitter.
+    - **Warm-up is 5-8 minutes** (heat on standby power before an event). Then about 40 s of continuous
+      fog before a reheat.
+    - The ready-made 12 V 200 W fogger on AliExpress ($58.49) uses the same class of heater, but it has one
+      1-star review and no size listed.
+29. **Control and safety.**
+    - The STM32 holds each core at 220-240 C, with a firmware cut at 245 C. It switches the heaters
+      slowly (about 1 Hz) on paired MOSFET channels, gated at 5 V through the spare 74AHCT125 buffers.
+    - The pumps and the blower are on their own MOSFET channels. That's 9 channels in all, so two
+      6-packs.
+    - Each core's 40 A relay sits upstream of its MOSFETs. Its coil runs through the KSD301 and an STM32
+      enable pin that's pulled low, so an overheated core, a shorted MOSFET or an STM32 reset all drop it.
+      The KSD301 resets itself when it cools, so the firmware latches the fault.
+    - Pump only within 10 C of the setpoint, with a pump timeout, and cut the heater if a thermocouple
+      reads open.
+    - The cores sit on an aluminum bracket with ceramic-fiber wrap, never on a print.
+30. **Fluid:** water-based glycol fog fluid only. Oil (the EVAP fluid) cokes the core's 2.5 mm tube. Like
+    any fogger, it can trip gym smoke detectors, so check with each venue.
+31. **Ducts:** a printed outlet adapter feeds a printed 1-to-4 splitter, then your four flexible tubes.
+    - **Two go to the barrels.** Each barrel has six 5 mm holes 205 mm from its breech end, just past a
+      rolled shirt. A printed two-piece smoke collar clamps round both barrels over the holes. Its two
+      ring grooves meet between the barrels, so one plenum feeds both.
+      - Smoke fills each barrel ahead of the shirt and spills out of the muzzle. On a shot, the shirt
+        pushes it out in front.
+      - The holes sit ahead of the shirt, so they don't leak the shot until the shirt has passed.
+      - Drill the polycarbonate slowly with a sharp bit and deburr; the clamps still never drill it.
+      - These two tubes flex with elevation, like the air loops.
+    - **One goes to a vent under the front bumper** (through the bellypan, front left).
+    - **One goes to a nozzle low in the rear panel**, centred under the open middle. It runs along the
+      bellypan, under the gun's swing and over the electronics shelf. That's the back trail.
+    - Keep the ducts short and sloped so condensed fluid drains back. Check the core's tab layout and outlet
+      tube when they arrive, before printing the tray and splitter.
+
+## Wheels (from your vector-wheel file, TTB-0010)
+32. **Same style as your TTB wheel, scaled to 10 in.**
+    - 10 rollers, 42 mm across and 104 mm long (rev B had 14 at 30 mm).
+    - A lobed hub rim with a printed cup round each roller end, like the TTB's hooked lugs.
+    - One change: the rollers keep a true mecanum barrel profile instead of the TTB's straight
+      cylinders. At 10 in, a straight roller rides on its corners and the wheel bumps.
+    - Coverage +6%, with 5 mm between neighbouring rollers.
+33. **Rollers on 608 2RS and a fixed M8 rod.**
+    - PETG-CF core, 3 mm TPU 95A tread (1.8 mm at the ends), a 608 pressed 8 mm into each end.
+    - The rod doesn't turn; the bearings do. It threads through a captured M8 nyloc in the outboard
+      cup (Loctite 243) and bottoms in a blind hole in the inboard cup. The outboard plate covers the
+      nut channels, so a rod can't back out.
+    - Each cup's stub sits in the roller's end recess and presses only on the bearing's inner race.
+    - Nuts, not tapped aluminum: the rods sit at 45 deg to the plates, so a flat plate can't be
+      tapped square to them.
+    - To change a roller: take off the outboard plate (8 nuts), unscrew the rod by a slot cut in its
+      end, and the roller drops out.
+34. **Hub: two halves, as big as the bed allows.**
+    - Split at the roller centre plane. Each half is 242 mm across and prints face down.
+    - The bed would take 250 mm, but the rim stops 6 mm inside the tread so it never touches the floor.
+    - Each half is a lobed face web, a drum ring, 6 spokes and a 1/2 hex boss.
+35. **Aluminum: 12 flat 1/8 in plates (waterjet), three per wheel.**
+    - The inboard plate is the belt's inner flange.
+    - A centre disc sits between the two halves.
+    - The outboard plate is lobed, the same shape as the rim.
+    - 8 x 1/4-20 x 5-1/2 in bolts clamp the stack (M6 x 130 fits the same holes). The plates' hex holes
+      put the wheel load on the axle through aluminum, not plastic.
+36. **Pulley: 116T HTD 5M, 15 mm, printed into the inboard half.**
+    - Its flange is 1.27 in off the floor. 118T would be 1.20 in.
+    - 9.67:1 from the Falcon's 12T (was 10:1); free speed 28.8 ft/s.
+    - The stock 140T belt still fits; the Falcons now sit 169 mm from the axle.
+37. **Load.** Two 608s per roller rate 2.7 kN static. At 69 kg, a wheel carries about 170 N standing
+    and about 500 N on a 3 g bump, often all on one roller: over 5x margin. The printed cups are the
+    weakest link, and the plates and bolts carry their load to the axle.
+38. **The cost of the width.**
+    - Each wheel is 120 mm wide (rev B 94). The outer rails stay put (27.7 in over the bumpers), so
+      the inner rails and Falcons moved 26.5 mm inboard: the inner rails are now 104-129 mm off centre.
+    - The electronics shelf narrowed to +/-100 mm, with the boards rearranged on it.
+    - The fill block moved 25 mm inboard, clear of the rear-left wheel.
+    - The tank lines now run inboard of the rail posts.
+    - The pivot bearing blocks follow the rails and are now 20 mm wide (was 47); both flanged hex
+      bearings still fit, and the pivot stubs are shorter to match.
+39. **Weight: 3.3 kg a wheel** (rev B 2.4), so +3.6 kg for four.
+40. **Cost: +$60.85.** The 608s, rod, nylocs, bolts and Loctite replace the 685ZZ and M5 lines. The
+    Bolt Depot prices are from search snippets, so check stock when you order.
 
 ## Things I'd flag
-32. **Cost: $1,827.38.**
-    - By section: gun $843, pressure side $344, controls $208, drive $130, frame and body $92, bumpers
-      $89, elevation $74, smoke $48.
-    - The chamber ($397) is the biggest line. The old tank's nameplate and a compressor-dealer or used
-      price could cut most of it.
-33. **Weight is about 146 lb** (66 kg); the gun is 13.6 kg.
-34. **Check before ordering:**
-    - the old valve's coil voltage and the old tank's nameplate;
-    - the CPT44-5 pack count;
+41. **Cost: $1,707.39**, inside the $2,000 ceiling.
+    - By section: gun $564, pressure side $360, controls $208, drive $191, smoke $131, frame and body $92,
+      bumpers $89, elevation $74.
+    - The biggest lines are the second SZW-25 ($128), the two tanks ($113) and the polycarbonate ($84).
+      The U.S. Solid valve ($60) would save $68 if you'd rather not match the old one.
+42. **Weight is about 148 lb**, with the new wheels and pipe chambers; the gun is 11.4 kg.
+43. **Check before ordering:**
+    - the old valve's coil voltage (it must be the 12 V DC coil);
+    - the CPT44-5 pack count (you need 3 blocks);
     - the Aignep coil and plug;
-    - the smoker's size, current and outlet.
-35. **The Onshape model is imported STEP** (dumb solids), with the gun posed at 20 deg. To change it,
+    - the fog cores' tabs and outlet tube when they arrive;
+    - the Bolt Depot and AliExpress stock (search snippets only).
+44. **The Onshape model is imported STEP** (dumb solids), with the gun posed at 20 deg. To change it,
     edit `cad/glacis`, run `python robot.py`, and replace the changed tabs.
