@@ -243,3 +243,19 @@ Every call is in `docs/glacis/JUDGMENTS.md`. The ones that change earlier decisi
   bottom.
 - **Body:** 60 deg front, more lean on the sides and back. The LED strips run in a channel through every
   frame member, backlighting the panels.
+
+## 2026-11-02 - Glacis rev C wheels: vector style on 608s (proposed, waiting on Micah)
+
+Micah sent a small 3D-printed vector wheel (TTB-0010) and asked for the same style, much larger and able
+to carry a lot of weight: aluminum-reinforced but with flat parts, 608 2RS bearings and M8 threaded rod,
+the biggest hub the bed takes, and an integrated 15 mm HTD 5M pulley 1.25 in off the floor. Details are in
+`docs/glacis/JUDGMENTS.md` (Wheels).
+
+- **10 rollers, 42 mm x 104 mm** (was 14 at 30 mm), each on two 608 2RS turning on a fixed M8 rod held
+  by a captured nyloc in the outboard cup. Barrel profile kept (not the TTB's straight cylinders).
+- **Hub in two PETG-CF halves, 242 mm across**, split at the roller centre plane; the inboard half
+  carries a **116T** pulley (flange 1.27 in off the floor). Ratio 9.67:1 (was 10:1).
+- **Three flat 1/8 in aluminum plates per wheel** on 8 x 1/4-20 through-bolts.
+- **Wheels are 120 mm wide (was 94)**: the inner rails and Falcons moved 26.5 mm inboard; the
+  electronics shelf, fill block and tank lines were refit around them.
+- Parts list +$60.85, now $1,888.23. Wheels +0.9 kg each.

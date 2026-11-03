@@ -21,7 +21,7 @@ Each item says what I picked and why. Numbers come from `cad/glacis/params.py` a
 - every part is a single solid.
 
 **Where it is:** Onshape "Brophy Mark 5 - Glacis" holds the rev C tabs and the "Glacis rev C (whole
-robot)" assembly (468 parts). The parts list is the "Glacis BOM" tab: **$1,827.38** to buy (rev B was
+robot)" assembly (484 parts). The parts list is the "Glacis BOM" tab: **$1,888.23** to buy (rev B was
 $1,555.11). Aluminum, acrylic, prints, Falcons, FRC stash parts and the old cannon's valve and chamber
 are all at $0.
 
@@ -180,17 +180,63 @@ are all at $0.
     - The smoker's box in the CAD is a placeholder. Measure the real one and its outlet before printing
       the cradle and adapter.
 
+## Wheels (from your vector-wheel file, TTB-0010)
+32. **Same style as your TTB wheel, scaled to 10 in.**
+    - 10 rollers, 42 mm across and 104 mm long (rev B had 14 at 30 mm).
+    - A lobed hub rim with a printed cup round each roller end, like the TTB's hooked lugs.
+    - One change: the rollers keep a true mecanum barrel profile instead of the TTB's straight
+      cylinders. At 10 in, a straight roller rides on its corners and the wheel bumps.
+    - Coverage +6%, with 5 mm between neighbouring rollers.
+33. **Rollers on 608 2RS and a fixed M8 rod.**
+    - PETG-CF core, 3 mm TPU 95A tread (1.8 mm at the ends), a 608 pressed 8 mm into each end.
+    - The rod doesn't turn; the bearings do. It threads through a captured M8 nyloc in the outboard
+      cup (Loctite 243) and bottoms in a blind hole in the inboard cup. The outboard plate covers the
+      nut channels, so a rod can't back out.
+    - Each cup's stub sits in the roller's end recess and presses only on the bearing's inner race.
+    - Nuts, not tapped aluminum: the rods sit at 45 deg to the plates, so a flat plate can't be
+      tapped square to them.
+    - To change a roller: take off the outboard plate (8 nuts), unscrew the rod by a slot cut in its
+      end, and the roller drops out.
+34. **Hub: two halves, as big as the bed allows.**
+    - Split at the roller centre plane. Each half is 242 mm across and prints face down.
+    - The bed would take 250 mm, but the rim stops 6 mm inside the tread so it never touches the floor.
+    - Each half is a lobed face web, a drum ring, 6 spokes and a 1/2 hex boss.
+35. **Aluminum: 12 flat 1/8 in plates (waterjet), three per wheel.**
+    - The inboard plate is the belt's inner flange.
+    - A centre disc sits between the two halves.
+    - The outboard plate is lobed, the same shape as the rim.
+    - 8 x 1/4-20 x 5-1/2 in bolts clamp the stack (M6 x 130 fits the same holes). The plates' hex holes
+      put the wheel load on the axle through aluminum, not plastic.
+36. **Pulley: 116T HTD 5M, 15 mm, printed into the inboard half.**
+    - Its flange is 1.27 in off the floor. 118T would be 1.20 in.
+    - 9.67:1 from the Falcon's 12T (was 10:1); free speed 28.8 ft/s.
+    - The stock 140T belt still fits; the Falcons now sit 169 mm from the axle.
+37. **Load.** Two 608s per roller rate 2.7 kN static. At 69 kg, a wheel carries about 170 N standing
+    and about 500 N on a 3 g bump, often all on one roller: over 5x margin. The printed cups are the
+    weakest link, and the plates and bolts carry their load to the axle.
+38. **The cost of the width.**
+    - Each wheel is 120 mm wide (rev B 94). The outer rails stay put (27.7 in over the bumpers), so
+      the inner rails and Falcons moved 26.5 mm inboard: the inner rails are now 104-129 mm off centre.
+    - The electronics shelf narrowed to +/-100 mm, with the boards rearranged on it.
+    - The fill block moved 25 mm inboard, clear of the rear-left wheel.
+    - The tank lines now run inboard of the rail posts.
+    - The pivot bearing blocks follow the rails and are now 20 mm wide (was 47); both flanged hex
+      bearings still fit, and the pivot axle is 53 mm shorter.
+39. **Weight: 3.3 kg a wheel** (rev B 2.4), so +3.6 kg for four.
+40. **Cost: +$60.85.** The 608s, rod, nylocs, bolts and Loctite replace the 685ZZ and M5 lines. The
+    Bolt Depot prices are from search snippets, so check stock when you order.
+
 ## Things I'd flag
-32. **Cost: $1,827.38.**
-    - By section: gun $843, pressure side $344, controls $208, drive $130, frame and body $92, bumpers
+41. **Cost: $1,888.23.**
+    - By section: gun $843, pressure side $344, controls $208, drive $191, frame and body $92, bumpers
       $89, elevation $74, smoke $48.
     - The chamber ($397) is the biggest line. The old tank's nameplate and a compressor-dealer or used
       price could cut most of it.
-33. **Weight is about 146 lb** (66 kg); the gun is 13.6 kg.
-34. **Check before ordering:**
+42. **Weight is about 151 lb** (68.6 kg, with the new wheels); the gun is 13.5 kg.
+43. **Check before ordering:**
     - the old valve's coil voltage and the old tank's nameplate;
     - the CPT44-5 pack count;
     - the Aignep coil and plug;
     - the smoker's size, current and outlet.
-35. **The Onshape model is imported STEP** (dumb solids), with the gun posed at 20 deg. To change it,
+44. **The Onshape model is imported STEP** (dumb solids), with the gun posed at 20 deg. To change it,
     edit `cad/glacis`, run `python robot.py`, and replace the changed tabs.

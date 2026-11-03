@@ -1,5 +1,5 @@
 drive: built
-gun: valves at x 60.9 from the axle, centre of mass (0.2, -0.1) mm, 13.6 kg
+gun: valves at x 60.9 from the axle, centre of mass (0.2, -0.1) mm, 13.5 kg
 gun well: floor at z 437 where it meets the front, 388 at the back, 232 under the axle
 elevation belt pitch length 500 mm (100.0 teeth)
 body: 36 faces, volume 107.3 L
@@ -9,26 +9,26 @@ frame network volume 4.82 L, 40 corner clips
 31 edges
 56 pieces (14 nodes)
 joints: 60 tapered tenons with M4 cross screws, 6 ends without a neighbour piece
-body: 56 frame pieces (8 slivers dropped), 9 panels, 40 clips, LED slot 12.4 m
-built 468 parts in 47 s
+body: 56 frame pieces (6 slivers dropped), 9 panels, 40 clips, LED slot 12.4 m
+built 484 parts in 156 s
 envelope at  0 deg: 44.9 L x 27.8 W x 31.2 H in
 envelope at 90 deg: 37.8 L x 27.8 W x 50.1 H in
 body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
-mass estimate 66.0 kg (146 lb): body 6.0, bumper 1.5, drive 11.8, frame 5.5, gun 13.6, pneu 9.5, power 18.0
-gun 13.6 kg, CG 0 mm ahead / -0 mm above the pivot -> 0.0 N*m at 0 deg
-interference: 0 pairs over 30 mm^3 (25 s)
-elevation sweep 0-90 deg: 0 clashes (4 s)
+mass estimate 68.6 kg (151 lb): body 6.0, bumper 1.5, drive 15.1, frame 5.0, gun 13.5, pneu 9.5, power 18.0
+gun 13.5 kg, CG 0 mm ahead / -0 mm above the pivot -> 0.0 N*m at 0 deg
+interference: 0 pairs over 30 mm^3 (92 s)
+elevation sweep 0-90 deg: 0 clashes (5 s)
 printed parts over a 256 mm bed: 0 []
 parts in more than one piece: 0 []
-exported Frame, pivot & drive: 87 parts, 6.7 MB
-exported Wheel FL: 31 parts, 5.4 MB
-exported Wheel FR: 31 parts, 6.0 MB
-exported Wheel RL: 31 parts, 5.5 MB
-exported Wheel RR: 31 parts, 5.9 MB
+exported Frame, pivot & drive: 87 parts, 6.6 MB
+exported Wheel FL: 35 parts, 6.8 MB
+exported Wheel FR: 35 parts, 7.5 MB
+exported Wheel RL: 35 parts, 6.8 MB
+exported Wheel RR: 35 parts, 7.5 MB
 exported Gun (at 20 deg): 46 parts, 2.2 MB
-exported Air, power & electronics: 72 parts, 2.0 MB
+exported Air, power & electronics: 72 parts, 1.9 MB
 exported Panels, clips, standoffs & bumpers: 83 parts, 2.1 MB
 exported Body frame 1 of 2: 28 parts, 7.8 MB
-exported Body frame 2 of 2: 28 parts, 7.5 MB
-BOM rollup: 141 distinct items -> /Users/user/Documents/Workspace/brophy-tshirt-cannon/cad/glacis/out/parts_from_cad.csv
+exported Body frame 2 of 2: 28 parts, 7.7 MB
+BOM rollup: 145 distinct items -> /Users/user/Documents/Workspace/brophy-tshirt-cannon-wheel/cad/glacis/out/parts_from_cad.csv
 renders written

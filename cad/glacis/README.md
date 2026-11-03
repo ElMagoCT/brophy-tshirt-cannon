@@ -11,7 +11,7 @@ The whole Glacis robot as a parametric CadQuery model. Every shared number is in
 | File | What it builds |
 |---|---|
 | `params.py` | Layout: frame bands, belts, rollers, body outline, pivot, gun, tanks, smoke machine |
-| `drive.py` | 1x2/1x1 box-tube frame, gussets, drive plates, Falcons, belts, printed mecanum (hub, aluminum side plates, rollers), hex axles |
+| `drive.py` | 1x2/1x1 box-tube frame, gussets, drive plates, Falcons, belts, vector-style printed mecanum (two-half hub with the 116T, 3 flat aluminum plates, rollers on 608s and fixed M8 rods), hex axles |
 | `gun.py` | Two in-line cannons (1 gal chamber -> Atlantic Valves SZW-25 -> breech adapter -> polycarbonate barrel), balanced on the axle between them; cradle, mantlet with smoke vents, pivot axle, elevation pulley, its sweep envelope |
 | `fittings.py` | NPT fittings placed along a run with real thread make-up |
 | `body.py` | Body shell (60 deg front, flat deck, leaning sides and back, gun well cut to the sweep envelope), panels, printed frame, panel recesses, corner clips, LED channels, sectioning, tapered tenons |

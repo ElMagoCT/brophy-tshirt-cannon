@@ -1,5 +1,6 @@
 """Base frame (1x2 / 1x1 x 1/16 aluminum box tube, 1/8 in gussets) and the four drive corners:
-Falcon 500 -> 12T WCP pulley -> 140T belt -> 120T printed into a 10 in printed mecanum (14 rollers).
+Falcon 500 -> 12T WCP pulley -> 140T belt -> 116T printed into a 10 in vector-style printed mecanum
+(10 rollers on 608 2RS + fixed M8 rods, three flat aluminum plates).
 Each wheel sits on a 1/2 in hex live axle running in flanged hex bearings in the inner and outer rails."""
 import math
 import cadquery as cq
@@ -142,35 +143,41 @@ def bolt(x, z, y_head, y_end, dia=0.5 * IN, head_af=0.75 * IN, nut=True):
     return union(parts)
 
 
-# ------------------------------------------------------------------ printed mecanum
+# ------------------------------------------------------------------ printed mecanum (vector style, after TTB-0010)
 def roller_profile(t):
     R, r0 = P.WHEEL_R, P.ROLL_R0
     s = math.sin(math.radians(P.ROLL_ANGLE))
     return math.sqrt(R * R - (t * s) ** 2) - (R - r0)
 
 
-def roller_parts():
-    """TPU tread over a PETG core, local frame: axis along +Z, centred at the origin."""
-    L = P.ROLL_L
-    ts = [-L / 2 + L * i / 20 for i in range(21)]
-    outer = [(roller_profile(t), t) for t in ts]
-    inner = [(roller_profile(t) - 3.0, t) for t in ts]
+def _rev(prof):
+    """Solid of revolution about +Z from (radius, z) points."""
+    pts = [(0, prof[0][1])] + prof + [(0, prof[-1][1])]
+    return cq.Workplane("XZ").polyline(pts).close().revolve(360, (0, 0, 0), (0, 1, 0)).val()
 
-    def rev(prof):
-        pts = [(0, prof[0][1])] + prof + [(0, prof[-1][1])]
-        return cq.Workplane("XZ").polyline(pts).close().revolve(360, (0, 0, 0), (0, 1, 0)).val()
-    tread = rev(outer).cut(rev(inner))
-    core = rev(inner)
-    core = core.cut(cyl(2.8, L + 2, (0, 0, -L / 2 - 1)))
+
+def _tread_t(t):
+    return P.TREAD_T[0] + (P.TREAD_T[1] - P.TREAD_T[0]) * (2 * t / P.ROLL_L) ** 2
+
+
+def roller_parts():
+    """TPU tread over a PETG core, local frame: axis along +Z, centred at the origin.
+    Core: a 608 2RS pressed in from each end, BRG_IN deep, behind the recess the hub's cup stub sits in."""
+    L = P.ROLL_L
+    ts = [-L / 2 + L * i / 24 for i in range(25)]
+    tread = _rev([(roller_profile(t), t) for t in ts]).cut(_rev([(roller_profile(t) - _tread_t(t), t) for t in ts]))
+    core = _rev([(roller_profile(t) - _tread_t(t), t) for t in ts])
     bd, bt = P.ROLL_BRG
+    z_seat = L / 2 - P.BRG_IN - bt                      # inner face of each bearing
+    core = core.cut(cyl(9.0, 2 * z_seat + 0.2, (0, 0, -z_seat - 0.1)))      # light bore; outer-race shoulders
     for s in (-1, 1):
-        core = core.cut(cyl(bd / 2 + 0.05, bt, (0, 0, s * L / 2 - (bt if s > 0 else 0))))
+        core = core.cut(cyl(bd / 2, bt, (0, 0, z_seat if s > 0 else -(z_seat + bt))))
+        core = core.cut(cyl(P.RECESS_R, P.BRG_IN + 1, (0, 0, L / 2 - P.BRG_IN if s > 0 else -L / 2 - 1)))
     return tread, core
 
 
 def roller_frames(hand):
-    """(centre, axis) for each roller of a wheel whose axle is along Y through the origin."""
-    a = P.WHEEL_R - P.ROLL_R0
+    """(centre, axis) for each roller of a wheel whose axle is along Y through the origin; +axis = outboard end."""
     s45 = math.sin(math.radians(P.ROLL_ANGLE))
     out = []
     for i in range(P.N_ROLL):
@@ -178,7 +185,7 @@ def roller_frames(hand):
         rad = V(math.cos(th), 0, math.sin(th))
         tan = V(-math.sin(th), 0, math.cos(th))
         axis = (V(0, 1, 0) * P.C45 + tan * (hand * s45)).normalized()
-        out.append((rad * a, axis))
+        out.append((rad * P.ROLL_A, axis))
     return out
 
 
@@ -194,67 +201,132 @@ def place(shape, centre, axis):
     return s.translate(centre)
 
 
-def _lug_ends(hand, inner):
-    out = []
+def _roller_clear(hand, extra=1.5):
+    L2 = P.ROLL_L / 2
+    ts = [-(L2 + 1) + (2 * L2 + 2) * i / 24 for i in range(25)]
+    env = _rev([(roller_profile(max(-L2, min(L2, t))) + extra, t) for t in ts])
+    return union([place(env, c, ax) for c, ax in roller_frames(hand)])
+
+
+def _cup(c, ax, outboard):
+    """One rod end: (stub + collar, pillar back to the face web, holes).
+    Stub sits in the roller recess and bears on the 608 inner race; outboard cups get a hex channel from the
+    face to a captured M8 nyloc deep in the stub, inboard cups a blind hole the rod bottoms in."""
+    L2 = P.ROLL_L / 2
+    d = ax if outboard else ax * -1
+    e0 = c + d * (L2 - P.CUP_IN)
+    body = cyl(P.CUP_R, P.CUP_IN + P.CUP_OUT, e0.toTuple(), d.toTuple())
+    body = body.fuse(cyl(6.0, 1.0, (e0 - d * 1.0).toTuple(), d.toTuple()))
+    sg = 1 if outboard else -1
+    tip = c + d * (L2 + P.CUP_OUT / 2 + 0.5)
+    yf = sg * (P.W_FACE - P.FACE_T / 2)
+    pillar = cyl(P.CUP_R, abs(yf - tip.y), tip.toTuple(), (0, sg, 0))
+    if outboard:
+        rad = V(c.x, 0, c.z).normalized()
+        u = (rad - d * rad.dot(d)).normalized()        # a hex flat faces the wheel's radial direction
+        h0 = e0 + d * 1.0
+        hexs = cq.Workplane(cq.Plane(origin=h0, xDir=d.cross(u), normal=d)).polygon(
+            6, 13.3 / math.cos(math.pi / 6)).extrude(60.0).val()
+        holes = cyl(P.ROD_D / 2 + 0.2, 4.0, (e0 - d * 1.5).toTuple(), d.toTuple()).fuse(hexs)
+    else:
+        holes = cyl(P.ROD_D / 2 + 0.15, P.CUP_IN + 4.5, (e0 - d * 1.5).toTuple(), d.toTuple())
+    return body, pillar, holes
+
+
+def _ang(k, n, off=0.0):
+    return 2 * math.pi * k / n + off
+
+
+def _hub_cuts():
+    bolts = union([cyl(3.3, 400, (P.HUB_BOLT_R * math.cos(_ang(k, P.N_HUB_BOLT, math.pi / 8)), -200,
+                                  P.HUB_BOLT_R * math.sin(_ang(k, P.N_HUB_BOLT, math.pi / 8))), (0, 1, 0))
+                   for k in range(P.N_HUB_BOLT)])
+    light = union([cyl(13.0, 400, (43 * math.cos(_ang(k, 6)), -200, 43 * math.sin(_ang(k, 6))), (0, 1, 0))
+                   for k in range(6)])
+    return bolts, light, hex_prism(12.9, 400, (0, -200, 0), (0, 1, 0))
+
+
+def _lobes(hand, outboard):
+    """(x, z) of each cup pillar on one hub face."""
+    L2, out = P.ROLL_L / 2, []
     for c, ax in roller_frames(hand):
-        out.append((c + ax * (P.LUG_OFF if (ax.y > 0) != inner else -P.LUG_OFF), ax))
+        tip = c + (ax if outboard else ax * -1) * (L2 + P.CUP_OUT / 2 + 0.5)
+        out.append((tip.x, tip.z))
     return out
 
 
-def _roller_clear(hand, extra=1.0):
-    return union([place(cyl(P.ROLL_R0 + extra, P.ROLL_L + extra, (0, 0, -(P.ROLL_L + extra) / 2)), c, ax)
-                  for c, ax in roller_frames(hand)])
-
-
-def lug_plate(hand, inner, r_in):
-    """Annulus r_in..100 on the lug plane plus a boss and web out to every roller axle end."""
-    y0, y1 = (-P.W_LUG[1], -P.W_LUG[0]) if inner else P.W_LUG
-    parts = [tube(100.0, r_in, y1 - y0, (0, y0, 0), (0, 1, 0)) if r_in else cyl(100.0, y1 - y0, (0, y0, 0), (0, 1, 0))]
-    for end, ax in _lug_ends(hand, inner):
-        parts.append(place(cyl(P.LUG_R, P.LUG_T, (0, 0, -P.LUG_T / 2)), end, ax))
-        r_end = math.hypot(end.x, end.z)
-        ang = math.atan2(end.z, end.x)
-        parts.append(cq.Workplane("XZ", origin=(0, y1, 0)).polyline([
-            (95 * math.cos(ang - 0.07), 95 * math.sin(ang - 0.07)),
-            ((r_end + 2) * math.cos(ang - 0.05), (r_end + 2) * math.sin(ang - 0.05)),
-            ((r_end + 2) * math.cos(ang + 0.05), (r_end + 2) * math.sin(ang + 0.05)),
-            (95 * math.cos(ang + 0.07), 95 * math.sin(ang + 0.07))]).close().extrude(y1 - y0).val())
-    return union(parts)
-
-
-WHEEL_BOLTS = [(70.0 * math.cos(math.radians(30 + 60 * k)), 70.0 * math.sin(math.radians(30 + 60 * k)))
-               for k in range(6)]
+def _scallop(lobes, y0, t, r_base=96.0, r_lobe=14.0):
+    """TTB-style rim: a base disc with a lobe round every cup, along +y from y0, trimmed to HUB_R."""
+    shapes = [cyl(r_base, t, (0, y0, 0), (0, 1, 0))]
+    for lx, lz in lobes:
+        a = math.atan2(lz, lx)
+        pts = [(lx + r_lobe * math.cos(2 * math.pi * k / 24), lz + r_lobe * math.sin(2 * math.pi * k / 24))
+               for k in range(24)]
+        pts += [(r_base * 0.97 * math.cos(a + da), r_base * 0.97 * math.sin(a + da)) for da in (-0.22, 0.22)]
+        shapes.append(cq.Workplane("XZ", origin=(0, y0, 0)).polyline(_hull(pts)).close().extrude(-t).val())
+    return union(shapes).intersect(cyl(P.HUB_R, t, (0, y0, 0), (0, 1, 0)))
 
 
 def wheel_parts(hand):
-    """One 10 in mecanum, wheel-local (axle along +Y through the roller centre plane).
+    """One 10 in mecanum, wheel-local (axle along +Y through the roller centre plane, +Y outboard).
 
-    Hub (one PETG print, 245 mm across): 120T pulley + both lug plates + drum + boss, 1/2 hex bore.
-    Two 1/8 in aluminum plates sandwich it on 6 x M5 through-bolts; the inner plate is the belt's inboard
-    flange. 14 rollers, each 2 x 685ZZ on an M5 x 100 axle through the lug bosses.
+    Two PETG-CF hub halves split at the roller centre plane, each a face web + drum ring + boss + spokes + cups;
+    the inboard half also carries the 116T teeth (its face web is the belt's outboard flange). Three flat 1/8 in
+    aluminum plates (inboard belt flange, centre disc, outboard disc) on 8 x 1/4-20 through-bolts clamp the stack.
+    10 rollers, each 2 x 608 2RS on a fixed M8 threaded rod that threads through a captured nyloc in the
+    outboard cup and bottoms in the inboard cup's blind hole; the outboard plate covers the channels.
     """
     clear = _roller_clear(hand)
-    pr = P.pd(P.T_WHEEL) / 2
-    pul = cyl(pr - 0.57, P.W_PULLEY[1] - P.W_PULLEY[0], (0, P.W_PULLEY[0], 0), (0, 1, 0))
-    flange = cyl(pr + 2.9, P.W_FLANGE[1] - P.W_FLANGE[0], (0, P.W_FLANGE[0], 0), (0, 1, 0))
-    drum = tube(94.0, 82.0, P.W_LUG[0] * 2 + 0.2, (0, -P.W_LUG[0] - 0.1, 0), (0, 1, 0))
-    boss = cyl(22.0, P.W_LUG[1] - P.W_PULLEY[0], (0, P.W_PULLEY[0], 0), (0, 1, 0))
-    hub = union([pul, flange, drum, boss, lug_plate(hand, True, 40.0), lug_plate(hand, False, 0.0)])
-    hub = hub.cut(union([place(cyl(2.7, P.ROLL_L + 40, (0, 0, -(P.ROLL_L + 40) / 2)), c, ax)
-                         for c, ax in roller_frames(hand)]))
-    hub = hub.cut(clear)
-    hub = hub.cut(hex_prism(12.9, 400, (0, -200, 0), (0, 1, 0)))
-    holes = union([cyl(2.75, 400, (bx, -200, bz), (0, 1, 0)) for bx, bz in WHEEL_BOLTS])
-    light = union([cyl(14.0, P.W_PULLEY[1] - P.W_PULLEY[0] + 1, (48 * math.cos(math.radians(60 * k)), P.W_PULLEY[0] - 0.5,
-                                                                  48 * math.sin(math.radians(60 * k))), (0, 1, 0))
-                   for k in range(6)])
-    hub = hub.cut(holes).cut(light)
-    out = [("Wheel hub + 120T", hub, "Mecanum hub + 120T pulley (one print)", "PETG, 6 walls, 40% gyroid; 1/2 hex bore")]
-    for tag, (y0, y1), r in (("inner", P.W_INNER_PLATE, pr + 2.9), ("outer", P.W_OUTER_PLATE, 98.0)):
-        pl = cyl(r, y1 - y0, (0, y0, 0), (0, 1, 0)).cut(hex_prism(12.9, 40, (0, y0 - 10, 0), (0, 1, 0)))
-        pl = pl.cut(holes).cut(clear)
-        out.append((f"Wheel plate {tag} (1/8 Al)", pl, "Mecanum side plate (1/8 Al)", "router or waterjet; 6 x M5"))
+    bolts, light, hexb = _hub_cuts()
+    frames = roller_frames(hand)
+    yc = P.W_CENTRE_PLATE[1]
+    out = []
+    for outboard in (True, False):
+        sg = 1 if outboard else -1
+        y0, y1 = (yc, P.W_FACE) if outboard else (P.W_PULLEY[0], -yc)
+        r0, r1 = (yc, P.W_FACE) if outboard else (-P.W_FACE, -yc)
+        fy = P.W_FACE - P.FACE_T if outboard else -P.W_FACE
+        parts = [_scallop(_lobes(hand, outboard), fy, P.FACE_T).cut(cyl(18.0, P.FACE_T + 2, (0, fy - 1, 0), (0, 1, 0))),
+                 tube(83.0, 72.0, r1 - r0, (0, r0, 0), (0, 1, 0)),
+                 cyl(22.0, y1 - y0, (0, y0, 0), (0, 1, 0))]
+        parts += [cq.Solid.makeBox(8.0, y1 - y0, 56.0, V(-4.0, y0, 18.0)).rotate(V(0, 0, 0), V(0, 1, 0), 60 * k + 30)
+                  for k in range(6)]
+        parts += [cyl(7.5, y1 - y0, (P.HUB_BOLT_R * math.cos(_ang(k, P.N_HUB_BOLT, math.pi / 8)), y0,
+                                     P.HUB_BOLT_R * math.sin(_ang(k, P.N_HUB_BOLT, math.pi / 8))), (0, 1, 0))
+                  for k in range(P.N_HUB_BOLT)]
+        if not outboard:
+            parts.append(tube(P.pd(P.T_WHEEL) / 2 - 0.57, 72.0, P.W_PULLEY[1] - P.W_PULLEY[0], (0, P.W_PULLEY[0], 0),
+                              (0, 1, 0)))                 # teeth ring on the spokes
+        cups, holes = [], []
+        for c, ax in frames:
+            b, pil, h = _cup(c, ax, outboard)
+            cups.append(b)
+            parts.append(pil)
+            holes.append(h)
+        hub = union(parts).cut(clear).fuse(union(cups))
+        hub = hub.intersect(cyl(P.HUB_R, y1 - y0, (0, y0, 0), (0, 1, 0)))
+        hub = hub.cut(union(holes)).cut(bolts).cut(light).cut(hexb).clean()
+        hub = max(hub.Solids(), key=lambda s: s.Volume())          # drop slivers the nut channels shave off the rim
+        if outboard:
+            out.append(("Wheel hub outboard", hub, "Mecanum hub, outboard half",
+                        "PETG-CF, 5 walls, 40% gyroid, face down; 10 x M8 nyloc captured"))
+        else:
+            out.append(("Wheel hub inboard + 116T", hub, "Mecanum hub, inboard half + 116T pulley",
+                        "PETG-CF, 5 walls, 40% gyroid, teeth down"))
+    for tag, (y0, y1), r in (("inner", P.W_INNER_PLATE, P.FLANGE_R), ("centre", P.W_CENTRE_PLATE, 83.0),
+                             ("outer", P.W_OUTER_PLATE, None)):
+        pl = (cyl(r, y1 - y0, (0, y0, 0), (0, 1, 0)) if r else _scallop(_lobes(hand, True), y0, y1 - y0))
+        pl = pl.cut(hexb).cut(bolts).cut(light)
+        out.append((f"Wheel plate {tag} (1/8 Al)", pl, f"Mecanum {tag} plate (1/8 Al)", "waterjet; 1/2 hex + 8 x 1/4-20"))
     return out
+
+
+def rod():
+    """Fixed M8 roller rod, local frame like roller_parts: from 0.2 short of the inboard blind-hole bottom to
+    flush with the outboard nyloc."""
+    L2 = P.ROLL_L / 2
+    a0, a1 = -(L2 + 3.0 - 0.2), L2 - P.CUP_IN + 2.0 + 8.0
+    return cyl(P.ROD_D / 2, a1 - a0, (0, 0, a0))
 
 
 # ------------------------------------------------------------------ build
@@ -297,6 +369,7 @@ def build(log=print):
             bom="Bellypan half (1/8 Al)", kind="stock", note="rivets to the inner rails")
 
     tread, core = roller_parts()
+    m8 = rod()
     for front in (True, False):
         for sgn, side in ((1, "L"), (-1, "R")):
             corner = ("F" if front else "R") + side
@@ -317,6 +390,7 @@ def build(log=print):
             yf = sgn * P.DRIVE_PLATE_Y[0]
             add(f"Falcon 500 {corner}", falcon(fx, fz, yf, sgn), "falcon", "drive", bom="Falcon 500 (owned)")
             band0 = P.YMID + P.W_PULLEY[0] if sgn > 0 else -(P.YMID + P.W_PULLEY[1])
+            band0 += 0.5                                       # 15 mm belt centred on 16 mm of teeth
             add(f"Falcon pulley 12T {corner}", htd_pulley(P.T_PIN, 15.0, band0 - 3.0, fx, fz, bore=8.6),
                 "alu", "drive", bom="WCP-0319 12T HTD 15 mm Falcon pulley")
             add(f"Belt {P.BELT_T}T {corner}", belt_loop((fx, fz), P.pd(P.T_PIN) / 2, (ax, P.AXLE_Z),
@@ -335,7 +409,10 @@ def build(log=print):
                 add(f"Roller tread {corner}{i:02d}", put(place(tread, c, axv)), "tpu", "drive",
                     bom="Mecanum roller tread (TPU 95A)", kind="print")
                 add(f"Roller core {corner}{i:02d}", put(place(core, c, axv)), "print_d", "drive",
-                    bom="Mecanum roller core (PETG)", kind="print", note="2 x 685ZZ, M5 x 100 axle")
+                    bom="Mecanum roller core (PETG-CF)", kind="print", note="2 x 608 2RS pressed in")
+                add(f"Roller rod {corner}{i:02d}", put(place(m8, c, axv)), "steel", "drive",
+                    bom="M8 threaded rod, roller axle (cut 109 mm)", kind="stock",
+                    note="Loctite 243 in the captured nyloc; slot the outboard end")
             # live axle: 1/2 hex in two flanged hex bearings (outer rail inner wall, inner rail outer wall)
             add(f"Bearing hex wheel {corner} outer", rail_bearing(ax, sgn * P.OUTER_RAIL_Y[0], P.AXLE_Z, sgn), "steel",
                 "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")

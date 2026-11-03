@@ -113,7 +113,7 @@ def _tank_shell(axis, c):
 
 
 REAR_MAN = (-347.0, 93.5, 275.0)             # rear manifold centre, back bottom, behind the rear panel
-FILL = (-248.6, 80.0, 200.0)                 # fill block centre (5-port), back bottom bay
+FILL = (-248.6, 55.0, 200.0)                 # fill block centre (5-port), back bottom bay
 CHECKS = []                                  # outlets of the two inline check valves (service loops start here)
 FOG_OUT = []                                 # fog splitter barbs for the two gun lines
 
@@ -204,12 +204,11 @@ def air():
     for side, dy in (("left", 45.0), ("right", -45.0)):
         t = tank_out[side]
         sg = 1 if side == "left" else -1
-        if sg > 0:                                         # under the sled rails' inboard ends, then up beside the manifold
-            mid = [(-325.0, 112.0, 245.0), (-325.0, 112.0, 330.0)]
-        else:                                              # across the bay above the boards
-            mid = [(-330.0, -40.0, 245.0), (mx + 2.0, my + dy, 330.0)]
-        pts = [t, (t[0] - 20.0, sg * 120.0, 262.0), (-200.0, sg * 112.0, 245.0)] + mid + \
-              [(mx, my + dy, 330.0), (mx, my + dy, top + 18.0)]
+        # inboard of the rail posts (|y| 104+) and outside the gun, over the Falcons, then up between the sled
+        # posts and across to the manifold above the sled rails
+        xr = -295.0 if sg > 0 else -330.0                 # the right one rises behind service loop B
+        pts = [t, (t[0], sg * 98.0, 262.0), (xr, sg * 98.0, 245.0), (xr, sg * 98.0, 330.0),
+               (mx, my + dy, 330.0), (mx, my + dy, top + 18.0)]
         add(f"Tube tank {side}", tube_path(pts), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
     tf = [(mx + 12.7 + 18.0, my - 40.0, mz), (sx1 - 70.0, fy, mz - 20.0), (sx1 - 70.0, fy, fz), (sx1 - 37.0 - 22.0, fy, fz)]
     add("Tube to fill valve", tube_path(tf), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
@@ -256,7 +255,8 @@ def batteries_and_electronics():
     for sgn, side in ((1, "left"), (-1, "right")):
         for xr in (-320.0, -215.0):
             post(f"Sled post {side} {xr:.0f} (1x1)", xr, sgn * IY, P.RAIL_Z[1], P.RAIL_Z[1] + 104.0)
-            tube_part(f"Sled rail {side} {xr:.0f} (1x1)", "y", sgn * 118.0, sgn * 262.0, xr, P.RAIL_Z[1] + 104.0 + 12.7)
+            tube_part(f"Sled rail {side} {xr:.0f} (1x1)", "y", sgn * P.INNER_RAIL_Y[0], sgn * 262.0, xr,
+                      P.RAIL_Z[1] + 104.0 + 12.7)
         ya, yb = sorted([sgn * (P.BATT_Y[0] - 3.0), sgn * (P.BATT_Y[1] + 4.0)])
         sled = box(P.BATT_X[0] - 4.0, P.BATT_X[1] + 4.0, ya, yb, zs, P.BATT_Z)
         for (x0, x1) in ((P.BATT_X[0] - 4.0, P.BATT_X[0] - 2.0), (P.BATT_X[1] + 2.0, P.BATT_X[1] + 4.0)):
@@ -279,19 +279,19 @@ def batteries_and_electronics():
     add("Power distribution (REV PDH)", box(-370.0, -267.0, -86.5, 86.5, zb, zb + 36), "black", "power",
         bom="REV PDH (owned) + ATO breakers / fuses (stash)")
     add("Main breaker 120 A", box(-255.0, -218.0, -20.0, 20.0, zb, zb + 40), "black", "power", bom="120 A main breaker (stash)")
-    shelf = box(-380.0, -180.0, -125.0, 125.0, 150.0, 154.0)
-    for (x, y) in ((-372, -117), (-372, 117), (-188, -117), (-188, 117)):
+    shelf = box(-380.0, -180.0, -100.0, 100.0, 150.0, 154.0)          # between the inner rails (|y| 104+)
+    for (x, y) in ((-372, -92), (-372, 92), (-188, -92), (-188, 92)):
         shelf = shelf.fuse(box(x - 5, x + 5, y - 5, y + 5, zb, 150.0))
     add("Electronics shelf", shelf, "print", "power", bom="Electronics shelf", kind="print")
     z = 154.0
-    boards = [("STM32 Nucleo-F446RE (main controller)", -375, -305, -102, -20, 20, "pcb", "STM32 Nucleo-64 NUCLEO-F446RE"),
-              ("ESP32-S3 WiFi bridge", -295, -226, -48, -20, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8"),
-              ("ESP32-S3 safety node", -295, -226, -84, -56, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8"),
-              ("PWM gate (74AHCT125)", -295, -245, -122, -96, 12, "pcb", "SN74AHCT125N quad buffer + perfboard"),
-              ("Spark MAX (elevation)", -220, -185, -125, -55, 25, "black", "REV Spark MAX (owned)"),
-              ("Safety relay 40 A", -375, -347, -125, -107, 36, "black", "12 V 40 A SPDT relay + socket"),
-              ("Valve + fog drivers (relays, ULN2803A)", -378, -308, 10, 70, 32, "pcb", "12 V 40 A SPDT relay + socket"),
-              ("Buck 12-5 V 20 A", -378, -322, 75, 125, 25, "black", "12->5 V 20 A buck (B089M5R3NJ)")]
+    boards = [("STM32 Nucleo-F446RE (main controller)", -375, -305, -98, -16, 20, "pcb", "STM32 Nucleo-64 NUCLEO-F446RE"),
+              ("ESP32-S3 WiFi bridge", -298, -229, -48, -20, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8"),
+              ("ESP32-S3 safety node", -298, -229, -84, -56, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8"),
+              ("PWM gate (74AHCT125)", -298, -248, -12, 14, 12, "pcb", "SN74AHCT125N quad buffer + perfboard"),
+              ("Spark MAX (elevation)", -220, -185, -98, -28, 25, "black", "REV Spark MAX (owned)"),
+              ("Safety relay 40 A", -220, -192, -20, -2, 36, "black", "12 V 40 A SPDT relay + socket"),
+              ("Valve + fog drivers (relays, ULN2803A)", -378, -308, -6, 54, 32, "pcb", "12 V 40 A SPDT relay + socket"),
+              ("Buck 12-5 V 20 A", -300, -244, 45, 95, 25, "black", "12->5 V 20 A buck (B089M5R3NJ)")]   # under the fill valve
     for name, x0, x1, y0, y1, h, col, bom in boards:
         add(name, box(x0, x1, y0, y1, z, z + h), col, "power", bom=bom)
     # bottom of the rear panel: E-stop, standby charge port (fill port and bleed come out of the manifold)
