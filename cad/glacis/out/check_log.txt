@@ -1,39 +1,45 @@
 drive: built
-gun: valves at x 67.7 from the axis, centre of mass (0.3, -0.0) mm, 11.5 kg; chambers 0.53 L each, barrels 8.0 mm apart
-gun well: floor at z 470 where it meets the front, 328 at the back, 195 under the axle
-elevation belt pitch length 500 mm (100.0 teeth)
-body: 36 faces, volume 110.6 L
-shell volume 23.43 L, 1 solid
-9 panels
-frame network volume 6.79 L, 42 corner clips, strip 12.1 m in 9 panel loops + 9.5 m in 37 frame tunnels
-47 edges
-89 pieces (27 nodes, 1 extra glued splits to fit the bed)
-joints: 101 tapered tenons with M4 cross screws, 3 ends without a neighbour piece
-body: 89 frame pieces (5 slivers dropped), 9 panels, 40 clips, LED strip 12.1 m in panel loops + 9.5 m in the frame
-built 588 parts in 106 s
-envelope at  0 deg: 45.8 L x 27.8 W x 27.9 H in
-envelope at 90 deg: 37.8 L x 27.8 W x 51.0 H in
+gun: valves at x 73.1 from the axis, centre of mass (0.4, -0.0) mm, 11.1 kg; chambers 0.53 L each, barrels 8.0 mm apart
+gun well: floor at z 473 where it meets the front, 341 at the back, 205 under the axle
+elevation belt pitch length 675 mm (135.0 teeth)
+underglow: 2.5 m of strip under the bumpers
+body: 44 faces, volume 111.1 L
+shell volume 23.27 L, 1 solid
+8 panels
+frame network volume 5.31 L, 40 corner clips, strip 10.6 m in 8 panel loops + 8.3 m in 28 frame tunnels
+42 edges
+cheek L: 3 segments + 3 node parts -> 2 piece(s), main [159, 162, 187]
+cheek R: 3 segments + 3 node parts -> 2 piece(s), main [162, 186, 187]
+75 pieces (22 nodes, 0 extra glued splits to fit the bed)
+joints: 77 tapered tenons with M4 cross screws, 0 ends without a neighbour piece
+body: 75 frame pieces (3 slivers dropped), 8 panels, 38 clips, LED strip 10.6 m in panel loops + 8.3 m in the frame
+built 587 parts in 282 s
+envelope at  0 deg: 46.1 L x 27.8 W x 27.9 H in
+envelope at 90 deg: 37.8 L x 27.8 W x 51.2 H in
 body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
-mass estimate 71.0 kg (157 lb): body 7.2, bumper 1.5, drive 14.8, frame 5.0, gun 11.5, pneu 10.0, power 20.9
-gun 11.5 kg, CG 0 mm ahead / -0 mm above the pivot -> 0.0 N*m at 0 deg
-interference: 0 pairs over 30 mm^3 (48 s)
-elevation sweep 0-90 deg: 0 clashes (5 s)
+mass estimate 70.5 kg (155 lb): body 6.5, bumper 1.7, drive 15.0, frame 5.0, gun 11.1, pneu 10.0, power 21.3
+gun 11.1 kg, CG 0 mm ahead / -0 mm above the pivot -> 0.0 N*m at 0 deg
+interference: 1 pairs over 30 mm^3 (124 s)
+    (201, 'Service loop B (bottom cannon)', 'Service loop A (top cannon)')
+elevation sweep 0-90 deg: 0 clashes (25 s)
 printed parts over a 256 mm bed: 0 []
 parts in more than one piece: 0 []
-exported Frame, pivot & drive: 87 parts, 6.6 MB
-exported Wheel FL: 35 parts, 7.0 MB
-exported Wheel FR: 35 parts, 7.7 MB
-exported Wheel RL: 35 parts, 7.0 MB
-exported Wheel RR: 35 parts, 7.7 MB
-exported Gun (at 20 deg): 55 parts, 1.9 MB
-exported Air, power & electronics: 80 parts, 2.2 MB
-exported Panels, clips, standoffs & bumpers: 85 parts, 2.2 MB
-exported Body frame 1 of 6: 14 parts, 4.4 MB
-exported Body frame 2 of 6: 15 parts, 6.1 MB
-exported Body frame 3 of 6: 15 parts, 5.5 MB
-exported Body frame 4 of 6: 15 parts, 5.4 MB
-exported Body frame 5 of 6: 15 parts, 7.9 MB
-exported Body frame 6 of 6: 15 parts, 4.4 MB
-exported Lights & speakers: 52 parts, 1.8 MB
-BOM rollup: 193 distinct items -> /Users/user/Documents/Workspace/brophy-tshirt-cannon/cad/glacis/out/parts_from_cad.csv
+exported Chassis, pivot & drive: 87 parts, 6.6 MB
+exported Wheel FL: 35 parts, 6.9 MB
+exported Wheel FR: 35 parts, 7.6 MB
+exported Wheel RL: 35 parts, 6.9 MB
+exported Wheel RR: 35 parts, 7.6 MB
+exported Gun (at 20 deg): 53 parts, 2.6 MB
+exported Pneumatics: 46 parts, 1.1 MB
+exported Power, electronics & smoke: 40 parts, 1.1 MB
+exported Bumpers & wall standoffs: 48 parts, 1.4 MB
+exported Lights & speakers 1 of 2: 25 parts, 4.8 MB
+exported Lights & speakers 2 of 2: 25 parts, 4.1 MB
+exported Body frame 1 of 5: 15 parts, 7.5 MB
+exported Body frame 2 of 5: 15 parts, 8.2 MB
+exported Body frame 3 of 5: 15 parts, 6.0 MB
+exported Body frame 4 of 5: 15 parts, 7.3 MB
+exported Body frame 5 of 5: 15 parts, 6.6 MB
+exported Body panels & clips: 48 parts, 1.7 MB
+BOM rollup: 189 distinct items -> /Users/user/Documents/Workspace/brophy-tshirt-cannon/cad/glacis/out/parts_from_cad.csv
 renders written

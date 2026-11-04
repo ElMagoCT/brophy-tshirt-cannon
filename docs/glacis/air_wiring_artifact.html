@@ -248,10 +248,10 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <text class="t-b" x="384" y="489" text-anchor="middle">12 V fogger</text>
             <text class="t-s" x="384" y="504" text-anchor="middle">200 W core + blower</text>
             <path class="smk" d="M468 492H520"/>
-            <circle class="sym" cx="528" cy="492" r="8"/><text x="528" y="476" text-anchor="middle">1→4 splitter</text>
+            <circle class="sym" cx="528" cy="492" r="8"/><text x="528" y="476" text-anchor="middle">1→3 splitter</text>
             <path class="smk" marker-end="url(#ms)" d="M536 498Q560 530 600 530"/><text x="606" y="534">Front vent · under the bumper</text>
-            <path class="smk" marker-end="url(#ms)" d="M532 500Q548 556 600 556"/><text x="606" y="560">Rear vent · bottom of the rear panel</text>
-            <path class="smk" d="M536 488H1036V350"/><text class="t-s" x="790" y="480" text-anchor="middle">two tubes up to the gun</text>
+            <path class="smk" marker-end="url(#ms)" d="M532 500Q548 556 600 556"/><text x="606" y="560">Rear vent · down through the bellypan</text>
+            <path class="smk" d="M536 488H1036V350"/><text class="t-s" x="790" y="480" text-anchor="middle">one tube up through the gun core</text>
             <rect class="ext" x="1028" y="131" width="16" height="218" rx="3" style="stroke:var(--smoke)"/>
             <circle class="hole" cx="1036" cy="139" r="3"/><circle class="hole" cx="1036" cy="161" r="3"/>
             <circle class="hole" cx="1036" cy="319" r="3"/><circle class="hole" cx="1036" cy="341" r="3"/>
@@ -335,7 +335,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <path class="pw" d="M290 120H858"/>
             <rect class="box" x="858" y="104" width="78" height="32" rx="3"/><text x="897" y="124" text-anchor="middle">Spark MAX</text>
             <path class="pw" marker-end="url(#mp)" d="M936 120H998"/>
-            <rect class="box" x="1000" y="104" width="176" height="32" rx="3"/><text x="1088" y="119" text-anchor="middle">goBILDA motor</text><text class="t-s" x="1088" y="131" text-anchor="middle">gun elevation</text>
+            <rect class="box" x="1000" y="104" width="176" height="32" rx="3"/><text x="1088" y="119" text-anchor="middle">goBILDA 312 rpm</text><text class="t-s" x="1088" y="131" text-anchor="middle">gun elevation · 7:1 belt</text>
             <path class="pw" d="M290 200H330"/>
             <rect class="box" x="330" y="184" width="92" height="32" rx="3"/><text x="376" y="199" text-anchor="middle">LED buck</text><text class="t-s" x="376" y="211" text-anchor="middle">12 → 5 V 20 A</text>
             <path class="p5" d="M422 200H476V232H998"/>
@@ -505,7 +505,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     charge: "<b>Charge.</b> A shop compressor fills the three 6 L tanks (up to 200 psi; most shop compressors stop at 135–175) through the rear fill plug, an M-style quick-connect your universal coupler snaps onto, with a check valve behind it. PT1 reports tank pressure. The 200 psi relief on the same manifold has its pull ring at the rear panel: pull it to dump the tanks by hand. There's no bleed valve.",
     fill: "<b>Fill.</b> With the manual main valve open, the STM32 pulses one chamber's in valve until that chamber's sensor (PT2 or PT3) reads its own setpoint: up to 190 psi on top (the 725 psi valve), 110 on the bottom (the SZW-25). The in valves hold tank pressure the rest of the time, which pushes their seats shut. No check valves: a closed in valve is what keeps one shot from emptying the other chamber.",
     fire: "<b>Fire.</b> The web UI asks and the safety node keeps the valve rail live (the remote is a second E-stop with a link LED). The STM32 switches one firing valve through its MOSFET; the chamber dumps into the barrel and the shirt goes.",
-    smoke: "<b>Smoke.</b> The STM32 holds the 200 W fog core at 220–240 °C (5–8 min to warm up), then runs the pump and the blower through MOSFETs. A 250 °C cutout drops the core's relay on its own, a DS18B20 in the fogger box cuts the heater at 70 °C, and the level switch plus the pump's run time track the fluid. One splitter feeds the barrel collar (smoke fills each barrel ahead of the shirt and spills out of the muzzle) and the trail vents front and rear.",
+    smoke: "<b>Smoke.</b> The STM32 holds the 200 W fog core at 220–240 °C (5–8 min to warm up), then runs the pump and the blower through MOSFETs. A 250 °C cutout drops the core's relay on its own, a DS18B20 in the fogger box cuts the heater at 70 °C, and the level switch plus the pump's run time track the fluid. A 1→3 splitter feeds the barrel collar through one tube that runs up inside the gun's core (smoke fills each barrel ahead of the shirt and spills out of the muzzle), plus trail vents that point down through the bellypan, front and rear.",
     drive: "<b>Drive and aim.</b> The STM32 sends PWM through the gate to the four Falcons and the Spark MAX; the gate only passes it while the safety node enables it. The pot closes the elevation loop. The LEDs run off their own switched 5 V buck.",
     horn: "<b>Horn.</b> The web UI sends a sound. The ESP32-C5 bridge streams it over I2S to a PCM5102A DAC, and a TPA3116 amp (24 V from a boost converter, about 26 W a channel) drives the two 100 W slim siren speakers high in the front corners, aimed 45 deg out and 30 deg up.",
     safe: "<b>Safety trips.</b> Remote heartbeat lost for 200 ms, remote or rear E-stop, the STM32 heartbeat stopping, or PT1 over 210 psi: the safety node opens the relay (valves dead) and disables the gate (motors stop). The rear E-stop's second contact also opens the contactor, so the whole PDH dies while the logic stays up, and the STM32 stays off until you re-arm from the UI. The reliefs work with no power at all: 200 psi on the tanks, the valve cross and the top chamber, 125 psi on the bottom chamber. Their pull rings are the hand dump."

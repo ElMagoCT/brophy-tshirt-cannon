@@ -6,6 +6,9 @@ outward, transducer to the side) -> 1 x 1/4 bushing -> chamber (2 x 1 reducing c
 nipple, 2 x 1 reducing coupling, about 0.53 L) -> 1 in close nipple -> 1 in solenoid valve (the old Atlantic
 Valves SZW-25 on top, a U.S. Solid USS2-01023 below; 12 V DC, normally closed, coil pointing outward) -> 1 in close nipple -> CNC breech adapter (the
 barrel slips over its spigot) -> clear polycarbonate barrel. The barrels sit GUN_GAP apart.
+Rev C.3: a narrow core (cradle plates CRADLE_Y0 off the centre plane); a one-piece flowing mantlet, smoke collar
+and muzzle ring that slide on from the muzzle; every tube (both fill lines and the smoke line) runs inside the core
+and leaves through the bottom just behind the pivot, so the service loops barely move as the gun swings.
 Gun-local frame: origin on the pivot axis, +X along the barrels, +Z up. The cannons are built, their centre of
 mass is found from the parts' masses, and they are shifted so it lands on the axis: the gun balances in any
 pose. The axis is carried by two 1/2 hex stubs, one bolted to each cradle plate.
@@ -59,6 +62,30 @@ def valve(xv, h, s):
 
 AD_BODY, AD_SHOULDER, AD_SPIGOT = 30.0, 10.0, 40.0              # breech adapter lengths along the axis
 SMOKE_HOLE_X = AD_SPIGOT + 165.0                             # from the barrel's breech end: just past a 6 in rolled shirt
+ACCENT_T = 8.5                                               # wall of the smoke collar and muzzle ring round the barrels
+SMOKE_Y = 22.0                                               # smoke line: in the valley between the barrels, z = 0
+FILL_LANES = (-10.0, -22.0)                                  # fill lines (top, bottom cannon): y in the chambers' valley
+FILL_DOWN = ((-20.0, -44.0), (-30.0, -44.0))                 # (x, y) where each fill line drops out of the core
+SMOKE_DOWN = (-8.0, 42.0)                                    # ... and the smoke line (where the bottom reducer is narrow)
+
+
+def _rounded_prism(x0, L, W, H, r, edge=0.0):
+    """Rounded rectangle W (y) x H (z), corner radius r, along +x from x0; edge > 0 rounds both end faces' rims."""
+    s = cq.Workplane("YZ", origin=(x0, 0, 0)).rect(W, H).extrude(L).edges("|X").fillet(r)
+    if edge:
+        s = s.faces("<X or >X").edges().fillet(edge)
+    return s.val()
+
+
+def _rrect(x, W, H, r):
+    f = cq.Face.makeFromWires(cq.Workplane("YZ", origin=(x, 0, 0)).rect(W, H).val())
+    return f.fillet2D(r, f.Vertices()).outerWire()
+
+
+def _groove(xg, W, H, r, w=6.0, d=2.5):
+    """Band round a rounded-rectangle part's outside: a 5 mm LED strip groove w wide and d deep at x = xg."""
+    return _rounded_prism(xg - w / 2, w, W + 4, H + 4, r + 2).cut(
+        _rounded_prism(xg - w / 2 - 1, w + 2, W - 2 * d, H - 2 * d, r - d))
 
 
 def adapter():
@@ -92,12 +119,6 @@ def _cannon(k, xv):
         bar = bar.cut(cyl(2.5, 20, (xh, 0, h), (0, math.cos(a), math.sin(a))))
     gadd(f"Barrel {tag}", bar, "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock",
          note=f"{P.BARREL_LEN / IN:.1f} in; 6 x 5 mm smoke holes {SMOKE_HOLE_X:.0f} mm from the breech end")
-    xe = b0 + P.BARREL_LEN
-    mz = cyl(46.0, 25.0, (xe - 25.0, 0, h), (1, 0, 0)).cut(cyl(P.BARREL_OD / 2 + 0.2, 30, (xe - 27.0, 0, h), (1, 0, 0)))
-    mz = mz.cut(tube(44.0, 42.0, 6.0, (xe - 15.0, 0, h), (1, 0, 0)))
-    mz = mz.intersect(box(xe - 30, xe + 5, -100, 100, 0.25 if s > 0 else -200, 200 if s > 0 else -0.25))
-    gadd(f"Muzzle ring {tag}", mz, "print", bom="Muzzle collar half (LED groove)", kind="print",
-         note="the two halves meet between the barrels")
     ci = Chain((xv - hl, 0, h), (-1, 0, 0), "F", gadd, f"{tag} chamber ")
     ci.nipple("1", bom="1 in Sch 40 close nipple (1-1/2 in)")
     r = P.RED
@@ -117,8 +138,8 @@ def _cannon(k, xv):
     tip = ci.at(ci.s)
     ports[0].male_end("relief 125 psi", 44.0, 19.0, bom="Relief valve 125 psi 1/4 MNPT, ASME, pull ring (Milton 1090-125)",
                       extra=relief_cap)
-    ports[1].male_end("transducer 0-200 psi", 56.0, 20.0, color="steel",
-                      bom="Pressure transducer 0-200 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)")
+    ports[1].male_end("transducer 0-300 psi", 56.0, 20.0, color="steel",
+                      bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH) (+ 1/4 x 1/8 bushing)")
     return tip, ax0
 
 
@@ -151,8 +172,9 @@ def _build(xv):
         gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al)", kind="stock")
     # chamber saddles: one block between the two nipples at each station, a printed cap bolted over each outer half
     cyls = [cyl(R_PIPE + 0.5, 1200, (xr - 1100, 0, h), (1, 0, 0)) for h in H]
+    lanes = union([cyl(3.8, 1200, (xr - 1100, y, 0), (1, 0, 0)) for y in FILL_LANES])   # fill lines pass through
     for xs in xs_list:
-        sad = box(xs - 14, xs + 14, -CRADLE_Y0, CRADLE_Y0, H[1], H[0]).cut(cyls[0]).cut(cyls[1])
+        sad = box(xs - 14, xs + 14, -CRADLE_Y0, CRADLE_Y0, H[1], H[0]).cut(cyls[0]).cut(cyls[1]).cut(lanes)
         gadd(f"Chamber saddle {xs:.0f}", sad, "print", bom="Chamber saddle", kind="print",
              note="PETG-CF, screws through both cradle plates; caps close the outer halves")
         for k, h in enumerate(H):
@@ -160,10 +182,11 @@ def _build(xv):
             z0, z1 = (h + 0.5, h + 200) if s > 0 else (h - 200, h - 0.5)
             cap = tube(R_PIPE + 6.0, R_PIPE + 0.5, 20.0, (xs - 10, 0, h), (1, 0, 0)).intersect(box(xs - 11, xs + 11, -200, 200, z0, z1))
             fz0, fz1 = (h + 0.5, h + 6.5) if s > 0 else (h - 6.5, h - 0.5)
+            yh = (R_PIPE + 6.0 + CRADLE_Y0 - 0.5) / 2 + 1.0       # M5 head clears the cap's ring
             for sy in (1, -1):                                  # flanges onto the saddle, one M5 each into an insert
                 fl = box(xs - 10, xs + 10, min(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)),
                          max(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)), fz0, fz1)
-                cap = cap.fuse(fl.cut(cyl(2.75, 20, (xs, sy * (R_PIPE + 26.0), fz0 - 1), (0, 0, 1))))
+                cap = cap.fuse(fl.cut(cyl(2.75, 20, (xs, sy * yh, fz0 - 1), (0, 0, 1))))
             gadd(f"Chamber cap {TAGS[k]} {xs:.0f}", cap.clean(), "print", bom="Chamber cap", kind="print",
                  note="PETG-CF, 2 x M5 into heat-set inserts in the saddle")
     for k, h in enumerate(H):
@@ -178,43 +201,47 @@ def _build(xv):
     bb = box(ax0 + AD_BODY - 2.0, xb1, -CRADLE_Y0, CRADLE_Y0, -bz, bz)
     for h in H:
         bb = bb.cut(cyl(P.BARREL_OD / 2 + 0.3, 200, (ax0, 0, h), (1, 0, 0))).cut(cyl(25.5, 40, (ax0 - 5, 0, h), (1, 0, 0)))
+    bb = bb.cut(cyl(6.6, 200, (ax0 - 50, SMOKE_Y, 0), (1, 0, 0)))             # smoke line channel, split by the halves
     for z0, z1, tag in ((0.0, bz, "upper"), (-bz, 0.0, "lower")):
         gadd(f"Breech block {tag}", bb.intersect(box(-1000, 1000, -500, 500, z0 + (0.5 if z0 == 0 else 0), z1 - (0.5 if z1 == 0 else 0))),
              "print", bom="Breech block half", kind="print", note="the halves clamp both barrels onto their spigots")
-    # mantlet (LED groove), then the smoke collar round both barrels over their smoke holes
-    mz0, mz1 = xb1 + 2.0, xb1 + 50.0
-    span = P.PITCH
-    w0 = cq.Workplane("YZ", origin=(mz0, 0, 0)).rect(2 * CRADLE_Y0 - 4, span + 130).val()
-    w1 = cq.Workplane("YZ", origin=(mz1, 0, 0)).rect(2 * CRADLE_Y0 - 34, span + 90).val()
-    man = cq.Solid.makeLoft([cq.Wire.assembleEdges(w0.Edges()), cq.Wire.assembleEdges(w1.Edges())], True)
-    i0 = cq.Workplane("YZ", origin=(mz0 - 1, 0, 0)).rect(2 * CRADLE_Y0 - 16, span + 118).val()
-    i1 = cq.Workplane("YZ", origin=(mz1 - 6, 0, 0)).rect(2 * CRADLE_Y0 - 46, span + 78).val()
-    man = man.cut(cq.Solid.makeLoft([cq.Wire.assembleEdges(i0.Edges()), cq.Wire.assembleEdges(i1.Edges())], True))
-    for h in H:
-        man = man.cut(cyl(P.BARREL_OD / 2 + 1.0, 80, (mz0 - 5, 0, h), (1, 0, 0)))
-    for z0, z1, tag in ((-span / 2 - 70, 0, "lower"), (0, span / 2 + 70, "upper")):
-        gadd(f"Mantlet {tag}", man.intersect(box(mz0 - 2, mz1 + 2, -100, 100, z0, z1)), "print",
-             bom="Mantlet half (LED groove)", kind="print")
-    # smoke collar: two printed halves clamped round both barrels; one plenum (the two ring grooves meet between
-    # the barrels) over the six holes in each barrel, fed by a barb on each side
-    xc = b0s[0] + SMOKE_HOLE_X
+    # mantlet, smoke collar and muzzle ring: one-piece prints that slide on from the muzzle in that order, all
+    # rounded rectangles round both barrels with rounded rims; the mantlet flows (smooth loft) from the breech
+    # block's face to a stadium hugging the barrels. LED grooves on the mantlet and muzzle ring
     rb = P.BARREL_OD / 2
-    cz = P.PITCH / 2 + rb + 8.0
-    col = box(xc - 16, xc + 16, -(rb + 9.0), rb + 9.0, -cz, cz)
+    mz0, mz1 = xb1 + 2.0, xb1 + 50.0
+    W0, H0 = 2 * CRADLE_Y0 - 2.0, 2 * bz
+    W1, H1 = P.BARREL_OD + 12.0, P.PITCH + P.BARREL_OD + 12.0
+    secs = [(mz0, W0, H0, 16.0), (mz0 + 28.0, (W0 + W1) / 2 + 1.0, (H0 + H1) / 2 + 1.0, 30.0),
+            (mz1 - 5.0, W1, H1, W1 / 2 - 1.0), (mz1, W1 - 6.0, H1 - 6.0, W1 / 2 - 4.0)]
+    man = cq.Solid.makeLoft([_rrect(*s) for s in secs], False)
+    inner = [(mz0 - 1.0, W0 - 8.0, H0 - 8.0, 12.0), (mz0 + 28.0, secs[1][1] - 8.0, secs[1][2] - 8.0, 26.0),
+             (mz1 - 8.0, W1 - 8.0, H1 - 8.0, W1 / 2 - 5.0)]
+    man = man.cut(cq.Solid.makeLoft([_rrect(*s) for s in inner], False))
+    for h in H:
+        man = man.cut(cyl(rb + 1.0, 80, (mz0 - 5, 0, h), (1, 0, 0)))
+    man = man.cut(cyl(6.9, 80, (mz0 - 5, SMOKE_Y, 0), (1, 0, 0)))
+    man = man.cut(_groove(mz0 + 14.0, (W0 + secs[1][1]) / 2, (H0 + secs[1][2]) / 2, 23.0))
+    gadd("Mantlet", man.clean(), "print", bom="Mantlet (printed, one piece, LED groove)", kind="print",
+         note="slides on from the muzzle first and screws to the breech block; a 5 mm strip in its groove")
+    # smoke collar: one plenum (the two ring grooves meet between the barrels) over the six holes in each barrel,
+    # fed from the back by the gun's smoke line in a socket at z = 0
+    xc = b0s[0] + SMOKE_HOLE_X
+    Wa, Ha = 2 * (rb + ACCENT_T), P.PITCH + 2 * (rb + ACCENT_T)
+    col = _rounded_prism(xc - 16, 32.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
     for h in H:
         col = col.cut(cyl(rb + 0.3, 40, (xc - 20, 0, h), (1, 0, 0))).cut(tube(rb + 5.0, rb, 14.0, (xc - 7, 0, h), (1, 0, 0)))
-    fog_tips = []
-    zb = -10.0                                               # barbs and side channels sit in the lower half
-    for yy in (1, -1):
-        col = col.cut(cyl(4.5, rb + 10.0, (xc, 0, zb), (0, yy, 0)))
-    for z0, z1, tag in ((0.25, cz, "upper"), (-cz, -0.25, "lower")):
-        half = col.intersect(box(xc - 20, xc + 20, -100, 100, z0, z1))
-        if tag == "lower":
-            for yy in (1, -1):
-                half = half.fuse(tube(7.5, 4.5, 16.0, (xc, yy * (rb + 9.0), zb), (0, yy, 0)))
-                fog_tips.append(V(xc, yy * (rb + 25.0), zb))
-        gadd(f"Smoke collar {tag}", half, "print", bom="Smoke collar half (printed)", kind="print",
-             note="seals on the barrels with a bead of RTV; barbs take the flexible smoke tubes")
+    col = col.cut(cyl(6.5, 10.0, (xc - 17, SMOKE_Y, 0), (1, 0, 0))).cut(cyl(3.5, 9.0, (xc - 8, SMOKE_Y, 0), (1, 0, 0)))
+    col = col.cut(cyl(3.5, SMOKE_Y + 1.0, (xc, SMOKE_Y, 0), (0, -1, 0)))
+    gadd("Smoke collar", col, "print", bom="Smoke collar (printed, one piece)", kind="print",
+         note="slides on from the muzzle; seals on the barrels with a bead of RTV; the smoke line plugs into its rear port")
+    xe = b0s[0] + P.BARREL_LEN
+    mz = _rounded_prism(xe - 25.0, 25.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
+    for h in H:
+        mz = mz.cut(cyl(rb + 0.2, 30, (xe - 27.0, 0, h), (1, 0, 0)))
+    mz = mz.cut(_groove(xe - 12.5, Wa, Ha, rb + ACCENT_T - 0.5))
+    gadd("Muzzle ring", mz, "print", bom="Muzzle ring (printed, one piece, LED groove)", kind="print",
+         note="slides on last, flush with the barrel ends; a 5 mm strip in its groove")
     # pivot: a 1/2 hex stub per side, through a hub on the plate's outer face, flush with its inner face
     ya = P.BEARING_BLOCK_Y[1] + 1.0
     for sy, tag, y_lo, y_hi in ((1, "left", CRADLE_Y0, ya + 12.0), (-1, "right", -ya, -CRADLE_Y0)):
@@ -224,14 +251,26 @@ def _build(xv):
         hub = cyl(16.0, 10.0, (0, y_h, 0), (0, sy, 0)).cut(hex_prism(12.9, 14.0, (0, y_h - sy, 0), (0, sy, 0)))
         gadd(f"Axle hub {tag}", hub, "print_d", bom="Axle hub", kind="print", note="PA-CF, 6 x M3 to the cradle plate")
     pul = elevation_pulley().translate(V(0, -P.ELEV_PULLEY_Y[1], 0))
-    gadd("Elevation pulley 56T", pul, "print_d", bom="Elevation pulley 56T HTD 9 mm", kind="print", note="hex bore")
-    # supply tube from each chamber's fill push-to-connect: straight back, then to the side of the well
+    gadd(f"Elevation pulley {P.ELEV_T[1]}T", pul, "print_d", bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm", kind="print",
+         note="hex bore")
+    # every tube runs inside the core and drops out of its bottom just behind the pivot: each fill line from its
+    # chamber's push-to-connect round the back, forward in the valley between the chambers (through the saddles),
+    # out beside the bottom reducer; the smoke line from the collar back along the barrels' valley, through the
+    # mantlet and breech block, between the valves
+    z_exit = -(zo + 4.0)
     exits = []
     for k, t in enumerate(fills):
-        pts = [t, V(t.x - 25.0, 0, t.z)]                     # straight back on the centreline (the Falcons sit outboard)
-        gadd(f"Gun tube {TAGS[k]}", _tube_path(pts), "tube", bom="DOT nylon tube 1/4 OD (ft)", kind="stock")
+        xd, yd = FILL_DOWN[k]
+        xb = t.x - 18.0
+        pts = [t, V(xb, 0, t.z), V(xb, FILL_LANES[k], 0), V(xd, FILL_LANES[k], 0), V(xd, yd, 0), V(xd, yd, z_exit)]
+        gadd(f"Gun tube {TAGS[k]}", _tube_path(pts), "tube", bom="DOT nylon tube 1/4 OD (ft)", kind="stock",
+             note="inside the core; leaves the bottom behind the pivot")
         exits.append(pts[-1])
-    return exits, fog_tips
+    xd, yd = SMOKE_DOWN
+    pts = [V(xc - 7.5, SMOKE_Y, 0), V(xd, SMOKE_Y, 0), V(xd, yd, 0), V(xd, yd, z_exit)]
+    gadd("Gun smoke tube", _tube_path(pts, r=6.35), "tube", bom="Silicone tube 3/8 ID x 1/2 OD (ft)", kind="stock",
+         note="collar to the bottom of the core")
+    return exits, [pts[-1]]
 
 
 def build(log=print):

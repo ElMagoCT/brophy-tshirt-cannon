@@ -112,31 +112,42 @@ BUMP_Z = (GROUND_CLEAR, GROUND_CLEAR + 2 * NOODLE_D)
 # ------------------------------------------------------------------ body (printed frame + recessed acrylic)
 ACRYLIC_T = 0.125 * IN
 PANEL_MAX = (18 * IN, 36 * IN)
-MEM_W, MEM_H = 26.0, 24.0                   # printed member: width on each panel, depth inward
-REBATE_W = 14.0                             # panel edge overlaps the member by this much
+MEM_W, MEM_H = 19.0, 24.0                   # printed member: width on each panel, depth inward
+REBATE_W = 7.0                              # panel edge overlaps the member by this much (rev C.2 had 14); the outer
+                                            # lip stays MEM_W - REBATE_W = 12
 CLIP_T = 2.5                                # printed corner clips sit flush, panel sits CLIP_T below the face
 REBATE_D = CLIP_T + ACRYLIC_T + 0.3
-CLIP_LEG = 27.0                             # corner clip legs along the frame (rev C.1 discs reached ~14)
+CLIP_R, CLIP_OVER = 15.0, 6.0               # corner clip: round head radius, how far it laps over the acrylic
+INSERT = (2.8, 10.0)                        # M4 heat-set insert hole: radius, depth (every panel screw is an M4 x 12)
+WINDOW_R, ACRYLIC_R = 22.5, 28.0            # convex and concave corners of the frame windows and the acrylic round off
 NODE_SETBACK = 48.0
 PRINT_MAX = 240.0
 TENON = (6.5, 6.5, 12.0, 0.5)
 TENON_CLEAR = 0.15
-LED_RAIL = (2.5, 21.0, 43.0, 15.0)          # panel light rail: wall, from/to depth, lean toward the panel (deg)
-LED_RAIL_INSET = (42.0, 29.0)               # the rail's panel-side face is this far in from a panel edge at the strip's
-                                            # centre depth: (edge shared with another panel, open or coplanar edge).
-                                            # Every corner here is 91-100 deg: 42 keeps each panel's strip on its own
-                                            # side of the corner; 29 keeps the bottom runs under the rear controls.
-                                            # A flange at the member's inner face carries the rail
-LED_CORNER = 45.0                           # rail and loop corners round off at this radius (less where a panel is
+LED_RAIL = (2.5, 17.0, 43.0, 15.0)          # panel light rail: wall, from/to depth, lean toward the panel (deg) on
+                                            # the straight runs; the corners stand square to the panel (a strip
+                                            # can't bend round a cone) and the lean ramps in over LED_TWIST
+LED_TWIST = 40.0
+RAIL_FACE = dict(shared=42.0, coplanar=19.0, open=19.0, slot=24.0, notch=30.0, notch_top=46.0)
+                                            # the rail's strip face is this far in from a panel edge at the strip's
+                                            # centre depth. Shared corner edges need 42: a neighbour's rail hangs
+                                            # square to its own panel, so any closer it sits right behind this panel's
+                                            # acrylic (a dark shelf) and its cross runs cut through this loop. Edges
+                                            # with no neighbour (bottom, front cut, coplanar seams) sit just behind
+                                            # the window edge; the gun-well edges clear the pivot blocks, the speaker
+                                            # notches their cups (the deck's run under a cup's slanted wall) and the
+                                            # elevation motor. A flange at the member's inner face carries the rail
+LED_CORNER = 22.5                           # rail and loop corners round off at this radius (less where a panel is
                                             # too narrow)
 LED_LOOP = (10.0, 1.6, 35.0)                # 60/m strip on the rail: width, thickness, centre depth (1.15 in
                                             # behind the panel's back face)
 FRAME_STRIP = (5.0, 1.0)                    # 100/m strip in each frame tunnel: width, thickness
 TUNNEL = (6.0, 2.6)                         # frame light: tunnel for a 5 mm strip (width, height), LEDs facing out
 TUNNEL_GAP = 7.05                           # tunnel centre this far outward of the tenon centre (2.5 mm of wall)
-FEED = (12.0, 33.0)                         # feed slot from the inside at each end of a tunnel, from the vertex
-TUNNEL_SKIN = 9.5                           # slots and tunnel ends stop this far under any outer face
-CORE_DEPTH = 18.5                           # tenons sit this deep, inward of the light tunnel
+FEED = (17.0, 38.0)                         # feed slot from the inside at each end of a tunnel, from the vertex
+                                            # (clear of the corner-clip inserts)
+TUNNEL_SKIN = 7.0                           # slots and tunnel ends stop this far under any outer face
+CORE_DEPTH = 15.5                           # tenons sit this deep, inward of the light tunnel (inside a 19 mm member)
 
 Y_S = OUTER_RAIL_Y[1] + MEM_H               # side wall outer face at its bottom edge
 TUMBLE = 8.0                                # side walls lean in this much
@@ -171,12 +182,21 @@ def front_x(z, inner=False):
     return x - MEM_H / math.sin(math.radians(FRONT_ANGLE)) if inner else x
 
 
+HOOD_LIGHT = (138.0, 500.0, 18.0, 39.0)     # hood light pod in each cheek: |y|, z of its axis (straight ahead), pod
+                                            # radius, length; its front stands at the cheek face's height-mid + 4
+
+
+def hood_x():
+    """x of a hood light pod's front face."""
+    return FRAME_X - (HOOD_LIGHT[1] - Z_WALL_BOT) / math.tan(math.radians(FRONT_ANGLE)) + 4.0
+
+
 # ------------------------------------------------------------------ speakers (rev C.2)
 SPEAKER = (140.0, 146.0, 51.0)              # slim 100 W siren speaker: width, height, depth (UBL 100W Slim, 5.5 x 5.75 x 2 in)
 SPK_CLEAR, SPK_WALL, SPK_GRILLE = 4.0, 4.0, 4.0   # pocket clearance round it, printed cup wall, grille thickness
 SPEAKERS = [  # (tag, end of the front-side corner edge, distance along it, aim out from straight, aim up, seat depth,
               #  slid inboard). A bottom pair (22.5 out, 15 up) doesn't fit: see JUDGMENTS
-    ("top", "top", 90.0, 45.0, 30.0, 55.0, 0.0),
+    ("top", "top", 90.0, 45.0, 30.0, 68.0, 0.0),        # sunk 13 mm deeper in rev C.3
 ]
 
 
@@ -193,13 +213,14 @@ CH_PIPE, CH_NIPPLE_L = "2", 8.0 * IN
 RED = dict(L=71.0, OD_IN=44.0, OD_OUT=76.0, BAND_IN=16.0, BAND_OUT=26.0, MASS=0.31)   # 2 x 1 (CNSD4005, 10.9 oz)
 GUN_GAP = 8.0                               # between the barrels (and between the reducers' wide ends)
 PITCH = BARREL_OD + GUN_GAP                 # cannons at z = +/- PITCH / 2 about the axis
-CRADLE_Y0 = 79.7                            # inner faces of the two cradle plates (room for the smoke vents)
+CRADLE_Y0 = 50.0                            # inner faces of the two cradle plates: a narrow core (reducers r 38, tubes
+                                            # drop beside the bottom one)
 X_VALVE = 83.0                              # valve centre ahead of the axis (from the balance calc, see gun.py)
 CH_SADDLE_S = (110.0, 205.0)                # chamber saddles, distance behind the valve's rear face
 ELEV_RANGE = (0.0, 90.0)
 ELEV_SHOW = 20.0
-ELEV_T = (16, 56)                           # goBILDA pinion -> pulley on the right axle end (HTD 5M 9 mm)
-ELEV_BELT_T = 100
+ELEV_T = (16, 112)                          # goBILDA 312 rpm pinion -> pulley on the right axle end (HTD 5M 9 mm), 7:1
+ELEV_BELT_T = 135
 ELEV_PULLEY_Y = (95.0, 108.0)               # |y| of the elevation pulley, just outside the gun
 Y_GUN = CRADLE_Y0 + PLATE_T                 # half width of the gun over its cradle plates
 
@@ -228,6 +249,8 @@ BATT_X = (-336.0, -336.0 + BATT[0])         # one battery each side, long axis a
 BATT_Y = (145.0, 145.0 + BATT[1])           # |y|: they slide out the side walls
 ELEC_BAY = ((-380.0, -192.0), (-100.0, 100.0), (BELLY_Z, 250.0))   # back bottom
 FOG_BOX = ((190.0, 350.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # custom 12 V fogger (2 x 200 W cores), front bay
+FOG_VENTS = ((368.0, 80.0), (-140.0, 0.0))  # smoke trails (x, y), both down through the bellypan: front under the bumper,
+                                            # rear just ahead of the electronics bay
 
 
 def summary():

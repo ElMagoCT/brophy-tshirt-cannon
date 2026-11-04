@@ -60,14 +60,15 @@ def towers_and_pivot():
         for yb, d in ((y0, sgn), (y1, -sgn)):
             add(f"Pivot bearing {side} {yb:.0f}", fr8(px, sgn * yb, pz, d, hexbore=True), "steel", "frame",
                 bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
-    # elevation: goBILDA 5203 (99.5:1, 60 rpm) on a Spark MAX, 16T -> 56T HTD 5M 9 mm belt on the right axle end
+    # elevation: goBILDA 5203 (19.2:1, 312 rpm: backdrives easily when off) on a Spark MAX, 16T -> 112T HTD 5M 9 mm
+    # belt on the right axle end (7:1, about 45 rpm free at the gun). Gearbox drawn at the 3-stage length (conservative)
     mx_, mz_ = P.ELEV_MOTOR_X, P.ELEV_MOTOR_Z
     ya, yb_ = P.ELEV_PULLEY_Y
     y_face = -(yb_ + 2.0)
     mot = cyl(18.0, 50.3, (mx_, y_face, mz_), (0, -1, 0)).fuse(cyl(18.75, 74.8, (mx_, y_face - 50.3, mz_), (0, -1, 0))).fuse(
         cyl(4.0, 23.5, (mx_, y_face, mz_), (0, 1, 0)))
-    add("Elevation motor goBILDA 5203 99.5:1", mot, "black", "frame",
-        bom="goBILDA 5203-2402-0100 Yellow Jacket 99.5:1, 60 rpm (FTC motor)", note="Spark MAX, brushed mode")
+    add("Elevation motor goBILDA 5203 19.2:1", mot, "black", "frame",
+        bom="goBILDA 5203-2402-0019 Yellow Jacket 19.2:1, 312 rpm (FTC motor)", note="Spark MAX, brushed mode")
     pin = cyl(P.pd(P.ELEV_T[0]) / 2 + 2.5, yb_ - ya, (mx_, -yb_, mz_), (0, 1, 0)).cut(
         cyl(4.1, 40, (mx_, -yb_ - 5, mz_), (0, 1, 0)))
     add("Elevation pinion 16T", pin, "print_d", "frame", bom="Elevation pinion 16T HTD 9 mm (8 mm REX bore)", kind="print")
@@ -114,9 +115,11 @@ def _tank_shell(axis, c):
 
 
 REAR_MAN = (-347.0, 93.5, 250.0)             # rear manifold centre, back bottom, behind the rear panel
+MAIN_Y = 40.0                                # main ball valve's elbow off the manifold's back face (y)
+MAIN_OUT = []
 FILL = (-248.6, 55.0, 200.0)                 # fill block centre (5-port), back bottom bay
 CHECKS = []                                  # outlets of the two in valves (service loops start here)
-FOG_OUT = []                                 # fog splitter barbs for the two gun lines
+FOG_OUT = []                                 # fog splitter barb for the gun's smoke line
 
 
 def air():
@@ -151,7 +154,7 @@ def air():
         for xs in (tx - 40.0, tx + 40.0):
             add(f"Tank strap {side} {xs:.0f}", tube(R + 2.5, R + 0.5, 25.0, (xs - 12.5, sgn * ty, tz), (1, 0, 0)), "black",
                 "pneu", bom="1 in cam-buckle strap")
-    # rear manifold (200 psi zone), back bottom: tank lines and transducer on top, Schrader fill port out through the
+    # rear manifold (200 psi zone), back bottom: tank lines and transducer on top, the fill port out through the
     # bottom of the rear panel, and the 200 psi relief beside it with its pull ring at the panel (the hand dump; no
     # bleed valve); line to the main valve on its front face
     mx, my, mz = REAR_MAN
@@ -159,19 +162,41 @@ def air():
         bom="Rear manifold: 1/4 NPT brass crosses + close nipples (built)")
     top = mz + 12.7
     add("Tank transducer 0-300 psi", cyl(10.0, 55.0, (mx, my - 15.0, mz - 12.7), (0, 0, -1)), "steel", "pneu",
-        bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT")
+        bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)")
     for dy, tag in ((-45.0, "right tank"), (35.0, "left tank")):          # left one clear of its battery sled
         add(f"Rear manifold push-to-connect {tag}", cyl(7.5, 18.0, (mx + 6.0, my + dy, top), (0, 0, 1)), "brass", "pneu",
             bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-    add("Rear manifold push-to-connect main out", cyl(7.5, 18.0, (mx + 12.7, my - 40.0, mz), (1, 0, 0)), "brass", "pneu",
-        bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
+    # main valve (rev C.3, manual): a 1/4 ball valve off the manifold's back face, turned along -y by a street
+    # elbow, its stem pointing back through the rear panel to a printed lever outside (open all session, closed for
+    # transport and gun work)
     rear = P.rear_x(mz) + P.CLIP_T + P.ACRYLIC_T          # inner face of the rear panel at this height
+    xb = mx - 12.7 - 12.3                                  # valve and elbow axis, between the manifold and the panel
+    add("Main valve elbow", box(mx - 12.7 - 24.0, mx - 12.7, MAIN_Y - 10.0, MAIN_Y + 10.0, mz - 10.0, mz + 10.0), "brass",
+        "pneu", bom="1/4 NPT brass street elbow")
+    vb = box(xb - 12.0, xb + 12.0, MAIN_Y - 10.0 - 45.0, MAIN_Y - 10.0, mz - 12.0, mz + 12.0)
+    xo = P.rear_x(mz)
+    add("Main valve (1/4 ball valve)", vb.fuse(cyl(4.0, xb - 12.0 - (xo - 2.0), (xb - 12.0, MAIN_Y - 32.5, mz), (-1, 0, 0))),
+        "brass", "pneu", bom="Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG (the old cannon's if it fits)",
+        note="stem extended through the rear panel")
+    add("Main valve lever", box(xo - 12.0, xo - 2.0, MAIN_Y - 32.5 - 8.0, MAIN_Y - 32.5 + 8.0, mz - 8.0, mz + 40.0), "red",
+        "pneu", bom="Main valve lever (printed)", kind="print", note="on the stem outside the rear panel: up = open")
+    MAIN_OUT[:] = [V(xb, MAIN_Y - 55.0 - 18.0, mz)]
+    add("Main valve push-to-connect", cyl(7.5, 18.0, (xb, MAIN_Y - 55.0, mz), (0, -1, 0)), "brass", "pneu",
+        bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
+    # fill: universal-coupler M plug outside the panel, nipple through it, then a U behind the panel through the
+    # check valve (along +y) into the manifold's back face
     yb = my - 30.0
-    add("Fill port (Schrader) nipple", cyl(6.86, mx - 12.7 - rear + 2, (mx - 12.7 + 2, yb, mz), (-1, 0, 0)), "brass", "pneu",
-        bom="1/4 NPT brass nipple x 1-1/2 in")
-    add("Fill port (Schrader)", cyl(6.0, 22.0, (rear, yb, mz), (-1, 0, 0)), "brass", "pneu", bom="1/4 MNPT tank fill valve (Schrader)")
-    xo = P.rear_x(mz) - 0.5
-    add("Tank relief valve 200 psi", cyl(9.5, mx - 12.7 - (xo - 4.0), (mx - 12.7, my + 30.0, mz), (-1, 0, 0)), "brass", "pneu",
+    xf = rear + 12.0                                       # U axis, just inside the (leaning) panel
+    add("Fill plug (M-style)", cyl(7.0, 26.0, (xo + 2.0, yb, mz), (-1, 0, 0)), "brass", "pneu",
+        bom="Fill plug: 1/4 MNPT industrial (M-style) plug, brass (Foster 10-3B)", note="your universal coupler snaps on")
+    add("Fill nipple", cyl(6.86, xf - 9.0 - (xo + 2.0), (xo + 2.0, yb, mz), (1, 0, 0)), "brass", "pneu",
+        bom="1/4 NPT brass close nipple")
+    for tag, y0 in (("panel", yb - 9.0), ("manifold", yb + 45.0)):
+        add(f"Fill elbow {tag}", box(xf - 9.0, xf + 9.0 if tag == "panel" else mx - 12.7, y0, y0 + 18.0, mz - 9.0, mz + 9.0),
+            "brass", "pneu", bom="1/4 NPT brass street elbow")
+    add("Fill check valve", cyl(9.0, 36.0, (xf, yb + 9.0, mz), (0, 1, 0)), "brass", "pneu",
+        bom="Fill check valve, brass, 1/4 FNPT x 1/4 MNPT, 250 psi (Control Devices P2525-1WA)", note="holds the tanks behind the open plug")
+    add("Tank relief valve 200 psi", cyl(9.5, mx - 12.7 - (xo - 4.0), (mx - 12.7, my + 50.0, mz), (-1, 0, 0)), "brass", "pneu",
         bom="Relief valve 200 psi 1/4 NPT, pull ring (Interstate V200-4)", note="pull ring at the rear panel: the hand dump")
     # main valve (the tanks' shut-off, opens only while a chamber fills) into a brass cross; one in valve per chamber
     # off the cross meters its chamber against that chamber's transducer, and its closed seat is what keeps the
@@ -190,9 +215,7 @@ def air():
         coil = cyl(15.0, 38.0, (c + V(0, 0, 19.0)).toTuple(), (0, 0, 1))
         add(name, body.fuse(coil), "brass", "pneu", bom=bom, note="coil up")
 
-    solenoid("Main valve", (sx1 - 37.0, fy, fz), (1, 0, 0),
-             "2/2 NC 12 V direct-acting solenoid valve, 1/4 NPT (Aignep 02F)")
-    add("Main valve push-to-connect", cyl(7.5, 22.0, (sx1 - 37.0, fy, fz), (-1, 0, 0)), "brass", "pneu",
+    add("Valve cross push-to-connect", cyl(7.5, 18.0, (sx1, fy, fz), (-1, 0, 0)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     add("Valve cross", box(fx - 12.7, fx + 12.7, fy - 12.7, fy + 12.7, fz - 12.7, fz + 12.7), "brass", "pneu",
         bom="1/4 NPT brass cross (ChillWaves)", note="close nipples to the three valves")
@@ -216,15 +239,17 @@ def air():
         pts = [t, (t[0], sg * 98.0, 262.0), (xr, sg * 98.0, 245.0), (xr, sg * 98.0, 330.0),
                (mx + 6.0, my + dy, 330.0), (mx + 6.0, my + dy, top + 18.0)]
         add(f"Tube tank {side}", tube_path(pts), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
-    tf = [(mx + 12.7 + 18.0, my - 40.0, mz), (sx1 - 70.0, fy, mz - 20.0), (sx1 - 70.0, fy, fz), (sx1 - 37.0 - 22.0, fy, fz)]
-    add("Tube to main valve", tube_path(tf), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
+    m0 = MAIN_OUT[0]
+    tf = [m0.toTuple(), (m0.x, m0.y - 12.0, mz), (sx1 - 40.0, m0.y - 12.0, mz - 20.0), (sx1 - 40.0, fy, mz - 25.0),
+          (sx1 - 40.0, fy, fz), (sx1 - 18.0, fy, fz)]
+    add("Tube main valve to cross", tube_path(tf), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
 
 
 # ------------------------------------------------------------------ fog
 def fog():
-    """Custom 12 V fogger in the front bay, printed 1 -> 4 splitter: two flexible lines up to the smoke collar round
-    the barrels, one to a vent under the front bumper and one along the centreline to a nozzle low in the rear panel
-    (smoke trails front and back)."""
+    """Custom 12 V fogger in the front bay, printed 1 -> 3 splitter: a silicone line up into the gun's core (to the
+    smoke collar round the barrels), one flexible line to a vent under the front bumper and one along the centreline
+    to a vent down through the bellypan near the back (smoke trails front and back)."""
     (x0, x1), (y0, y1), (z0, z1) = P.FOG_BOX
     # custom 12 V fogger: two 200 W cast heater cores on an aluminum bracket (never on a print), a peristaltic pump
     # each from a printed fluid tank, and a 5015 blower that pushes the fog into the splitter
@@ -251,34 +276,32 @@ def fog():
         note="pushes the fog from the cores into the splitter")
     hub = box(cx - 22, cx + 22, -28, 28, z1 + 14, z1 + 44).cut(box(cx - 19, cx + 19, -25, 25, z1 + 13, z1 + 41))
     barbs = []
-    for sy in (1, -1):                                     # bumper lines out the sides, gun lines out the top
+    for sy in (1, -1):                                     # trail lines out the sides, the gun line out the top
         hub = hub.fuse(tube(11.0, 8.5, 16.0, (cx, sy * 28.0, z1 + 29), (0, sy, 0)))
-        hub = hub.fuse(tube(11.0, 8.5, 16.0, (cx - 10, sy * 14.0, z1 + 44), (0, 0, 1)))
-        barbs.append(((cx, sy * 44.0, z1 + 29), (cx - 10, sy * 14.0, z1 + 60)))
-    add("Fog splitter 1-4", hub, "print", "power", bom="Fog splitter 1 -> 4 (printed)", kind="print",
-        note="22 mm barbs for the four flexible tubes")
-    FOG_OUT[:] = [V(*barbs[0][1]), V(*barbs[1][1])]
+        barbs.append((cx, sy * 44.0, z1 + 29))
+    hub = hub.fuse(tube(5.4, 3.5, 16.0, (cx - 10, 0, z1 + 44), (0, 0, 1)))
+    add("Fog splitter 1-3", hub, "print", "power", bom="Fog splitter 1 -> 3 (printed)", kind="print",
+        note="22 mm barbs for the two trail tubes, a 3/8 barb for the gun's silicone line")
+    FOG_OUT[:] = [V(cx - 10, 0, z1 + 60)]
     # front: down through the bellypan just ahead of the machine
-    side_b = barbs[0][0]
-    vx, vy = 368.0, 80.0
+    side_b = barbs[0]
+    vx, vy = P.FOG_VENTS[0]
     add("Fog vent front", tube(13.0, 10.0, 14.0, (vx, vy, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1)).fuse(
         tube(16.0, 10.0, 3.0, (vx, vy, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1))), "print", "power",
         bom="Fog vent nozzle (under bumper)", kind="print", note="through a hole in the bellypan")
     add("Fog tube front", tube_path([side_b, (side_b[0] + 30, vy, side_b[2]), (vx, vy, P.BELLY_Z + 10.0),
                                      (vx, vy, P.BELLY_Z - P.PLATE_T)], r=11.0),
         "tube", "power", bom="Fog tube (owner's flexible tube)", kind="stock")
-    # back: along the bellypan centreline, under the gun's swing, over the electronics shelf, out the rear panel
-    side_b = barbs[1][0]
-    zr = SMOKE_REAR[1]
-    xo = P.rear_x(zr)
-    xi = xo + 36.0
-    add("Fog vent rear", tube(13.0, 10.0, xi - (xo - 6.0), (xo - 6.0, SMOKE_REAR[0], zr), (1, 0, 0)).fuse(
-        tube(16.0, 10.0, 3.0, (xo - 6.0, SMOKE_REAR[0], zr), (1, 0, 0))), "print", "power",
-        bom="Smoke nozzle (rear panel)", kind="print", note="through a hole low in the rear panel")
-    add("Fog tube rear", tube_path([side_b, (side_b[0], -70.0, side_b[2]), (165.0, -70.0, side_b[2]), (165.0, 0.0, 125.0),
-                                    (-150.0, 0.0, 125.0), (-150.0, 28.0, 166.0), (-275.0, 28.0, 166.0), (-290.0, 28.0, 235.0),
-                                    (-345.0, 0.0, 250.0), (xi + 12.0, 0.0, zr),
-                                    (xi, 0.0, zr)], r=11.0),
+    # back: along the bellypan centreline, under the gun's swing, down through the bellypan just ahead of the
+    # electronics bay (the trail comes out underneath, not straight out the back)
+    side_b = barbs[1]
+    rx, ry = P.FOG_VENTS[1]
+    add("Fog vent rear", tube(13.0, 10.0, 14.0, (rx, ry, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1)).fuse(
+        tube(16.0, 10.0, 3.0, (rx, ry, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1))), "print", "power",
+        bom="Fog vent nozzle (under the belly)", kind="print", note="through a hole in the bellypan")
+    add("Fog tube rear", tube_path([side_b, (side_b[0], -70.0, side_b[2]), (165.0, -70.0, side_b[2]), (165.0, ry, 125.0),
+                                    (rx + 30.0, ry, 125.0), (rx, ry, P.BELLY_Z + 10.0), (rx, ry, P.BELLY_Z - P.PLATE_T)],
+                                   r=11.0),
         "tube", "power", bom="Fog tube (owner's flexible tube)", kind="stock")
 
 
@@ -326,8 +349,13 @@ def batteries_and_electronics():
               ("Safety relay 40 A", -220, -192, -20, -2, 36, "black", "12 V 40 A SPDT relay + socket"),
               ("Valve + fog drivers (relays, ULN2803A)", -378, -308, -6, 54, 32, "pcb", "12 V 40 A SPDT relay + socket"),
               ("Buck 12-5 V 20 A", -300, -244, 45, 95, 25, "black", "12->5 V 20 A buck (B089M5R3NJ)")]   # under the main valve
+    boards.append(("Logic supply 5 V (Pololu S13V30F5)", -378, -352, 60, 85, 10, "pcb",
+                   "Logic supply: Pololu S13V30F5 5 V 3 A buck-boost (#4082)"))
     for name, x0, x1, y0, y1, h, col, bom in boards:
         add(name, box(x0, x1, y0, y1, z, z + h), col, "power", bom=bom)
+    add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power",
+        bom="Contactor 12 V 200 A continuous duty, isolated coil, 4 terminal, 2-pack (Hamolar RD-200)",
+        note="main breaker -> contactor -> PDH; the STM32 closes it, the E-stop opens its coil")
     # bottom of the rear panel: E-stop, standby charge port (fill port and tank relief come out of the manifold)
     ey, ez = ESTOP
     xo = P.rear_x(ez)
@@ -347,7 +375,6 @@ def batteries_and_electronics():
 
 
 ESTOP = (-170.0, 255.0)     # (y, z) on the rear panel, bottom strip under the open middle
-SMOKE_REAR = (0.0, 247.0)   # rear smoke-trail nozzle, centre of the rear panel's bottom strip
 CHARGE = (-95.0, 255.0)
 USB = (182.0, 255.0)
 
@@ -367,6 +394,19 @@ def speakers():
             bom="Slim 100 W siren speaker, 11 ohm (UBL 100W Slim)", note="5.5 x 5.75 x 2 in, 120-130 dB at 100 W")
         add(f"Speaker grille {pod['name']}", pod["grille"], "print", "body", bom="Speaker grille", kind="print",
             note="3 walls, no top or bottom layers, 12% gyroid: an open mesh; glue or screw to the cup")
+    # hood lights: a mini 12 V spot in a printed pod through each cheek, aimed straight ahead (30 deg beam), dimmed
+    # together on the last spare MOSFET channel
+    hy, hz, hr, hl = P.HOOD_LIGHT
+    x1 = P.hood_x()
+    for sg, side in ((1, "left"), (-1, "right")):
+        pod = cyl(hr, hl, (x1 - hl, sg * hy, hz), (1, 0, 0)).cut(cyl(14.2, 21.0, (x1 - 20.0, sg * hy, hz), (1, 0, 0))).cut(
+            cyl(4.0, hl, (x1 - hl - 1.0, sg * hy, hz), (1, 0, 0)))
+        add(f"LED hood light pod {side}", pod, "print", "body", bom="Hood light pod (printed)", kind="print",
+            note="glued into the cheek; the light's spring clips grip its 28.4 mm bore")
+        lamp = cyl(14.0, 19.0, (x1 - 19.0, sg * hy, hz), (1, 0, 0)).fuse(cyl(16.0, 2.0, (x1, sg * hy, hz), (1, 0, 0)))
+        add(f"LED hood light {side}", lamp, "steel", "power", mass=0.03,
+            bom="Hood light: mini 12 V 3 W LED spot, 30 deg, 32 x 19 mm, PWM dimmable (Ohlite / MDK-YJ)",
+            note="straight ahead; PWM on the last spare MOSFET channel")
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
     add("Audio amp (TPA3116D2)", box(-120.0, -25.0, 35.0, 95.0, zb, zb + 28.0), "pcb", "power",
         bom="TPA3116D2 2 x 50 W amp board", note="one channel per speaker, on 24 V")
@@ -431,6 +471,40 @@ def bumpers():
             bom="Bumper fabric cover (white canvas, owner's pick)", kind="stock")
 
 
+def underglow():
+    """Underglow: a printed 45 deg strip bracket under the outer and end rails, just inside the bumper backing, each
+    carrying a 60/m strip aimed down and out. The light passes under the bumper (its bottom is 3 in up) and pools on
+    the floor round the robot; a strip inside the bumper would mostly light the noodles."""
+    dz = -P.PLATE_T                                       # under the bottom corner gussets
+    sec = [(u, z + dz) for u, z in ((-19.0, 84.6), (-5.0, 98.6), (-5.0, 101.6), (-25.0, 101.6), (-25.0, 98.6), (-9.2, 98.6),
+                                    (-21.1, 86.7))]
+    c, d, nn = (-12.0, 91.6 + dz), (0.7071, 0.7071), (0.7071, -0.7071)
+    strip = [(c[0] - 5 * d[0], c[1] - 5 * d[1]), (c[0] + 5 * d[0], c[1] + 5 * d[1]),
+             (c[0] + 5 * d[0] + 1.6 * nn[0], c[1] + 5 * d[1] + 1.6 * nn[1]),
+             (c[0] - 5 * d[0] + 1.6 * nn[0], c[1] - 5 * d[1] + 1.6 * nn[1])]
+    xo, yo = P.FRAME_X, P.OUTER_RAIL_Y[1]
+    total = 0.0
+    for tag, out, half, pos in (("left", (0, 1), xo - P.RAIL_W - 5.0, yo), ("right", (0, -1), xo - P.RAIL_W - 5.0, yo),
+                                ("front", (1, 0), yo - P.RAIL_W - 5.0, xo), ("rear", (-1, 0), yo - P.RAIL_W - 5.0, xo)):
+        ox, oy = out
+
+        def prism(pts, a0, a1):
+            if ox == 0:                                   # runs along x; section in the (y, z) plane
+                q = [(oy * (pos + u), z) for u, z in pts]
+                return cq.Workplane("YZ", origin=(a0, 0, 0)).polyline(q).close().extrude(a1 - a0).val()
+            q = [(ox * (pos + u), z) for u, z in pts]
+            return cq.Workplane("XZ", origin=(0, a1, 0)).polyline(q).close().extrude(a1 - a0).val()
+        n = math.ceil(2 * half / 230.0)
+        for k in range(n):
+            a0 = -half + 2 * half * k / n
+            add(f"Underglow bracket {tag} {k + 1}", prism(sec, a0 + 0.5, a0 + 2 * half / n - 0.5), "print", "bumper",
+                bom="Underglow bracket (printed, 45 deg)", kind="print", note="2 x M4 up into the rail; strip on its outer face")
+        add(f"LED strip underglow {tag}", prism(strip, -half + 5.0, half - 5.0), "led", "bumper",
+            bom="WS2812B strip 10 mm, 60/m (m)", kind="stock", note="aimed 45 deg down and out, under the bumper")
+        total += 2 * half - 10.0
+    return total
+
+
 def _mitre(s, sgm, yo, xf, reach):
     """Cut a bumper run at 45 deg along each corner diagonal (outer corner -> rail corner)."""
     big = 3000.0
@@ -465,8 +539,9 @@ def wall_standoffs():
                 note="#10-32 through the rail; the wall frame sits on its lip, 2 x M4 up into it")
 
 
-REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 30.0, REAR_MAN[2], 14.0), (ESTOP[0], ESTOP[1], 23.0),
-              (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0), (SMOKE_REAR[0], SMOKE_REAR[1], 13.5))
+REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 50.0, REAR_MAN[2], 14.0), (ESTOP[0], ESTOP[1], 23.0),
+              (MAIN_Y - 32.5, REAR_MAN[2], 6.0),
+              (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0))
 
 
 def body_parts(log=print):
@@ -483,7 +558,7 @@ def body_parts(log=print):
             note="natural PETG, 4 walls, 15% gyroid")
     nclip = 0
     for i, p in enumerate(panels):
-        a = B.slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + 0.3, P.CLIP_T, P.ACRYLIC_T)
+        a = B.slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + 0.3, P.CLIP_T, P.ACRYLIC_T, P.ACRYLIC_R)
         if p["n"].x < -0.9:                      # rear face: fill port, tank relief, E-stop, charge port, USB-C
             for (yb, zb, r) in REAR_HOLES:
                 a = a.cut(cyl(r, 30, (-P.FRAME_X - 10, yb, zb), (1, 0, 0)))
@@ -500,7 +575,7 @@ def body_parts(log=print):
                     note="quarter-turn tab on an M4 shoulder screw into a heat-set insert")
                 continue
             add(f"Panel clip {i:02d}-{k}", c["clip"], "print", "body", bom="Panel corner clip", kind="print",
-                note="M3 x 8 into a heat-set insert")
+                note="M4 x 12 into a heat-set insert")
             nclip += 1
         add(f"LED loop panel {i:02d}", p["led"], "led", "body", bom="WS2812B strip 10 mm, 60/m (m)", kind="stock",
             note="on the rail behind the panel, LEDs across it")

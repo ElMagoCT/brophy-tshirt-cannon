@@ -58,6 +58,8 @@ def build(elev=P.ELEV_SHOW):
     misc.fog()
     misc.batteries_and_electronics()
     misc.bumpers()
+    glow = misc.underglow()
+    log(f"underglow: {glow / 1000:.1f} m of strip under the bumpers")
     misc.wall_standoffs()
     misc.body_parts(log)
     misc.speakers()
@@ -65,21 +67,21 @@ def build(elev=P.ELEV_SHOW):
         if p["moving"]:
             p["local"] = p["shape"]
             p["shape"] = pose(p["shape"], elev)
-    # flexible lines to the gun: air from the two check valves, fog from the splitter. Their gun ends ride with
-    # the gun; the rest is a slack coil, so the sweep check skips them.
+    # flexible lines to the gun: air from the two in valves, fog from the splitter, up through the open well floor
+    # into the bottom of the gun's core just behind the pivot (they barely move as it swings). Their gun ends ride
+    # with the gun; the rest is a slack coil, so the sweep check skips them.
     ex = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.GUN_EXITS]
     a, b = misc.CHECKS
     routes = {}
-    for tag, c, e, yl in (("A (top cannon)", a, ex[0], -62.0), ("B (bottom cannon)", b, ex[1], -80.0)):   # up through the open well floor
-        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 260.0), V(-300.0, yl, 400.0), V(e.x + 15.0, yl, e.z), V(e.x, yl, e.z), e]
+    for tag, c, e, dy in (("A (top cannon)", a, ex[0], 9.0), ("B (bottom cannon)", b, ex[1], -9.0)):
+        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 260.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e]
     fx = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.FOG_EXITS]
-    for k, (f0, f1) in enumerate(zip(misc.FOG_OUT, fx)):
-        routes[f"Fog loop {'L' if k == 0 else 'R'} (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(180.0, f1.y, 420.0),
-                                                                  V(f1.x - 10.0, f1.y, f1.z - 60.0), f1]   # into the well from below
+    for f0, f1 in zip(misc.FOG_OUT, fx):
+        routes["Fog loop (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(60.0, f1.y, 380.0), V(f1.x, f1.y, f1.z - 50.0), f1]
     for tag, pts in routes.items():
-        r = 11.0 if tag.startswith("Fog") else 3.175
+        r = 6.35 if tag.startswith("Fog") else 3.175
         lib.add(tag, misc.tube_path([p.toTuple() for p in pts], r=r), "tube", "pneu" if r < 5 else "power",
-                bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Fog tube (owner's flexible tube)", kind="stock")
+                bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 3/8 ID x 1/2 OD (ft)", kind="stock")
     log(f"built {len(PARTS)} parts in {time.time() - t:.0f} s")
     return PARTS
 
@@ -110,7 +112,8 @@ ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the
     ("nipple", "Chamber"),                      # 1 in close nipple in the tank's end port
     ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Tube", "push-to-connect"),
     ("Service loop", "push-to-connect"), ("Tank elbow", "Air tank"), ("Gun tube", "Service loop"),
-    ("Fog loop", "Fog vent"), ("Fog loop", "Smoke collar"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
+    ("Fog loop", "Fog vent"), ("Fog loop", "Gun smoke tube"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
+    ("Gun smoke tube", "Smoke collar"),
 ]
 
 
@@ -263,20 +266,32 @@ def tabs(parts):
         if n.startswith(("LED ", "Speaker")):
             out["Lights & speakers"].append(p)
         elif g == "frame" or (g == "drive" and c is None):
-            out["Frame, pivot & drive"].append(p)
+            out["Chassis, pivot & drive"].append(p)
         elif g == "drive" and n.startswith(WHEEL_PARTS):
             out[f"Wheel {c}"].append(p)
         elif g == "drive":
-            out["Frame, pivot & drive"].append(p)
-        elif g == "body":
-            out["Body frame" if n.startswith("Body frame") else "Panels, clips, standoffs & bumpers"].append(p)
-        elif g == "bumper":
-            out["Panels, clips, standoffs & bumpers"].append(p)
+            out["Chassis, pivot & drive"].append(p)
+        elif g == "body" and n.startswith("Body frame"):
+            out["Body frame"].append(p)
+        elif g == "body" and n.startswith(("Panel", "Battery door")):
+            out["Body panels & clips"].append(p)
+        elif g in ("body", "bumper"):
+            out["Bumpers & wall standoffs"].append(p)
         elif g == "gun":
             out["Gun (at 20 deg)"].append(p)
-        else:                                   # pneu, power, spot
-            out["Air, power & electronics"].append(p)
+        elif g == "pneu":
+            out["Pneumatics"].append(p)
+        else:                                   # power, spot
+            out["Power, electronics & smoke"].append(p)
     return out
+
+
+# Onshape sub-assemblies (one click hides or shows each) -> the tabs they hold
+SUBASSEMBLIES = {"Body panels": ("Body panels & clips",), "Body frame": ("Body frame",),
+                 "Lights & speakers": ("Lights & speakers",), "Bumpers": ("Bumpers & wall standoffs",),
+                 "Pneumatics": ("Pneumatics",), "Power & smoke": ("Power, electronics & smoke",),
+                 "Chassis & drive": ("Chassis, pivot & drive", "Wheel FL", "Wheel FR", "Wheel RL", "Wheel RR"),
+                 "Gun": ("Gun (at 20 deg)",)}
 
 
 def export(parts):

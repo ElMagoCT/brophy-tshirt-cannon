@@ -88,7 +88,7 @@ class Chain:
         assert self.state == "M"
         e = ENG[size]
         s0 = self.s - e
-        body = cq.Solid.makeBox(side, side, side, V(-side / 2, -side / 2, 0))
+        body = cq.Workplane("XY").box(side, side, side, centered=(True, True, False)).edges().chamfer(1.5).val()
         sh = _along(body, self.at(s0), self.d)
         c = self.at(s0 + side / 2)
         sh = sh.cut(_along(cyl(OD[size] / 2, e), self.at(s0), self.d))
@@ -165,7 +165,7 @@ class Chain:
         assert self.state == "F"
         e = ENG[size]
         s0 = self.s - e
-        body = tube(OD[size] / 2, BORE[size] / 2, e).fuse(cyl(od / 2, length - e, (0, 0, e)))   # threads are hollow
+        body = tube(OD[size] / 2, BORE[size] / 2, e).fuse(_male_detail(name, length - e, od).translate(V(0, 0, e)))
         if extra is not None:
             body = body.fuse(extra(length))
         self._put(name, body, s0, color, bom or name)
@@ -213,6 +213,24 @@ class Chain:
         self.state, self.s = "F", s0 + run
         return [Chain((bc + bb * (run / 2)).toTuple(), bb.toTuple(), "F", self.add, self.prefix, self.group, self.moving)
                 for bb in (b, b * -1)]
+
+
+def _male_detail(name, L, od):
+    """What stands out of the port (along +Z from the port face, L long, od wide), shaped like the real part:
+    push-to-connect (hex, body, release collet, tube bore), relief valve (hex, spring body, cap), transducer
+    (hex, body, Packard connector), else a plain body."""
+    n = name.lower()
+    af = min(od * 0.98, 22.0)
+    if "push-to-connect" in n:
+        s = union([hex_prism(min(af, 14.3), 5.0), cyl(od / 2, L - 9.0, (0, 0, 5.0)), cyl(od / 2 - 1.1, 4.0, (0, 0, L - 4.0))])
+        return s.cut(cyl(3.3, 12.0, (0, 0, L - 11.0)))
+    if "relief" in n:
+        return union([hex_prism(af, 7.0), cyl(od / 2, max(4.0, L - 13.0), (0, 0, 7.0)), cyl(od / 2 - 2.5, 6.0, (0, 0, L - 6.0))])
+    if "transducer" in n:
+        body = union([hex_prism(af, 8.0), cyl(od / 2, L - 22.0, (0, 0, 8.0))])
+        con = cq.Solid.makeBox(12.0, min(od, 18.0), 14.0, V(-6.0, -min(od, 18.0) / 2, L - 14.0))
+        return body.fuse(con)
+    return cyl(od / 2, L)
 
 
 # ------------------------------------------------------------------ valve bodies (along +Z)
