@@ -612,3 +612,22 @@ D12. **Money, each round** (parts list on committed rows):
       (12 in nipple $31.59, two couplings $63.78, a bushing $8.99) +$104.36. The old tank goes back to spare.
     - The other session's C.3 rows (elevation, smoke, body) add about $55 on top.
     - The biggest lines now: speakers $160, barrels $169, the three tanks $170, the HSV04 $98.
+D13. **Search: one tank, 200 psi, bigger than the three 6 L tanks (18 L) and under their $169.80.**
+    None found that also fits. 200 psi tanks over about 12 L are long and thin (24-30 in). The robot's
+    longest straight run in the spot you circled is about 18-20 in across, and only if the Falcons and
+    fogger move. Shorter, fatter 5 gal tanks exist, but they're 125-150 psi.
+
+    | 200 psi tank | Volume | Size | Price | Verdict |
+    |---|---|---|---|---|
+    | **6 L aluminum (current)** | 6 L | 6 x 14.2 in | $56.60 | Fits anywhere; $9.43/L, the cheapest per litre |
+    | Viair 91028 steel | 9.5 L | 6 x 23.5 in | $109.25 | Too long to go across |
+    | Ridetech 3 gal aluminum | 11.4 L | 7 x 18.9 in | $141-145 | Might fit across; pressure rating not published |
+    | Generic 3 gal aluminum (eBay) | 11.4 L | 6.7 x 20.5 in | $48-58 | Listed 200 psi but out of stock; generic like the 6 L |
+    | Seamless / Speedway 2 gal | 7.6 L | 6.6 x 18 in | $175-201 | Over budget |
+    | Air Lift 4 gal aluminum | 15 L | 6 x 30 in | not checked | Too long |
+    | Vixen 5 gal steel | 19 L | 7 x 30 in | not checked | Too long |
+    | "Bomb" 5 gal | 19 L | 20 in long, 12.5 in high | about $230 (EUR 199) | Over budget, 1/2 in ports |
+
+    - **So the three 6 L tanks stay (18 L, $169.80).** The only upgrade worth it is a 3 gal as the third tank
+      (23.4 L total), if one is confirmed 200 psi and the CAD shows it fits across. That's +$0 to +$88.
+    - Skipped: 150 psi tanks (Viair 91050, Firestone, Kleinn, HornBlasters) and anything with G (BSP) ports.
