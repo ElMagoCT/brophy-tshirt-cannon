@@ -130,7 +130,7 @@ The pneumatic and electrical diagrams are in the "Glacis air & wiring" artifact
       firing one would have drained the other back through it. With a valve per chamber, a closed in
       valve seals its chamber, so the checks and the fill block (with its sensor and relief) are gone.
     - **Main valve** (kept, as you asked): the tanks' shut-off. It opens only while a chamber fills, and
-      it's on the safety-powered valve rail, so a trip closes it.
+      it's on the safety-powered valve rail, so a trip closes it. *Rev C.3: now a manual ball valve (E2).*
     - **In valves A and B:** each pulses until its chamber's sensor reads that cannon's own setpoint
       (110 psi max). All three are the same Aignep 02F direct-acting 12 V valve ($41.36, 507 psi rated).
       Direct-acting means they open from 0 psi and don't need a pressure difference to work.
@@ -266,7 +266,7 @@ The pneumatic and electrical diagrams are in the "Glacis air & wiring" artifact
     spot.
 29. **Bottom of the rear panel:**
     - E-stop;
-    - Schrader fill port (air in);
+    - fill port (air in; rev C.3: an M-style plug with a check valve behind it, P3);
     - the tank relief's pull ring (the hand dump; there's no bleed valve);
     - SB50 charge port, to run or charge on standby power with the batteries in;
     - USB-C to the STM32.
@@ -276,6 +276,8 @@ The pneumatic and electrical diagrams are in the "Glacis air & wiring" artifact
     - PDH and main breaker on the bellypan;
     - STM32, both ESP32-S3s, the PWM gate, the drivers, the buck and the Spark MAX on a printed shelf;
     - the main valve, valve cross and in valves beside them (coils up).
+    - Rev C.3 adds the PDH contactor and the logic supply here (E1); the main valve's handle has to reach
+      the rear panel (E2).
 32. **Batteries:** two spots, one per side, each on its own sled over a rear wheel, so you can swap one
     while the other runs. Each slides out through its side's rear panel.
     - **The battery doors latch at the top** (your call). Each door keeps its two bottom corner clips,
@@ -411,3 +413,88 @@ The pneumatic and electrical diagrams are in the "Glacis air & wiring" artifact
     the battery on its side. Your call; the new top latch doesn't change it.
 50. **The Onshape model is imported STEP** (dumb solids), with the gun posed at 20 deg. To change it,
     edit `cad/glacis`, run `python robot.py`, and replace the changed tabs.
+
+## Electronics and air review (rev C.3, 2026-11-03)
+Your electronics review notes, then your pneumatics notes. Full electrical write-up: `electrical/README.md`.
+Range math: `cad/glacis/range_model.py`. The parts list goes up $36.46 for all of this.
+
+**Electronics**
+
+E1. **The STM32 switches the whole PDH, and the logic has its own always-on circuit** (your call).
+    - Main breaker -> 200 A contactor -> PDH. Ahead of the contactor, a 5 A fuse feeds a Pololu S13V30F5
+      5 V buck-boost ($17.95): the logic rail for the STM32, both ESP32-S3s and every sensor.
+    - Standby (contactor open) leaves the PDH dead but the STM32, sensors, web UI and remote alive, so you
+      see pressures, fog fluid, temperatures and battery with the systems off. Arm from the UI.
+    - Contactor: Hamolar RD-200 2-pack ($26.24, one spare), coil about 0.7 A through a spare MOSFET channel.
+      The rear E-stop's second contact is in that coil, so the E-stop now kills the whole PDH in hardware;
+      the first contact stays in the safety relay coil.
+    - Buck-boost, not a buck: a drive sag can't brown out the controllers.
+    - The 20 A buck now feeds only the LEDs, from the PDH. 1,680 WS2812s draw about 1 A even when dark,
+      so they belong on the switched side.
+E2. **Main valve is manual** (your call). A 1/4 NPT brass ball valve, the old cannon's if it's stamped
+    200 psi or more (else a $6.55 Dwyer DBV-00). -$41.36 for the Aignep it replaces.
+    - Open all session, closed for transport and gun work. Its handle needs to reach the rear panel:
+      that's a CAD move I haven't made (the C.3 CAD session has the model open).
+    - The in valves now hold tank pressure all session. They're rated 507 psi and normally closed on the
+      valve rail, so a trip still isolates both chambers. A stuck in valve is caught by the chamber's
+      125 psi relief, which flows 120 SCFM against a 2 mm orifice.
+E3. **Smoke sensing.** The core temperature sensor was already there (MAX6675 + K probe). Added:
+    - an XKC-Y25 capacitive level switch on the outside of the printed tank ($21.95; no hole in the tank);
+    - a fluid gauge for free: the pump is peristaltic, so pump-seconds = mL used;
+    - DS18B20 probes ($9.49 for 5) in the fogger box (heater off at 70 C, before the PETG tray softens),
+      on the electronics shelf and in the battery bay. That last pair answers the "cooling system" question
+      with data.
+E4. **The STM32F411 is right for its job, not for Wi-Fi or video.** It has the ADC channels, timers and
+    FPU for everything time-critical, and a drag-model trajectory solve takes it tens of ms. But it has no
+    radio and 128 KB RAM, which is why the ESP32-S3 bridge does the web UI. Put the trajectory math in the
+    browser: it's where the aim arc is drawn, and it costs the robot nothing.
+E5. **Camera: a Pi Zero 2 W + Camera Module 3 Wide, about $50, on the logic rail.** H.264 over WebRTC at
+    about 720p30 and 0.2 s lag. An ESP32S3 camera ($14-20) is cheaper but VGA MJPEG. Not on the list yet.
+    - If 2.4 GHz turns out jammed at games, the better option is an ESP32-C5 bridge (5 GHz access point,
+      $8-14) with a dual-band camera Pi. Test with one of your S3s at a game before buying.
+E6. **Fixes from the review:**
+    - battery and PDH volts on two ADC pins (the dashboard's battery goal had no sensor);
+    - pull-downs so a cut transducer wire reads as a fault, not as an empty chamber to keep filling;
+    - the gun-angle pot on 3.3 V, not 5 V (5 V would overdrive the ADC);
+    - all three transducers are now the same 0-300 psi part;
+    - firmware latches: no restart after an E-stop, a welded-contactor check, low-battery standby, an
+      in-valve time limit;
+    - LED power injection at every frame node.
+E7. **Runtime:** about 25 A on average at an event, so two FRC batteries last roughly an hour. Swap one
+    every ~30 minutes at long games. LEDs and fog are the big steady draws.
+
+**Air**
+
+P1. **The tanks aren't what's short. The gun is.** I modelled range with drag (250 g rolled shirt; its
+    drag is the big unknown, so three cases):
+
+    | Gun (110 psi max on the SZW-25) | Exit speed | Range | 200 ft at | 75 ft at |
+    |---|---|---|---|---|
+    | **rev C.2: 0.53 L, 22.5 in barrel** | 22.7 m/s | **108-132 ft** | can't | 77 psi |
+    | 2.0 L, 36 in barrel | 35.3 m/s | 175-238 ft | 109 psi | 34 psi |
+    | 2.0 L, 48 in barrel | 39.4 m/s | 194-271 ft | 89 psi | 40 psi |
+    | 3.8 L (old 1 gal tank), 36 in barrel | 37.5 m/s | 185-256 ft | 93 psi | 22 psi |
+    | QE5 QEV (opens in 10 ms), 1.0 L, 30 in | 35.2 m/s | 174-237 ft | 110 psi | 52 psi |
+
+    - 200 ft needs about 35 m/s at the nominal drag (31-41 across the range). 75 ft needs only about 17.
+    - So 75 ft x 6 already works. 200 ft doesn't with any pressure these valves allow: the SZW-25's DC
+      coil stops at 115 psi, and its 50 ms opening is slower than the shirt's trip down a 22.5 in barrel.
+      More pressure isn't available without a QEV.
+    - What gets 200 ft back is the old cannon's recipe: about 2 L or more of chamber and a 36-48 in barrel.
+P2. **Shot count is fine with the tanks you have.** One 200 ft shot then six 75 ft shots needs 4-6 L of
+    tank, from shop air at 150 psi. The two 6 L tanks (12 L) cover it twice over. The rev C.2 gun gets
+    15-23 shots at 75 ft per charge. Bigger tanks would only add shots, so I didn't change them.
+    - Shot order: take the 200 ft shot first in a charge, while the tanks are highest. The dashboard can
+      show when the big shot is still available.
+    - Most shop compressors stop at 135-175 psi, not 200. Everything above assumes 150.
+P3. **Fill port: your universal coupler.** A 1/4 MNPT M-style plug ($4.29) replaces the Schrader valve, so
+    your EVOULTES couplers snap on like they do on your tanks. A plug is an open pipe, so a 250 psi brass
+    check valve ($7.05) sits right behind it to hold the tanks. No kit to buy: you already have the
+    hose-side coupler. +$2.19 net.
+P4. **Fewer sizes.** All the air plumbing is 1/4 NPT with one 1/4 in tube and one push-fit. The only other
+    sizes are the firing path (1 in), the chamber body (2 in) and the transducers' 1/8 NPT port. I looked
+    for 1/4 NPT transducers to drop the bushings: the cheap ones are G1/4 (BSPP, which won't seal in NPT),
+    so the bushings stay. The 0-200 and 0-300 psi transducers are now one part. A bigger gun in the old
+    cannon's style (a 1 gal tank with its 1 in end port) would also drop the 2 in pipe and reducing couplings.
+P5. **Open: which gun for 200 ft.** Bigger chambers and longer barrels change the gun's size, weight and
+    balance, so the CAD has to be redone. I haven't changed the model or the list for it; that waits on your pick.
