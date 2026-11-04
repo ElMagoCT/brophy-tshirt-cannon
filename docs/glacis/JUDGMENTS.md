@@ -803,3 +803,30 @@ N10. **Also fixed:** the light bar brackets' upright tab now sits behind the bar
      - sweep 0-45 deg clean;
      - nothing over the bed;
      - every part one solid.
+
+## Rev D.1.3: chamfered window wall, filled LED corners, bent frame strips (2026-11-04)
+Onshape version "Glacis rev D.1.3" (once you're signed in again). Replaces N7's straight wall.
+
+N11. **The thick edge is chamfered away, everywhere.** The acrylic keeps its 7 mm ledge (the only step). From the ledge's
+     edge, which follows a line MEM_W in from the panel edge rounded at the corners, the wall chamfers straight down to
+     the top of the LED band, then the band, then the skin.
+     - Below the member the window cut is only a 4 mm ring inside the LED line. It clears the strip and nothing else.
+     - Frame 5.17 L of PETG, down from 5.64 L (D.1.2), even with the corners filled.
+N12. **The gap between back-to-back LED corners is filled.** On the 10 edges shared by two panels at an angle, the
+     corner is solid between the two skins. The two strips sit on one V-shaped ridge that comes to a point, with no slot
+     between them. Every way in for a joint screw there would come through the ridge or a surface you see through the
+     acrylic, so those 24 joints are tapered tenons glued with epoxy. The other 57 keep their M4 cross screws.
+N13. **Frame (interior) strips are modelled as one piece per member.**
+     - Each strip lies on its tunnel's inner wall with the LEDs facing out.
+     - At each end it bends the easy way (about its width), up to 8 mm radius, up into the feed slot. It runs out to the
+       slot's mouth at the bottom of the ridge, where it's soldered to the next member's strip. Each bend is sized so the
+       whole strip width stays inside the slot.
+     - On 6 short members the slot at one end is too short for even a 3 mm bend. There the strip ends straight at the
+       slot and is soldered in place.
+     - 8.7 m in all.
+N14. **Checks:**
+     - No strip touches another strip, a skin, a corner fill or the frame; 0 jumpers.
+     - Sweep clean, nothing over the bed, every part one solid.
+     - Only the two known fitting slivers.
+     - An independent code review caught and fixed: the joint counterbore cutting both LED bands, a corner-fill gap at
+       mismatched corners, buried solder ends, and the contact check not seeing strips.

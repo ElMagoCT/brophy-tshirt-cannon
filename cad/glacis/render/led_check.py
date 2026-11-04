@@ -27,7 +27,12 @@ shell = solid.cut(B.inner_solid()).clean()
 panels = [dict(poly=poly, n=fi["n"]) for fi in B.face_info(solid) for poly in B.panels_for(fi)]
 B.edge_kinds(panels, print)
 B._settle_insets(panels, shell, print)
-rest = shell.cut(union([B._window_prism(p) for p in panels]))
+fills = B.corner_fills(panels, print)
+raw = shell.fuse(union(fills).intersect(solid)) if fills else shell
+rest = raw.cut(union([B._window_prism(p) for p in panels]))                  # the real frame, for the drawings
+probe = shell.cut(union([B._window_prism(p, test=True) for p in panels]))   # without the deep ring: shows hits
+fills_cut = [f.intersect(solid).cut(union([B._window_prism(p) for p in panels])) for f in fills]
+print(f"{len(fills)} corner fills")
 webs = [B.led_web(p) for p in panels]
 strips = [B.led_loop(p)[0] for p in panels]
 print(f"built in {time.time() - t0:.0f} s")
@@ -49,7 +54,13 @@ for i, s in enumerate(strips):
                 c = v.BoundingBox().center
                 print(f"strip {B._label(panels[i])} into web {B._label(panels[j])}: {v.Volume():.0f} mm3 at ({c.x:.0f}, {c.y:.0f}, {c.z:.0f})")
                 bad += 1
-    v = B._robust(s.intersect, rest)
+    for f in fills_cut:                                                   # the fills' window side must be gone
+        x = s.intersect(f)
+        if x.Volume() > 1.0:
+            c = x.BoundingBox().center
+            print(f"strip {B._label(panels[i])} into a corner fill: {x.Volume():.0f} mm3 at ({c.x:.0f}, {c.y:.0f}, {c.z:.0f})")
+            bad += 1
+    v = B._robust(s.intersect, probe)
     for x in v.Solids():
         if x.Volume() > 1.0:
             c = x.BoundingBox().center

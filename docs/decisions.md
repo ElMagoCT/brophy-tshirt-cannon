@@ -368,3 +368,11 @@ Micah's notes on the rev C.1 diagrams and follow-ups in the same session. Detail
   (25 mm behind the acrylic, 10 deg lean), with no rail or flange.
 - Shared edges set by the corner bisector (31-36 mm), so neighbours' strips meet back to back with no overlap.
 - Frame 4.44 -> 5.64 L. Clip inserts kept inside slanted faces. Onshape version "Glacis rev D.1.2".
+
+## 2026-11-04 - Glacis rev D.1.3: chamfered window wall, filled LED corners
+
+- Micah: chamfer the thick edge from the 7 mm ledge right to the LED; fill the gap between the close LED corners;
+  model the interior (frame tunnel) strips so they bend well.
+- Wall: ledge, straight chamfer, LED band. Shared corners are solid V ridges, with their 24 joints glued (no screw
+  access). Frame strips are continuous, with easy-way bends into the feed slots (straight ends on 6 short slots).
+- Frame 5.17 L. 0 contacts.

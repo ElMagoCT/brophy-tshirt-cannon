@@ -145,6 +145,8 @@ WINDOW_IN = dict(coplanar=MEM_W, open=MEM_W, notch=MEM_W, notch_top=MEM_W, slot=
                                             # edge whose strip would run into frame (a cheek, the bottom shell) moves in
                                             # a few mm at a time (body._settle_insets). Gun-well edges clear the pivots
 LED_GAP = 1.0                               # gap between two neighbours' webs at the bisector
+WINDOW_RING = 4.0                           # below the member the window cut is only this ring inside the LED line
+                                            # (clears the strip and the corner fills' window side, nothing else)
 WINDOW_IN_MAX = 46.0                        # cap on any window inset
 LED_AB = CLIP_T + ACRYLIC_T                 # acrylic's back face, in from the outer face
 LED_D0 = LED_AB + LED_BAND[1] - LED_BAND[0] / 2   # top and bottom of the strip, in from the outer face
@@ -154,6 +156,8 @@ FRAME_STRIP = (5.0, 1.0)                    # 100/m strip in each frame tunnel: 
 TUNNEL = (6.0, 2.6)                         # frame light: tunnel for a 5 mm strip (width, height), LEDs facing out
 TUNNEL_GAP = 7.05                           # tunnel centre this far outward of the tenon centre (2.5 mm of wall)
 FEED = (17.0, 38.0)                         # feed slot from the inside at each end of a tunnel, from the vertex
+FRAME_BEND = (8.0, 12.0)                    # frame strip: easy-way bend radius into each feed slot, then this much
+                                            # straight up the slot to where it's soldered to the next edge's strip
                                             # (clear of the corner-clip inserts)
 TUNNEL_SKIN = 7.0                           # slots and tunnel ends stop this far under any outer face
 CORE_DEPTH = 15.5                           # tenons sit this deep, inward of the light tunnel (inside a 19 mm member)

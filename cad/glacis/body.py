@@ -293,7 +293,10 @@ def build(log=print):
     # each window's edge is also its LED surface: set per edge (edge_kinds), corners rounded at WINDOW_R
     edge_kinds(panels, log)
     _settle_insets(panels, shell, log)
-    frame = shell.cut(union([_window_prism(p) for p in panels])).clean()
+    fills = corner_fills(panels, log)
+    raw = shell.fuse(union(fills).intersect(body)) if fills else shell
+    frame = raw.cut(union([_window_prism(p) for p in panels])).clean()
+    log(f"corner fills: {len(fills)} shared edges filled solid between their back-to-back LED skins")
     recess, short, out = [], 0, 0
     for p in panels:
         recess.append(slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W, -1.0, P.REBATE_D + 1.0, P.ACRYLIC_R + 0.3))
@@ -323,7 +326,7 @@ def build(log=print):
     for p in panels:
         p["led"], length = led_loop(p)
         loop += length
-    tunnels, frame_strips, frame_strip = strip_tunnels(panels, body.cut(inner_solid(P.TUNNEL_SKIN)))
+    tunnels, frame_strips, frame_strip = strip_tunnels(panels, body.cut(inner_solid(P.TUNNEL_SKIN)), frame)
     skipped = 0
     for k in range(0, len(tunnels), 3):                    # one edge (tunnel + two feed slots) at a time: a single
         cut = union(tunnels[k:k + 3])                     # fused cut silently skipped some of them
@@ -513,7 +516,8 @@ def _settle_insets(panels, shell, log, rounds=4, step=4.0):
     for rnd in range(rounds):
         for p in panels:
             p.pop("rail_path", None)
-        rest = shell.cut(union([_window_prism(p) for p in panels]))
+            p.pop("chamfer", None)
+        rest = shell.cut(union([_window_prism(p, test=True) for p in panels]))
         moved = []
         for p in panels:
             ring, _ = led_loop(p)
@@ -535,17 +539,107 @@ def _settle_insets(panels, shell, log, rounds=4, step=4.0):
         log(f"  round {rnd + 1}: " + "; ".join(moved))
     for p in panels:
         p.pop("rail_path", None)
+        p.pop("chamfer", None)
     log("window/LED insets: " + " | ".join(f"{_label(p)} " + " ".join(f"{d:.0f}" for d in p["ins"]) for p in panels))
 
 
-def _window_prism(p):
-    """The window cut through the member, along the outline above (falls back to an even MEM_W inset)."""
+def _ledge_2d(p):
+    """The ledge line (panel outline inset MEM_W, corners at WINDOW_R) as a 2D polyline in the panel plane."""
     pl, pts = _wp_on(p["poly"], p["n"])
-    w, _ = _window_outline(p, pl, pts)
-    if w is None:
-        return slab(p["poly"], p["n"], P.MEM_W, -1.0, P.MEM_H + 2.0, P.WINDOW_R)
-    f = cq.Face.makeFromWires(w.translate(p["n"] * 1.0))
-    return cq.Solid.extrudeLinear(f, p["n"] * -(P.MEM_H + 3.0))
+    w = round_wire(cq.Workplane(pl).polyline(pts).close().wires().val(), P.MEM_W, P.WINDOW_R)
+    o, ux, uy = pl.origin, pl.xDir, pl.yDir
+    out = []
+    for ed, rev in _ordered_edges(w):
+        n = 1 if ed.geomType() == "LINE" else max(4, math.ceil(ed.Length() / 2.0))
+        ps = [ed.positionAt(k / n) for k in range(n + 1)]
+        ps = ps[::-1] if rev else ps
+        out += [((v - o).dot(ux), (v - o).dot(uy)) for v in ps[:-1]]
+    return out
+
+
+def _chamfer(p):
+    """Per sample of the LED line: its offset out to the ledge line (MEM_W in from the panel edge, rounded at
+    WINDOW_R), found along the sample's own normal, so the wall chamfers straight from the acrylic's 7 mm ledge
+    down to the LED band all round, corners included; and the skin's back there (a true LED_BAND[3] across the
+    slope)."""
+    if "chamfer" in p:
+        return p["chamfer"]
+    _, xy, nrm, _ = _rail_path(p)
+    ledge = _ledge_2d(p)
+    c = []
+    for (x, y), (nx, ny) in zip(xy, nrm):
+        k = math.hypot(nx, ny)
+        dx, dy = -nx / k, -ny / k                     # outward
+        best = None
+        for i in range(len(ledge)):
+            (ax, ay), (bx, by) = ledge[i], ledge[(i + 1) % len(ledge)]
+            ex, ey = bx - ax, by - ay
+            den = dx * ey - dy * ex
+            if abs(den) < 1e-12:
+                continue
+            t = ((ax - x) * ey - (ay - y) * ex) / den
+            u_ = ((ax - x) * dy - (ay - y) * dx) / den
+            if -1e-9 <= u_ <= 1 + 1e-9 and t > -0.5 and (best is None or t < best):
+                best = t
+        c.append(-max(0.0, best) / k if best is not None and best < 80.0 else 0.0)
+    h = P.LED_D0 - P.REBATE_D
+    p["chamfer"] = (c, [ci - P.LED_BAND[3] * math.hypot(1.0, ci / h) for ci in c])
+    return p["chamfer"]
+
+
+def _window_prism(p, test=False):
+    """The window cut: the ledge line down to the acrylic's ledge, a chamfer straight to the top of the LED band on
+    the window/LED line, then the whole window to just past the member; below that only a WINDOW_RING-wide ring
+    inside the LED line down past the skin (it clears the strip and the corner fills' window side and nothing
+    else). test=True: without the ring, so a strip that runs into other frame still shows."""
+    if _rail_path(p) is None:
+        return slab(p["poly"], p["n"], P.MEM_W, -1.0, (P.MEM_H if test else P.LED_END) + 3.0, P.WINDOW_R)
+    c, _ = _chamfer(p)
+    full = _rail_region(p, 0, 0, 0, sections=[(-1.0, c), (P.REBATE_D, c), (P.LED_D0, 0.0), (P.MEM_H + 3.0, 0.0)])
+    if test:
+        return full
+    # sections break at LED_D0 like every other LED surface: the lean starts there, and a loft that skipped it would
+    # sit a hair off the strip's back face along the leaning runs
+    ring = _rail_region(p, 0, 0, 0, sections=[(P.LED_D0 - 0.5, 0.0), (P.LED_D0, 0.0), (P.LED_END + 2.0, 0.0)]).cut(
+        _rail_region(p, 0, 0, 0, sections=[(P.LED_D0 - 1.0, P.WINDOW_RING), (P.LED_D0, P.WINDOW_RING),
+                                           (P.LED_END + 3.0, P.WINDOW_RING)]))
+    return full.fuse(ring)
+
+
+def _edge_index(p, a, b):
+    """Index of the panel outline edge lying on segment ab."""
+    m = (a + b) * 0.5
+    poly = [V(*q) for q in p["poly"]]
+    return min(range(len(poly)), key=lambda k: _dist_seg(m, poly[k], poly[(k + 1) % len(poly)]))
+
+
+def corner_fills(panels, log=print):
+    """Solid between two neighbours' LED skins along a shared edge, so their back-to-back strips sit on one V-shaped
+    ridge with no gap between them. Generous on the window sides: the window cuts trim it to the chamfers and bands."""
+    out = []
+    for ed in edges_of(panels):
+        groups = []                                       # one panel per plane (a side wall split at its battery
+        for i in ed["panels"]:                            # door is two coplanar panels on one edge)
+            if not any(abs(panels[i]["n"].dot(panels[j]["n"])) > 0.99 for j in groups):
+                groups.append(i)
+        if len(groups) != 2:
+            continue
+        A, B = (panels[i] for i in groups)
+        a, b = ed["a"], ed["b"]
+        side = []
+        for q in (A, B):
+            t, ins = _inward_dir(q, a, b), q["ins"][_edge_index(q, a, b)]
+            o_ = P.WINDOW_RING - 1.0                      # inside the window ring, which trims it back to the band
+            side.append((a + t * (ins + o_), a + t * (ins + o_) - q["n"] * P.LED_END, a + t * ins - q["n"] * P.LED_END))
+        e = (b - a).normalized()                          # exactly square to the edge (a panel's edges can sit
+        poly = [q - e * e.dot(q - a) for q in         # a hair off its plane, which OCC calls non-planar)
+                [a, side[0][0], side[0][1], side[0][2], side[1][2], side[1][1], side[1][0]]]
+        try:
+            f = cq.Face.makeFromWires(cq.Wire.makePolygon(poly, close=True))
+            out.append(cq.Solid.extrudeLinear(f, b - a))
+        except Exception as ex:
+            log(f"  corner fill skipped at ({a.x:.0f}, {a.y:.0f}, {a.z:.0f}): {repr(ex)[:60]}")
+    return out
 
 
 def _rail_path(p):
@@ -567,8 +661,8 @@ def _rail_path(p):
         if line:
             T0 = min(P.LED_TWIST, L / 4)                  # square for this far from each corner (the neighbours'
             T = min(P.LED_TWIST, L / 4)                   # loops turn their corners there), then twists in over T
-            ss = sorted(set([0.0, T0, L - T0, L / 2] + [T0 + T * k / 4 for k in range(1, 5)] +
-                            [L - T0 - T * k / 4 for k in range(1, 5)]))
+            ss = sorted(set([0.0, T0, L - T0, L / 2] + [T0 + T * k / 8 for k in range(1, 9)] +
+                            [L - T0 - T * k / 8 for k in range(1, 9)]))
         else:
             ss = [L * k / max(2, math.ceil(L / 4.0)) for k in range(max(2, math.ceil(L / 4.0)))]
         a = [q2(ed.positionAt(s / L)) for s in ss]
@@ -608,33 +702,35 @@ def _rail_path(p):
 
 def _rail_region(p, d0, d1, off, sections=None):
     """Solid behind the panel from depth d0 to d1, inside the window/LED line shifted `off` inward (or through
-    `sections`, a list of (depth, off)). Above the strip the wall stands square to the panel; from the strip's
+    `sections`, a list of (depth, off), off a number or one per sample). Above the strip the wall stands square to the panel; from the strip's
     top edge down it leans LED_BAND[2] toward the panel along the straight runs, and round the corners it stays
     square, so the strip only bends the easy way there."""
     pl, xy, nrm, wt = _rail_path(p)
     n, tl = p["n"], math.tan(math.radians(P.LED_BAND[2]))
     wires = []
     for d, off in (sections or ((d0, off), (d1, off))):
+        offs = off if isinstance(off, (list, tuple)) else [off] * len(xy)
         pts = []
-        for (x, y), (nx, ny), f in zip(xy, nrm, wt):
-            s = off + max(0.0, d - P.LED_D0) * tl * f
+        for (x, y), (nx, ny), f, o in zip(xy, nrm, wt, offs):
+            s = o + max(0.0, d - P.LED_D0) * tl * f
             pts.append(pl.origin + pl.xDir * (x + nx * s) + pl.yDir * (y + ny * s) - n * d)
         wires.append(cq.Wire.makePolygon(pts, close=True))
     return cq.Solid.makeLoft(wires, True)
 
 
 def led_web(p):
-    """The window wall carried on past the member's back as a thin web to just below the strip: one surface from
-    the acrylic's ledge to the strip, its back edge rounded over at the bottom. A closed loop, so each panel's strip
-    lights only its own panel."""
+    """The skin behind the window wall: from the ledge down the chamfer and the LED band to just below the strip,
+    LED_BAND[3] thick, its back edge rounded over at the bottom. A closed loop, so each panel's strip lights only its
+    own panel."""
     t = P.LED_BAND[3]
     if _rail_path(p) is None:
         return None
+    c, sk = _chamfer(p)
     r = min(P.RAIL_EDGE_R, t)
-    d0, d1 = P.MEM_H - 3.0, P.LED_END
-    back = [(d0, -t), (P.LED_D0, -t)] + [(d1 - r + r * math.sin(a), -t + r - r * math.cos(a))
-                                         for a in (math.radians(k * 22.5) for k in range(5))]
-    face = [(d0 - 1.0, 0.0), (P.LED_D0, 0.0), (d1 + 1.0, 0.0)]
+    d1 = P.LED_END
+    back = [(P.REBATE_D + 0.5, sk), (P.LED_D0, -t)] + [(d1 - r + r * math.sin(a), -t + r - r * math.cos(a))
+                                                      for a in (math.radians(k * 22.5) for k in range(5))]
+    face = [(P.REBATE_D - 0.5, c), (P.REBATE_D, c), (P.LED_D0, 0.0), (d1 + 1.0, 0.0)]
     return _rail_region(p, 0, 0, 0, sections=back).cut(_rail_region(p, 0, 0, 0, sections=face))
 
 
@@ -657,14 +753,53 @@ def _bar(o, e, u, w, length, w0, w1, u0, u1):
     return cq.Workplane(pl).polyline(pts).close().extrude(length).val()
 
 
-def strip_tunnels(panels, skin):
+def _bend_pts(c, e, u, s_, sgn, R, tail, uc):
+    """Centre-line points of one end's bend (from the run, up into the slot) and its tail; sgn +1 at the start
+    end (the run goes +e), -1 at the far end."""
+    k = math.sqrt(0.5)
+    cs = s_ + sgn * R                                 # bend centre along the edge
+    return [c + e * s_ + u * (uc + R + tail), c + e * s_ + u * (uc + R),
+            c + e * (cs - sgn * R * k) + u * (uc + R - R * k), c + e * cs + u * uc]
+
+
+def _frame_strip(c, e, u, w, L, ends=None):
+    """The frame strip along one edge's tunnel, lying on the tunnel's inner wall with its LEDs facing out, bent the
+    easy way (about its width) up into the feed slot at each end and on up to the slot's mouth, where it's
+    soldered to the next edge's strip. `ends`: per end, (R, tail), or None for a straight end at the slot where
+    the slot is too short to bend into. Returns (solid, strip length)."""
+    ws, ts = P.FRAME_STRIP
+    uc = P.TUNNEL[1] / 2 - ts / 2
+    sc = (P.FEED[0] + P.FEED[1]) / 2
+    ends = ends or (P.FRAME_BEND, P.FRAME_BEND)
+    eds = []
+    a_ = _bend_pts(c, e, u, sc, 1, *ends[0], uc) if ends[0] else None
+    b_ = _bend_pts(c, e, u, L - sc, -1, *ends[1], uc) if ends[1] else None
+    run0 = a_[3] if a_ else c + e * sc + u * uc
+    run1 = b_[3] if b_ else c + e * (L - sc) + u * uc
+    if a_:
+        if ends[0][1] > 0.2:
+            eds.append(cq.Edge.makeLine(a_[0], a_[1]))
+        eds.append(cq.Edge.makeThreePointArc(a_[1], a_[2], a_[3]))
+    eds.append(cq.Edge.makeLine(run0, run1))
+    if b_:
+        eds.append(cq.Edge.makeThreePointArc(b_[3], b_[2], b_[1]))
+        if ends[1][1] > 0.2:
+            eds.append(cq.Edge.makeLine(b_[1], b_[0]))
+    path = cq.Wire.assembleEdges(eds)
+    start = (a_[0] if ends[0][1] > 0.2 else a_[1]) if a_ else run0
+    first = (eds[0].endPoint() - eds[0].startPoint()).normalized()
+    prof = cq.Workplane(cq.Plane(origin=start.toTuple(), xDir=w.toTuple(), normal=first.toTuple())).rect(ws, ts)
+    return prof.sweep(cq.Workplane(obj=path), transition="round").val(), path.Length()
+
+
+def strip_tunnels(panels, skin, frame=None):
     """Frame light: a rectangular tunnel down the middle of every member, TUNNEL_GAP outward of the tenon line so
     the joint screws stop short of it, and a feed slot from the inside at each end where the strip goes in and
     the next edge's strip is joined. Slots and tunnel ends are trimmed TUNNEL_SKIN under every outer face and
-    kept out of every joint. Also returns a simplified strip lying on each tunnel's inner wall, LEDs out."""
+    kept out of every joint. Also returns each edge's strip (_frame_strip), bent up into both its slots."""
     tw, th = P.TUNNEL
     s0, s1 = P.FEED
-    cuts, strips, total = [], [], 0.0
+    cuts, strips, total, short = [], [], 0.0, []
     # keep slots out of every joint: tenon, mortise and the screw boss inward of them
     keep = []
     for ed in edges_of(panels):
@@ -688,10 +823,45 @@ def strip_tunnels(panels, skin):
         fa = _bar(c + e * s0, e, u, w, s1 - s0, -tw / 2, tw / 2, -th / 2, 45.0)
         fb = _bar(c + e * (L - s1), e, u, w, s1 - s0, -tw / 2, tw / 2, -th / 2, 45.0)
         cuts += [x.cut(skin) for x in (tun, fa, fb)]
-        ws, ts = P.FRAME_STRIP
-        strip = _bar(c + e * (s1 + 10.0), e, u, w, L - 2 * s1 - 20.0, -ws / 2, ws / 2, th / 2 - ts, th / 2).intersect(cuts[-3])
-        strips.append((f"E{k:02d}", strip))
-        total += L - 2 * s0
+        # per end: the largest bend whose whole footprint (centre line and both strip edges) lies in the slot and
+        # tunnel, then a tail out to where the slot leaves the frame (the mouth, where the joint is soldered); a
+        # straight end where not even a 3 mm bend fits
+        room = union(cuts[-3:])
+        sc, uc = (s0 + s1) / 2, th / 2 - P.FRAME_STRIP[1] / 2
+        ends = []
+        for s_, sgn in ((sc, 1), (L - sc, -1)):
+            pick = None
+            for R_ in (P.FRAME_BEND[0], 6.0, 4.5, 3.0):
+                pts = _bend_pts(c, e, u, s_, sgn, R_, 0.0, uc)
+                arc = [pts[1], pts[2], pts[3], c + e * (s_ + sgn * R_ * 0.3) + u * (uc + R_ * 0.05)]
+                if all(room.isInside(q + w * dw, 0.05) for q in arc for dw in (-2.2, 0.0, 2.2)):
+                    pick = R_
+                    break
+            if pick is None:
+                ends.append(None)
+                continue
+            mouth = P.FRAME_BEND[1]
+            if frame is not None:                         # where the slot axis leaves the frame
+                seg = cq.Edge.makeLine(c + e * s_ + u * (uc + pick), c + e * s_ + u * 50.0)
+                ins_ = [x for x in frame.intersect(seg).Edges()]
+                if ins_:
+                    near = min(ins_, key=lambda x: min((x.startPoint() - seg.startPoint()).Length,
+                                                       (x.endPoint() - seg.startPoint()).Length))
+                    mouth = max((near.startPoint() - seg.startPoint()).Length, (near.endPoint() - seg.startPoint()).Length) + 1.0
+            top = uc + pick + mouth                       # never past the slot's own open length
+            while top > uc + pick and not room.isInside(c + e * s_ + u * top, 0.05):
+                top -= 1.0
+            ends.append((pick, max(0.0, top - uc - pick)))
+        strip, length = _frame_strip(c, e, u, w, L, ends)
+        kept = strip.intersect(room)
+        if kept.Volume() < 0.97 * strip.Volume() or len(kept.Solids()) > 1:
+            short.append(f"E{k:02d} {kept.Volume() / strip.Volume() * 100:.0f}%")
+        if any(x is None for x in ends):
+            short.append(f"E{k:02d} straight end")
+        strips.append((f"E{k:02d}", max(kept.Solids(), key=lambda x: x.Volume()) if kept.Solids() else strip))
+        total += length
+    if short:
+        print("frame strips: " + ", ".join(short))
     return cuts, strips, total
 
 
@@ -1087,7 +1257,7 @@ def _split_to_bed(s, bed=245.0):
 def add_joints(pieces, panels, log=print):
     """Tapered tenon on each segment end, mortise + M4 cross-screw hole in its neighbour."""
     tw, th, tl, tt = P.TENON
-    ok = skipped = 0
+    ok = skipped = glued = 0
     shapes = {p["name"]: p["shape"] for p in pieces}
     for p in pieces:
         ed = p["edge"]
@@ -1125,14 +1295,30 @@ def add_joints(pieces, panels, log=print):
             mid = core + out * (tl / 2)
             clear_h = cyl(2.25, 45, (mid - u * 2).toTuple(), u.toTuple())
             pilot = cyl(1.65, 45, (mid - u * 3).toTuple(), u.toTuple())
+            ps2 = [panels[i] for i in ed["panels"]]
+            ps2 = [q for k, q in enumerate(ps2) if not any(abs(q["n"].dot(r["n"])) > 0.99 for r in ps2[:k])]
+            if len(ps2) == 2:
+                # a filled corner (corner_fills): every way in for a screw head is a surface seen through the acrylic
+                # or the LED ridge, so this joint is a tapered tenon glued with epoxy, no cross screw
+                clear_h = pilot = cyl(0.01, 0.01, mid.toTuple(), u.toTuple())
+                glued += 1
             # the fused tenon starts 0.5 mm inside its own piece: OCC doesn't always merge solids that only touch
             root = _frustum(core - out * 0.5, out, u, w, size, length + 0.5, taper)
             shapes[p["name"]] = shapes[p["name"]].fuse(root).cut(pilot).clean()
-            shapes[nb["name"]] = shapes[nb["name"]].cut(mort.fuse(ten)).cut(clear_h).clean()
+            hole = mort.fuse(ten).fuse(clear_h)
+            hb = hole.BoundingBox()
+            for q in pieces:                              # every piece the tenon reaches (a joint can sit across two)
+                if q is p:
+                    continue
+                qb = shapes[q["name"]].BoundingBox()
+                if hb.xmin < qb.xmax and qb.xmin < hb.xmax and hb.ymin < qb.ymax and qb.ymin < hb.ymax and \
+                        hb.zmin < qb.zmax and qb.zmin < hb.zmax and (q is nb or shapes[q["name"]].intersect(ten).Volume() > 1.0):
+                    shapes[q["name"]] = shapes[q["name"]].cut(hole).clean()
             ok += 1
     for p in pieces:
         p["shape"] = shapes[p["name"]]
-    log(f"joints: {ok} tapered tenons with M4 cross screws, {skipped} ends without a neighbour piece")
+    log(f"joints: {ok} tapered tenons, {ok - glued} with M4 cross screws and {glued} glued (filled corners), "
+        f"{skipped} ends without a neighbour piece")
     return ok
 
 
