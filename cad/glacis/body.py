@@ -290,19 +290,35 @@ def build(log=print):
             panels.append(dict(poly=poly, n=fi["n"]))
     log(f"{len(panels)} panels")
 
-    frame = shell.cut(union([slab(p["poly"], p["n"], P.MEM_W, -1.0, P.MEM_H + 2.0, P.WINDOW_R) for p in panels])).clean()
-    recess = []
+    # each window's edge is also its LED surface: set per edge (edge_kinds), corners rounded at WINDOW_R
+    edge_kinds(panels, log)
+    _settle_insets(panels, shell, log)
+    frame = shell.cut(union([_window_prism(p) for p in panels])).clean()
+    recess, short, out = [], 0, 0
     for p in panels:
         recess.append(slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W, -1.0, P.REBATE_D + 1.0, P.ACRYLIC_R + 0.3))
         p["clips"] = corner_clips(p)
         for c in p["clips"]:
+            if c.get("holes"):                            # an insert near a slanted face mustn't break out of it:
+                keep = []                                 # shorten it (an M4 x 8 there), or drop that screw
+                for S in c["holes"]:
+                    at, dn = (S - p["n"] * (P.CLIP_T - 0.1)).toTuple(), (p["n"] * -1).toTuple()
+                    for depth, sk in ((P.INSERT[1], 1.0), (8.0, 1.0), (7.0, 1.0), (7.0, 0.5), (6.5, 0.5)):
+                        if cyl(P.INSERT[0] + sk, depth + sk, at, dn).cut(body).Volume() < 0.5:
+                            keep.append(cyl(P.INSERT[0], depth, at, dn))
+                            short += depth < P.INSERT[1]
+                            break
+                    else:
+                        out += 1
+                        log(f"  clip screw dropped (its insert would break out) at ({S.x:.0f}, {S.y:.0f}, {S.z:.0f})")
+                c["insert"] = union(keep) if keep else cyl(0.1, 0.1, c["holes"][0].toTuple(), (0, 0, 1))
             recess += [c["pocket"], c["insert"]]
+    log(f"clip inserts: {short} shortened to stay inside a slanted face (M4 x 8 there), {out} screws dropped")
     frame = frame.cut(union(recess)).clean()
-    # panel light: the rail round each window (kept out of the speaker pockets), then the frame tunnels (their
-    # feed slots cut through it)
-    edge_kinds(panels)
-    rails = union([r for r in (led_rail(p) for p in panels) if r is not None])
-    frame = frame.fuse(rails.cut(union(SPK.cuts())) if SPK.cuts() else rails).clean()
+    # panel light: the web that carries the window wall back to the strip (kept out of the speaker pockets), then
+    # the frame tunnels (their feed slots cut through it)
+    webs = union([r for r in (led_web(p) for p in panels) if r is not None])
+    frame = frame.fuse(webs.cut(union(SPK.cuts())) if SPK.cuts() else webs).clean()
     loop = 0.0
     for p in panels:
         p["led"], length = led_loop(p)
@@ -335,12 +351,31 @@ def build(log=print):
         f"strip {loop / 1000:.1f} m in {len(panels)} panel loops + {frame_strip / 1000:.1f} m in {len(frame_strips)} frame tunnels")
     # where three faces meet, the neighbours' rails and loops cross this loop's corner: the strip is cut there at
     # its nearest cut mark and jumped with three wires, so trim the model strip to match and count the jumpers
-    jumpers = 0
+    jumpers, pairs, worst = 0, 0, 0.0
+    for i, p in enumerate(panels):                         # before trimming: where would two strips run into each other?
+        for q in panels[:i]:
+            if p["led"] is None or q["led"] is None:
+                continue
+            x = p["led"].intersect(q["led"])
+            v = x.Volume()
+            if v > 1.0:
+                pairs, worst = pairs + 1, max(worst, v)
+                c = x.BoundingBox().center
+                log(f"  strips {_label(q)} / {_label(p)} overlap {v:.0f} mm3 at ({c.x:.0f}, {c.y:.0f}, {c.z:.0f})")
+    log(f"LED strips overlapping before trimming: {pairs} pairs, worst {worst:.0f} mm3")
+    spk = union(SPK.cuts()) if SPK.cuts() else None
     for i, p in enumerate(panels):
         if p["led"] is None:
             p["led_pieces"] = []
             continue
+        inside = _robust(p["led"].intersect, frame)
+        for x in inside.Solids():
+            if x.Volume() > 5.0:
+                c = x.BoundingBox().center
+                log(f"  strip {_label(p)} runs into the frame: {x.Volume():.0f} mm3 at ({c.x:.0f}, {c.y:.0f}, {c.z:.0f})")
         ring = _robust(p["led"].cut, frame)
+        if spk is not None:
+            ring = _robust(ring.cut, spk)
         for q in panels[:i]:
             for piece in q.get("led_pieces", []):
                 bb, pb = ring.BoundingBox(), piece.BoundingBox()
@@ -349,10 +384,20 @@ def build(log=print):
                     ring = _robust(ring.cut, piece)
         p["led_pieces"] = sorted([s for s in ring.Solids() if s.Volume() > 50.0], key=lambda s: -s.Volume())
         jumpers += max(0, len(p["led_pieces"]) - 1)
-    log(f"LED loops: {jumpers} jumpers where neighbours' rails or loops cross a corner")
+        p["led_kept"] = sum(s.Volume() for s in p["led_pieces"]) / max(1.0, p["led"].Volume())
+    log(f"LED loops: {jumpers} jumpers where neighbours' webs or loops cross a corner; strip kept per panel "
+        + ", ".join(f"{p.get('led_kept', 0) * 100:.0f}%" for p in panels))
     build.strips, build.tunnels, build.frame_strips = (loop, frame_strip), tunnels, frame_strips
     build.jumpers = jumpers
     return body, frame, panels
+
+
+def _label(p):
+    """Short panel name for logs."""
+    n = p["n"]
+    c = sum((V(*q) for q in p["poly"]), V(0, 0, 0)) * (1.0 / len(p["poly"]))
+    side = "deck" if n.z > 0.9 else "front" if n.x > 0.3 else "rear" if n.x < -0.3 else ("left" if n.y > 0 else "right")
+    return f"{side}@x{c.x:.0f}"
 
 
 def _ordered_edges(wire):
@@ -364,45 +409,66 @@ def _ordered_edges(wire):
     return out
 
 
-def edge_kinds(panels):
+def edge_kinds(panels, log=None):
     """p["kinds"][k]: edge k of the panel outline is "shared" (with a panel at an angle), "coplanar" (a seam in
-    one face), "notch" (a speaker pocket's edge), "slot" (the gun well) or "open" (the bottom, the front cut)."""
+    one face), "notch" (a speaker pocket's edge), "slot" (the gun well) or "open" (the bottom, the front cut).
+    p["ins"][k]: how far in from that edge the window edge (the LED surface) sits. On an edge shared with a panel
+    at interior angle phi, the web (square to the panel, `ins` in from the edge, down to LED_END) must stay on this
+    panel's side of the bisector, a point at distance x from the edge and depth y being inside when
+    y < x tan(phi / 2): the two neighbours' strips then meet back to back in a point at the corner."""
+    seen = {}
     for i, p in enumerate(panels):
         poly = [V(*q) for q in p["poly"]]
-        kinds = []
+        kinds, ins = [], []
         for k in range(len(poly)):
             a, b = poly[k], poly[(k + 1) % len(poly)]
             mids = [a + (b - a) * f for f in (0.25, 0.5, 0.75)]
             shared = coplanar = False
+            nb = None
             for j, o in enumerate(panels):
                 if j == i:
                     continue
-                before = shared
+                hit = False
                 oq = [V(*q) for q in o["poly"]]
                 for m in range(len(oq)):
                     c, d = oq[m], oq[(m + 1) % len(oq)]
                     cd = d - c
                     for x in mids:
                         t = max(0.0, min(1.0, (x - c).dot(cd) / cd.dot(cd)))
-                        shared |= (c + cd * t - x).Length < 0.5
-                if shared and not before and abs(o["n"].dot(p["n"])) > 0.99:
-                    coplanar = True
+                        hit |= (c + cd * t - x).Length < 0.5
+                if hit:
+                    if abs(o["n"].dot(p["n"])) > 0.99:
+                        coplanar = True
+                    else:
+                        shared, nb = True, o["n"]
             notch = any(c.isInside(mids[1], 1.0) for c in SPK.cuts())
             slot = all(abs(abs(q.y) - P.Y_SLOT) < 0.5 for q in (a, b))
             notch |= p["n"].z > 0.9 and all(abs(q.x - P.X_TOP_FRONT) < 1.0 for q in (a, b))   # deck front: over the cups
-            kinds.append("coplanar" if coplanar else "shared" if shared else
-                         ("notch_top" if p["n"].z > 0.9 else "notch") if notch else "slot" if slot else "open")
-        p["kinds"] = kinds
+            kind = ("coplanar" if coplanar else "shared" if shared else
+                    ("notch_top" if p["n"].z > 0.9 else "notch") if notch else "slot" if slot else "open")
+            d = P.WINDOW_IN[kind]
+            if kind == "shared":
+                phi = math.pi - math.acos(max(-1.0, min(1.0, p["n"].dot(nb))))
+                tn, t = math.tan(phi / 2), P.LED_BAND[3]
+                r, g = min(P.RAIL_EDGE_R, t), P.LED_GAP / 2
+                d = min(P.WINDOW_IN_MAX, max(d, (P.LED_END - r + g) / tn + t, (P.LED_END + g) / tn))
+                seen[round(math.degrees(phi))] = round(d, 1)
+            kinds.append(kind)
+            ins.append(d)
+        p["kinds"], p["ins"] = kinds, ins
+    if log:
+        log("shared edges, interior angle -> window/LED inset (mm): " +
+            ", ".join(f"{a} deg -> {d}" for a, d in sorted(seen.items())))
 
 
-def _rail_outline(p, pl, pts):
-    """The strip face's line at the strip's centre depth: each edge inset by its kind's RAIL_FACE, corners
-    rounded at LED_CORNER (less where a neck is too narrow)."""
-    ins = [P.RAIL_FACE[k] for k in p.get("kinds") or ["shared"] * len(pts)]
+def _window_outline(p, pl, pts):
+    """The window edge, which is also the LED surface: each edge inset by p["ins"], corners rounded at WINDOW_R
+    (less where a neck is too narrow)."""
+    ins = p.get("ins") or [P.MEM_W] * len(pts)
     i0 = min(ins)
     outline = cq.Workplane(pl).polyline(pts).close().wires().val()
     poly = [pl.origin + pl.xDir * x + pl.yDir * y for x, y in pts]
-    for r in (P.LED_CORNER, 15.0, 10.0, 5.0, 3.0):
+    for r in (P.WINDOW_R, 10.0, 6.0, 3.0):
         try:
             base = outline.offset2D(-(i0 + r), "intersection")
             if len(base) != 1:
@@ -432,7 +498,54 @@ def _rail_outline(p, pl, pts):
                 return c1[0], r
         except Exception:
             continue
-    return None, 0.0                                       # too narrow for a rail: the panel goes without a loop
+    return None, 0.0                                       # too narrow: the panel goes without a loop
+
+
+def _dist_seg(c, a, b):
+    ab = b - a
+    t = max(0.0, min(1.0, (c - a).dot(ab) / ab.dot(ab)))
+    return (a + ab * t - c).Length
+
+
+def _settle_insets(panels, shell, log, rounds=4, step=4.0):
+    """Push a window edge (= LED surface) further in wherever its strip would run into frame that stays (another
+    face's member, a speaker cheek, the bottom shell), `step` mm a round, up to WINDOW_IN_MAX."""
+    for rnd in range(rounds):
+        for p in panels:
+            p.pop("rail_path", None)
+        rest = shell.cut(union([_window_prism(p) for p in panels]))
+        moved = []
+        for p in panels:
+            ring, _ = led_loop(p)
+            if ring is None:
+                continue
+            poly = [V(*q) for q in p["poly"]]
+            bump = set()
+            for x in _robust(ring.intersect, rest).Solids():
+                if x.Volume() < 5.0:
+                    continue
+                c = x.BoundingBox().center
+                bump.add(min(range(len(poly)), key=lambda k: _dist_seg(c, poly[k], poly[(k + 1) % len(poly)])))
+            for k in bump:
+                if p["ins"][k] < P.WINDOW_IN_MAX:
+                    p["ins"][k] = min(P.WINDOW_IN_MAX, p["ins"][k] + step)
+                    moved.append(f"{_label(p)} edge {k} ({p['kinds'][k]}) -> {p['ins'][k]:.0f}")
+        if not moved:
+            break
+        log(f"  round {rnd + 1}: " + "; ".join(moved))
+    for p in panels:
+        p.pop("rail_path", None)
+    log("window/LED insets: " + " | ".join(f"{_label(p)} " + " ".join(f"{d:.0f}" for d in p["ins"]) for p in panels))
+
+
+def _window_prism(p):
+    """The window cut through the member, along the outline above (falls back to an even MEM_W inset)."""
+    pl, pts = _wp_on(p["poly"], p["n"])
+    w, _ = _window_outline(p, pl, pts)
+    if w is None:
+        return slab(p["poly"], p["n"], P.MEM_W, -1.0, P.MEM_H + 2.0, P.WINDOW_R)
+    f = cq.Face.makeFromWires(w.translate(p["n"] * 1.0))
+    return cq.Solid.extrudeLinear(f, p["n"] * -(P.MEM_H + 3.0))
 
 
 def _rail_path(p):
@@ -441,7 +554,7 @@ def _rail_path(p):
     if "rail_path" in p:
         return p["rail_path"]
     pl, pts = _wp_on(p["poly"], p["n"])
-    wire, p["rail_r"] = _rail_outline(p, pl, pts)
+    wire, p["rail_r"] = _window_outline(p, pl, pts)
     if wire is None:
         p["rail_path"] = None
         return None
@@ -494,44 +607,45 @@ def _rail_path(p):
 
 
 def _rail_region(p, d0, d1, off, sections=None):
-    """Solid behind the panel from depth d0 to d1, inside the strip face shifted `off` inward (or through
-    `sections`, a list of (depth, off)). Along the straight runs the face leans LED_RAIL[3] toward the panel
-    (pivoting at the strip's centre depth); round the corners it stands square to the panel, so the strip only
-    bends the easy way there."""
+    """Solid behind the panel from depth d0 to d1, inside the window/LED line shifted `off` inward (or through
+    `sections`, a list of (depth, off)). Above the strip the wall stands square to the panel; from the strip's
+    top edge down it leans LED_BAND[2] toward the panel along the straight runs, and round the corners it stays
+    square, so the strip only bends the easy way there."""
     pl, xy, nrm, wt = _rail_path(p)
-    n, tl, dc = p["n"], math.tan(math.radians(P.LED_RAIL[3])), P.LED_LOOP[2]
+    n, tl = p["n"], math.tan(math.radians(P.LED_BAND[2]))
     wires = []
     for d, off in (sections or ((d0, off), (d1, off))):
         pts = []
         for (x, y), (nx, ny), f in zip(xy, nrm, wt):
-            s = off + (d - dc) * tl * f
+            s = off + max(0.0, d - P.LED_D0) * tl * f
             pts.append(pl.origin + pl.xDir * (x + nx * s) + pl.yDir * (y + ny * s) - n * d)
         wires.append(cq.Wire.makePolygon(pts, close=True))
     return cq.Solid.makeLoft(wires, True)
 
 
-def led_rail(p):
-    """Printed rail inside the window, carried by a flange from the member's inner face: a closed loop, so each
-    panel's strip lights only its own panel."""
-    t, d0, d1, _ = P.LED_RAIL
+def led_web(p):
+    """The window wall carried on past the member's back as a thin web to just below the strip: one surface from
+    the acrylic's ledge to the strip, its back edge rounded over at the bottom. A closed loop, so each panel's strip
+    lights only its own panel."""
+    t = P.LED_BAND[3]
     if _rail_path(p) is None:
         return None
-    r = min(P.RAIL_EDGE_R, t)                             # the back edge rounds over to the strip face at the free end
-    back = [(d0, -t)] + [(d1 - r + r * math.sin(a), -t + r - r * math.cos(a))
-                         for a in (math.radians(k * 22.5) for k in range(5))]
-    rail = _rail_region(p, 0, 0, 0, sections=back).cut(_rail_region(p, d0 - 1.0, d1 + 1.0, 0.0))
-    flange = slab(p["poly"], p["n"], P.MEM_W - 4.0, d0, 6.0, P.FLANGE_ROUND).cut(
-        _rail_region(p, d0 - 1.0, d0 + 7.0, -t + 1.0))
-    return rail.fuse(flange)
+    r = min(P.RAIL_EDGE_R, t)
+    d0, d1 = P.MEM_H - 3.0, P.LED_END
+    back = [(d0, -t), (P.LED_D0, -t)] + [(d1 - r + r * math.sin(a), -t + r - r * math.cos(a))
+                                         for a in (math.radians(k * 22.5) for k in range(5))]
+    face = [(d0 - 1.0, 0.0), (P.LED_D0, 0.0), (d1 + 1.0, 0.0)]
+    return _rail_region(p, 0, 0, 0, sections=back).cut(_rail_region(p, 0, 0, 0, sections=face))
 
 
 def led_loop(p):
-    """Simplified 60/m strip stuck to the rail's face, LEDs aimed across the panel (and slightly at it along the
+    """Simplified 60/m strip stuck to the web's face, LEDs aimed across the panel (and slightly at it along the
     straight runs)."""
-    w, th, dc = P.LED_LOOP
+    th = P.LED_STRIP_T
     if _rail_path(p) is None:
         return None, 0.0
-    ring = _rail_region(p, dc - w / 2, dc + w / 2, 0.0).cut(_rail_region(p, dc - w / 2 - 1.0, dc + w / 2 + 1.0, th))
+    ring = _rail_region(p, 0, 0, 0, sections=[(P.LED_D0, 0.0), (P.LED_D1, 0.0)]).cut(
+        _rail_region(p, 0, 0, 0, sections=[(P.LED_D0 - 1.0, th), (P.LED_D0, th), (P.LED_D1 + 1.0, th)]))
     _, xy, _, _ = _rail_path(p)
     return ring, sum(math.hypot(xy[i][0] - xy[i - 1][0], xy[i][1] - xy[i - 1][1]) for i in range(len(xy)))
 
@@ -648,9 +762,10 @@ def corner_clips(p):
                 c["clip"] = c["clip"].fuse(clip).cut(cyl(2.25, 10, (S + n).toTuple(), (n * -1).toTuple()))
                 c["pocket"] = c["pocket"].fuse(pocket)
                 c["insert"] = c["insert"].fuse(insert)
+                c["holes"].append(S)
                 break
         else:
-            corners.append(dict(clip=clip, pocket=pocket, insert=insert))
+            corners.append(dict(clip=clip, pocket=pocket, insert=insert, holes=[S]))
     if door:
         corners.append(_door_latch(p))
     return corners
@@ -750,8 +865,8 @@ def _section_prism(edge, panels, t0, t1, margin=0.6):
         o = pa - t * margin + n * margin
         L = (pb - pa).Length
         pl = cq.Plane(origin=o, xDir=t, normal=e)
-        w = max(P.MEM_W, max(P.RAIL_FACE.values()) + 3.0) + 2 * margin   # the member plus its LED rail
-        h = P.LED_RAIL[2] + 2 * margin
+        w = max(P.MEM_W, P.WINDOW_IN_MAX) + 3.0 + 2 * margin   # the member plus its LED web
+        h = P.LED_END + 2 * margin
         pts = []                                   # in-plane t (0..w) x inward -n (0..h)
         for (u, v) in [(0, 0), (w, 0), (w, h), (0, h)]:
             q = o + t * u - n * v

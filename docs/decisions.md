@@ -361,3 +361,10 @@ Micah's notes on the rev C.1 diagrams and follow-ups in the same session. Detail
   for less air. Keep the two 6 L (JUDGMENTS N3).
 - Parts: cheapest of AliExpress (Micah's logged-in prices), Amazon and McMaster. No rivets, old 9 in mecanum for now,
   goBILDA motors owned. $1,888.37 -> $1,359.91. Onshape version "Glacis rev D.1.1".
+
+## 2026-11-04 - Glacis rev D.1.2: LED band = window wall
+
+- Micah: the D.1.1 rails overlapped. The window wall now runs from the acrylic ledge straight back to the strip
+  (25 mm behind the acrylic, 10 deg lean), with no rail or flange.
+- Shared edges set by the corner bisector (31-36 mm), so neighbours' strips meet back to back with no overlap.
+- Frame 4.44 -> 5.64 L. Clip inserts kept inside slanted faces. Onshape version "Glacis rev D.1.2".

@@ -405,7 +405,7 @@ def speakers():
         bom="Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V", note="straight ahead")
     for sg, side in ((1, "left"), (-1, "right")):
         brk = box(P.front_x(zc - hb / 2 - 6.0) - 20.0, xf + 6.0, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc - hb / 2)
-        brk = brk.fuse(box(xf - 2.0, xf + 6.0, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc + hb / 2)).cut(plain)
+        brk = brk.fuse(box(xf - 6.0, xf, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc + hb / 2)).cut(plain)   # tab behind the bar
         add(f"LED light bar bracket {side}", brk, "print", "body", bom="Light bar bracket (printed)", kind="print",
             note="2 x M4 into the front panel's bottom member; the bar's own bolt through its slot")
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing

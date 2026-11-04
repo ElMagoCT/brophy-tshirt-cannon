@@ -390,6 +390,10 @@ if __name__ == "__main__":
         log(f"printed parts over a 256 mm bed: {len(bad)}", bad[:10])
         split = [p["name"] for p in parts if len(p["shape"].Solids()) > 1]
         log(f"parts in more than one piece: {len(split)}", split[:10])
+        for p in parts:
+            if len(p["shape"].Solids()) > 1:
+                log("   ", p["name"], [(round(x.Volume()), tuple(round(v) for v in x.BoundingBox().center.toTuple()))
+                                       for x in sorted(p["shape"].Solids(), key=lambda x: -x.Volume())][:4])
         if "--checks" in sys.argv:
             open(os.path.join(OUT, "check_log.txt"), "w").write("\n".join(LOG) + "\n")
             sys.exit(0)

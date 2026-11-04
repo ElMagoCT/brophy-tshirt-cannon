@@ -773,3 +773,33 @@ N6. **Checks:**
     - Sweep 0-45 deg is clean, nothing is over the bed, and every part is one solid.
     - The same two fitting slivers as D.1 remain (146 and 64 mm3): where two male threads overlap inside a 1/4 cross, the
       model engages them deeper than a real joint does.
+
+## Rev D.1.2: the LED band is the window wall (2026-11-04)
+Onshape version "Glacis rev D.1.2"; sections in `docs/glacis/led_sections_d1_2.png`. This replaces N1's rail.
+
+N7. **Your fix list:**
+    - **No rail, no flange.** The window wall runs straight back from the ledge the acrylic sits on (the only step) and
+      carries on past the member as a 2.5 mm web.
+    - **The strip** sits on that wall's last 10 mm, centred 25 mm behind the acrylic. It leans 10 deg toward the panel
+      on the straight runs and stands square round the corners. The bend into the lean is the only "chamfer".
+    - The strip needs only about 8 mm to stick to; the band is 10 mm, the strip's width.
+N8. **No strip touches another strip, a web or the frame**: 0 overlaps, 0 jumpers, with 99-100% of every loop kept.
+    The rule that does it:
+    - **Shared corners:** each panel's web and strip stay on their own side of the corner's bisector, so the two
+      neighbours' strips meet back to back at a point. That puts the window edge 31-36 mm in from a shared edge,
+      depending on the angle (91 deg 36, 94 deg 35, 98 deg 32.5, 100 deg 31.4): in between the old 42 and the 19
+      that overlapped. At 19, each web hung into the neighbour's window and ran into its seams and corners.
+    - **Every other edge** stays at 19 (gun-well edges 24). The build pushes in any edge whose strip would hit frame,
+      4 mm at a time. None needed it.
+    - **The cost:** wider solid members on the shared edges, so the frame is 5.64 L of PETG (was 4.44). Hollowing their
+      hidden back would only win about a third of that back, because the neighbour's member already fills most of
+      the extra width.
+N9. **Clip inserts no longer break out of a slanted face.** Each hole is tested against the outer surface with a 1 mm
+    skin and shortened if needed. At the two deck-front corners, where two clips merge, the second screw would break
+    out whatever the depth, so each of those clips keeps one screw.
+N10. **Also fixed:** the light bar brackets' upright tab now sits behind the bar instead of inside it (2,880 mm3 each).
+     Checks:
+     - interference: only the two known fitting slivers;
+     - sweep 0-45 deg clean;
+     - nothing over the bed;
+     - every part one solid.

@@ -122,32 +122,34 @@ INSERT = (2.8, 10.0)                        # M4 heat-set insert hole: radius, d
 # corner and edge radii, one per kind (rev C.3.1: every corner radius is 2/3 of rev C.3's)
 WINDOW_R = 15.0                             # frame window corners (convex and concave)
 ACRYLIC_R = 18.7                            # acrylic panel corners, and the rebate they sit in (+0.3)
-LED_CORNER = 15.0                           # LED rail and strip loop corners (less where a panel neck is too narrow).
-                                            # Where three faces meet, the neighbours' corner turns cross a loop: the
-                                            # strip is cut and jumped with 3 wires there (body.build counts them)
-FLANGE_ROUND = LED_CORNER + 4.0             # rail flange corners: concentric with the rail, so no solid corner plates
 CLIP_ROUND = 4.0                            # corner clip and clip pocket outline corners
-RAIL_EDGE_R = 2.5                           # the rail's free back edge rounds over to its strip face (= the wall)
+RAIL_EDGE_R = 2.5                           # the LED web's free back edge rounds over to its strip face
 NODE_SETBACK = 48.0
 PRINT_MAX = 240.0
 TENON = (6.5, 6.5, 12.0, 0.5)
 TENON_CLEAR = 0.15
-LED_RAIL = (2.5, 17.0, 38.0, 15.0)          # panel light rail: wall, from/to depth, lean toward the panel (deg) on
-                                            # the straight runs; the corners stand square to the panel (a strip
-                                            # can't bend round a cone); runs stay square LED_TWIST from each corner,
-                                            # then the lean ramps in over the next LED_TWIST
-LED_TWIST = 40.0
-RAIL_FACE = dict(shared=19.0, coplanar=19.0, open=19.0, slot=24.0, notch=30.0, notch_top=46.0)
-                                            # the rail's strip face is this far in from a panel edge at the strip's
-                                            # centre depth: just behind the window edge. On an edge shared with
-                                            # another panel the two rails meet back to back in a point (Micah,
-                                            # 2026-11-03); the gun-well edges clear the pivot blocks, the speaker
-                                            # notches their cups (the deck's run under a cup's slanted wall) and the
-                                            # elevation motor. A thin flange from the member's inner face carries a
-                                            # rail where it stands further in
-LED_LOOP = (10.0, 1.6, 30.0)                # 60/m strip on the rail: width, thickness, centre depth (0.96 in
-                                            # behind the panel's back face; rev C.3 had 1.15). Any shallower and, at the
-                                            # 98 deg deck-to-side corners, a strip runs into its neighbour's rail
+# panel light (rev D.1.2, Micah 2026-11-04): the window wall IS the LED surface. Below the acrylic's ledge it runs
+# straight back, past the member as a thin web, and its last 10 mm (the strip) leans a little toward the panel on the
+# straight runs. No rail, no flange, no step but the ledge the acrylic sits on.
+LED_BAND = (10.0, 25.0, 10.0, 2.5)          # strip width (a 10 mm strip; ~8 is enough to stick to), strip centre this
+                                            # far behind the acrylic's back face, lean toward the panel (deg) on the
+                                            # straight runs, web thickness below the member
+LED_STRIP_T = 1.6                           # 60/m strip thickness on the band
+LED_TWIST = 40.0                            # runs stay square this far from each corner (a strip can't bend round a
+                                            # cone), then the lean ramps in over the next LED_TWIST
+WINDOW_IN = dict(coplanar=MEM_W, open=MEM_W, notch=MEM_W, notch_top=MEM_W, slot=24.0, shared=MEM_W)
+                                            # window edge (= LED surface) in from each panel edge, before the checks:
+                                            # a shared edge then moves in until its web and strip stay on their own side
+                                            # of the corner's bisector, so two neighbours' strips meet back to back in a
+                                            # point there (Micah, 2026-11-04: "somewhere in between" 19 and 42), and any
+                                            # edge whose strip would run into frame (a cheek, the bottom shell) moves in
+                                            # a few mm at a time (body._settle_insets). Gun-well edges clear the pivots
+LED_GAP = 1.0                               # gap between two neighbours' webs at the bisector
+WINDOW_IN_MAX = 46.0                        # cap on any window inset
+LED_AB = CLIP_T + ACRYLIC_T                 # acrylic's back face, in from the outer face
+LED_D0 = LED_AB + LED_BAND[1] - LED_BAND[0] / 2   # top and bottom of the strip, in from the outer face
+LED_D1 = LED_D0 + LED_BAND[0]
+LED_END = LED_D1 + 0.8                      # the web stops just past the strip
 FRAME_STRIP = (5.0, 1.0)                    # 100/m strip in each frame tunnel: width, thickness
 TUNNEL = (6.0, 2.6)                         # frame light: tunnel for a 5 mm strip (width, height), LEDs facing out
 TUNNEL_GAP = 7.05                           # tunnel centre this far outward of the tenon centre (2.5 mm of wall)

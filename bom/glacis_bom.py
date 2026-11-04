@@ -129,13 +129,13 @@ ROWS = [
      "Structure", "The only screw size on the body: frame-joint cross screws, panel clips (into inserts), standoffs, door latches, speaker cups (8)", f"Only 2 left; backup 12.9 black-oxide B0CTH3FQLD $8.86 ({D}, L)"),
     ("Frosted acrylic 1/8 in (owned): 8 panels", "Owned", 8, 0.00, "", "Cosmetic",
      "Recessed in the printed frame, held by corner clips", "Owned; outlines in the Onshape panels tab"),
-    ("Printed body frame: 66 pieces incl. two front cheeks, 73 tapered tenons, 36 corner clips, 2 door latches, 2 light bar brackets, "
+    ("Printed body frame: 71 pieces incl. two front cheeks, 81 tapered tenons, 34 corner clips, 2 door latches, 2 light bar brackets, "
      "14 underglow brackets (natural PETG, 15% gyroid)", "Owned", 1, 0.00, "", "Structure",
-     "Holds the panels; a strip tunnel down every member (the frame glows) and an LED rail round each window",
+     "Holds the panels; a strip tunnel down every member (the frame glows); each window wall carries its LED strip",
      "Filament assumed owned. 4 walls, 15% gyroid: lighter, and the glow is more even"),
     ("LIGHTS - panel loops, glowing frame, underglow, front light bar", None),
     ('WS2812B LED strip 5 mm wide, 2020 LEDs, 100 LED/m, 5 m', 'Aliexpress', 2, 14.16, 'https://www.aliexpress.us/item/3256806570121908.html', 'Electrical', '8.3 m pushed through the frame tunnels, LEDs out, so the printed frame glows', '$13.61 a reel + $1.09 shipping split over the two; 77 sold, 5 stars. Logged-in price (2026-11-04, L)'),
-    ('WS2812B LED strip 10 mm, 60 LED/m, 5 m, black PCB, IP30', 'Aliexpress', 3, 7.33, 'https://www.aliexpress.us/item/3256807802893080.html', 'Electrical', '10.6 m: one closed loop per panel on the rail 1.15 in behind it, LEDs aimed across the panel; 2.5 m of underglow under the bumpers from the rest of the third reel', '3,000+ sold, 4.8 stars, Choice. Logged-in price; was $13.99 a reel on Amazon (2026-11-04, L)'),
+    ('WS2812B LED strip 10 mm, 60 LED/m, 5 m, black PCB, IP30', 'Aliexpress', 3, 7.33, 'https://www.aliexpress.us/item/3256807802893080.html', 'Electrical', '11.2 m: one closed loop per panel on its window wall, centred 25 mm behind the acrylic, LEDs aimed across the panel; 2.5 m of underglow under the bumpers from the rest of the third reel', '3,000+ sold, 4.8 stars, Choice. Logged-in price; was $13.99 a reel on Amazon (2026-11-04, L)'),
     ('Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V (your pick)', 'Amazon', 1, 19.99, 'https://www.amazon.com/dp/B07SWZ1LMM', 'Electrical', 'Across the nose just above the bumper on two printed brackets, aimed straight ahead. The STM32 switches it (and can PWM-dim it) through a MOSFET channel; about 6 A at 12 V', '4.5 stars (3,552). $17.99 is the Prime-member price. Size not listed: modelled 330 x 30 x 45 mm [UNVERIFIED] (2026-11-04, L)'),
     ("12/24 V -> 5 V 20 A buck, potted", "Amazon", 1, 15.99, "https://www.amazon.com/dp/B089M5R3NJ",
      "Electrical", "LEDs only, on a PDH channel, so they go dark with the PDH",
