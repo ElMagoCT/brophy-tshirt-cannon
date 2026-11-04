@@ -555,3 +555,60 @@ D7. **Cost: +$360.07**, so $1,908.97 on the committed list. That's close to the 
     $1,964 with the other session's C.3 rows). The biggest adds are tanks +$170, barrels +$84 and the valve +$38.
 D8. **Electronics:** the web UI's access point moves to 5 GHz on an ESP32-C5 ($13.99); the camera is deferred.
     The "STM32 with WiFi" question is answered in `electrical/README.md`.
+
+## Rev D.1: both chambers in 3 in pipe, three tanks (proposal, 2026-11-03)
+Your notes on rev D: five tanks is too many and too expensive; put a bigger or third tank where you
+circled (low in the front half, under the gun); the old tank is too big, so make the top chamber like the
+bottom one but longer; barrel spacing, the top elevation (60 deg is fine), the pivot and the drive motors
+can all move. Supersedes D2, D5 and D6.
+
+D9. **Both chambers are 3 in Sch 40 pipe between 3 x 1 reducing couplings.** Top: 12 in nipple, about
+    1.59 L, on the HSV04 (up to 190 psi). Bottom: 10 in nipple, about 1.35 L, on the SZW-25 (110 psi).
+    Both use 36 in barrels:
+
+    | Top chamber on the HSV04 | 200 ft at | 120 ft at | Air per 120 ft shot |
+    |---|---|---|---|
+    | 10 in (same as the bottom) | 127-184 psi | 70-96 psi | 95-129 L*psi |
+    | **12 in (picked)** | **120-176 psi** | **64-89 psi** | **102-142** |
+    | 18 in | 107-163 psi | 52-76 psi | 122-177 |
+    | old 1 gal tank (rev D) | 96-151 psi | 42-65 psi | 159-246 |
+
+    - Past 12 in, a longer chamber barely adds speed (the valve limits it), and it burns more air on every
+      120 ft shot. 12 in keeps the 200 ft shot under the 190 psi cap even if the valve opens slowly.
+    - The smaller top chamber uses about 40% less air per shot than the old tank, which is what lets the
+      tank count drop.
+D10. **Barrel spacing: about 112 mm between axes (barrels about 36 mm apart, was 8).** A 3 in coupling is
+    4.28 in (109 mm) across, so two of them side by side set the spacing.
+    - Staggering the couplings only gets it to about 102 mm (a coupling still has to clear the other
+      chamber's 3.5 in pipe), and it takes a longer nipple on one cannon. Not worth 10 mm.
+    - 2.5 in pipe would fit at about 95 mm, but the chambers grow to 17-21 in long.
+D11. **Tanks: the two side tanks plus a third 6 L of the same part (18 L), in the space you circled.**
+    120 ft shots per charge, both cannons alternating:
+
+    | Tanks | Total | Fast valve (150/175/200 psi) | Slow valve | Cost of the third |
+    |---|---|---|---|---|
+    | two side tanks only | 12 L | 9 / 11 / 15 | 6 / 8 / 10 | - |
+    | **+ third 6 L (picked)** | **18 L** | **13 / 17 / 21** | **8 / 12 / 16** | **$56.60** |
+    | + Viair 2.5 gal steel, 6 x 23.5 in | 21.5 L | 15 / 21 / 25 | 10 / 14 / 18 | $109.25 |
+    | + 3 gal aluminum, 7 x 18.9 in (Ridetech) | 23.4 L | 17 / 23 / 27 | 10 / 16 / 20 | about $145 |
+
+    - The third 6 L gets your 12-shot target from a 175 psi charge, and 16-21 shots from 200 psi.
+    - The bigger ones add 2-6 shots for $53-88 more. The Viair is likely too long for that spot, and Ridetech
+      doesn't publish the 3 gal tank's pressure rating (ask before buying). AccuAir's 2 gal seamless tank is
+      $174.95.
+    - The spot you circled is where the side tanks and, above 60 deg, the chambers' swing already are. So the
+      CAD has to make room: cap elevation at 60 deg, move the pivot or the Falcons, or move the side tanks.
+      That's a CAD call (the C.3 session); if a 3 gal fits there, it's the upgrade.
+D12. **Money, each round** (parts list on committed rows):
+
+    | Round | Change | Total |
+    |---|---|---|
+    | rev C.2 | | $1,512.44 |
+    | C.3 electronics + air review | +$36.46 | $1,548.90 |
+    | rev D (old tank on a 725 psi valve, 5 tanks, 36 in barrels, 5 GHz bridge) | +$360.07 | $1,908.97 |
+    | **rev D.1 (3 in top chamber, 3 tanks)** | **-$17.83** | **$1,891.14** |
+
+    - Rev D.1 in detail: two fewer tanks -$113.20 and one fewer pack of straps -$8.99; the top chamber
+      (12 in nipple $31.59, two couplings $63.78, a bushing $8.99) +$104.36. The old tank goes back to spare.
+    - The other session's C.3 rows (elevation, smoke, body) add about $55 on top.
+    - The biggest lines now: speakers $160, barrels $169, the three tanks $170, the HSV04 $98.

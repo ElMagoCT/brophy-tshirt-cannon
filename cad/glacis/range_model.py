@@ -112,13 +112,14 @@ if __name__ == "__main__":
         tanks = " / ".join(f"{tank_l_needed(vc, p2, p7, p0):.1f}" for p0 in (150, 190)) if p2 else "-"
         print(f"{name:40s} | {v:4.1f} | {rs:11s} | {('%3.0f' % p2) if p2 else 'n/a'} | {p7:3.0f} | {tanks}")
 
-    # Rev D proposal (Micah, 2026-11-03): top cannon = old 1 gal tank (3.8 L) on a U.S. Solid HSV04 (1 in, Cv 11.67,
-    # pilot, 725 psi) so it can run to the full tank pressure; bottom cannon = 3 in Sch 40 x 10 in nipple between
-    # 3 x 1 reducing couplings (~1.35 L) on the old SZW-25 (110 psi cap); both barrels the same length.
+    # Rev D.1 proposal (Micah, 2026-11-03): both chambers are 3 in Sch 40 between 3 x 1 reducing couplings. Top cannon:
+    # 12 in nipple (~1.59 L) on a U.S. Solid HSV04 (1 in, Cv 11.67, pilot, 725 psi), so it can run to 190 psi; bottom:
+    # 10 in nipple (~1.35 L) on the old SZW-25 (110 psi cap). Both barrels the same length. (Rev D had the old 1 gal
+    # tank on top; Micah found it too big.)
     # Targets: 200 ft from the top cannon; 120 ft shots, 6 per cannon (12) per tank charge, 10 each (20) ideally.
     # The HSV04's opening time isn't published, so 50 and 80 ms bracket it.
     v120 = speed_for(120, 0.008)                                   # pessimistic drag for the everyday shot
-    top, bot = 3.8, 1.35
+    top, bot = 1.59, 1.35
     print(f"\nRev D: 120 ft needs {v120:.1f} m/s (CdA .008), 200 ft {v200:.1f} (CdA .006)")
     for b in (30, 36, 42, 48):
         for to in (0.05, 0.08):
@@ -151,3 +152,19 @@ if __name__ == "__main__":
         row = "  ".join(f"{p0} psi: {tank_for(6, p0, p_top, p_bot):4.1f} / {tank_for(10, p0, p_top, p_bot):4.1f} L"
                         for p0 in (150, 175, 200))
         print(f"  HSV04 {to * 1000:.0f} ms (top at {p_top:.0f} psi, bottom at {p_bot:.0f}):  {row}")
+
+    def shots_per_charge(vt, p0, p_top, p_bot, k=1.15):
+        pt, n = p0, 0
+        while True:
+            for vc, ps in ((top, p_top), (bot, p_bot)):
+                if pt < ps + 5:
+                    return n
+                pt -= k * vc * ps / vt
+                n += 1
+
+    print("\n120 ft shots per charge, both cannons alternating (charged to 150 / 175 / 200 psi):")
+    for vt, name in ((12, "two side 6 L tanks"), (18, "+ a third 6 L"), (21.5, "+ Viair 2.5 gal"), (23.4, "+ 3 gal")):
+        row = "   ".join(f"HSV04 {to * 1000:.0f} ms: " + " / ".join(
+            str(shots_per_charge(vt, p0, psi_for(v120, top, 11.67, to, b, hi=200.0), p_bot)) for p0 in (150, 175, 200))
+            for to in (0.05, 0.08))
+        print(f"  {name:20s} {vt:4.1f} L   {row}")
