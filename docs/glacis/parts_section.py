@@ -7,6 +7,7 @@ of every system in a collapsible list. Owned, stash and unused lines show at $0.
 """
 import html
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -22,7 +23,8 @@ def systems():
     for r in ROWS:
         if r[1] is None:
             name, _, about = r[0].partition(" - ")
-            out.append(dict(name=name.strip().capitalize(), about=about.strip(), items=[]))
+            nm = re.sub(r"\b(rev [a-z])(\.\d)?", lambda m: m.group(0)[:4] + m.group(0)[4:].upper(), name.strip().capitalize())
+            out.append(dict(name=nm, about=about.strip(), items=[]))
         elif out:
             name, seller, qty, unit, link = r[0], r[1], r[2], r[3], r[4]
             purpose = r[6] if len(r) > 6 else ""

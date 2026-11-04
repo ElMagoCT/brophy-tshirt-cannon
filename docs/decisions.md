@@ -336,3 +336,17 @@ Micah's notes on the rev C.1 diagrams and follow-ups in the same session. Detail
   - Not changed: 1/4 NPT transducers (FUSCH 200 psi is 1/8 NPT only); HornBlasters VA-4 in valves (no
     cheaper than the Aignep, and not confirmed direct-acting); the VA-4 can't be a firing valve (Cv about
     0.15 against 12).
+
+## 2026-11-03 - Glacis rev C.3 body + rev D.1 gun, modelled (proposed, waiting on Micah)
+- Body (Micah's notes): acrylic ledge halved to 7 mm (19 mm members); rounded windows, acrylic and clips; M4 heat-set
+  inserts for every panel screw (no M3); front panel cut at the gun-well floor with one printed cheek each side;
+  speakers 13 mm deeper; LED corners 22.5 mm and square to the panel, lean only on straight runs; 42 mm stays on
+  shared edges (any less puts the neighbour's rail behind the acrylic), 19 mm on edges without a neighbour; battery
+  doors split at x -105 so a battery clears the rails.
+- Added: 45 deg underglow brackets under the bumpers; two 3 W hood lights at the low front corners.
+- Gun (rev D.1 from the electronics/air session): 3 in chambers (12 in on the HSV04, 10 in on the SZW-25), barrels
+  112 mm apart and 36 in long, pivot raised to z 645, elevation capped at 45 deg (60 hit the rear bay). One-piece
+  smoke collar, muzzle ring and mantlet; fill and smoke lines run inside the core and out the bottom behind the
+  pivot; 312 rpm elevation motor at 7:1; rear smoke vents down through the bellypan.
+- A third 6 L tank doesn't fit with the two side tanks (see JUDGMENTS M8). Two tanks, 12 L.
+- Onshape: one sub-assembly per system; every pneumatic part detailed and described. Parts $1,888.37.

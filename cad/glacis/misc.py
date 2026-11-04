@@ -10,6 +10,7 @@ import body as B
 import speakers as SPK
 from lib import add, box, cyl, tube, hex_prism, union
 from drive import tube_part, fr8, _hull, bearing_seat
+import pneu_parts as PP
 
 IN = P.IN
 IY = (P.INNER_RAIL_Y[0] + P.INNER_RAIL_Y[1]) / 2       # inner rail centre |y|
@@ -72,7 +73,7 @@ def towers_and_pivot():
     pin = cyl(P.pd(P.ELEV_T[0]) / 2 + 2.5, yb_ - ya, (mx_, -yb_, mz_), (0, 1, 0)).cut(
         cyl(4.1, 40, (mx_, -yb_ - 5, mz_), (0, 1, 0)))
     add("Elevation pinion 16T", pin, "print_d", "frame", bom="Elevation pinion 16T HTD 9 mm (8 mm REX bore)", kind="print")
-    yi, yo = y_face - 2.0, y_face - 30.0
+    yi, yo = y_face - 2.0, -P.Y_SLOT + 2.0                  # the bracket stays inside the gun well
     brk = union([box(px - 10.0, px + 25.0, yo, yi, mz_ - 20.0, pz - 28.0),          # web under the bearing block
                  box(px - 10.0, mx_ + 26.0, yo, yi, mz_ - 24.0, mz_ + 24.0)])        # arm out to the motor
     brk = brk.cut(cyl(18.3, 60, (mx_, yi + 5, mz_), (0, -1, 0)))
@@ -96,9 +97,10 @@ def towers_and_pivot():
         "print_d", "frame", bom="Pot coupler (1/2 hex to 1/4 in D)", kind="print")
     add("Arm-angle pot", cyl(12.0, 12.0, (px, yb + 25.0, pz), (0, 1, 0)).fuse(cyl(4.8, 8.0, (px, yb + 17.0, pz), (0, 1, 0))),
         "black", "frame", bom="10k linear pot, 1/4 in shaft (arm angle)")
-    bri = box(px - 30, px + 30, yb + 37.0, yb + 40.2, pz - 30, pz + 10).cut(cyl(5.0, 10, (px, yb + 35, pz), (0, 1, 0)))
+    zb0 = max(pz - 30.0, P.Z_TOP + 1.0)                    # above the deck when the pivot is that high
+    bri = box(px - 30, px + 30, yb + 37.0, yb + 40.2, zb0, pz + 10).cut(cyl(5.0, 10, (px, yb + 35, pz), (0, 1, 0)))
     for sx in (-1, 1):
-        bri = bri.fuse(box(px + sx * 24 - 3, px + sx * 24 + 3, yb, yb + 37.0, pz - 30, pz + 10))   # under the deck's LED loop
+        bri = bri.fuse(box(px + sx * 24 - 3, px + sx * 24 + 3, yb, yb + 37.0, zb0, pz + 10))
     add("Pot bracket", bri, "print", "frame", bom="Pot bracket", kind="print", note="screws to the left bearing block")
     return per
 
@@ -130,16 +132,17 @@ def air():
     for sgn, side in ((1, "left"), (-1, "right")):
         c = (tx, sgn * ty, tz)
         shell = _tank_shell("x", c)
-        for dx in (-80.0, 0.0, 80.0):
-            shell = shell.fuse(cyl(9.0, 12.0, (tx + dx, sgn * ty, tz - R + 4), (0, 0, -1)))
+        for dx in (-80.0, 0.0, 80.0):                       # weld bungs: a 1/4 NPT port opening down
+            shell = shell.fuse(cyl(9.0, 12.0, (tx + dx, sgn * ty, tz - R + 4), (0, 0, -1))).cut(
+                cyl(7.0, 11.0, (tx + dx, sgn * ty, zp - 0.5), (0, 0, 1)))
         add(f"Air tank {side} (6 L 200 psi)", shell, "tank", "pneu",
             bom="Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT (owner's AliExpress pick)")
         xb0 = tx                                          # middle port, outlet forward: clear of the arms and straps
-        el = cyl(7.5, 10.0, (xb0, sgn * ty, zp), (0, 0, -1)).fuse(cyl(7.0, 16.0, (xb0, sgn * ty, zp - 6), (1, 0, 0)))
-        add(f"Tank elbow push-to-connect {side}", el, "brass", "pneu", bom="DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT")
-        tank_out[side] = (xb0 + 16.0, sgn * ty, zp - 6)
+        add(f"Tank elbow push-to-connect {side}", PP.ptc_elbow(V(xb0, sgn * ty, zp), (0, 0, -1), (1, 0, 0)), "brass", "pneu",
+            bom="DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT")
+        tank_out[side] = (xb0 + 16.0, sgn * ty, zp - 13.0)
         for dx in (-80.0, 80.0):
-            add(f"Tank plug {side} {dx:.0f}", cyl(9.0, 12.0, (tx + dx, sgn * ty, zp), (0, 0, -1)), "brass", "pneu",
+            add(f"Tank plug {side} {dx:.0f}", PP.npt_plug(V(tx + dx, sgn * ty, zp), (0, 0, -1)), "brass", "pneu",
                 bom="1/4 NPT brass plug")
         for xb in (-60.0, 200.0):
             post(f"Tank post {side} {xb:.0f} (1x1)", xb, sgn * IY, P.RAIL_Z[1], P.RAIL_Z[1] + 104.0)
@@ -158,46 +161,52 @@ def air():
     # bottom of the rear panel, and the 200 psi relief beside it with its pull ring at the panel (the hand dump; no
     # bleed valve); line to the main valve on its front face
     mx, my, mz = REAR_MAN
-    add("Rear manifold block", box(mx - 12.7, mx + 12.7, my - 63.5, my + 63.5, mz - 12.7, mz + 12.7), "brass", "pneu",
-        bom="Rear manifold: 1/4 NPT brass crosses + close nipples (built)")
-    top = mz + 12.7
-    add("Tank transducer 0-300 psi", cyl(10.0, 55.0, (mx, my - 15.0, mz - 12.7), (0, 0, -1)), "steel", "pneu",
-        bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)")
-    for dy, tag in ((-45.0, "right tank"), (35.0, "left tank")):          # left one clear of its battery sled
-        add(f"Rear manifold push-to-connect {tag}", cyl(7.5, 18.0, (mx + 6.0, my + dy, top), (0, 0, 1)), "brass", "pneu",
-            bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-    # main valve (rev C.3, manual): a 1/4 ball valve off the manifold's back face, turned along -y by a street
-    # elbow, its stem pointing back through the rear panel to a printed lever outside (open all session, closed for
-    # transport and gun work)
     rear = P.rear_x(mz) + P.CLIP_T + P.ACRYLIC_T          # inner face of the rear panel at this height
-    xb = mx - 12.7 - 12.3                                  # valve and elbow axis, between the manifold and the panel
-    add("Main valve elbow", box(mx - 12.7 - 24.0, mx - 12.7, MAIN_Y - 10.0, MAIN_Y + 10.0, mz - 10.0, mz + 10.0), "brass",
-        "pneu", bom="1/4 NPT brass street elbow")
-    vb = box(xb - 12.0, xb + 12.0, MAIN_Y - 10.0 - 45.0, MAIN_Y - 10.0, mz - 12.0, mz + 12.0)
     xo = P.rear_x(mz)
-    add("Main valve (1/4 ball valve)", vb.fuse(cyl(4.0, xb - 12.0 - (xo - 2.0), (xb - 12.0, MAIN_Y - 32.5, mz), (-1, 0, 0))),
-        "brass", "pneu", bom="Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG (the old cannon's if it fits)",
-        note="stem extended through the rear panel")
-    add("Main valve lever", box(xo - 12.0, xo - 2.0, MAIN_Y - 32.5 - 8.0, MAIN_Y - 32.5 + 8.0, mz - 8.0, mz + 40.0), "red",
-        "pneu", bom="Main valve lever (printed)", kind="print", note="on the stem outside the rear panel: up = open")
-    MAIN_OUT[:] = [V(xb, MAIN_Y - 55.0 - 18.0, mz)]
-    add("Main valve push-to-connect", cyl(7.5, 18.0, (xb, MAIN_Y - 55.0, mz), (0, -1, 0)), "brass", "pneu",
-        bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-    # fill: universal-coupler M plug outside the panel, nipple through it, then a U behind the panel through the
-    # check valve (along +y) into the manifold's back face
-    yb = my - 30.0
-    xf = rear + 12.0                                       # U axis, just inside the (leaning) panel
-    add("Fill plug (M-style)", cyl(7.0, 26.0, (xo + 2.0, yb, mz), (-1, 0, 0)), "brass", "pneu",
-        bom="Fill plug: 1/4 MNPT industrial (M-style) plug, brass (Foster 10-3B)", note="your universal coupler snaps on")
-    add("Fill nipple", cyl(6.86, xf - 9.0 - (xo + 2.0), (xo + 2.0, yb, mz), (1, 0, 0)), "brass", "pneu",
+    xu = mx - 12.7 - 14.0                                  # main valve and fill U: one street elbow off the back face
+    yb = my - 30.0                                         # fill plug through the panel here
+    y_fill = yb + 57.0                                     # fill line back into the manifold
+    stations = [(-38.0, (0, 0, 1)), (35.0, (0, 0, 1)), (-15.0, (0, 0, -1)), (MAIN_Y - my, (-1, 0, 0)),
+                (y_fill - my, (-1, 0, 0)), (50.0, (-1, 0, 0))]
+    blk, ports = PP.manifold(V(mx, my, mz), (0, 1, 0), (0, 0, 1), stations)
+    add("Rear manifold", blk, "brass", "pneu", bom="Rear manifold: 1/4 NPT brass crosses + close nipples (built)")
+    add("Tank transducer 0-300 psi", PP.transducer(ports[2][0], ports[2][1]), "steel", "pneu",
+        bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)")
+    tops = {}
+    for k, tag in ((0, "right tank"), (1, "left tank")):          # left one clear of its battery sled
+        add(f"Rear manifold push-to-connect {tag}", PP.ptc_straight(ports[k][0], ports[k][1]), "brass", "pneu",
+            bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
+        tops[tag.split()[0]] = ports[k][0] + V(0, 0, 18.0)
+    # main valve (rev C.3, manual): a 1/4 ball valve off the manifold's back face, turned along -y by a street
+    # elbow, its stem extended back through the rear panel to its lever outside (open all session, closed for
+    # transport and gun work)
+    add("Main valve elbow", PP.street_elbow(V(xu, MAIN_Y, mz), (0, -1, 0), (1, 0, 0)), "brass", "pneu",
+        bom="1/4 NPT brass street elbow")
+    add("Main valve nipple", PP.close_nipple(V(xu, MAIN_Y - 15.5, mz), (0, -1, 0)), "brass", "pneu",
         bom="1/4 NPT brass close nipple")
-    for tag, y0 in (("panel", yb - 9.0), ("manifold", yb + 45.0)):
-        add(f"Fill elbow {tag}", box(xf - 9.0, xf + 9.0 if tag == "panel" else mx - 12.7, y0, y0 + 18.0, mz - 9.0, mz + 9.0),
-            "brass", "pneu", bom="1/4 NPT brass street elbow")
-    add("Fill check valve", cyl(9.0, 36.0, (xf, yb + 9.0, mz), (0, 1, 0)), "brass", "pneu",
-        bom="Fill check valve, brass, 1/4 FNPT x 1/4 MNPT, 250 psi (Control Devices P2525-1WA)", note="holds the tanks behind the open plug")
-    add("Tank relief valve 200 psi", cyl(9.5, mx - 12.7 - (xo - 4.0), (mx - 12.7, my + 50.0, mz), (-1, 0, 0)), "brass", "pneu",
-        bom="Relief valve 200 psi 1/4 NPT, pull ring (Interstate V200-4)", note="pull ring at the rear panel: the hand dump")
+    vc = V(xu, MAIN_Y - 39.5, mz)
+    add("Main valve (1/4 ball valve)", PP.ball_valve(vc, (0, -1, 0), (-1, 0, 0), stem_ext=xu - (xo - 6.0) - 10.0),
+        "brass", "pneu", bom="Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG (the old cannon's if it fits)",
+        note="stem extended through the rear panel; its lever is outside: along the line = open")
+    add("Main valve push-to-connect", PP.ptc_straight(vc - V(0, 22.5, 0), (0, -1, 0)), "brass", "pneu",
+        bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
+    MAIN_OUT[:] = [vc - V(0, 22.5 + 18.0, 0)]
+    # fill: universal-coupler M plug outside the panel, a nipple through it, then a U behind the panel through the
+    # check valve (along +y) into the manifold's back face
+    add("Fill plug (M-style)", PP.m_plug(V(xo - 2.0, yb, mz), (-1, 0, 0)), "brass", "pneu",
+        bom="Fill plug: 1/4 MNPT industrial (M-style) plug, brass (Foster 10-3B)", note="your universal coupler snaps on")
+    xn0, xn1 = xo - 2.0 + 10.2, xu - 14.0 + 10.0              # from the plug's thread to the elbow's port
+    add("Fill nipple", PP.close_nipple(V((xn0 + xn1) / 2, yb, mz), (1, 0, 0), length=xn1 - xn0, hexed=False), "brass", "pneu",
+        bom="1/4 NPT brass nipple x 1-1/2 in")
+    add("Fill elbow panel", PP.street_elbow(V(xu, yb, mz), (-1, 0, 0), (0, 1, 0)), "brass", "pneu",
+        bom="1/4 NPT brass street elbow")
+    add("Fill check valve", PP.check_valve(V(xu, yb + 17.0, mz), (0, 1, 0)), "brass", "pneu",
+        bom="Fill check valve, brass, 1/4 FNPT x 1/4 MNPT, 250 psi (Control Devices P2525-1WA)",
+        note="holds the tanks behind the open plug")
+    add("Fill elbow manifold", PP.street_elbow(V(xu, y_fill, mz), (0, -1, 0), (1, 0, 0)), "brass", "pneu",
+        bom="1/4 NPT brass street elbow")
+    add("Tank relief valve 200 psi", PP.relief_valve(ports[5][0], ports[5][1], length=ports[5][0].x - (xo - 4.0)), "brass",
+        "pneu", bom="Relief valve 200 psi 1/4 NPT, pull ring (Interstate V200-4)", note="pull ring at the rear panel: the hand dump")
     # main valve (the tanks' shut-off, opens only while a chamber fills) into a brass cross; one in valve per chamber
     # off the cross meters its chamber against that chamber's transducer, and its closed seat is what keeps the
     # other cannon's shot from reaching it (no check valves). Main valve to in-valve seats is all brass at tank
@@ -205,28 +214,18 @@ def air():
     fx, fy, fz = FILL
     sx1 = fx - 12.7 - 1.8
 
-    def solenoid(name, x0, d, bom):
-        """Aignep 02F body (37 along the flow, 28 x 38) with its coil up, starting x0 along unit vector d."""
-        d = V(*d)
-        c = V(*x0) + d * 18.5
-        s = V(0, 0, 1).cross(d)
-        pl = cq.Plane(origin=(c - d * 18.5).toTuple(), xDir=s.toTuple(), normal=d.toTuple())
-        body = cq.Workplane(pl).rect(28.0, 38.0).extrude(37.0).val()
-        coil = cyl(15.0, 38.0, (c + V(0, 0, 19.0)).toTuple(), (0, 0, 1))
-        add(name, body.fuse(coil), "brass", "pneu", bom=bom, note="coil up")
-
-    add("Valve cross push-to-connect", cyl(7.5, 18.0, (sx1, fy, fz), (-1, 0, 0)), "brass", "pneu",
+    add("Valve cross push-to-connect", PP.ptc_straight(V(fx - 12.7, fy, fz), (-1, 0, 0)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-    add("Valve cross", box(fx - 12.7, fx + 12.7, fy - 12.7, fy + 12.7, fz - 12.7, fz + 12.7), "brass", "pneu",
-        bom="1/4 NPT brass cross (ChillWaves)", note="close nipples to the three valves")
-    add("Line relief valve 200 psi", cyl(9.5, 44.0, (fx, fy + 12.7, fz), (0, 1, 0)), "brass", "pneu",
+    add("Valve cross", PP.npt_cross(V(fx, fy, fz), (1, 0, 0), (0, 1, 0)), "brass", "pneu",
+        bom="1/4 NPT brass cross (ChillWaves)", note="close nipples to the in valves")
+    add("Line relief valve 200 psi", PP.relief_valve(V(fx, fy + 12.7, fz), (0, 1, 0)), "brass", "pneu",
         bom="Relief valve 200 psi 1/4 NPT, pull ring (Interstate V200-4)")
     CHECKS.clear()
     for d, tag in ((V(1, 0, 0), "A (top cannon)"), (V(0, -1, 0), "B (bottom cannon)")):
         a0 = V(fx, fy, fz) + d * (12.7 + 1.8)
-        solenoid(f"In valve {tag}", a0.toTuple(), d.toTuple(),
-                 "2/2 NC 12 V direct-acting solenoid valve, 1/4 NPT (Aignep 02F)")
-        add(f"In valve {tag} push-to-connect", cyl(7.5, 18.0, (a0 + d * 37.0).toTuple(), d.toTuple()), "brass", "pneu",
+        add(f"In valve {tag}", PP.solenoid_02f(a0 + d * 18.5, d, (0, 0, 1)), "brass", "pneu",
+            bom="2/2 NC 12 V direct-acting solenoid valve, 1/4 NPT (Aignep 02F)", note="coil up")
+        add(f"In valve {tag} push-to-connect", PP.ptc_straight(a0 + d * 37.0, d), "brass", "pneu",
             bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
         CHECKS.append(a0 + d * 55.0)
     # tubes: tanks -> rear manifold, rear manifold -> main valve
@@ -236,12 +235,13 @@ def air():
         # inboard of the rail posts (|y| 104+) and outside the gun, over the Falcons, then up between the sled
         # posts and across to the manifold above the sled rails
         xr = -295.0 if sg > 0 else -330.0                 # the right one rises behind service loop B
+        e = tops[side]
         pts = [t, (t[0], sg * 98.0, 262.0), (xr, sg * 98.0, 245.0), (xr, sg * 98.0, 330.0),
-               (mx + 6.0, my + dy, 330.0), (mx + 6.0, my + dy, top + 18.0)]
+               (e.x, e.y, 330.0), e.toTuple()]
         add(f"Tube tank {side}", tube_path(pts), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
     m0 = MAIN_OUT[0]
     tf = [m0.toTuple(), (m0.x, m0.y - 12.0, mz), (sx1 - 40.0, m0.y - 12.0, mz - 20.0), (sx1 - 40.0, fy, mz - 25.0),
-          (sx1 - 40.0, fy, fz), (sx1 - 18.0, fy, fz)]
+          (sx1 - 40.0, fy, fz), (fx - 12.7 - 18.0, fy, fz)]
     add("Tube main valve to cross", tube_path(tf), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
 
 
@@ -374,7 +374,7 @@ def batteries_and_electronics():
         bom="Panel-mount USB-C extension (to the STM32)")
 
 
-ESTOP = (-170.0, 255.0)     # (y, z) on the rear panel, bottom strip under the open middle
+ESTOP = (-215.0, 255.0)     # (y, z) on the rear panel, bottom strip under the open middle
 CHARGE = (-95.0, 255.0)
 USB = (182.0, 255.0)
 
@@ -394,15 +394,16 @@ def speakers():
             bom="Slim 100 W siren speaker, 11 ohm (UBL 100W Slim)", note="5.5 x 5.75 x 2 in, 120-130 dB at 100 W")
         add(f"Speaker grille {pod['name']}", pod["grille"], "print", "body", bom="Speaker grille", kind="print",
             note="3 walls, no top or bottom layers, 12% gyroid: an open mesh; glue or screw to the cup")
-    # hood lights: a mini 12 V spot in a printed pod through each cheek, aimed straight ahead (30 deg beam), dimmed
-    # together on the last spare MOSFET channel
+    # hood lights: a mini 12 V spot in a printed pod at each low front corner, on the front face just above the
+    # bumper, aimed straight ahead (30 deg beam), dimmed together on the last spare MOSFET channel
     hy, hz, hr, hl = P.HOOD_LIGHT
-    x1 = P.hood_x()
+    x0 = P.front_x(hz + hr)                                # the face at the pod's top: its back is cut to the slant
+    x1 = P.front_x(hz - hr) + hl                           # front face of the pod
     for sg, side in ((1, "left"), (-1, "right")):
-        pod = cyl(hr, hl, (x1 - hl, sg * hy, hz), (1, 0, 0)).cut(cyl(14.2, 21.0, (x1 - 20.0, sg * hy, hz), (1, 0, 0))).cut(
-            cyl(4.0, hl, (x1 - hl - 1.0, sg * hy, hz), (1, 0, 0)))
+        pod = cyl(hr, x1 - x0 + 2.0, (x0 - 2.0, sg * hy, hz), (1, 0, 0)).cut(plain)
+        pod = pod.cut(cyl(14.2, 21.0, (x1 - 20.0, sg * hy, hz), (1, 0, 0))).cut(cyl(4.0, x1 - x0 + 4.0, (x0 - 3.0, sg * hy, hz), (1, 0, 0)))
         add(f"LED hood light pod {side}", pod, "print", "body", bom="Hood light pod (printed)", kind="print",
-            note="glued into the cheek; the light's spring clips grip its 28.4 mm bore")
+            note="2 x M4 into the frame along the front panel's bottom edge; the light's spring clips grip its 28.4 mm bore")
         lamp = cyl(14.0, 19.0, (x1 - 19.0, sg * hy, hz), (1, 0, 0)).fuse(cyl(16.0, 2.0, (x1, sg * hy, hz), (1, 0, 0)))
         add(f"LED hood light {side}", lamp, "steel", "power", mass=0.03,
             bom="Hood light: mini 12 V 3 W LED spot, 30 deg, 32 x 19 mm, PWM dimmable (Ohlite / MDK-YJ)",
@@ -540,7 +541,7 @@ def wall_standoffs():
 
 
 REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 50.0, REAR_MAN[2], 14.0), (ESTOP[0], ESTOP[1], 23.0),
-              (MAIN_Y - 32.5, REAR_MAN[2], 6.0),
+              (MAIN_Y - 39.5, REAR_MAN[2], 6.0),
               (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0))
 
 
@@ -577,6 +578,8 @@ def body_parts(log=print):
             add(f"Panel clip {i:02d}-{k}", c["clip"], "print", "body", bom="Panel corner clip", kind="print",
                 note="M4 x 12 into a heat-set insert")
             nclip += 1
+        if p["led"] is None:
+            continue
         add(f"LED loop panel {i:02d}", p["led"], "led", "body", bom="WS2812B strip 10 mm, 60/m (m)", kind="stock",
             note="on the rail behind the panel, LEDs across it")
     for tag, strip in B.build.frame_strips:

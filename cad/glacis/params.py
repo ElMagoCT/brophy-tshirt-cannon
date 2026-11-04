@@ -163,7 +163,8 @@ SIDE_OUTLINE = [
     (X_TOP_REAR, Z_TOP),                    # flat deck
     (-FRAME_X, Z_WALL_BOT),                 # back slant
 ]
-SIDE_SPLIT_X = -150.0                       # both side walls split here: the rear panels are the battery doors
+SIDE_SPLIT_X = -105.0                       # both side walls split here: the rear panels are the battery doors, wide
+                                            # enough between their LED rails for a battery to slide out
 
 
 def wall_y(z, inner=False):
@@ -182,13 +183,10 @@ def front_x(z, inner=False):
     return x - MEM_H / math.sin(math.radians(FRONT_ANGLE)) if inner else x
 
 
-HOOD_LIGHT = (138.0, 500.0, 18.0, 39.0)     # hood light pod in each cheek: |y|, z of its axis (straight ahead), pod
-                                            # radius, length; its front stands at the cheek face's height-mid + 4
+HOOD_LIGHT = (250.0, 229.0, 18.0, 39.0)     # hood light pod at each low front corner, just above the bumper: |y|, z of
+                                            # its axis (straight ahead), pod radius, length out from the front face
 
 
-def hood_x():
-    """x of a hood light pod's front face."""
-    return FRAME_X - (HOOD_LIGHT[1] - Z_WALL_BOT) / math.tan(math.radians(FRONT_ANGLE)) + 4.0
 
 
 # ------------------------------------------------------------------ speakers (rev C.2)
@@ -204,29 +202,31 @@ SPEAKERS = [  # (tag, end of the front-side corner edge, distance along it, aim 
 # Each cannon: pipe chamber -> 1 in stainless solenoid valve -> polycarbonate barrel, all on one axis.
 # The two cannons stack as close as the barrels allow; the pivot axis runs between them, at the gun's centre of
 # mass, on two hex stubs (one per cradle plate) so nothing has to pass between the cannons.
-BARREL_OD, BARREL_WALL, BARREL_LEN = 3.0 * IN, 0.125 * IN, 22.5 * IN   # clear polycarbonate tube
+BARREL_OD, BARREL_WALL, BARREL_LEN = 3.0 * IN, 0.125 * IN, 36.0 * IN   # clear polycarbonate tube (rev D: one per 4 ft stick)
 N_BARRELS = 2
 VALVE = dict(L=82.6, W=66.0, BODY=(-28.0, 30.0), COIL_R=25.0, COIL_TOP=86.0)  # Atlantic Valves SZW-25 (1 in NPT)
+HSV04 = dict(L=131.1, W=64.3, BODY=(-27.0, 27.0), COIL_R=24.0, COIL_TOP=75.4)  # U.S. Solid USS-HSV04, 5.16 x 2.53 x 4.03 in
+VALVES = (HSV04, VALVE)                     # (top, bottom) firing valves (rev D.1)
 # chamber: 2 in Sch 40 x 8 in nipple between two 2 x 1 black malleable reducing couplings (about 0.53 L; a longer
 # nipple swings the chamber low enough at the back to open the rear face down through its controls)
-CH_PIPE, CH_NIPPLE_L = "2", 8.0 * IN
-RED = dict(L=71.0, OD_IN=44.0, OD_OUT=76.0, BAND_IN=16.0, BAND_OUT=26.0, MASS=0.31)   # 2 x 1 (CNSD4005, 10.9 oz)
-GUN_GAP = 8.0                               # between the barrels (and between the reducers' wide ends)
+CH_PIPE, CH_NIPPLE_L = "3", (12.0 * IN, 10.0 * IN)   # rev D.1: 3 in Sch 40, top 12 in, bottom 10 in
+RED = dict(L=80.8, OD_IN=44.0, OD_OUT=108.7, BAND_IN=16.0, BAND_OUT=28.0, MASS=0.9)   # 3 x 1 malleable reducing coupling
+GUN_GAP = 35.8                              # between the barrels: 112 mm between axes, the 3 x 1 couplings side by side + 3
 PITCH = BARREL_OD + GUN_GAP                 # cannons at z = +/- PITCH / 2 about the axis
-CRADLE_Y0 = 50.0                            # inner faces of the two cradle plates: a narrow core (reducers r 38, tubes
-                                            # drop beside the bottom one)
-X_VALVE = 83.0                              # valve centre ahead of the axis (from the balance calc, see gun.py)
-CH_SADDLE_S = (110.0, 205.0)                # chamber saddles, distance behind the valve's rear face
-ELEV_RANGE = (0.0, 90.0)
+CRADLE_Y0 = 74.0                            # inner faces of the two cradle plates: the 109 mm couplings plus the fill
+                                            # and smoke lines that run beside them
+X_VALVE = 190.0                             # valve front faces ahead of the axis (from the balance calc, see gun.py)
+CH_SADDLE_S = (233.0, 352.0)                # chamber saddles, distance behind the valve front faces (both pipes there)
+ELEV_RANGE = (0.0, 45.0)                    # rev D.1: the longer chambers swing down through the back
 ELEV_SHOW = 20.0
 ELEV_T = (16, 112)                          # goBILDA 312 rpm pinion -> pulley on the right axle end (HTD 5M 9 mm), 7:1
-ELEV_BELT_T = 135
+ELEV_BELT_T = 150
 ELEV_PULLEY_Y = (95.0, 108.0)               # |y| of the elevation pulley, just outside the gun
 Y_GUN = CRADLE_Y0 + PLATE_T                 # half width of the gun over its cradle plates
 
-PIVOT = (-40.0, 572.0)                      # axle between the cannons; high enough that the gun's swing
+PIVOT = (-40.0, 645.0)                      # axle between the cannons; high enough that the gun's swing
                                             # clears the Falcons' inboard ends
-Y_SLOT = 112.0                              # gun well half width (the elevation pulley turns inside it)
+Y_SLOT = 133.0                              # gun well half width (the elevation pulley turns inside it)
 X_SLOT_REAR = -2000.0                       # the well is open at the back: at 0 deg the chambers reach the rear face
 
 # towers: 1x1 on the inner rails behind the pivot (clear of the rear Falcons); a printed bearing block
@@ -245,7 +245,7 @@ TANK_SIDE = (46.0, 163.0, 364.0)            # (x, |y|, z): reservoirs lying alon
 BATT = (7.13 * IN, 3.01 * IN, 6.57 * IN)    # FRC battery L, W, H
 BELLY_Z = RAIL_Z[0]
 BATT_Z = 287.8                              # battery bottoms on their sleds (over the rear wheels)
-BATT_X = (-336.0, -336.0 + BATT[0])         # one battery each side, long axis along x
+BATT_X = (-319.0, -319.0 + BATT[0])         # one battery each side, long axis along x, inside its door's rails
 BATT_Y = (145.0, 145.0 + BATT[1])           # |y|: they slide out the side walls
 ELEC_BAY = ((-380.0, -192.0), (-100.0, 100.0), (BELLY_Z, 250.0))   # back bottom
 FOG_BOX = ((190.0, 350.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # custom 12 V fogger (2 x 200 W cores), front bay

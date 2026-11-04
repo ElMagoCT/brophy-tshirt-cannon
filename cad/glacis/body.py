@@ -297,14 +297,11 @@ def build(log=print):
         p["clips"] = corner_clips(p)
         for c in p["clips"]:
             recess += [c["pocket"], c["insert"]]
-    hy, hz, hr, hl = P.HOOD_LIGHT
-    for sg in (1, -1):                                    # hood light pods sit through the cheeks
-        recess.append(cyl(hr + 0.3, hl + 60.0, (P.hood_x() - hl, sg * hy, hz), (1, 0, 0)))
     frame = frame.cut(union(recess)).clean()
     # panel light: the rail round each window (kept out of the speaker pockets), then the frame tunnels (their
     # feed slots cut through it)
     edge_kinds(panels)
-    rails = union([led_rail(p) for p in panels])
+    rails = union([r for r in (led_rail(p) for p in panels) if r is not None])
     frame = frame.fuse(rails.cut(union(SPK.cuts())) if SPK.cuts() else rails).clean()
     loop = 0.0
     for p in panels:
@@ -417,7 +414,7 @@ def _rail_outline(p, pl, pts):
                 return c1[0], r
         except Exception:
             continue
-    raise ValueError("panel outline too narrow for its LED rail")
+    return None, 0.0                                       # too narrow for a rail: the panel goes without a loop
 
 
 def _rail_path(p):
@@ -427,6 +424,9 @@ def _rail_path(p):
         return p["rail_path"]
     pl, pts = _wp_on(p["poly"], p["n"])
     wire, p["rail_r"] = _rail_outline(p, pl, pts)
+    if wire is None:
+        p["rail_path"] = None
+        return None
     o, u, w = pl.origin, pl.xDir, pl.yDir
     q2 = lambda v: ((V(*v.toTuple()) - o).dot(u), (V(*v.toTuple()) - o).dot(w))
     xy, wt = [], []
@@ -493,6 +493,8 @@ def led_rail(p):
     """Printed rail inside the window, carried by a flange from the member's inner face: a closed loop, so each
     panel's strip lights only its own panel."""
     t, d0, d1, _ = P.LED_RAIL
+    if _rail_path(p) is None:
+        return None
     rail = _rail_region(p, d0, d1, -t).cut(_rail_region(p, d0 - 1.0, d1 + 1.0, 0.0))
     flange = slab(p["poly"], p["n"], P.MEM_W - 4.0, d0, 6.0).cut(_rail_region(p, d0 - 1.0, d0 + 7.0, -t + 1.0))
     return rail.fuse(flange)
@@ -502,6 +504,8 @@ def led_loop(p):
     """Simplified 60/m strip stuck to the rail's face, LEDs aimed across the panel (and slightly at it along the
     straight runs)."""
     w, th, dc = P.LED_LOOP
+    if _rail_path(p) is None:
+        return None, 0.0
     ring = _rail_region(p, dc - w / 2, dc + w / 2, 0.0).cut(_rail_region(p, dc - w / 2 - 1.0, dc + w / 2 + 1.0, th))
     _, xy, _, _ = _rail_path(p)
     return ring, sum(math.hypot(xy[i][0] - xy[i - 1][0], xy[i][1] - xy[i - 1][1]) for i in range(len(xy)))

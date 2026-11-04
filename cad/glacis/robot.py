@@ -27,6 +27,7 @@ import drive
 import gun
 import misc
 import render
+import pneu_parts
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
@@ -77,7 +78,7 @@ def build(elev=P.ELEV_SHOW):
         routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 260.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e]
     fx = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.FOG_EXITS]
     for f0, f1 in zip(misc.FOG_OUT, fx):
-        routes["Fog loop (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(60.0, f1.y, 380.0), V(f1.x, f1.y, f1.z - 50.0), f1]
+        routes["Fog loop (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(f1.x + 60.0, f1.y, f1.z - 120.0), V(f1.x, f1.y, f1.z - 50.0), f1]
     for tag, pts in routes.items():
         r = 6.35 if tag.startswith("Fog") else 3.175
         lib.add(tag, misc.tube_path([p.toTuple() for p in pts], r=r), "tube", "pneu" if r < 5 else "power",
@@ -147,7 +148,7 @@ def check_interference(parts, tol=30.0):
     return hits
 
 
-def check_sweep(parts, angles=range(0, 91, 5), tol=30.0):
+def check_sweep(parts, angles=range(int(P.ELEV_RANGE[0]), int(P.ELEV_RANGE[1]) + 1, 5), tol=30.0):
     movers = [p for p in parts if p["moving"]]
     parts = [p for p in parts if not p["name"].startswith(("Service loop", "Fog loop"))]   # flexible, follow the gun
     fixed = [p for p in parts if not p["moving"]]
@@ -244,7 +245,8 @@ def _save_step(sel, name, path):
         asm.add(p["shape"], name=nm.replace("/", "-"), color=cq.Color(r, g, b_, a))
         q = p["shape"].BoundingBox()
         names.append(dict(name=nm, c=[(q.xmin + q.xmax) / 2, (q.ymin + q.ymax) / 2, (q.zmin + q.zmax) / 2],
-                          size=[q.xlen, q.ylen, q.zlen], color=p["color"], bom=p["bom"], kind=p["kind"]))
+                          size=[q.xlen, q.ylen, q.zlen], color=p["color"], bom=p["bom"], kind=p["kind"],
+                          purpose=pneu_parts.purpose(p["name"]) if p["group"] in ("pneu", "gun") else ""))
     asm.save(path, exportType="STEP")
     return names
 
@@ -381,7 +383,7 @@ if __name__ == "__main__":
             fh.write("\n".join(str(h) for h in hits) + "\n")
         t = time.time()
         sw = check_sweep(parts)
-        log(f"elevation sweep 0-90 deg: {len(sw)} clashes ({time.time() - t:.0f} s)")
+        log(f"elevation sweep {P.ELEV_RANGE[0]:.0f}-{P.ELEV_RANGE[1]:.0f} deg: {len(sw)} clashes ({time.time() - t:.0f} s)")
         for s in sw[:40]:
             log("   ", s)
         bad = print_parts(parts)

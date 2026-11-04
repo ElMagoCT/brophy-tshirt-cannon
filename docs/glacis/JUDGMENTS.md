@@ -1,4 +1,4 @@
-# Glacis rev C.2: judgment calls
+# Glacis rev D.1: judgment calls
 
 Rev C (2026-11-02), C.1 and C.2 (2026-11-03) are the redesign from your third to fifth rounds of notes:
 - both chambers on the back of their cannons, in line, with the barrels as close together as they go
@@ -644,3 +644,54 @@ D14. **CAD test-fit (the C.3 session): no room for a third tank, so it's two 6 L
       a bigger relayout: the side tanks need somewhere new, and the battery bay is behind them.
     - **Money: -$65.59** (one fewer tank -$56.60, one fewer pack of straps -$8.99), so **$1,825.55** on the
       committed rows. The other session's C.3 parts rows (elevation, smoke) are still uncommitted.
+
+## Model: rev C.3 body and rev D.1 gun (CAD, 2026-11-03)
+Your body notes, then the D.1 gun above, as built and checked in `cad/glacis/` (Onshape version "Glacis rev D.1").
+These replace items 14-17 and 20-26 where they disagree.
+
+M1. **Frame and acrylic.** The acrylic now laps 7 mm onto the print (was 14): members are 19 mm wide, the outer lip
+    stays 12. Windows, acrylic and clips all have rounded corners (22.5 mm windows, 28 mm acrylic). Each clip is a
+    round head lapping 6 mm over the acrylic's corner plus a tail to its screw, which goes into an M4 heat-set
+    insert where the acrylic's corner is cut away. M4 x 12 is now the only screw on the body; the M3 pack is off
+    the list.
+M2. **Front.** The front panel stops at the gun-well floor, so it's one plain rectangle (no arms up the sides).
+    Above it, each side is one printed cheek round the speaker pocket (it replaces the cluster of small pieces you
+    named). The speakers sit 13 mm deeper.
+M3. **LED loops.** Corners are 22.5 mm (half) and stand square to the panel, so the strip bends the easy way; the
+    15 deg lean only happens on the straight runs and twists in over 40 mm. How far in each run sits:
+    - **42 mm on edges shared with another panel.** I tried 8. A neighbour's rail hangs square to its own panel, so
+      any closer it sits right behind this panel's acrylic (a dark shelf, and it hit the acrylic) and its cross runs
+      cut through this loop. The corners still come in: about 66 mm from the panel corner, was 78.
+    - **19 mm on edges with no neighbour** (bottom, front cut, the seams in the deck and side walls): just behind the
+      window edge, so those dim bands are gone. 24 on the gun-well edges (clear of the pivot blocks), 30 on the
+      speaker notches, 46 under the speaker cups.
+    - A flange from the member's inner face carries each rail. 10.6 m of 60/m strip in the loops.
+M4. **Battery doors.** The side walls now split at x -105 (was -150) and the batteries sit 17 mm further forward,
+    so a battery passes between the door's LED rails with a few mm each end.
+M5. **Underglow:** a printed 45 deg bracket under each outer and end rail, just inside the bumper, with 60/m strip
+    aimed down and out. Light passes under the bumper (3 in off the floor) and pools round the robot. 2.5 m, from
+    the rest of the third 60/m roll. A strip inside the bumper would mostly light the noodles.
+M6. **Hood lights:** two mini 12 V 3 W spots (30 deg beam, 32 x 19 mm, $3.86 each on AliExpress) in printed pods at
+    the low front corners, just above the bumper, aimed straight ahead; dimmed together on the last spare MOSFET.
+    The cheeks were the first spot, but the wider gun well left them only about 20 mm wide.
+M7. **Gun (rev D.1).** Both chambers 3 in Sch 40 between 3 x 1 couplings: 12 in on the HSV04 (1.63 L) on top, 10 in on
+    the SZW-25 (1.38 L) below; barrels 112 mm apart and 36 in long. Valve faces line up; the core is 148 mm wide
+    for the couplings plus the fill and smoke lines beside them. Gun 20.3 kg, balanced on the pivot.
+    - **Elevation 0-45 deg, pivot raised 73 mm to z 645.** The chambers reach 460 mm behind the pivot. At 60 deg
+      they swung down through the electronics shelf and the rear manifold, fill plug and main-valve lever; 45 deg
+      is about the best range angle anyway. The bearing towers now stand about 15 mm above the deck, inside the
+      gun well, which is 266 mm wide (was 224).
+    - Envelope: 62.2 in long with the gun level (the muzzles reach 25 in past the front bumper), 30.9 in tall.
+    - Elevation belt 150T (was 135T) so the motor stays above the side tanks.
+M8. **Third tank: no room.** The side tanks already fill the zone you circled (x -134..226, |y| 87-239, z 280-440).
+    Between them, a 6 L lengthwise needs 360 mm but about 295 is free (the gun's rear swing behind, the front face
+    ahead). A tank across the robot (3 gal 170 x 520 or Ridetech 178 x 479) fits at x ~80, z ~335 with its ends in
+    the middle of the front side windows, but only in place of the two side tanks. So D.1 keeps two 6 L tanks (12 L).
+M9. **Detailed pneumatics in Onshape.** Every air part is now a recognisable fitting (hex bodies, thread stubs,
+    push-to-connect collets, valve coils and levers, relief pull rings, transducer plugs; `cad/glacis/pneu_parts.py`),
+    and each one's Onshape Description says what it does.
+M10. **Onshape is grouped by system:** sub-assemblies for the body panels, body frame, lights & speakers, bumpers,
+    pneumatics, power & smoke, chassis & drive, and the gun. Click one's eye to hide or show it.
+M11. **Checks:** sweep 0-45 deg clean, nothing over the bed, every part one solid. Two fittings' hex bodies touch
+    (146 and 64 mm3) at the valve cross and the manifold's fill elbow, where a real close nipple would space them.
+    Weight 174 lb (gun 20.3 kg). Parts $1,888.37.

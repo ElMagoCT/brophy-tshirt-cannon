@@ -17,7 +17,8 @@ The whole Glacis robot as a parametric CadQuery model. Every shared number is in
 | `fittings.py` | NPT fittings placed along a run with real thread make-up |
 | `body.py` | Body shell (60 deg front, flat deck, leaning sides and back, gun well cut to the sweep envelope), panels, printed frame, panel recesses, edge-light grooves, corner clips, frame strip tunnels and feed slots, sectioning, tapered tenons |
 | `misc.py` | Towers, bearing blocks, elevation motor and pot, side tanks, rear manifold, main valve and in valves, custom 12 V fogger and smoke ducts, battery sleds, back-bottom electronics, rear-panel controls, bumpers, standoffs |
-| `speakers.py` | The four slim siren speakers: where each corner notch goes, its aim, the pocket, cup and grille solids |
+| `speakers.py` | The two slim siren speakers: where each corner notch goes, its aim, the pocket, cup and grille solids |
+| `pneu_parts.py` | Detailed pneumatic parts (NPT fittings, push-to-connects, ball and solenoid valves, reliefs, check valve, M plug, transducer, the rear manifold) and the one-line purpose of each part that goes into its Onshape Description |
 | `robot.py` | Assembly, checks, export |
 
 **Checks** (written to `out/check_log.txt`):

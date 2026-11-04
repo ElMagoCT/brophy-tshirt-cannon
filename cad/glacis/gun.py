@@ -20,6 +20,10 @@ import params as P
 from lib import add, box, cyl, tube, hex_prism, union, C
 from fittings import Chain, OD, ENG, BORE, relief_cap
 
+OD.setdefault("3", 88.9)                                     # 3 in Sch 40 chambers (rev D.1)
+ENG.setdefault("3", 26.0)
+BORE.setdefault("3", 77.9)
+
 IN = P.IN
 R_CH = P.RED["OD_OUT"] / 2                                   # widest part of a chamber
 R_PIPE = OD[P.CH_PIPE] / 2
@@ -46,9 +50,8 @@ def _mass(p):
     return p["shape"].Volume() / 1e6 * DENS.get(p["color"], 1.0)
 
 
-def valve(xv, h, s):
-    """Atlantic Valves SZW-25: stainless body (1 in NPT both ends), bonnet and 12 V coil toward `s`."""
-    v = P.VALVE
+def valve(xv, h, s, v=P.VALVE):
+    """Firing valve (the SZW-25 or the HSV04): body (1 in NPT both ends), bonnet and 12 V coil toward `s`."""
     hl = v["L"] / 2
     z0, z1 = sorted([h - s * (-v["BODY"][0]), h + s * v["BODY"][1]])
     body = box(xv - hl, xv + hl, -v["W"] / 2, v["W"] / 2, z0, z1)
@@ -64,9 +67,9 @@ AD_BODY, AD_SHOULDER, AD_SPIGOT = 30.0, 10.0, 40.0              # breech adapter
 SMOKE_HOLE_X = AD_SPIGOT + 165.0                             # from the barrel's breech end: just past a 6 in rolled shirt
 ACCENT_T = 8.5                                               # wall of the smoke collar and muzzle ring round the barrels
 SMOKE_Y = 22.0                                               # smoke line: in the valley between the barrels, z = 0
-FILL_LANES = (-10.0, -22.0)                                  # fill lines (top, bottom cannon): y in the chambers' valley
-FILL_DOWN = ((-20.0, -44.0), (-30.0, -44.0))                 # (x, y) where each fill line drops out of the core
-SMOKE_DOWN = (-8.0, 42.0)                                    # ... and the smoke line (where the bottom reducer is narrow)
+FILL_LANES = (-59.0, -67.0)                                  # fill lines (top, bottom cannon): y beside the couplings
+FILL_DOWN = ((-20.0, -59.0), (-30.0, -67.0))                 # (x, y) where each fill line drops out of the core
+SMOKE_DOWN = (-8.0, 63.0)                                    # ... and the smoke line, on the other side
 
 
 def _rounded_prism(x0, L, W, H, r, edge=0.0):
@@ -100,12 +103,18 @@ def adapter():
     return s.cut(cyl(P.BARREL_OD / 2 - P.BARREL_WALL - 4.0, AD_SPIGOT + 1, (x2, 0, 0), (1, 0, 0)))
 
 
-def _cannon(k, xv):
-    """One cannon in gun-local coordinates with its valve centre at x = xv. Returns its tank-fill tip."""
+VALVE_INFO = (("U.S. Solid USS-HSV04", "Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi", 1.75),
+              ("Atlantic Valves SZW-25", "Firing valve: Atlantic Valves SZW-25 1 in NPT stainless solenoid, 12 V DC, NC", 1.0))
+
+
+def _cannon(k, xf):
+    """One cannon in gun-local coordinates with its valve's front face at x = xf. Returns its tank-fill tip."""
     h, s, tag = H[k], OUT[k], TAGS[k]
-    hl = P.VALVE["L"] / 2
-    gadd(f"Firing valve {tag} (Atlantic Valves SZW-25)", valve(xv, h, s), "steel",
-         bom="Firing valve: Atlantic Valves SZW-25 1 in NPT stainless solenoid, 12 V DC, NC", mass=1.0)
+    v = P.VALVES[k]
+    hl = v["L"] / 2
+    xv = xf - hl
+    name, vbom, vmass = VALVE_INFO[k]
+    gadd(f"Firing valve {tag} ({name})", valve(xv, h, s, v), "steel", bom=vbom, mass=vmass)
     ch = Chain((xv + hl, 0, h), (1, 0, 0), "F", gadd, f"{tag} ")
     ch.nipple("1", bom="1 in Sch 40 close nipple (1-1/2 in)")
     ax0 = ch.at(ch.s).x - ENG["1"]
@@ -122,14 +131,15 @@ def _cannon(k, xv):
     ci = Chain((xv - hl, 0, h), (-1, 0, 0), "F", gadd, f"{tag} chamber ")
     ci.nipple("1", bom="1 in Sch 40 close nipple (1-1/2 in)")
     r = P.RED
-    red_bom = "Chamber: 2 x 1 black malleable reducing coupling, 150 lb (Supply Giant CNSD4005)"
+    red_bom = "Chamber: 3 x 1 black malleable reducing coupling, 150 lb"
     vol = ci.reducer("1", P.CH_PIPE, r["L"], r["OD_IN"], r["OD_OUT"], r["BAND_IN"], r["BAND_OUT"], bom=red_bom,
                      mass=r["MASS"])
-    ci.nipple(P.CH_PIPE, length=P.CH_NIPPLE_L, bom="Chamber: 2 in Sch 40 black steel nipple x 8 in (Supply Giant OQCM2080)")
+    nl = P.CH_NIPPLE_L[k]
+    ci.nipple(P.CH_PIPE, length=nl, bom=f"Chamber: 3 in Sch 40 black steel nipple x {nl / IN:.0f} in")
     vol += ci.reducer(P.CH_PIPE, "1", r["L"], r["OD_OUT"], r["OD_IN"], r["BAND_OUT"], r["BAND_IN"], bom=red_bom,
                       mass=r["MASS"])
-    vol += math.pi * (BORE_PIPE / 2) ** 2 * P.CH_NIPPLE_L / 1000.0
-    CH_VOL[:] = [vol]
+    vol += math.pi * (BORE_PIPE / 2) ** 2 * nl / 1000.0
+    CH_VOL[k] = vol
     ci.bushing("1", "1/4", 34.9, 7.0, bom="1 x 1/4 NPT black malleable hex bushing (Supply Giant CNCV3003)")
     ci.nipple("1/4", color="brass", bom="1/4 NPT brass close nipple 7/8 in")
     ports = ci.block("1/4", side=32.0, sides=((0, 0, s), (0, 1, 0)),     # transducer left, tubes run right
@@ -147,14 +157,13 @@ def _build(xv):
     LOCAL.clear()
     fills, ax0s = [], []
     for k in range(2):
-        t, ax0 = _cannon(k, xv)
+        t, ax0 = _cannon(k, xv)                              # xv: the valves' front faces (they line up)
         fills.append(t)
         ax0s.append(ax0)
     b0s = [a + AD_BODY + AD_SHOULDER for a in ax0s]
     ax0 = ax0s[0]
-    hl = P.VALVE["L"] / 2
-    xr = xv - hl                                             # valve rear face
-    xs_list = [xr - sv for sv in P.CH_SADDLE_S]              # chamber saddles, on the 2 in nipples
+    xr = xv - max(v["L"] for v in P.VALVES)                  # rear face of the longer valve
+    xs_list = [xv - sv for sv in P.CH_SADDLE_S]              # chamber saddles, where both 3 in pipes run
     zo = P.PITCH / 2 + R_CH + 12.0
     xb1 = ax0 + AD_BODY + AD_SHOULDER + AD_SPIGOT            # end of the barrel spigots = front of the breech block
     # cradle: two 1/8 in plates outside everything, from the rear saddle to the breech block
@@ -167,7 +176,7 @@ def _build(xv):
         for a in range(6):
             pl = pl.cut(cyl(1.7, 10, (11.5 * math.cos(a * math.pi / 3), y0 - 2, 11.5 * math.sin(a * math.pi / 3)), (0, 1, 0)))
         for (x, z) in ((x0 + 15, zo - 15), (x0 + 15, -zo + 15), (x1 - 25, zo - 30), (x1 - 25, -zo + 30),
-                       (xv, zo - 12), (xv, -zo + 12)):
+                       (xv - 40, zo - 12), (xv - 40, -zo + 12)):
             pl = pl.cut(cyl(3.3, 10, (x, y0 - 2, z), (0, 1, 0)))
         gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al)", kind="stock")
     # chamber saddles: one block between the two nipples at each station, a printed cap bolted over each outer half
@@ -182,7 +191,7 @@ def _build(xv):
             z0, z1 = (h + 0.5, h + 200) if s > 0 else (h - 200, h - 0.5)
             cap = tube(R_PIPE + 6.0, R_PIPE + 0.5, 20.0, (xs - 10, 0, h), (1, 0, 0)).intersect(box(xs - 11, xs + 11, -200, 200, z0, z1))
             fz0, fz1 = (h + 0.5, h + 6.5) if s > 0 else (h - 6.5, h - 0.5)
-            yh = (R_PIPE + 6.0 + CRADLE_Y0 - 0.5) / 2 + 1.0       # M5 head clears the cap's ring
+            yh = (R_PIPE + 3.0 + CRADLE_Y0 - 0.5) / 2 + 0.5       # M5 head clears the cap's ring
             for sy in (1, -1):                                  # flanges onto the saddle, one M5 each into an insert
                 fl = box(xs - 10, xs + 10, min(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)),
                          max(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)), fz0, fz1)
@@ -190,8 +199,10 @@ def _build(xv):
             gadd(f"Chamber cap {TAGS[k]} {xs:.0f}", cap.clean(), "print", bom="Chamber cap", kind="print",
                  note="PETG-CF, 2 x M5 into heat-set inserts in the saddle")
     for k, h in enumerate(H):
-        vb = box(xv - hl + 4, xv + hl - 4, -CRADLE_Y0, CRADLE_Y0, h - 18, h + 18)
-        vb = vb.cut(box(xv - hl - 1, xv + hl + 1, -P.VALVE["W"] / 2 - 0.4, P.VALVE["W"] / 2 + 0.4, h - 40, h + 40))
+        vk = P.VALVES[k]
+        x0v, x1v = xv - vk["L"], xv
+        vb = box(x0v + 4, x1v - 4, -CRADLE_Y0, CRADLE_Y0, h - 18, h + 18)
+        vb = vb.cut(box(x0v - 1, x1v + 1, -vk["W"] / 2 - 0.4, vk["W"] / 2 + 0.4, h - 40, h + 40))
         for yy in (1, -1):
             gadd(f"Valve side block {TAGS[k]} {'L' if yy > 0 else 'R'}",
                  vb.intersect(box(-1000, 1000, 0 if yy > 0 else -500, 500 if yy > 0 else 0, -1000, 1000)), "print",
@@ -267,7 +278,8 @@ def _build(xv):
              note="inside the core; leaves the bottom behind the pivot")
         exits.append(pts[-1])
     xd, yd = SMOKE_DOWN
-    pts = [V(xc - 7.5, SMOKE_Y, 0), V(xd, SMOKE_Y, 0), V(xd, yd, 0), V(xd, yd, z_exit)]
+    xt = xv - 40.0                                           # crosses over beside the valves, where the reducers are clear
+    pts = [V(xc - 7.5, SMOKE_Y, 0), V(xt, SMOKE_Y, 0), V(xt, yd, 0), V(xd, yd, 0), V(xd, yd, z_exit)]
     gadd("Gun smoke tube", _tube_path(pts, r=6.35), "tube", bom="Silicone tube 3/8 ID x 1/2 OD (ft)", kind="stock",
          note="collar to the bottom of the core")
     return exits, [pts[-1]]
@@ -291,10 +303,10 @@ def build(log=print):
     GUN_EXITS[:] = exits
     FOG_EXITS[:] = fogs
     log(f"gun: valves at x {xv:.1f} from the axis, centre of mass ({cg:.1f}, {cgz:.1f}) mm, {mtot:.1f} kg; "
-        f"chambers {CH_VOL[0] / 1000:.2f} L each, barrels {P.GUN_GAP:.1f} mm apart")
+        f"chambers {CH_VOL[0] / 1000:.2f} L (top) and {CH_VOL[1] / 1000:.2f} L (bottom), barrels {P.GUN_GAP:.1f} mm apart")
 
 
-GUN_EXITS, FOG_EXITS, BALANCE, CH_VOL = [], [], {}, [0.0]
+GUN_EXITS, FOG_EXITS, BALANCE, CH_VOL = [], [], {}, [0.0, 0.0]
 
 
 def sweep_profile(step=2.5, margin=10.0, ybins=None):
