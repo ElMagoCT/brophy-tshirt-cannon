@@ -68,8 +68,8 @@ def speed_for(ft, cda):
     return hi
 
 
-def psi_for(v_target, vc, cv, t_open, barrel):
-    lo, hi = 10.0, 150.0
+def psi_for(v_target, vc, cv, t_open, barrel, hi=150.0):
+    lo = 10.0
     if shot(vc, hi, t_open, cv, barrel) < v_target:
         return None
     for _ in range(25):
@@ -111,3 +111,43 @@ if __name__ == "__main__":
         p2, p7 = psi_for(v200, vc, cv, to, b), psi_for(v75, vc, cv, to, b)
         tanks = " / ".join(f"{tank_l_needed(vc, p2, p7, p0):.1f}" for p0 in (150, 190)) if p2 else "-"
         print(f"{name:40s} | {v:4.1f} | {rs:11s} | {('%3.0f' % p2) if p2 else 'n/a'} | {p7:3.0f} | {tanks}")
+
+    # Rev D proposal (Micah, 2026-11-03): top cannon = old 1 gal tank (3.8 L) on a U.S. Solid HSV04 (1 in, Cv 11.67,
+    # pilot, 725 psi) so it can run to the full tank pressure; bottom cannon = 3 in Sch 40 x 10 in nipple between
+    # 3 x 1 reducing couplings (~1.35 L) on the old SZW-25 (110 psi cap); both barrels the same length.
+    # Targets: 200 ft from the top cannon; 120 ft shots, 6 per cannon (12) per tank charge, 10 each (20) ideally.
+    # The HSV04's opening time isn't published, so 50 and 80 ms bracket it.
+    v120 = speed_for(120, 0.008)                                   # pessimistic drag for the everyday shot
+    top, bot = 3.8, 1.35
+    print(f"\nRev D: 120 ft needs {v120:.1f} m/s (CdA .008), 200 ft {v200:.1f} (CdA .006)")
+    for b in (30, 36, 42, 48):
+        for to in (0.05, 0.08):
+            vt = shot(top, 200, to, 11.67, b)
+            p2 = psi_for(v200, top, 11.67, to, b, hi=200.0)
+            print(f"  barrel {b} in, HSV04 {to * 1000:.0f} ms: top {vt:4.1f} m/s at 200 psi = "
+                  f"{range_ft(vt, 0.006):3.0f} ft; 200 ft at {('%3.0f psi' % p2) if p2 else 'n/a'}; "
+                  f"120 ft at {psi_for(v120, top, 11.67, to, b, hi=200.0):3.0f} psi")
+        p_b = psi_for(v120, bot, 12, 0.05, b)
+        print(f"  barrel {b} in, bottom: {shot(bot, 110, 0.05, 12, b):4.1f} m/s at 110 psi; 120 ft at {p_b:3.0f} psi")
+
+    def tank_for(n_each, p0, p_top, p_bot, k=1.15):
+        """Tank (L) for n_each 120 ft shots per cannon, alternating, k = penalty for tanks cooling as they empty."""
+        lo, hi = 1.0, 300.0
+        for _ in range(40):
+            vt = 0.5 * (lo + hi)
+            pt, ok = p0, True
+            for _ in range(n_each):
+                for vc, ps in ((top, p_top), (bot, p_bot)):
+                    ok = ok and pt >= ps + 5
+                    pt -= k * vc * ps / vt
+            lo, hi = (lo, vt) if ok else (vt, hi)
+        return hi
+
+    b = 36
+    p_bot = psi_for(v120, bot, 12, 0.05, b)
+    print(f"\nTank volume for 120 ft shots, {b} in barrels (6+6 / 10+10):")
+    for to in (0.05, 0.08):
+        p_top = psi_for(v120, top, 11.67, to, b)
+        row = "  ".join(f"{p0} psi: {tank_for(6, p0, p_top, p_bot):4.1f} / {tank_for(10, p0, p_top, p_bot):4.1f} L"
+                        for p0 in (150, 175, 200))
+        print(f"  HSV04 {to * 1000:.0f} ms (top at {p_top:.0f} psi, bottom at {p_bot:.0f}):  {row}")

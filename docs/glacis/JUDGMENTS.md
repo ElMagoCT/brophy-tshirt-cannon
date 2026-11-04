@@ -498,3 +498,60 @@ P4. **Fewer sizes.** All the air plumbing is 1/4 NPT with one 1/4 in tube and on
     cannon's style (a 1 gal tank with its 1 in end port) would also drop the 2 in pipe and reducing couplings.
 P5. **Open: which gun for 200 ft.** Bigger chambers and longer barrels change the gun's size, weight and
     balance, so the CAD has to be redone. I haven't changed the model or the list for it; that waits on your pick.
+
+## Rev D gun and air (proposal, 2026-11-03)
+Your picks after the range math: the top cannon on the old chamber, the bottom on a smaller one, both
+barrels the same length, and the top able to run at full tank pressure. Targets: 200 ft from the top
+cannon; 120 ft shots, 6 per cannon (12) per tank charge, 10 each (20) ideally. Numbers: `cad/glacis/range_model.py`.
+Not in the CAD yet (D6).
+
+D1. **Top firing valve: U.S. Solid USS-HSV04, $98.19.** 1 in NPT, 12 V DC, normally closed, pilot-operated,
+    rated 1-50 bar (725 psi) on air, Cv 11.67 (the SZW-25 is 12), 25 mm, 16 W, PTFE seal, 3.86 lb.
+    - What else I found: every 1 in 12 V valve on Amazon and AliExpress tops out at 0.8-1.0 MPa
+      (116-145 psi). One U.S. Solid listing claims 230 psi, but its own spec table says 7 bar. ASCO's 1 in
+      high-flow valve is rated 350 psi on air (price not checked; ASCO is usually several hundred). The
+      1/2 in train-horn valves are rated high enough (HornBlasters 210 psi, Kleinn VX7004 250 psi), but at
+      Cv 5.5 they flow under half as much.
+    - Its opening time isn't published, so the model brackets it at 50 and 80 ms. Bench-test it with a
+      phone in slow-motion before cutting the barrels.
+    - It replaces the U.S. Solid USS2-01023 (116 psi, $59.80). The old SZW-25 moves to the bottom cannon.
+D2. **Top chamber: the old 1 gal ASME tank (3.8 L)**, its 1 in end port straight onto the HSV04.
+    - Read its nameplate. It needs 200 psi or more to run at full tank pressure; otherwise cap it 10% under
+      the plate. Also check which small ports it has (fill, transducer, relief) and its diameter and length.
+    - Software cap 190 psi, with a 200 psi relief (the same Interstate V200-4 as the tanks). It can't fill
+      past the tanks anyway.
+D3. **Bottom chamber: 3 in Sch 40 x 10 in nipple between two 3 x 1 reducing couplings, about 1.35 L** (you
+    asked for 3 in pipe). It stays on the SZW-25 with the 110 psi cap and the 125 psi relief. 2 L would be
+    a 3 in x 16 in pipe; 1.35 L does the 120 ft shot at 69 psi, so the extra length buys nothing.
+D4. **Both barrels 36 in** (two 4 ft sticks, +$84.48):
+
+    | 36 in barrels | Top, 200 psi | 200 ft at | 120 ft at |
+    |---|---|---|---|
+    | HSV04 opens in 50 ms | 46.5 m/s, about 263 ft | 96 psi | 42 psi |
+    | HSV04 opens in 80 ms | 39.2 m/s, about 224 ft | 151 psi | 65 psi |
+    | Bottom, 1.35 L on the SZW-25 | 33.0 m/s at 110 psi | can't | 69 psi |
+
+    - 48 in barrels (the option you picked) were for a 110 psi valve. With 200 psi on the top they add range
+      you don't need and make the gun a foot longer. Go to 42 in if the HSV04 bench-tests slower than ~60 ms.
+D5. **Tanks: five of the same 6 L aluminum 200 psi tank (30 L), +$170.** Tank needed for 120 ft shots:
+
+    | Charge | 6 + 6 shots | 10 + 10 shots |
+    |---|---|---|
+    | 200 psi | 13-18 L | 22-30 L |
+    | 175 psi | 16-22 L | 28-38 L |
+    | 150 psi | 22-29 L | 37-50 L |
+
+    (Ranges are the 50 ms and 80 ms cases, with 15% lost to the tanks cooling as they empty.)
+    - 30 L gives 10 + 10 from a 200 psi charge and 6 + 6 from 150-175. Three tanks (18 L, -$113 from this)
+      would give 6 + 6 only from a 200 psi charge.
+    - One part number, daisy-chained. More fittings and straps are on the list.
+    - **"Full 200" needs a compressor that reaches 200 psi.** Most shop compressors stop at 135-175.
+    - The other way to get a whole event from one fill: a 4,500 psi carbon-fibre paintball tank holds more
+      air than all five tanks in about 1.5 kg, but it's filled at a paintball or scuba shop, not with shop air.
+D6. **CAD (not done).** A 1 gal tank (about 6 in across) and a 3.5 in chamber can't both sit in line behind
+    barrels 84 mm apart. Stagger them along the barrel axis or spread the barrels. The gun also gets longer
+    and roughly 5 kg heavier, which changes its balance. That's the gun CAD, which the C.3 session has open.
+D7. **Cost: +$360.07**, so $1,908.97 on the committed list. That's close to the $2,000 ceiling (about
+    $1,964 with the other session's C.3 rows). The biggest adds are tanks +$170, barrels +$84 and the valve +$38.
+D8. **Electronics:** the web UI's access point moves to 5 GHz on an ESP32-C5 ($13.99); the camera is deferred.
+    The "STM32 with WiFi" question is answered in `electrical/README.md`.

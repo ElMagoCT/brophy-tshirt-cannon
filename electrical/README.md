@@ -12,7 +12,7 @@ FRC battery x2 (parallel, SB50) + charge port
         |
         +--- 5 A ATO fuse --- Pololu S13V30F5 5 V buck-boost --- LOGIC RAIL (always on)
         |                                                         STM32, WiFi bridge, safety node,
-        |                                                         all sensors, camera (if added)
+        |                                                         all sensors
         |
    200 A contactor  (coil: 12 V tap -> rear E-stop contact 2 -> STM32 MOSFET channel; flyback diode)
         |
@@ -34,7 +34,7 @@ FRC battery x2 (parallel, SB50) + charge port
   safety relay and disables the PWM gate, as before. The STM32 also opens the contactor on any of these.
 - **No precharge** on the contactor. At 12 V with FRC loads it's the same event as closing a main breaker.
 - **Never switch the negative.** Grounds are common; only +12 V goes through the contactor.
-- **Storage:** flip the main breaker off. Standby draws about 2 W (4-5 W with a Pi camera).
+- **Storage:** flip the main breaker off. Standby draws about 2 W.
 
 ## Sensors (all on the logic rail)
 
@@ -78,38 +78,51 @@ A 1/4 NPT brass ball valve (600 WOG; the old cannon's if it's rated) replaces th
 What it is not, and shouldn't be: the Wi-Fi, web or video computer. It has no radio and 128 KB RAM.
 That's why the design already splits it:
 - **STM32:** everything time-critical (valves, metering, drive, elevation loop, fog, contactor).
-- **ESP32-S3 WiFi bridge:** serves the gzipped web UI from flash and runs the WebSocket at 20-50 Hz.
-  The browser does the heavy work (robot rendering, trajectory). Fine for a rich UI; limit is about
-  4-8 clients and 2.4 GHz only.
+- **ESP32-C5 WiFi bridge (rev D; was an ESP32-S3):** serves the gzipped web UI from flash and runs the
+  WebSocket at 20-50 Hz on 5 GHz. The browser does the heavy work (robot rendering, trajectory). Fine for
+  a rich UI; the limit is about 4-8 clients.
 - **Trajectory math goes in the browser.** The dashboard already has the angle and chamber pressure, and
   it's where the aim arc gets drawn. The robot only receives angle and pressure setpoints.
 
-### Camera live feed
+### WiFi on 5 GHz (rev D)
 
-Neither the STM32 nor the bridge should carry video. It needs its own board on the logic rail.
+2.4 GHz in a packed gym is crowded (phones, earbuds), so the web UI's access point moves to 5 GHz on an
+**ESP32-C5** (Waveshare WiFi 6 kit, $13.99). Espressif documents a 5 GHz SoftAP on the non-DFS channels
+36-48. It replaces ESP32-S3 #1 as the bridge, same UART to the STM32, same code base. The safety node and
+remote stay on 2.4 GHz ESP-NOW, so the two links don't share a band.
+- Use long-range mode for ESP-NOW and send heartbeats every 20 ms, so a 200 ms trip needs about 10 lost
+  packets in a row.
 
-| Option | Cost | Video | Verdict |
+### "An STM32 with WiFi?"
+
+ST doesn't make one with WiFi built in. What exists:
+
+| Board | Price | WiFi | Verdict |
 |---|---|---|---|
-| **Pi Zero 2 W + Camera Module 3 Wide** | about $50 | H.264 over WebRTC (MediaMTX), ~720p30, ~0.2 s lag, 120 deg | **Recommended** |
-| XIAO ESP32S3 Sense | $14-20 | MJPEG, ~VGA, 10-20 fps, weak in gym light, one viewer | Cheapest; fine as a peek camera |
-| ESP32-C5 bridge + dual-band camera Pi | +$40 or so | Same as the Pi, on 5 GHz | Only if 2.4 GHz chokes at games |
+| Arduino GIGA R1 WiFi (STM32H747 + Murata 1DX) | $72.82 | 2.4 GHz only (802.11b/g/n) | The closest thing. 10x the Black Pill, back on 2.4 GHz, and its Arduino core sits on Mbed OS, which Arm retired in July 2026 (Arduino is moving it to Zephyr) |
+| STM32 + EMW3080 discovery kits | ~$60 | 2.4 GHz | Dev kits, not robot boards |
+| **STM32F411 + ESP32-C5 bridge** | $7 + $14 | 5 GHz | **Picked**: the STM32 keeps the clean ADC and the real-time work; the C5 only does WiFi |
+| ESP32-C5 alone | $14 + ~$15 of helpers | 5 GHz | One board, but it needs an ADS1115 for the pressure sensors and a PCA9685 for the 15 switched outputs (about 22 free pins), and its single core runs control and the WiFi stack together |
 
-- The Pi joins the bridge's network; the dashboard embeds its stream. Video can never delay a fire command.
-- On the logic rail it boots once (~25 s) when the main breaker goes on, so it's ready before you arm.
-  Control is still up in under 3 s.
-- Mount it on the gun mantlet so the aim overlay moves with the barrels.
-- **Test 2.4 GHz before buying anything:** take one of your ESP32-S3s to a game, run an AP with a
-  WebSocket ping page, and check the round trip stays under ~50 ms. If it doesn't, the ESP32-C5
-  (Waveshare boards, $8-14) runs a 5 GHz access point on channels 36-48 with the same code.
-- ESP-NOW (safety node) stays on 2.4 GHz. Use long-range mode and send heartbeats every 20 ms so a
-  200 ms trip needs about 10 lost packets in a row.
+Two boards with one job each is the more reliable setup. The one-board C5 is fewer parts, not fewer
+failure modes.
+
+### Camera (deferred, rev D)
+
+No camera for now. For later:
+- **USB webcam:** it needs a board with USB host on the 5 GHz network. A spare ESP32-S3 can stream a USB
+  webcam (Espressif's UVC host driver, MJPEG), but it's 2.4 GHz only, so it can't join a 5 GHz access
+  point. A dual-band Linux board (a Raspberry Pi 4, or similar) can. Prices unchecked until it's needed.
+- **GoPro:** a HERO12 or HERO13 can join an existing WiFi network ("Camera on the Home Network" in Open
+  GoPro). Neither the STM32 nor the C5 can relay video, though: the laptop would have to pull the stream
+  from the GoPro itself, and browsers can't play its preview format without a helper app.
+- Mount any camera on the gun mantlet so an aim overlay moves with the barrels.
 
 ## Power budget (estimates)
 
 | Load | Average | Peak | Side |
 |---|---|---|---|
 | Logic rail (STM32, 2 x ESP32-S3, sensors) | 0.2 A | 0.5 A | always on |
-| + Pi Zero 2 W camera | +0.25 A | +0.5 A | always on |
 | Contactor coil | 0.7 A | 0.7 A | coil on logic tap |
 | LEDs, 1,680 at the 20% cap | 4-5 A | 6 A | switched |
 | Fog core (holding temp, puffs) | 9 A | 17.5 A | switched |

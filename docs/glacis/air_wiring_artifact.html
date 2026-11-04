@@ -96,7 +96,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
 
 <div class="wrap">
   <header>
-    <div class="kicker">Brophy Mark 5 · Glacis rev C.3</div>
+    <div class="kicker">Brophy Mark 5 · Glacis rev C.3 · rev D gun proposal</div>
     <h1>Glacis air &amp; wiring</h1>
     <p class="lede">How air, smoke and power move through the cannon. Pick a step to light up the parts it uses on both drawings, or tap a sensor to find it.</p>
   </header>
@@ -127,7 +127,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     </div>
     <figure>
       <div class="scroll">
-        <svg class="dg" id="pneu" viewBox="0 0 1200 580" role="img" aria-label="Pneumatic diagram: shop air fills two 200 psi tanks through an M-style fill plug and check valve into a rear manifold; a manual main valve feeds a brass cross and one 12 V in valve per chamber meters air into each 0.53 L chamber; each chamber's Atlantic SZW-25 valve fires into its barrel; three pressure sensors watch the tanks (PT1) and the two chambers (PT2, PT3); smoke runs from the 12 V smoke machine to a collar on the barrels and vents front and rear.">
+        <svg class="dg" id="pneu" viewBox="0 0 1200 580" role="img" aria-label="Pneumatic diagram: shop air fills two 200 psi tanks through an M-style fill plug and check valve into a rear manifold; a manual main valve feeds a brass cross and one 12 V in valve per chamber meters air into the top chamber (the old 1 gal tank, up to 190 psi, fired by a 725 psi U.S. Solid HSV04) and the bottom chamber (3 in pipe, 1.35 L, up to 110 psi, fired by the old SZW-25); both fire into 36 in barrels; three pressure sensors watch the tanks (PT1) and the two chambers (PT2, PT3); smoke runs from the 12 V smoke machine to a collar on the barrels and vents front and rear.">
           <defs>
             <marker id="ma" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-air" d="M0 0L10 5L0 10z"/></marker>
             <marker id="ms" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-smk" d="M0 0L10 5L0 10z"/></marker>
@@ -136,7 +136,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           <rect class="zone z200" x="140" y="38" width="462" height="402" rx="10"/>
           <text class="ztxt" x="152" y="58">Tanks · 200 psi</text>
           <rect class="zone z110" x="602" y="38" width="333" height="402" rx="10"/>
-          <text class="ztxt" x="614" y="58">Chambers · 110 psi cap</text>
+          <text class="ztxt" x="614" y="58">Chambers · 190 top · 110 bottom</text>
           <rect class="zone zbar" x="935" y="38" width="250" height="402" rx="10"/>
           <text class="ztxt" x="947" y="58">Barrels · open air</text>
 
@@ -156,8 +156,8 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           </g>
           <g data-s="charge fill">
             <path class="air" d="M240 233V121M342 233V121"/>
-            <rect class="sym" x="200" y="82" width="80" height="38" rx="19"/><text x="240" y="105" text-anchor="middle">Tank L 6 L</text>
-            <rect class="sym" x="302" y="82" width="80" height="38" rx="19"/><text x="342" y="105" text-anchor="middle">Tank R 6 L</text>
+            <rect class="sym" x="200" y="82" width="80" height="38" rx="19"/><text x="240" y="105" text-anchor="middle">5 × 6 L</text>
+            <rect class="sym" x="302" y="82" width="80" height="38" rx="19"/><text x="342" y="105" text-anchor="middle">= 30 L</text>
           </g>
           <g data-s="safe charge">
             <path class="air" d="M225 247V290"/>
@@ -201,13 +201,13 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <rect class="solid" x="720" y="136" width="50" height="28" rx="2"/>
             <rect class="solid" x="720" y="316" width="50" height="28" rx="2"/>
             <path class="air" d="M770 150H790M770 330H790"/>
-            <rect class="sym" x="790" y="136" width="112" height="28" rx="3"/><text x="846" y="154" text-anchor="middle">Chamber 0.53 L</text>
-            <rect class="sym" x="790" y="316" width="112" height="28" rx="3"/><text x="846" y="334" text-anchor="middle">Chamber 0.53 L</text>
+            <rect class="sym" x="790" y="136" width="112" height="28" rx="3"/><text x="846" y="154" text-anchor="middle">Old 1 gal 3.8 L</text>
+            <rect class="sym" x="790" y="316" width="112" height="28" rx="3"/><text x="846" y="334" text-anchor="middle">3 in pipe 1.35 L</text>
           </g>
           <g class="pt" data-k="PT2" data-s="fill fire">
             <path class="ptl" d="M732 136V102"/>
             <circle cx="732" cy="88" r="14"/><text class="id" x="732" y="92" text-anchor="middle">PT2</text>
-            <text class="t-s" x="732" y="68" text-anchor="middle">0–300 psi</text>
+            <text class="t-s" x="714" y="92" text-anchor="end">0–300 psi</text>
           </g>
           <g class="pt" data-k="PT3" data-s="fill fire">
             <path class="ptl" d="M732 344V378"/>
@@ -218,7 +218,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <path class="air" d="M762 136V104M762 344V376"/>
             <rect class="sym" x="752" y="80" width="20" height="24"/><path class="sg" d="M756 100L768 84M768 84l-5 1M768 84l-1 5"/>
             <rect class="sym" x="752" y="376" width="20" height="24"/><path class="sg" d="M756 396L768 380M768 380l-5 1M768 380l-1 5"/>
-            <text x="780" y="90">Relief 125 psi</text><text class="t-s" x="780" y="104">pull ring = bleed</text>
+            <text x="780" y="90">Relief 200 psi</text><text class="t-s" x="780" y="104">pull ring = bleed</text>
             <text x="780" y="386">Relief 125 psi</text><text class="t-s" x="780" y="400">pull ring = bleed</text>
           </g>
           <!-- firing valves -->
@@ -226,7 +226,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <path class="air" d="M902 150H920M902 330H920"/>
             <path class="sym" d="M920 140L950 160V140L920 160Z"/><rect class="sym" x="928" y="118" width="14" height="14"/><text class="t-s" x="935" y="129" text-anchor="middle">S</text><path class="sg" d="M935 132V140"/>
             <path class="sym" d="M920 320L950 340V320L920 340Z"/><rect class="sym" x="928" y="348" width="14" height="14"/><text class="t-s" x="935" y="359" text-anchor="middle">S</text><path class="sg" d="M935 340V348"/>
-            <text class="t-b" x="935" y="108" text-anchor="middle">SZW-25</text>
+            <text class="t-b" x="935" y="108" text-anchor="middle">HSV04 · 725 psi</text>
             <text class="t-b" x="935" y="380" text-anchor="middle">SZW-25</text>
           </g>
           <!-- barrels -->
@@ -236,8 +236,8 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <rect class="barrel" x="958" y="319" width="214" height="22"/>
             <rect class="shirt" x="962" y="142" width="52" height="16" rx="3"/><text class="t-s" x="988" y="154" text-anchor="middle">shirt</text>
             <rect class="shirt" x="962" y="322" width="52" height="16" rx="3"/><text class="t-s" x="988" y="334" text-anchor="middle">shirt</text>
-            <text x="1065" y="128" text-anchor="middle">Barrel · 3 in polycarbonate</text>
-            <text x="1065" y="362" text-anchor="middle">Barrel · 3 in polycarbonate</text>
+            <text x="1065" y="128" text-anchor="middle">Barrel · 36 in polycarbonate</text>
+            <text x="1065" y="362" text-anchor="middle">Barrel · 36 in polycarbonate</text>
           </g>
           <g data-s="fire">
             <path class="air" marker-end="url(#ma)" d="M1172 150H1194M1172 330H1194"/>
@@ -246,7 +246,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           <g data-s="smoke">
             <rect class="box" x="300" y="470" width="168" height="44" rx="4"/>
             <text class="t-b" x="384" y="489" text-anchor="middle">12 V fogger</text>
-            <text class="t-s" x="384" y="504" text-anchor="middle">200 W core (room for 2) + blower</text>
+            <text class="t-s" x="384" y="504" text-anchor="middle">200 W core + blower</text>
             <path class="smk" d="M468 492H520"/>
             <circle class="sym" cx="528" cy="492" r="8"/><text x="528" y="476" text-anchor="middle">1→4 splitter</text>
             <path class="smk" marker-end="url(#ms)" d="M536 498Q560 530 600 530"/><text x="606" y="534">Front vent · under the bumper</text>
@@ -260,7 +260,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           </g>
         </svg>
       </div>
-      <figcaption>Air enters at the rear fill port and only reaches a barrel when its SZW-25 opens. The main valve is a manual ball valve, open all session; each in valve meters its own chamber to its own setpoint (110 psi max), and its closed seat keeps a shot from reaching the other chamber, so there are no check valves. Every pressure zone has its own relief, and the pull rings are the hand dump.</figcaption>
+      <figcaption>Air enters at the rear fill plug and only reaches a barrel when its firing valve opens. The main valve is a manual ball valve, open all session; each in valve meters its own chamber to its own setpoint (190 psi max on top, 110 on the bottom), and its closed seat keeps a shot from reaching the other chamber, so there are no check valves. Every pressure zone has its own relief, and the pull rings are the hand dump.</figcaption>
     </figure>
   </section>
 
@@ -279,7 +279,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     </div>
     <figure>
       <div class="scroll">
-        <svg class="dg" id="elec" viewBox="0 0 1200 760" role="img" aria-label="Electrical diagram: two FRC batteries and a charge port feed the 120 A main breaker. After it, a 5 A fuse and a 5 V buck-boost make the always-on logic rail for the STM32, both ESP32-S3s, every sensor and an optional camera, and a 200 A contactor that the STM32 closes feeds the REV PDH. The PDH powers the Falcons, the Spark MAX, an LED-only 5 V buck, the fogger and, through the safety relay, the 12 V valve rail for the firing and in valves. The STM32 reads the three transducers, the gun-angle pot, battery and PDH volts, fog fluid level and temperatures; drives the motors through a PWM gate and the valves and fogger through MOSFETs. An ESP32-S3 WiFi bridge serves the web UI; an ESP32-S3 safety node, linked by ESP-NOW to a handheld E-stop remote, holds the safety relay and the PWM gate enable. The rear E-stop opens both the safety relay and the contactor.">
+        <svg class="dg" id="elec" viewBox="0 0 1200 760" role="img" aria-label="Electrical diagram: two FRC batteries and a charge port feed the 120 A main breaker. After it, a 5 A fuse and a 5 V buck-boost make the always-on logic rail for the STM32, the WiFi bridge, the safety node and every sensor, and a 200 A contactor that the STM32 closes feeds the REV PDH. The PDH powers the Falcons, the Spark MAX, an LED-only 5 V buck, the fogger and, through the safety relay, the 12 V valve rail for the firing and in valves. The STM32 reads the three transducers, the gun-angle pot, battery and PDH volts, fog fluid level and temperatures; drives the motors through a PWM gate and the valves and fogger through MOSFETs. An ESP32-C5 WiFi bridge serves the web UI on 5 GHz; an ESP32-S3 safety node, linked by ESP-NOW to a handheld E-stop remote, holds the safety relay and the PWM gate enable. The rear E-stop opens both the safety relay and the contactor.">
           <defs>
             <marker id="mp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-pw" d="M0 0L10 5L0 10z"/></marker>
             <marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-sg" d="M0 0L10 5L0 10z"/></marker>
@@ -342,21 +342,14 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
             <text class="t-s" x="790" y="226" text-anchor="middle">switched 5 V · LEDs only</text>
             <rect class="box" x="1000" y="214" width="176" height="36" rx="3"/><text x="1088" y="230" text-anchor="middle">WS2812 LEDs</text><text class="t-s" x="1088" y="243" text-anchor="middle">loops 60/m · frame 100/m</text>
           </g>
-          <!-- camera (option) on the logic rail -->
-          <g data-s="standby drive">
-            <rect class="tag" x="448" y="89" width="64" height="18" rx="9"/><text class="tg" x="480" y="102" text-anchor="middle">5V LOGIC</text>
-            <path class="lg" d="M512 98H520"/>
-            <rect class="ext" x="520" y="82" width="180" height="32" rx="3"/><text x="610" y="96" text-anchor="middle">Camera (option)</text><text class="t-s" x="610" y="108" text-anchor="middle">Pi Zero 2 W · own stream</text>
-            <path class="rf" d="M700 98H950V158"/>
-          </g>
           <!-- wifi bridge -->
           <g data-s="standby drive fire fill horn">
             <rect class="tag" x="448" y="149" width="64" height="18" rx="9"/><text class="tg" x="480" y="162" text-anchor="middle">5V LOGIC</text>
             <path class="lg" d="M512 158H520"/>
-            <rect class="box" x="520" y="140" width="180" height="36" rx="3"/><text x="610" y="156" text-anchor="middle">ESP32-S3 WiFi bridge</text><text class="t-s" x="610" y="169" text-anchor="middle">serves the web UI</text>
+            <rect class="box" x="520" y="140" width="180" height="36" rx="3"/><text x="610" y="156" text-anchor="middle">ESP32-C5 WiFi bridge</text><text class="t-s" x="610" y="169" text-anchor="middle">web UI on 5 GHz</text>
             <path class="sg" d="M580 176V260" marker-end="url(#mg)"/><text class="t-s" x="574" y="214" text-anchor="end">UART</text>
             <path class="rf" d="M700 158H998"/>
-            <rect class="ext" x="1000" y="144" width="176" height="30" rx="3"/><text x="1088" y="163" text-anchor="middle">Any browser · WebSocket</text>
+            <rect class="ext" x="1000" y="144" width="176" height="30" rx="3"/><text x="1088" y="163" text-anchor="middle">Any browser · 5 GHz</text>
           </g>
           <!-- audio: bridge -> I2S DAC -> amp on a 24 V boost -> two siren speakers -->
           <g data-s="horn">
@@ -487,7 +480,7 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
           </g>
         </svg>
       </div>
-      <figcaption>Two sides. After the main breaker, a 5 A fuse feeds the always-on 5 V logic rail (STM32, both ESP32-S3s, every sensor, the camera if added), and a contactor that the STM32 closes feeds the PDH. In standby the PDH is dead but every sensor still reads. The safety node is the only thing that can power the valve rail and enable the motor PWM; the rear E-stop opens both that relay and the contactor in hardware.</figcaption>
+      <figcaption>Two sides. After the main breaker, a 5 A fuse feeds the always-on 5 V logic rail (STM32, WiFi bridge, safety node, every sensor), and a contactor that the STM32 closes feeds the PDH. In standby the PDH is dead but every sensor still reads. The safety node is the only thing that can power the valve rail and enable the motor PWM; the rear E-stop opens both that relay and the contactor in hardware.</figcaption>
     </figure>
   </section>
 
@@ -510,12 +503,12 @@ figure { margin: 0 } figcaption { font-size: 13px; color: var(--muted); max-widt
     "": "Everything at once. Pick a step to see which parts it uses.",
     standby: "<b>Standby.</b> Main breaker on, contactor open: the PDH and everything on it is dead, but the 5 V logic rail stays up on its own fuse and buck-boost. The STM32 reads every sensor, the web UI shows pressures, fog fluid, temperatures and battery, and the remote stays linked. Arm from the UI and the STM32 closes the contactor. Flip the main breaker off for storage.",
     charge: "<b>Charge.</b> A shop compressor fills both 6 L tanks (up to 200 psi; most shop compressors stop at 135–175) through the rear fill plug, an M-style quick-connect your universal coupler snaps onto, with a check valve behind it. PT1 reports tank pressure. The 200 psi relief on the same manifold has its pull ring at the rear panel: pull it to dump the tanks by hand. There's no bleed valve.",
-    fill: "<b>Fill.</b> With the manual main valve open, the STM32 pulses one chamber's in valve until that chamber's sensor (PT2 or PT3) reads its own setpoint, never above 110 psi. The in valves hold tank pressure the rest of the time, which pushes their seats shut. No check valves: a closed in valve is what keeps one shot from emptying the other chamber.",
-    fire: "<b>Fire.</b> The web UI asks and the safety node keeps the valve rail live (the remote is a second E-stop with a link LED). The STM32 switches one SZW-25 through its MOSFET; the chamber dumps into the barrel and the shirt goes.",
+    fill: "<b>Fill.</b> With the manual main valve open, the STM32 pulses one chamber's in valve until that chamber's sensor (PT2 or PT3) reads its own setpoint: up to 190 psi on top (the 725 psi valve), 110 on the bottom (the SZW-25). The in valves hold tank pressure the rest of the time, which pushes their seats shut. No check valves: a closed in valve is what keeps one shot from emptying the other chamber.",
+    fire: "<b>Fire.</b> The web UI asks and the safety node keeps the valve rail live (the remote is a second E-stop with a link LED). The STM32 switches one firing valve through its MOSFET; the chamber dumps into the barrel and the shirt goes.",
     smoke: "<b>Smoke.</b> The STM32 holds the 200 W fog core at 220–240 °C (5–8 min to warm up), then runs the pump and the blower through MOSFETs. A 250 °C cutout drops the core's relay on its own, a DS18B20 in the fogger box cuts the heater at 70 °C, and the level switch plus the pump's run time track the fluid. One splitter feeds the barrel collar (smoke fills each barrel ahead of the shirt and spills out of the muzzle) and the trail vents front and rear.",
     drive: "<b>Drive and aim.</b> The STM32 sends PWM through the gate to the four Falcons and the Spark MAX; the gate only passes it while the safety node enables it. The pot closes the elevation loop. The LEDs run off their own switched 5 V buck.",
-    horn: "<b>Horn.</b> The web UI sends a sound. The ESP32-S3 bridge streams it over I2S to a PCM5102A DAC, and a TPA3116 amp (24 V from a boost converter, about 26 W a channel) drives the two 100 W slim siren speakers high in the front corners, aimed 45 deg out and 30 deg up.",
-    safe: "<b>Safety trips.</b> Remote heartbeat lost for 200 ms, remote or rear E-stop, the STM32 heartbeat stopping, or PT1 over 210 psi: the safety node opens the relay (valves dead) and disables the gate (motors stop). The rear E-stop's second contact also opens the contactor, so the whole PDH dies while the logic stays up, and the STM32 stays off until you re-arm from the UI. The reliefs work with no power at all: 200 psi on the tanks and on the valve cross, 125 psi on each chamber. Their pull rings are the hand dump."
+    horn: "<b>Horn.</b> The web UI sends a sound. The ESP32-C5 bridge streams it over I2S to a PCM5102A DAC, and a TPA3116 amp (24 V from a boost converter, about 26 W a channel) drives the two 100 W slim siren speakers high in the front corners, aimed 45 deg out and 30 deg up.",
+    safe: "<b>Safety trips.</b> Remote heartbeat lost for 200 ms, remote or rear E-stop, the STM32 heartbeat stopping, or PT1 over 210 psi: the safety node opens the relay (valves dead) and disables the gate (motors stop). The rear E-stop's second contact also opens the contactor, so the whole PDH dies while the logic stays up, and the STM32 stays off until you re-arm from the UI. The reliefs work with no power at all: 200 psi on the tanks, the valve cross and the top chamber, 125 psi on the bottom chamber. Their pull rings are the hand dump."
   };
   const note = document.getElementById("note");
   const parts = document.querySelectorAll(".dg [data-s]");
