@@ -631,3 +631,16 @@ D13. **Search: one tank, 200 psi, bigger than the three 6 L tanks (18 L) and und
     - **So the three 6 L tanks stay (18 L, $169.80).** The only upgrade worth it is a 3 gal as the third tank
       (23.4 L total), if one is confirmed 200 psi and the CAD shows it fits across. That's +$0 to +$88.
     - Skipped: 150 psi tanks (Viair 91050, Firestone, Kleinn, HornBlasters) and anything with G (BSP) ports.
+D14. **CAD test-fit (the C.3 session): no room for a third tank, so it's two 6 L tanks (12 L).**
+    - The side tanks already fill your circled band in side view (x -134..226 mm, z 280-440). Between them
+      only about 295 mm is free lengthwise, and a 6 L needs 360. The gun's rear swing is behind that and
+      the front face is ahead of it.
+    - Across the robot (x ~80, z ~335, ends in the middle of each front side window) a 3 gal fits: the
+      generic 170 x 520 mm and the Ridetech 178 x 479. But it takes the side tanks' place, so 11.4 L would
+      replace 12 L. The Viair 2.5 gal (597 mm) doesn't fit.
+    - The CAD now has the pivot at z 645 and **45 deg max elevation** (you'd allowed 60), slot +/-133 mm.
+    - 120 ft shots per charge with 12 L: **9 / 11 / 15** from a 150 / 175 / 200 psi fill if the HSV04 opens
+      fast, **6 / 8 / 10** if slow. Your 12-shot target needs a 200 psi fill and a fast valve. More would take
+      a bigger relayout: the side tanks need somewhere new, and the battery bay is behind them.
+    - **Money: -$65.59** (one fewer tank -$56.60, one fewer pack of straps -$8.99), so **$1,825.55** on the
+      committed rows. The other session's C.3 parts rows (elevation, smoke) are still uncommitted.

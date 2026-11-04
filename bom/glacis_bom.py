@@ -31,10 +31,10 @@ ROWS = [
      "Not used: 125 psi is below the 200 psi tank zone", f"{OLD}; spare"),
 
     ("PRESSURE SIDE - tanks, rear manifold, main valve and in valves (200 psi)", None),
-    ("Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT, aluminum (your pick)", "Aliexpress", 3, 56.60,
+    ("Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT, aluminum (your pick)", "Aliexpress", 2, 56.60,
      "https://www.aliexpress.us/item/3256804024554756.html", "Motion",
-     "Three, 18 L (rev D.1): the two side tanks plus a third in the space under the gun you circled. "
-     "12-16 shots at 120 ft per 175-200 psi charge; one part number",
+     "Two, 12 L: left and right over the front wheels. The CAD test-fit found no room for a third alongside them; "
+     "9-15 shots at 120 ft per 150-200 psi charge with a fast top valve, 6-10 with a slow one",
      "Inter Racing Store, 4.9 stars, 92 sold; $44.31 for one as a new shopper (2026-11-03, L)"),
     ("Relief valve 200 psi, 1/4 MNPT, pull ring (Interstate V200-4)", "Amazon", 3, 16.30, "https://www.amazon.com/dp/B00ABZ0JP0",
      "Motion", "Tank zone (rear manifold; its pull ring at the rear panel is the hand dump), the valve cross, and the top chamber (rev D)", f"Listing doesn't say ASME; Milton S-1090-200 ($17.99) is ASME, no ring ({D}, L)"),
@@ -77,8 +77,8 @@ ROWS = [
      "Motion", "5 used: tank outlets", "SAE J1131, 250 psi, NPT (2026-11-02, L)"),
     ("Pipe thread sealant, RectorSeal T Plus 2", "Other", 1, 4.25, "https://www.homedepot.com/p/100116773",
      "Tool", "Every NPT joint", "Home Depot (2026-11-01, L)"),
-    ("1 in cam-buckle strap 4 ft, 4-pack", "Amazon", 2, 8.99, "https://www.amazon.com/dp/B0GVS7RGTB",
-     "Structure", "6 used: two per tank, three tanks", "1,100 lb (2026-11-02, L)"),
+    ("1 in cam-buckle strap 4 ft, 4-pack", "Amazon", 1, 8.99, "https://www.amazon.com/dp/B0GVS7RGTB",
+     "Structure", "4 used: two per side tank", "1,100 lb (2026-11-02, L)"),
 
     ("GUN (rev D.1 proposal) - 3 in pipe chambers: top 1.59 L on a 725 psi valve (to 190 psi), bottom 1.35 L, 110 psi; 36 in barrels", None),
     ("Top firing valve: U.S. Solid USS-HSV04, 1 in NPT, 12 V DC, NC, pilot-operated, 1-50 bar (725 psi), PTFE seal", "Other", 1, 98.19,
