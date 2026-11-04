@@ -4,6 +4,21 @@ import cadquery as cq
 from cadquery import Vector as V, Location as Loc
 
 # ------------------------------------------------------------------ colours (r, g, b, a)
+
+_clean = cq.Shape.clean
+
+
+def _safe_clean(self):
+    """Shape.clean (merge coplanar faces) that gives the shape back unmerged when OCC's upgrader trips (it does on
+    the LED rails' rounded, twisting faces)."""
+    try:
+        return _clean(self)
+    except Exception:
+        return self
+
+
+cq.Shape.clean = _safe_clean
+
 C = {
     "print":   (0.94, 0.94, 0.95, 1.0),     # white PETG/ASA
     "print_d": (0.22, 0.23, 0.26, 1.0),     # dark PETG-CF / PA-CF (drive, pulleys)

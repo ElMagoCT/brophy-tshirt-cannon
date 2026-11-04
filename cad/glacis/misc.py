@@ -206,7 +206,7 @@ def air():
     add("Fill elbow manifold", PP.street_elbow(V(xu, y_fill, mz), (0, -1, 0), (1, 0, 0)), "brass", "pneu",
         bom="1/4 NPT brass street elbow")
     add("Tank relief valve 200 psi", PP.relief_valve(ports[5][0], ports[5][1], length=ports[5][0].x - (xo - 4.0)), "brass",
-        "pneu", bom="Relief valve 200 psi 1/4 NPT, pull ring (Interstate V200-4)", note="pull ring at the rear panel: the hand dump")
+        "pneu", bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)", note="pull ring at the rear panel: the hand dump")
     # main valve (the tanks' shut-off, opens only while a chamber fills) into a brass cross; one in valve per chamber
     # off the cross meters its chamber against that chamber's transducer, and its closed seat is what keeps the
     # other cannon's shot from reaching it (no check valves). Main valve to in-valve seats is all brass at tank
@@ -219,7 +219,7 @@ def air():
     add("Valve cross", PP.npt_cross(V(fx, fy, fz), (1, 0, 0), (0, 1, 0)), "brass", "pneu",
         bom="1/4 NPT brass cross (ChillWaves)", note="close nipples to the in valves")
     add("Line relief valve 200 psi", PP.relief_valve(V(fx, fy + 12.7, fz), (0, 1, 0)), "brass", "pneu",
-        bom="Relief valve 200 psi 1/4 NPT, pull ring (Interstate V200-4)")
+        bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)")
     CHECKS.clear()
     for d, tag in ((V(1, 0, 0), "A (top cannon)"), (V(0, -1, 0), "B (bottom cannon)")):
         a0 = V(fx, fy, fz) + d * (12.7 + 1.8)
@@ -349,8 +349,8 @@ def batteries_and_electronics():
               ("Safety relay 40 A", -220, -192, -20, -2, 36, "black", "12 V 40 A SPDT relay + socket"),
               ("Valve + fog drivers (relays, ULN2803A)", -378, -308, -6, 54, 32, "pcb", "12 V 40 A SPDT relay + socket"),
               ("Buck 12-5 V 20 A", -300, -244, 45, 95, 25, "black", "12->5 V 20 A buck (B089M5R3NJ)")]   # under the main valve
-    boards.append(("Logic supply 5 V (Pololu S13V30F5)", -378, -352, 60, 85, 10, "pcb",
-                   "Logic supply: Pololu S13V30F5 5 V 3 A buck-boost (#4082)"))
+    boards.append(("Logic supply 5 V (PM02 buck-boost)", -378, -352, 60, 85, 10, "pcb",
+                   "Logic supply: 5 V 5 A buck-boost (PM02, 3-20 V in)"))
     for name, x0, x1, y0, y1, h, col, bom in boards:
         add(name, box(x0, x1, y0, y1, z, z + h), col, "power", bom=bom)
     add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power",
@@ -391,23 +391,23 @@ def speakers():
         add(f"Speaker cup {pod['name']}", cup, "print", "body", bom="Speaker cup", kind="print",
             note="lines the corner notch; 4 x M4 through its floor into the speaker's bracket holes")
         add(f"Speaker {pod['name']}", pod["speaker"], "black", "power", mass=2.4,
-            bom="Slim 100 W siren speaker, 11 ohm (UBL 100W Slim)", note="5.5 x 5.75 x 2 in, 120-130 dB at 100 W")
+            bom="Slim 100 W siren speaker, 8 ohm (SoundAlert B08B3CLLHJ)", note="2 in deep x 6 in, 118-124 dB at 100 W")
         add(f"Speaker grille {pod['name']}", pod["grille"], "print", "body", bom="Speaker grille", kind="print",
             note="3 walls, no top or bottom layers, 12% gyroid: an open mesh; glue or screw to the cup")
-    # hood lights: a mini 12 V spot in a printed pod at each low front corner, on the front face just above the
-    # bumper, aimed straight ahead (30 deg beam), dimmed together on the last spare MOSFET channel
-    hy, hz, hr, hl = P.HOOD_LIGHT
-    x0 = P.front_x(hz + hr)                                # the face at the pod's top: its back is cut to the slant
-    x1 = P.front_x(hz - hr) + hl                           # front face of the pod
+    # front light bar: Micah's Zmoon 12 in single-row bar (72 W, spot/flood combo) across the nose just above the
+    # bumper, on two printed brackets screwed into the front panel's bottom member; the STM32 switches (and can PWM-dim)
+    # it through a MOSFET channel
+    L, hb, db, zc, yb = P.LIGHT_BAR
+    xf = P.front_x(zc - hb / 2) + 8.0                      # bar's back, clear of the slant at its bottom edge (the front leans back)
+    bar = box(xf, xf + db, -L / 2, L / 2, zc - hb / 2, zc + hb / 2)
+    bar = bar.cut(box(xf + db - 2.0, xf + db + 1.0, -L / 2 + 14.0, L / 2 - 14.0, zc - hb / 2 + 5.0, zc + hb / 2 - 5.0))  # one lens strip
+    add("LED light bar front", bar, "black", "power", mass=0.37,
+        bom="Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V", note="straight ahead")
     for sg, side in ((1, "left"), (-1, "right")):
-        pod = cyl(hr, x1 - x0 + 2.0, (x0 - 2.0, sg * hy, hz), (1, 0, 0)).cut(plain)
-        pod = pod.cut(cyl(14.2, 21.0, (x1 - 20.0, sg * hy, hz), (1, 0, 0))).cut(cyl(4.0, x1 - x0 + 4.0, (x0 - 3.0, sg * hy, hz), (1, 0, 0)))
-        add(f"LED hood light pod {side}", pod, "print", "body", bom="Hood light pod (printed)", kind="print",
-            note="2 x M4 into the frame along the front panel's bottom edge; the light's spring clips grip its 28.4 mm bore")
-        lamp = cyl(14.0, 19.0, (x1 - 19.0, sg * hy, hz), (1, 0, 0)).fuse(cyl(16.0, 2.0, (x1, sg * hy, hz), (1, 0, 0)))
-        add(f"LED hood light {side}", lamp, "steel", "power", mass=0.03,
-            bom="Hood light: mini 12 V 3 W LED spot, 30 deg, 32 x 19 mm, PWM dimmable (Ohlite / MDK-YJ)",
-            note="straight ahead; PWM on the last spare MOSFET channel")
+        brk = box(P.front_x(zc - hb / 2 - 6.0) - 20.0, xf + 6.0, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc - hb / 2)
+        brk = brk.fuse(box(xf - 2.0, xf + 6.0, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc + hb / 2)).cut(plain)
+        add(f"LED light bar bracket {side}", brk, "print", "body", bom="Light bar bracket (printed)", kind="print",
+            note="2 x M4 into the front panel's bottom member; the bar's own bolt through its slot")
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
     add("Audio amp (TPA3116D2)", box(-120.0, -25.0, 35.0, 95.0, zb, zb + 28.0), "pcb", "power",
         bom="TPA3116D2 2 x 50 W amp board", note="one channel per speaker, on 24 V")
@@ -578,10 +578,11 @@ def body_parts(log=print):
             add(f"Panel clip {i:02d}-{k}", c["clip"], "print", "body", bom="Panel corner clip", kind="print",
                 note="M4 x 12 into a heat-set insert")
             nclip += 1
-        if p["led"] is None:
-            continue
-        add(f"LED loop panel {i:02d}", p["led"], "led", "body", bom="WS2812B strip 10 mm, 60/m (m)", kind="stock",
-            note="on the rail behind the panel, LEDs across it")
+        pieces = p.get("led_pieces") or []
+        for k, piece in enumerate(pieces):
+            add(f"LED loop panel {i:02d}" + (f" {chr(97 + k)}" if len(pieces) > 1 else ""), piece, "led", "body",
+                bom="WS2812B strip 10 mm, 60/m (m)", kind="stock",
+                note="on the rail behind the panel, LEDs across it; cut and jumped with 3 wires where a neighbour crosses")
     for tag, strip in B.build.frame_strips:
         add(f"LED strip frame {tag}", strip, "led", "body", bom="WS2812B strip 5 mm, 100/m (m)", kind="stock",
             note="pushed through the frame tunnel, LEDs out")

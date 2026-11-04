@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Glacis render</title>
+<style>html,body{margin:0;background:#05060a;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const Q = new URLSearchParams(location.search), qn = (k, d) => Q.has(k) ? parseFloat(Q.get(k)) : d;
+const W = 1920, H = 1080, GLOW = qn('glow', 1), SMOKE = qn('smoke', 1);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = qn('exp', 0.85);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x05060a);
+scene.fog = new THREE.FogExp2(0x05060a, 0.09);
+// Z-up robot frame -> three's Y-up: rotate the robot group
+const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; scene.add(root);
+
+const camera = new THREE.PerspectiveCamera(32, W / H, 0.05, 60);
+camera.position.set(qn('cx', 3.1), qn('cy', 1.25), qn('cz', 2.6)); camera.lookAt(qn('tx', 0.25), qn('ty', 0.45), qn('tz', 0));
+
+// lights: dim moon key, red spill from the panels, white pools under the bumpers
+scene.add(new THREE.HemisphereLight(0x223355, 0x080808, 0.35));
+const key = new THREE.DirectionalLight(0x8899cc, 0.55); key.position.set(3, 5, 2); key.castShadow = true; scene.add(key);
+const red = (x, y, z, i, d) => { const l = new THREE.PointLight(0xff1530, i, d, 2); l.position.set(x, y, z); scene.add(l); };
+const RI = qn('red', 1.2); red(0.95, 0.45, 0.0, RI, 2.5); red(0.0, 0.5, 0.85, RI, 2.5); red(0.0, 0.5, -0.85, RI, 2.5); red(-0.8, 0.5, 0, RI * 0.7, 2.5);
+const white = (x, z, i) => { const l = new THREE.PointLight(0xf4f6ff, i, 1.4, 2); l.position.set(x, 0.07, z); scene.add(l); };
+for (const [x, z] of [[0.5, 0.33], [0.5, -0.33], [-0.5, 0.33], [-0.5, -0.33], [0.0, 0.36], [0.0, -0.36], [0.55, 0], [-0.55, 0]]) white(x, z, qn('under', 0.5));
+
+// floor: dark, a little glossy, catches the underglow
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40),
+  new THREE.MeshStandardMaterial({ color: 0x0c0d12, roughness: qn('rough', 0.75), metalness: 0.05 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+const MAT = {
+  panel: new THREE.MeshStandardMaterial({ color: 0xff1a33, emissive: 0xff0a24, emissiveIntensity: 0.55 * GLOW, roughness: 0.6, transparent: true, opacity: 0.9 }),
+  loop: new THREE.MeshStandardMaterial({ color: 0xff2040, emissive: 0xff1030, emissiveIntensity: 1.4 * GLOW }),
+  frame: new THREE.MeshStandardMaterial({ color: 0xf2f4ff, emissive: 0xdfe6ff, emissiveIntensity: 0.3 * GLOW, roughness: 0.55 }),
+  underglow: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1.8 * GLOW }),
+  lightbar: new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0xffffff, emissiveIntensity: 1.5 * GLOW, roughness: 0.3 }),
+  grille: new THREE.MeshStandardMaterial({ color: 0x15161a, roughness: 0.8 }),
+  bumper: new THREE.MeshStandardMaterial({ color: 0xe8e8ea, roughness: 0.9 }),
+  barrel: new THREE.MeshPhysicalMaterial({ color: 0xdfefff, roughness: 0.08, transmission: 0.6, transparent: true, opacity: 0.45, thickness: 0.003 }),
+  gunprint: new THREE.MeshStandardMaterial({ color: 0xf0f1f5, emissive: 0xdfe6ff, emissiveIntensity: 0.12 * GLOW, roughness: 0.5 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0x8a8f99, roughness: 0.35, metalness: 0.8 }),
+  darkprint: new THREE.MeshStandardMaterial({ color: 0x2a2c33, roughness: 0.6 }),
+  tire: new THREE.MeshStandardMaterial({ color: 0x141416, roughness: 0.95 }),
+};
+
+// soft smoke sprite texture
+function puffTex() {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64);
+  gr.addColorStop(0, 'rgba(255,255,255,0.9)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+}
+const TEX = puffTex();
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function puff(p, size, color, alpha) {      // p in robot coords (m, Z up)
+  if (!SMOKE) return;
+  const m = new THREE.SpriteMaterial({ map: TEX, color, transparent: true, opacity: alpha * 0.55 * SMOKE, depthWrite: false });
+  const s = new THREE.Sprite(m); s.position.set(p[0], p[2], -p[1]); s.scale.setScalar(size); scene.add(s);
+}
+
+const meta = await (await fetch('meta.json')).json();
+new GLTFLoader().load('robot.glb', (g) => {
+  g.scene.traverse((o) => {
+    if (!o.isMesh) return;
+    // CAD tessellation has sliver triangles whose stored normals are NaN, and bloom smears NaN into black
+    // blocks: rebuild flat normals from the triangles themselves
+    o.geometry = o.geometry.toNonIndexed(); o.geometry.deleteAttribute('normal'); o.geometry.computeVertexNormals();
+    const nrm = o.geometry.attributes.normal.array; for (let i = 0; i < nrm.length; i++) if (!Number.isFinite(nrm[i])) nrm[i] = 0;
+    const name = (o.name || o.parent?.name || '').replace(/_\d+$/, '');
+    o.material = MAT[name] || MAT.metal; o.castShadow = name !== 'panel'; o.receiveShadow = true;
+  });
+  root.add(g.scene);
+  // smoke under the robot: low wisps round the bumpers, lit white by the underglow
+  for (let i = 0; i < 70; i++) {
+    const a = rnd() * Math.PI * 2, r = 0.42 + rnd() * 0.45;
+    puff([Math.cos(a) * r * 1.25, Math.sin(a) * r, 0.02 + rnd() * 0.08], 0.25 + rnd() * 0.35, 0xf1f3ff, 0.10 + rnd() * 0.08);
+  }
+  // behind: the rear trail rolls out from under the back and drifts away, catching red from the rear panel
+  for (let i = 0; i < 55; i++) {
+    const t = rnd();
+    puff([-0.45 - t * 1.5, (rnd() - 0.5) * (0.3 + t * 0.9), 0.04 + t * 0.35 + rnd() * 0.1], 0.3 + t * 0.7, t < 0.3 ? 0xffb0b8 : 0xc9ccd6, 0.12 + 0.06 * (1 - t));
+  }
+  // the bottom barrel: a thin wisp still curling out of the tube
+  const bot = meta['Barrel bottom'], top = meta['Barrel top'];
+  for (let i = 0; i < 18; i++) {
+    const t = i / 18;
+    puff([bot.tip[0] + bot.dir[0] * t * 0.25, bot.tip[1] + (rnd() - 0.5) * 0.03, bot.tip[2] + bot.dir[2] * t * 0.25 + t * t * 0.18],
+         0.05 + t * 0.16, 0xe7e9f0, 0.22 * (1 - t) + 0.05);
+  }
+  // the top barrel just fired: a dense puff at the muzzle and a smoke ring rolling ahead of it
+  for (let i = 0; i < 40; i++) {
+    const t = rnd() * 0.35;
+    puff([top.tip[0] + top.dir[0] * t + (rnd() - 0.5) * 0.12, top.tip[1] + (rnd() - 0.5) * 0.16, top.tip[2] + top.dir[2] * t + (rnd() - 0.5) * 0.12],
+         0.12 + rnd() * 0.22, 0xf4f5fa, 0.16 + rnd() * 0.1);
+  }
+  const c = top.tip.map((v, k) => v + top.dir[k] * 0.95), R = 0.17;
+  const u = [0, 1, 0], w = [-top.dir[2], 0, top.dir[0]];              // two axes across the barrel
+  for (let i = 0; i < 90; i++) {
+    const a = i / 90 * Math.PI * 2, j = (rnd() - 0.5) * 0.025;
+    const q = [0, 1, 2].map(k => c[k] + (u[k] * Math.cos(a) + w[k] * Math.sin(a)) * (R + j) + top.dir[k] * (rnd() - 0.5) * 0.03);
+    puff(q, 0.07 + rnd() * 0.05, 0xf6f7fb, 0.34);
+  }
+  // render a few frames (bloom settles), then hand the PNG to the save server
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), qn('bloom', 0.4), 0.45, qn('thr', 0.85)));
+  composer.addPass(new OutputPass());
+  for (let k = 0; k < 3; k++) composer.render();
+  renderer.domElement.toBlob(async (b) => {
+    await fetch('save?name=' + (new URLSearchParams(location.search).get('out') || 'render.png'), { method: 'POST', body: b });
+    document.title = 'saved';
+  }, 'image/png');
+});
+</script></body></html>

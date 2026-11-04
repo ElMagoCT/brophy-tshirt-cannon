@@ -350,3 +350,14 @@ Micah's notes on the rev C.1 diagrams and follow-ups in the same session. Detail
   pivot; 312 rpm elevation motor at 7:1; rear smoke vents down through the bellypan.
 - A third 6 L tank doesn't fit with the two side tanks (see JUDGMENTS M8). Two tanks, 12 L.
 - Onshape: one sub-assembly per system; every pneumatic part detailed and described. Parts $1,888.37.
+
+## 2026-11-04 - Glacis rev D.1.1: LEDs, light bar, cost-down
+
+- LED loops at 2/3 radii, with rounded rail edges. Rails back to back on shared edges. Strip 0.96 in behind the panel.
+  8 jumpers where loops cross at three-panel corners.
+- Micah's Zmoon 12 in light bar across the nose, switched and dimmed by the STM32 through a MOSFET. The hood lights
+  and the lens-pod bars are out.
+- EVIL ENERGY 2.5 gal tanks: two don't fit (sides blocked by the batteries), and one can only replace both 6 L tanks
+  for less air. Keep the two 6 L (JUDGMENTS N3).
+- Parts: cheapest of AliExpress (Micah's logged-in prices), Amazon and McMaster. No rivets, old 9 in mecanum for now,
+  goBILDA motors owned. $1,888.37 -> $1,359.91. Onshape version "Glacis rev D.1.1".

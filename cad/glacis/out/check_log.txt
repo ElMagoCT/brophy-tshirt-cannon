@@ -6,23 +6,24 @@ underglow: 2.5 m of strip under the bumpers
 body: 28 faces, volume 118.4 L
 shell volume 22.56 L, 1 solid
 8 panels
-frame network volume 5.14 L, 38 corner clips, strip 10.6 m in 8 panel loops + 8.3 m in 28 frame tunnels
+frame network volume 4.47 L, 36 corner clips, strip 11.6 m in 8 panel loops + 8.3 m in 28 frame tunnels
+LED loops: 8 jumpers where neighbours' rails or loops cross a corner
 38 edges
-cheek L: 2 segments + 2 node parts -> 1 piece(s), main [120, 137, 147]
-cheek R: 2 segments + 2 node parts -> 1 piece(s), main [120, 147, 163]
-66 pieces (18 nodes, 1 extra glued splits to fit the bed)
-joints: 73 tapered tenons with M4 cross screws, 0 ends without a neighbour piece
-body: 66 frame pieces (3 slivers dropped), 8 panels, 36 clips, LED strip 10.6 m in panel loops + 8.3 m in the frame
-built 576 parts in 236 s
+cheek L: 2 segments + 1 node parts -> 1 piece(s), main [120, 123, 147]
+cheek R: 2 segments + 1 node parts -> 1 piece(s), main [120, 147, 153]
+69 pieces (20 nodes, 0 extra glued splits to fit the bed)
+joints: 77 tapered tenons with M4 cross screws, 0 ends without a neighbour piece
+body: 4 frame pieces (3 slivers dropped), 8 panels, 34 clips, LED strip 11.6 m in panel loops + 8.3 m in the frame
+built 585 parts in 3625 s
 envelope at  0 deg: 62.2 L x 27.8 W x 30.9 H in
 envelope at 90 deg: 37.8 L x 27.8 W x 69.6 H in
 body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
-mass estimate 78.9 kg (174 lb): body 6.4, bumper 1.7, drive 15.0, frame 5.0, gun 20.3, pneu 9.3, power 21.3
+mass estimate 78.6 kg (173 lb): body 6.0, bumper 1.7, drive 15.0, frame 5.0, gun 20.3, pneu 9.3, power 21.3
 gun 20.3 kg, CG 0 mm ahead / 4 mm above the pivot -> 0.1 N*m at 0 deg
-interference: 2 pairs over 30 mm^3 (71 s)
+interference: 2 pairs over 30 mm^3 (385 s)
     (146, 'Valve cross push-to-connect', 'Line relief valve 200 psi')
     (64, 'Fill elbow manifold', 'Rear manifold')
-elevation sweep 0-45 deg: 0 clashes (10 s)
+elevation sweep 0-45 deg: 0 clashes (32 s)
 printed parts over a 256 mm bed: 0 []
 parts in more than one piece: 0 []
 exported Chassis, pivot & drive: 87 parts, 6.6 MB
@@ -34,13 +35,15 @@ exported Gun (at 20 deg): 53 parts, 3.1 MB
 exported Pneumatics: 46 parts, 2.9 MB
 exported Power, electronics & smoke: 40 parts, 1.1 MB
 exported Bumpers & wall standoffs: 48 parts, 1.4 MB
-exported Lights & speakers 1 of 2: 25 parts, 4.8 MB
-exported Lights & speakers 2 of 2: 25 parts, 4.4 MB
-exported Body frame 1 of 5: 13 parts, 6.8 MB
-exported Body frame 2 of 5: 13 parts, 6.9 MB
-exported Body frame 3 of 5: 13 parts, 6.6 MB
-exported Body frame 4 of 5: 13 parts, 6.5 MB
-exported Body frame 5 of 5: 14 parts, 7.3 MB
-exported Body panels & clips: 46 parts, 1.6 MB
-BOM rollup: 182 distinct items -> /Users/user/Documents/Workspace/brophy-tshirt-cannon/cad/glacis/out/parts_from_cad.csv
+exported Lights & speakers 1 of 2: 29 parts, 7.2 MB
+exported Lights & speakers 2 of 2: 29 parts, 5.3 MB
+exported Body frame 1 of 7: 9 parts, 6.7 MB
+exported Body frame 2 of 7: 10 parts, 7.1 MB
+exported Body frame 3 of 7: 10 parts, 6.1 MB
+exported Body frame 4 of 7: 10 parts, 7.9 MB
+exported Body frame 5 of 7: 10 parts, 8.3 MB
+exported Body frame 6 of 7: 10 parts, 5.7 MB
+exported Body frame 7 of 7: 10 parts, 6.2 MB
+exported Body panels & clips: 44 parts, 1.6 MB
+BOM rollup: 186 distinct items -> /Users/user/Documents/Workspace/brophy-tshirt-cannon/cad/glacis/out/parts_from_cad.csv
 renders written

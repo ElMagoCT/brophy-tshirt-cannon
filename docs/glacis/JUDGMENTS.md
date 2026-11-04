@@ -606,7 +606,10 @@ D12. **Money, each round** (parts list on committed rows):
     | rev C.2 | | $1,512.44 |
     | C.3 electronics + air review | +$36.46 | $1,548.90 |
     | rev D (old tank on a 725 psi valve, 5 tanks, 36 in barrels, 5 GHz bridge) | +$360.07 | $1,908.97 |
-    | **rev D.1 (3 in top chamber, 3 tanks)** | **-$17.83** | **$1,891.14** |
+    | rev D.1 (3 in top chamber, 3 tanks) | -$17.83 | $1,891.14 |
+    | rev D.1 as modelled (two tanks, underglow, hood lights) | -$2.77 | $1,888.37 |
+    | D.1.1 your cuts: no rivets, old 9 in mecanum (printed-wheel hardware off), goBILDA owned, light bar | -$225.30 | $1,663.07 |
+    | **D.1.1 cost-down: cheapest of AliExpress (logged in), Amazon, McMaster** | **-$303.16** | **$1,359.91** |
 
     - Rev D.1 in detail: two fewer tanks -$113.20 and one fewer pack of straps -$8.99; the top chamber
       (12 in nipple $31.59, two couplings $63.78, a bushing $8.99) +$104.36. The old tank goes back to spare.
@@ -695,3 +698,78 @@ M10. **Onshape is grouped by system:** sub-assemblies for the body panels, body 
 M11. **Checks:** sweep 0-45 deg clean, nothing over the bed, every part one solid. Two fittings' hex bodies touch
     (146 and 64 mm3) at the valve cross and the manifold's fill elbow, where a real close nipple would space them.
     Weight 174 lb (gun 20.3 kg). Parts $1,888.37.
+
+## Rev D.1.1: LEDs, light bar, tanks, parts cost-down (2026-11-04)
+Onshape version "Glacis rev D.1.1"; renders in `docs/glacis/render_d1_1_*.png`.
+
+N1. **LED loops (your notes).** Every corner radius is 2/3 of C.3's (windows 15 mm, acrylic 18.7, LED corners 15), and
+    each kind has its own variable in `params.py`: `WINDOW_R`, `ACRYLIC_R`, `LED_CORNER`, `FLANGE_ROUND`, `CLIP_ROUND`,
+    `RAIL_EDGE_R`. The rail's free back edge rounds over (2.5 mm).
+    - The strip face now starts right at the window edge on every side (19 mm in), so the dead band is gone. On an
+      edge shared with another panel the two rails meet back to back in a point.
+    - The strip is 5 mm closer to the acrylic (0.96 in behind the panel, was 1.15) and the rail is 5 mm shorter.
+    - Where three panels meet, a neighbour's corner turn crosses the loop. The strip is cut there and jumped with 3 wires:
+      8 jumpers on the robot.
+N2. **Front light bar: your Zmoon 12 in** (72 W, spot/flood) across the nose just above the bumper, on two printed
+    brackets. Its face stays inside the bumper line.
+    - The STM32 switches it, and can PWM-dim it, through a MOSFET channel (about 6 A).
+    - Amazon lists only "12 in", so it's modelled 330 x 30 x 45 mm [UNVERIFIED].
+    - The lens-pod bars from the AliExpress search are out.
+N3. **Tanks: the EVIL ENERGY 2.5 gal (9.5 L, 200 psi, 498 x 200 x 160 mm, steel 4.55 kg, $98.99) isn't worth it.**
+    The CAD test-fit:
+    - **Sides, lengthwise:** about 381 mm is free ahead of the battery bays, but the tank needs 498. At every position
+      tried it runs into a battery and pokes through the side wall.
+    - **Across the front:** one fits, at x 60 and z 330. It only needs the fog line to the gun rerouted. But it sits in
+      the same space as the two side tanks, so it can only replace them.
+
+    Shots at 120 ft per charge to 150 / 175 / 200 psi, both cannons alternating:
+
+    | Air | Cost | HSV04 opens in 50 ms | in 80 ms | Fits? |
+    |---|---|---|---|---|
+    | **Two 6 L (now), 12 L** | $112.62 | 9 / 11 / 14 | 6 / 8 / 10 | yes |
+    | One EVIL instead, 9.5 L | $98.99 | 7 / 9 / 11 | 4 / 6 / 8 | yes, in their place |
+    | Two EVIL, 18.9 L | $197.98 | 13 / 17 / 22 | 8 / 12 / 16 | no |
+    | Two 6 L + one EVIL, 21.5 L | $211.61 | 15 / 21 / 25 | 10 / 14 / 18 | no |
+
+    - **For the EVIL:** steel, 6 ports, well reviewed. Two of them would nearly double the shots.
+    - **Against:** two don't fit without moving the batteries back and growing the body. One alone holds less air than
+      now, and the steel adds about 6 kg over two.
+    - **The cheaper lever is the valve:** bench-test the HSV04 and charge to 200 psi.
+N4. **Parts cost-down: $1,888.37 to $1,359.91.** Every line is now the cheapest of AliExpress (your logged-in
+    prices), Amazon and McMaster.
+    - **Your cuts:** no rivets (your screws), the old 9 in mecanum for now (608s, M8 rod, nylocs, hub bolts and 140T
+      belts off), and the goBILDA owned.
+    - **Biggest savings:**
+      - relief valves -$39.09 (McMaster 48435K72: ASME, ring pull, $6.67);
+      - speakers -$40 (SoundAlert $59.99, 2 in deep like the old pick, 8 ohm);
+      - barrels -$36.86 (3 ft tubes are the 36 in barrels);
+      - couplings -$31.60;
+      - LED strips -$23.24;
+      - one push-to-connect pack instead of two -$19.99 (the CAD uses 8);
+      - E-stops -$17.48;
+      - most electronics moved to AliExpress.
+    - **What went up:**
+      - fog core +$11.97 ($22.42 was the new-shopper price);
+      - check valve +$8.82 (Zoro isn't one of the three; AliExpress check valves are 145 psi);
+      - Zmoon bar +$12.74 over the AliExpress bar;
+      - sealant +$4.53;
+      - an estimated $15 for McMaster shipping.
+    - **Still off the three sellers, on purpose:**
+      - the Aignep in valves: nothing at the three is 1/4 NPT, direct-acting and rated 200 psi under $155;
+      - the HSV04: Amazon's only 200+ psi 1 in valve is $156.66;
+      - the pool noodles: Amazon's are $33 for six.
+    - **Kept the dearer, rated part on the pressure side:**
+      - AliExpress relief valves are $2.69 but unrated;
+      - its brass crosses state 850 kPa (123 psi);
+      - the cheaper transducer doesn't state 0.5-4.5 V.
+N5. **Not checked yet:**
+    - AliExpress started showing a slider captcha after the parallel lookups, so the cheapest siren speakers there weren't
+      searched. Solve the slider once in your browser and I'll look.
+    - The M5 insert price is assumed equal to the M4 pack.
+    - The canvas colour on Amazon, the Zmoon's size and the SoundAlert's height are unconfirmed. The speaker cup may need
+      a few mm once it's in hand.
+N6. **Checks:**
+    - The light bar clears everything.
+    - Sweep 0-45 deg is clean, nothing is over the bed, and every part is one solid.
+    - The same two fitting slivers as D.1 remain (146 and 64 mm3): where two male threads overlap inside a 1/4 cross, the
+      model engages them deeper than a real joint does.

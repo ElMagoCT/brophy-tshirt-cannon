@@ -10,7 +10,7 @@ FRC battery x2 (parallel, SB50) + charge port
         |
    120 A main breaker  (master off: everything, logic included)
         |
-        +--- 5 A ATO fuse --- Pololu S13V30F5 5 V buck-boost --- LOGIC RAIL (always on)
+        +--- 5 A ATO fuse --- PM02 5 V 5 A buck-boost --- LOGIC RAIL (always on)
         |                                                         STM32, WiFi bridge, safety node,
         |                                                         all sensors
         |
@@ -21,13 +21,16 @@ FRC battery x2 (parallel, SB50) + charge port
         +--- 20 A buck -> WS2812 LEDs only
         +--- 24 V boost -> TPA3116 amp -> siren speakers
         +--- fog core relay(s) -> MOSFETs -> heater, pump, blower
+        +--- 10 A channel -> STM32 MOSFET (PWM) -> front light bar (Zmoon 12 in, 72 W, ~6 A)
         +--- safety relay (coil: safety node + rear E-stop contact 1) -> 12 V valve rail -> firing + in valves
 ```
 
 - **Standby** = main breaker on, contactor open. The PDH and everything on it is dead. The logic rail
   stays up, so the STM32 reads every sensor, the web UI shows pressures, fog fluid, temperatures and
   battery, and the remote stays linked. Arm from the UI and the STM32 closes the contactor (~20 ms).
-- **The logic rail is a buck-boost** (2.8-22 V in), so a drive sag can't reset the controllers.
+- **The light bar is the STM32's**: on, off and dimming from the web UI, through one MOSFET channel's PWM
+  (a few hundred Hz; if its driver flickers on PWM, run it on/off only).
+- **The logic rail is a buck-boost** (3-20 V in), so a drive sag can't reset the controllers.
 - **Rear E-stop:** a 2NC mushroom. Contact 1 is in the safety relay coil (valves dead), contact 2 is in
   the contactor coil (whole PDH dead). Both in hardware; the STM32 can't override either.
 - **Remote E-stop, lost link, dead STM32 heartbeat, tank over 210 psi:** the safety node drops the

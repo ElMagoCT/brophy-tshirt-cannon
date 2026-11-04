@@ -119,28 +119,35 @@ CLIP_T = 2.5                                # printed corner clips sit flush, pa
 REBATE_D = CLIP_T + ACRYLIC_T + 0.3
 CLIP_R, CLIP_OVER = 15.0, 6.0               # corner clip: round head radius, how far it laps over the acrylic
 INSERT = (2.8, 10.0)                        # M4 heat-set insert hole: radius, depth (every panel screw is an M4 x 12)
-WINDOW_R, ACRYLIC_R = 22.5, 28.0            # convex and concave corners of the frame windows and the acrylic round off
+# corner and edge radii, one per kind (rev C.3.1: every corner radius is 2/3 of rev C.3's)
+WINDOW_R = 15.0                             # frame window corners (convex and concave)
+ACRYLIC_R = 18.7                            # acrylic panel corners, and the rebate they sit in (+0.3)
+LED_CORNER = 15.0                           # LED rail and strip loop corners (less where a panel neck is too narrow).
+                                            # Where three faces meet, the neighbours' corner turns cross a loop: the
+                                            # strip is cut and jumped with 3 wires there (body.build counts them)
+FLANGE_ROUND = LED_CORNER + 4.0             # rail flange corners: concentric with the rail, so no solid corner plates
+CLIP_ROUND = 4.0                            # corner clip and clip pocket outline corners
+RAIL_EDGE_R = 2.5                           # the rail's free back edge rounds over to its strip face (= the wall)
 NODE_SETBACK = 48.0
 PRINT_MAX = 240.0
 TENON = (6.5, 6.5, 12.0, 0.5)
 TENON_CLEAR = 0.15
-LED_RAIL = (2.5, 17.0, 43.0, 15.0)          # panel light rail: wall, from/to depth, lean toward the panel (deg) on
+LED_RAIL = (2.5, 17.0, 38.0, 15.0)          # panel light rail: wall, from/to depth, lean toward the panel (deg) on
                                             # the straight runs; the corners stand square to the panel (a strip
-                                            # can't bend round a cone) and the lean ramps in over LED_TWIST
+                                            # can't bend round a cone); runs stay square LED_TWIST from each corner,
+                                            # then the lean ramps in over the next LED_TWIST
 LED_TWIST = 40.0
-RAIL_FACE = dict(shared=42.0, coplanar=19.0, open=19.0, slot=24.0, notch=30.0, notch_top=46.0)
+RAIL_FACE = dict(shared=19.0, coplanar=19.0, open=19.0, slot=24.0, notch=30.0, notch_top=46.0)
                                             # the rail's strip face is this far in from a panel edge at the strip's
-                                            # centre depth. Shared corner edges need 42: a neighbour's rail hangs
-                                            # square to its own panel, so any closer it sits right behind this panel's
-                                            # acrylic (a dark shelf) and its cross runs cut through this loop. Edges
-                                            # with no neighbour (bottom, front cut, coplanar seams) sit just behind
-                                            # the window edge; the gun-well edges clear the pivot blocks, the speaker
+                                            # centre depth: just behind the window edge. On an edge shared with
+                                            # another panel the two rails meet back to back in a point (Micah,
+                                            # 2026-11-03); the gun-well edges clear the pivot blocks, the speaker
                                             # notches their cups (the deck's run under a cup's slanted wall) and the
-                                            # elevation motor. A flange at the member's inner face carries the rail
-LED_CORNER = 22.5                           # rail and loop corners round off at this radius (less where a panel is
-                                            # too narrow)
-LED_LOOP = (10.0, 1.6, 35.0)                # 60/m strip on the rail: width, thickness, centre depth (1.15 in
-                                            # behind the panel's back face)
+                                            # elevation motor. A thin flange from the member's inner face carries a
+                                            # rail where it stands further in
+LED_LOOP = (10.0, 1.6, 30.0)                # 60/m strip on the rail: width, thickness, centre depth (0.96 in
+                                            # behind the panel's back face; rev C.3 had 1.15). Any shallower and, at the
+                                            # 98 deg deck-to-side corners, a strip runs into its neighbour's rail
 FRAME_STRIP = (5.0, 1.0)                    # 100/m strip in each frame tunnel: width, thickness
 TUNNEL = (6.0, 2.6)                         # frame light: tunnel for a 5 mm strip (width, height), LEDs facing out
 TUNNEL_GAP = 7.05                           # tunnel centre this far outward of the tenon centre (2.5 mm of wall)
@@ -183,14 +190,14 @@ def front_x(z, inner=False):
     return x - MEM_H / math.sin(math.radians(FRONT_ANGLE)) if inner else x
 
 
-HOOD_LIGHT = (250.0, 229.0, 18.0, 39.0)     # hood light pod at each low front corner, just above the bumper: |y|, z of
-                                            # its axis (straight ahead), pod radius, length out from the front face
+LIGHT_BAR = (330.0, 30.0, 45.0, 229.0, 120.0)   # front light bar (Zmoon 12 in single row): length, height, depth, z of its
+                                            # centre (just above the bumper), |y| of its two brackets
 
 
 
 
 # ------------------------------------------------------------------ speakers (rev C.2)
-SPEAKER = (140.0, 146.0, 51.0)              # slim 100 W siren speaker: width, height, depth (UBL 100W Slim, 5.5 x 5.75 x 2 in)
+SPEAKER = (140.0, 146.0, 51.0)              # slim 100 W siren speaker: width, height, depth (drawn for the UBL 5.5 x 5.75 x 2 in; the SoundAlert is 2 in deep x 6 in)
 SPK_CLEAR, SPK_WALL, SPK_GRILLE = 4.0, 4.0, 4.0   # pocket clearance round it, printed cup wall, grille thickness
 SPEAKERS = [  # (tag, end of the front-side corner edge, distance along it, aim out from straight, aim up, seat depth,
               #  slid inboard). A bottom pair (22.5 out, 15 up) doesn't fit: see JUDGMENTS

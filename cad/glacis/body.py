@@ -333,7 +333,25 @@ def build(log=print):
         log(f"frame tunnels: {skipped} edges' tunnels didn't cut")
     log(f"frame network volume {frame.Volume() / 1e6:.2f} L, {sum(len(p['clips']) for p in panels)} corner clips, "
         f"strip {loop / 1000:.1f} m in {len(panels)} panel loops + {frame_strip / 1000:.1f} m in {len(frame_strips)} frame tunnels")
+    # where three faces meet, the neighbours' rails and loops cross this loop's corner: the strip is cut there at
+    # its nearest cut mark and jumped with three wires, so trim the model strip to match and count the jumpers
+    jumpers = 0
+    for i, p in enumerate(panels):
+        if p["led"] is None:
+            p["led_pieces"] = []
+            continue
+        ring = _robust(p["led"].cut, frame)
+        for q in panels[:i]:
+            for piece in q.get("led_pieces", []):
+                bb, pb = ring.BoundingBox(), piece.BoundingBox()
+                if bb.xmin < pb.xmax and pb.xmin < bb.xmax and bb.ymin < pb.ymax and pb.ymin < bb.ymax and \
+                        bb.zmin < pb.zmax and pb.zmin < bb.zmax:
+                    ring = _robust(ring.cut, piece)
+        p["led_pieces"] = sorted([s for s in ring.Solids() if s.Volume() > 50.0], key=lambda s: -s.Volume())
+        jumpers += max(0, len(p["led_pieces"]) - 1)
+    log(f"LED loops: {jumpers} jumpers where neighbours' rails or loops cross a corner")
     build.strips, build.tunnels, build.frame_strips = (loop, frame_strip), tunnels, frame_strips
+    build.jumpers = jumpers
     return body, frame, panels
 
 
@@ -434,8 +452,10 @@ def _rail_path(p):
         L = ed.Length()
         line = ed.geomType() == "LINE"
         if line:
-            T = min(P.LED_TWIST, L / 2)
-            ss = sorted(set([0.0] + [T * k / 4 for k in range(1, 5)] + [L - T * k / 4 for k in range(1, 5)] + [L / 2]))
+            T0 = min(P.LED_TWIST, L / 4)                  # square for this far from each corner (the neighbours'
+            T = min(P.LED_TWIST, L / 4)                   # loops turn their corners there), then twists in over T
+            ss = sorted(set([0.0, T0, L - T0, L / 2] + [T0 + T * k / 4 for k in range(1, 5)] +
+                            [L - T0 - T * k / 4 for k in range(1, 5)]))
         else:
             ss = [L * k / max(2, math.ceil(L / 4.0)) for k in range(max(2, math.ceil(L / 4.0)))]
         a = [q2(ed.positionAt(s / L)) for s in ss]
@@ -449,7 +469,7 @@ def _rail_path(p):
                 continue
             xy.append((x, y))
             if line:
-                f = min(s, L - s) / T
+                f = max(0.0, min(s, L - s) - T0) / T
                 wt.append(f * f * (3 - 2 * f) if f < 1 else 1.0)       # smoothstep: the strip twists in gently
             else:
                 wt.append(0.0)
@@ -473,14 +493,15 @@ def _rail_path(p):
     return p["rail_path"]
 
 
-def _rail_region(p, d0, d1, off):
-    """Solid behind the panel from depth d0 to d1, inside the strip face shifted `off` inward. Along the straight
-    runs the face leans LED_RAIL[3] toward the panel (pivoting at the strip's centre depth); round the corners it
-    stands square to the panel, so the strip only bends the easy way there."""
+def _rail_region(p, d0, d1, off, sections=None):
+    """Solid behind the panel from depth d0 to d1, inside the strip face shifted `off` inward (or through
+    `sections`, a list of (depth, off)). Along the straight runs the face leans LED_RAIL[3] toward the panel
+    (pivoting at the strip's centre depth); round the corners it stands square to the panel, so the strip only
+    bends the easy way there."""
     pl, xy, nrm, wt = _rail_path(p)
     n, tl, dc = p["n"], math.tan(math.radians(P.LED_RAIL[3])), P.LED_LOOP[2]
     wires = []
-    for d in (d0, d1):
+    for d, off in (sections or ((d0, off), (d1, off))):
         pts = []
         for (x, y), (nx, ny), f in zip(xy, nrm, wt):
             s = off + (d - dc) * tl * f
@@ -495,8 +516,12 @@ def led_rail(p):
     t, d0, d1, _ = P.LED_RAIL
     if _rail_path(p) is None:
         return None
-    rail = _rail_region(p, d0, d1, -t).cut(_rail_region(p, d0 - 1.0, d1 + 1.0, 0.0))
-    flange = slab(p["poly"], p["n"], P.MEM_W - 4.0, d0, 6.0).cut(_rail_region(p, d0 - 1.0, d0 + 7.0, -t + 1.0))
+    r = min(P.RAIL_EDGE_R, t)                             # the back edge rounds over to the strip face at the free end
+    back = [(d0, -t)] + [(d1 - r + r * math.sin(a), -t + r - r * math.cos(a))
+                         for a in (math.radians(k * 22.5) for k in range(5))]
+    rail = _rail_region(p, 0, 0, 0, sections=back).cut(_rail_region(p, d0 - 1.0, d1 + 1.0, 0.0))
+    flange = slab(p["poly"], p["n"], P.MEM_W - 4.0, d0, 6.0, P.FLANGE_ROUND).cut(
+        _rail_region(p, d0 - 1.0, d0 + 7.0, -t + 1.0))
     return rail.fuse(flange)
 
 
@@ -569,8 +594,8 @@ def corner_clips(p):
     m = len(pts)
     area = sum(pts[i][0] * pts[(i + 1) % m][1] - pts[(i + 1) % m][0] * pts[i][1] for i in range(m))
     reb = P.MEM_W - P.REBATE_W
-    face4 = slab(p["poly"], n, 4.0, 0.0, P.CLIP_T, 6.0)               # clips stay 4 mm in from the face edges
-    pocket4 = slab(p["poly"], n, 3.8, -1.0, P.CLIP_T + 1.0, 6.2)
+    face4 = slab(p["poly"], n, 4.0, 0.0, P.CLIP_T, P.CLIP_ROUND)     # clips stay 4 mm in from the face edges
+    pocket4 = slab(p["poly"], n, 3.8, -1.0, P.CLIP_T + 1.0, P.CLIP_ROUND + 0.2)
     o3 = lambda x, y: pl.origin + pl.xDir * x + pl.yDir * y
     found = []
     for i in range(m):
@@ -618,7 +643,14 @@ def corner_clips(p):
         clip = head(0.0, 0.0, P.CLIP_T).intersect(face4).cut(cyl(2.25, 10, (S + n).toTuple(), (n * -1).toTuple()))
         pocket = head(0.2, -1.0, P.CLIP_T).intersect(pocket4)
         insert = cyl(P.INSERT[0], P.INSERT[1], (S - n * (P.CLIP_T - 0.1)).toTuple(), (n * -1).toTuple())
-        corners.append(dict(clip=clip, pocket=pocket, insert=insert))
+        for c in corners:                                 # a short edge: two clips that meet become one
+            if c["clip"].intersect(clip).Volume() > 1.0 or c["pocket"].intersect(pocket).Volume() > 1.0:
+                c["clip"] = c["clip"].fuse(clip).cut(cyl(2.25, 10, (S + n).toTuple(), (n * -1).toTuple()))
+                c["pocket"] = c["pocket"].fuse(pocket)
+                c["insert"] = c["insert"].fuse(insert)
+                break
+        else:
+            corners.append(dict(clip=clip, pocket=pocket, insert=insert))
     if door:
         corners.append(_door_latch(p))
     return corners
@@ -898,7 +930,12 @@ def _merge_cheeks(pieces, nodes, log):
             parts += inn
             rest = _robust(nd.cut, union(inn))
             keep += [x for x in rest.Solids() if x.Volume() > 50]
-        fused = union([q["shape"] for q in sp] + parts).clean()
+        shapes = [q["shape"] for q in sp] + parts
+        fused = shapes[0].fuse(*shapes[1:]) if len(shapes) > 1 else shapes[0]
+        try:
+            fused = fused.clean()
+        except Exception:                                  # OCC's upgrader sometimes trips on the rail faces
+            pass
         sols = sorted([x for x in fused.Solids() if x.Volume() > 50], key=lambda x: -x.Volume())
         out_p = [q for q in out_p if not any(q is x for x in sp)]
         out_n = keep
