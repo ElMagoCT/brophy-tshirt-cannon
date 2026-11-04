@@ -805,7 +805,7 @@ N10. **Also fixed:** the light bar brackets' upright tab now sits behind the bar
      - every part one solid.
 
 ## Rev D.1.3: chamfered window wall, filled LED corners, bent frame strips (2026-11-04)
-Onshape version "Glacis rev D.1.3" (once you're signed in again). Replaces N7's straight wall.
+Onshape version "Glacis rev D.1.3". Replaces N7's straight wall.
 
 N11. **The thick edge is chamfered away, everywhere.** The acrylic keeps its 7 mm ledge (the only step). From the ledge's
      edge, which follows a line MEM_W in from the panel edge rounded at the corners, the wall chamfers straight down to
