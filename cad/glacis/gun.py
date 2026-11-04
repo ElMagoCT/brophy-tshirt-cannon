@@ -146,8 +146,12 @@ def _cannon(k, xf):
                      bom="1/4 NPT brass cross (ChillWaves)")
     ci.male_end("fill push-to-connect", 22.0, 15.0, bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     tip = ci.at(ci.s)
-    ports[0].male_end("relief 125 psi", 44.0, 19.0, bom="Relief valve 125 psi 1/4 MNPT, ASME, pull ring (Milton 1090-125)",
-                      extra=relief_cap)
+    if k == 0:                                               # the top chamber runs to 190 psi (rev D)
+        ports[0].male_end("relief 200 psi", 44.0, 19.0, bom="Relief valve 200 psi, 1/4 MNPT, pull ring (Interstate V200-4)",
+                          extra=relief_cap)
+    else:
+        ports[0].male_end("relief 125 psi", 44.0, 19.0, bom="Relief valve 125 psi 1/4 MNPT, ASME, pull ring (Milton 1090-125)",
+                          extra=relief_cap)
     ports[1].male_end("transducer 0-300 psi", 56.0, 20.0, color="steel",
                       bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH) (+ 1/4 x 1/8 bushing)")
     return tip, ax0
