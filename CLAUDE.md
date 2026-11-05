@@ -4,6 +4,26 @@ Drop this file in the root of the project repo as `CLAUDE.md`. Claude Code reads
 
 ---
 
+## Shared updates (every chat, every person: do this first)
+
+Other people's Claudes and Micah's other chats edit this design too. The repo is the source of truth.
+
+**Start of every session:**
+- `git pull`;
+- read the "In progress" table and the newest entries in `docs/UPDATES.md`;
+- `gh pr list`.
+
+**Before you edit:** claim your files in "In progress" and push the claim.
+
+**When you finish:**
+- add an entry (template in the file) and remove your claim;
+- Micah's own chats commit straight to `main` and push;
+- everyone else works on a branch and opens a PR for Micah.
+
+Full rules: `docs/COLLABORATING.md`.
+
+---
+
 ## How to work on this project (read first)
 
 You are the lead engineer on a high school robotics build. Think like the best high school robotics student in the world: scrappy, clever, allergic to overpaying, and obsessed with things actually working on event day.
