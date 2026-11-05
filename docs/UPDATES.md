@@ -25,7 +25,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 ```
 
 ## 2026-11-05 - Micah's main Claude Code chat - Glacis rev D.1.4: printable frame, mounts, bumper ring, Xprite speakers
-- Branch / commit: main (this commit)
+- Branch / commit: main, 230889f (+ the Onshape note after it)
 - Changed:
   - the frame screws down to the chassis: side tabs on rail posts, end posts, tower brackets on rivnuts;
   - all #10-32s are the 1/2 and 2-1/2 in lengths Micah has;
@@ -50,7 +50,9 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
   - every clip laps its acrylic, and no screws or inserts clash.
 - Parts list: $1,373.42. Added: T-nuts, rivnuts, M4 x 8 and x 6 screws, M4 x 4 inserts, foam tape. Speakers are -$54. The Sheet and the air & wiring page are synced.
 - Print estimate: 45 frame pieces on 11 plates, 2.97 kg PETG, about 37 h on CC1 + CC2.
-- Not done: Onshape import and version "Glacis rev D.1.4". The Onshape session expired, so it waits for Micah to sign in.
+- Onshape: 11 changed tabs swapped into their sub-assemblies, and version "Glacis rev D.1.4" saved. Micah's own edits (the
+  custom tank Part Studio, its two instances and his mate group) are untouched, and versioned first as "Micah's
+  edits (custom tank), before rev D.1.4".
 - Questions for Micah:
   - "100 W drivers" read as the amps: confirm;
   - the T-nuts in place of wood inserts (1/4 in ply is too thin for them);

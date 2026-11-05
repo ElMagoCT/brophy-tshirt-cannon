@@ -839,7 +839,8 @@ Micah's asks:
 - bumpers that slide off the bottom, held by #10-32s from inside the chassis into wood inserts.
 
 A nine-agent review of all 121 printed body parts then found 39 more problems (26 survived a skeptic, the
-critic added 13), and the fixes are below. Onshape version "Glacis rev D.1.4".
+critic added 13), and the fixes are below. Onshape version "Glacis rev D.1.4". Your custom tank edits were versioned first,
+as "Micah's edits (custom tank), before rev D.1.4".
 
 N15. **Print plan** (docs/glacis/print_plan.md, from render/part_report.py):
      - each part in the orientation it prints in;
