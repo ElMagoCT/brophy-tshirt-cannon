@@ -292,31 +292,64 @@ def build(log=print):
 
     # each window's edge is also its LED surface: set per edge (edge_kinds), corners rounded at WINDOW_R
     edge_kinds(panels, log)
-    _settle_insets(panels, shell, log)
+    _settle_insets(panels, shell, log, plain=body_solid(notched=False))
     fills = corner_fills(panels, log)
     raw = shell.fuse(union(fills).intersect(body)) if fills else shell
     frame = raw.cut(union([_window_prism(p) for p in panels])).clean()
     log(f"corner fills: {len(fills)} shared edges filled solid between their back-to-back LED skins")
     recess, short, out = [], 0, 0
+    corner_clips.dropped.clear()
     for p in panels:
         recess.append(slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W, -1.0, P.REBATE_D + 1.0, P.ACRYLIC_R + 0.3))
         p["clips"] = corner_clips(p)
+        for c in p["clips"]:                              # an insert near a slanted face mustn't break out of it:
+            c["bores"] = []                               # the short one (M4 x 4) there, or drop that screw
+            for S in c["holes"]:
+                at, dn = (S - p["n"] * (P.CLIP_T - 0.1)), p["n"] * -1
+                for depth, sk in ((P.INSERT[1], 1.0), (P.INSERT_SHORT[1], 1.0), (P.INSERT_SHORT[1], 0.5)):
+                    if cyl(P.INSERT[0] + sk, depth + sk, at.toTuple(), dn.toTuple()).cut(body).Volume() < 0.5:
+                        c["bores"].append([at, dn, depth])
+                        break
+                else:
+                    out += 1
+                    log(f"  clip screw dropped (its insert would break out) at ({S.x:.0f}, {S.y:.0f}, {S.z:.0f})")
+    # where three faces meet, the two neighbouring panels' clip screws point at each other inside one node: a
+    # pair whose inserts or screws would meet both take the short insert (M4 x 4 with an M4 x 6 screw)
+    def seg_dist(p0, d0, l0, p1, d1, l1):
+        best = 1e9
+        for i in range(21):
+            a_ = p0 + d0 * (l0 * i / 20)
+            t_ = max(0.0, min(l1, (a_ - p1).dot(d1)))
+            best = min(best, (a_ - (p1 + d1 * t_)).Length)
+        for i in range(21):
+            b_ = p1 + d1 * (l1 * i / 20)
+            t_ = max(0.0, min(l0, (b_ - p0).dot(d0)))
+            best = min(best, (b_ - (p0 + d0 * t_)).Length)
+        return best
+    bores = [(i, b_) for i, p in enumerate(panels) for c in p["clips"] for b_ in c["bores"]]
+    clash = 0
+    for _ in range(2):
+        for x in range(len(bores)):
+            for y in range(x + 1, len(bores)):
+                (i, A), (j, Bb) = bores[x], bores[y]
+                if i == j or (A[0] - Bb[0]).Length > 40.0:
+                    continue
+                screw = lambda q: q[2] + 1.5 - (P.CLIP_T - 0.1)    # an M4 x (insert + 2): its tip past the insert
+                if seg_dist(A[0], A[1], A[2], Bb[0], Bb[1], Bb[2]) < 2 * P.INSERT[0] + 0.5 or \
+                        seg_dist(A[0], A[1], screw(A), Bb[0], Bb[1], screw(Bb)) < 4.5:
+                    if A[2] > P.INSERT_SHORT[1] or Bb[2] > P.INSERT_SHORT[1]:
+                        A[2] = Bb[2] = P.INSERT_SHORT[1]
+                    elif _ == 1:
+                        clash += 1
+                        log(f"  clip screws still meet near ({A[0].x:.0f}, {A[0].y:.0f}, {A[0].z:.0f})")
+    for p in panels:
         for c in p["clips"]:
-            if c.get("holes"):                            # an insert near a slanted face mustn't break out of it:
-                keep = []                                 # shorten it (an M4 x 8 there), or drop that screw
-                for S in c["holes"]:
-                    at, dn = (S - p["n"] * (P.CLIP_T - 0.1)).toTuple(), (p["n"] * -1).toTuple()
-                    for depth, sk in ((P.INSERT[1], 1.0), (8.0, 1.0), (7.0, 1.0), (7.0, 0.5), (6.5, 0.5)):
-                        if cyl(P.INSERT[0] + sk, depth + sk, at, dn).cut(body).Volume() < 0.5:
-                            keep.append(cyl(P.INSERT[0], depth, at, dn))
-                            short += depth < P.INSERT[1]
-                            break
-                    else:
-                        out += 1
-                        log(f"  clip screw dropped (its insert would break out) at ({S.x:.0f}, {S.y:.0f}, {S.z:.0f})")
-                c["insert"] = union(keep) if keep else cyl(0.1, 0.1, c["holes"][0].toTuple(), (0, 0, 1))
+            keep = [cyl(P.INSERT[0], d_, at.toTuple(), dn.toTuple()) for at, dn, d_ in c["bores"]]
+            short += sum(d_ < P.INSERT[1] for _, _, d_ in c["bores"])
+            c["insert"] = union(keep) if keep else cyl(0.1, 0.1, c["holes"][0].toTuple(), (0, 0, 1))
             recess += [c["pocket"], c["insert"]]
-    log(f"clip inserts: {short} shortened to stay inside a slanted face (M4 x 8 there), {out} screws dropped")
+    log(f"clip inserts: {short} short (M4 x 4 + M4 x 6: a slanted face, or a neighbour's screw), {out} screws dropped, "
+        f"{clash} pairs still meeting; corners with no clip that laps the acrylic: {corner_clips.dropped or 'none'}")
     frame = frame.cut(union(recess)).clean()
     # panel light: the web that carries the window wall back to the strip (kept out of the speaker pockets), then
     # the frame tunnels (their feed slots cut through it)
@@ -350,6 +383,17 @@ def build(log=print):
     frame = frame.clean()
     if skipped:
         log(f"frame tunnels: {skipped} edges' tunnels didn't cut")
+    hit = []
+    for p in panels:                                       # a clip insert must never cross a light tunnel
+        for c in p["clips"]:
+            ib = c["insert"].BoundingBox()
+            for tn in tunnels:
+                tb = tn.BoundingBox()
+                if ib.xmin < tb.xmax and tb.xmin < ib.xmax and ib.ymin < tb.ymax and tb.ymin < ib.ymax and \
+                        ib.zmin < tb.zmax and tb.zmin < ib.zmax and c["insert"].intersect(tn).Volume() > 0.5:
+                    hit.append(f"{_label(p)} ({ib.center.x:.0f}, {ib.center.y:.0f}, {ib.center.z:.0f})")
+                    break
+    log(f"clip inserts crossing a light tunnel: {hit or 'none'}")
     log(f"frame network volume {frame.Volume() / 1e6:.2f} L, {sum(len(p['clips']) for p in panels)} corner clips, "
         f"strip {loop / 1000:.1f} m in {len(panels)} panel loops + {frame_strip / 1000:.1f} m in {len(frame_strips)} frame tunnels")
     # where three faces meet, the neighbours' rails and loops cross this loop's corner: the strip is cut there at
@@ -510,9 +554,11 @@ def _dist_seg(c, a, b):
     return (a + ab * t - c).Length
 
 
-def _settle_insets(panels, shell, log, rounds=4, step=4.0):
+def _settle_insets(panels, shell, log, rounds=4, step=4.0, plain=None):
     """Push a window edge (= LED surface) further in wherever its strip would run into frame that stays (another
-    face's member, a speaker cheek, the bottom shell), `step` mm a round, up to WINDOW_IN_MAX."""
+    face's member, a speaker cheek, the bottom shell), or its strip or web would poke out of the body (the front
+    bottom edge, where they hung under the frame and left those pieces nothing flat to print on), `step` mm a
+    round, up to WINDOW_IN_MAX."""
     for rnd in range(rounds):
         for p in panels:
             p.pop("rail_path", None)
@@ -525,7 +571,12 @@ def _settle_insets(panels, shell, log, rounds=4, step=4.0):
                 continue
             poly = [V(*q) for q in p["poly"]]
             bump = set()
-            for x in _robust(ring.intersect, rest).Solids():
+            hits = list(_robust(ring.intersect, rest).Solids())
+            if plain is not None:
+                web = led_web(p)
+                for sh in [ring] + ([web] if web is not None else []):
+                    hits += list(_robust(sh.cut, plain).Solids())
+            for x in hits:
                 if x.Volume() < 5.0:
                     continue
                 c = x.BoundingBox().center
@@ -817,6 +868,12 @@ def strip_tunnels(panels, skin, frame=None):
         if L < 2 * s1 + 30.0:
             continue
         e, u, w = _axes(ed, panels)
+        ps_ = [panels[i] for i in ed["panels"]]
+        if len(ps_) == 1:                                  # an acute open face pushes the core in under the rebate:
+            ins_ = (_core_point(ed, panels, a) - a).dot(_inward_dir(ps_[0], a, b))   # the walls would be paper thin
+            if ins_ + tw / 2 > P.MEM_W - P.REBATE_W - 0.5 and P.CORE_DEPTH - P.TUNNEL_GAP - th / 2 < P.REBATE_D + 1.5:
+                short.append(f"E{k:02d} no tunnel (it would run under the acrylic's rebate; jumper wire round it)")
+                continue
         c = _core_point(ed, panels, a) - u * P.TUNNEL_GAP
         c = c - e * e.dot(c - a)
         tun = _bar(c + e * s0, e, u, w, L - 2 * s0, -tw / 2, tw / 2, -th / 2, th / 2)
@@ -868,18 +925,43 @@ def strip_tunnels(panels, skin, frame=None):
 def corner_clips(p):
     """Printed clip in a flush pocket at every convex corner of the panel: a round head that laps CLIP_OVER over
     the acrylic's rounded corner and a rounded tail to the screw, which goes into an M4 heat-set insert in the
-    frame where the acrylic's corner is cut away. A battery door keeps only its bottom clips (they act as hooks)
-    and gets a quarter-turn latch at the middle of its top edge: turn it, tip the door out from the top and lift
-    it off the hooks."""
+    frame where the acrylic's corner is cut away. A battery door has ordinary clips too: two screws at the top, and
+    the bottom ones act as hooks once loosened (the quarter-turn latch couldn't turn in its pocket and its insert
+    crossed the frame's light tunnel)."""
     n = p["n"]
-    door = abs(n.y) > 0.9 and max(q[0] for q in p["poly"]) < P.SIDE_SPLIT_X + 1
-    zmid = sum(q[2] for q in p["poly"]) / len(p["poly"])
     pl, pts = _wp_on(p["poly"], n)
     m = len(pts)
     area = sum(pts[i][0] * pts[(i + 1) % m][1] - pts[(i + 1) % m][0] * pts[i][1] for i in range(m))
+    sg_ = 1.0 if area > 0 else -1.0
+    convex = lambda q0, q1, q2: ((q1[0] - q0[0]) * (q2[1] - q1[1]) - (q1[1] - q0[1]) * (q2[0] - q1[0])) * sg_ > 1e-3
+    # two convex corners closer than 20 mm (where a speaker notch meets an edge, the face ends in a spike with a
+    # tiny flat tip) act as one corner at the tip of the two long edges: its clip runs down the spike's bisector to
+    # the acrylic's corner, far back from the tip, with the screw near the tip like every corner clip
+    k, merged = 0, []
+    while k < len(pts) and len(pts) > 3:
+        M = len(pts)
+        q0, q1, q2, q3 = pts[k - 1], pts[k], pts[(k + 1) % M], pts[(k + 2) % M]
+        if math.hypot(q2[0] - q1[0], q2[1] - q1[1]) < 20.0 and convex(q0, q1, q2) and convex(q1, q2, q3):
+            d1 = (q1[0] - q0[0], q1[1] - q0[1])
+            d2 = (q2[0] - q3[0], q2[1] - q3[1])
+            den = d1[0] * d2[1] - d1[1] * d2[0]
+            if abs(den) > 1e-9:
+                tt = ((q3[0] - q0[0]) * d2[1] - (q3[1] - q0[1]) * d2[0]) / den
+                X = (q0[0] + d1[0] * tt, q0[1] + d1[1] * tt)
+                if math.hypot(X[0] - q1[0], X[1] - q1[1]) < 40.0:
+                    pts = [q for j, q in enumerate(pts) if j not in (k, (k + 1) % M)]
+                    pts.insert(k if (k + 1) % M else max(0, k - 1), X)
+                    merged.append(X)
+                    continue
+        k += 1
+    m = len(pts)
     reb = P.MEM_W - P.REBATE_W
     face4 = slab(p["poly"], n, 4.0, 0.0, P.CLIP_T, P.CLIP_ROUND)     # clips stay 4 mm in from the face edges
+    face2 = slab(p["poly"], n, 2.0, 0.0, P.CLIP_T, P.CLIP_ROUND)     # ... 2 mm on a sharp corner, so the tip keeps wall
+    glass = slab(p["poly"], n, reb + P.PANEL_GAP, 0.0, P.CLIP_T, P.ACRYLIC_R)   # the acrylic's outline, clip layer
+    LAP_MIN = 120.0                                    # mm3 of clip over the acrylic (about 50 mm2): less holds nothing
     pocket4 = slab(p["poly"], n, 3.8, -1.0, P.CLIP_T + 1.0, P.CLIP_ROUND + 0.2)
+    pocket2 = slab(p["poly"], n, 1.8, -1.0, P.CLIP_T + 1.0, P.CLIP_ROUND + 0.2)
     o3 = lambda x, y: pl.origin + pl.xDir * x + pl.yDir * y
     found = []
     for i in range(m):
@@ -898,20 +980,32 @@ def corner_clips(p):
         bis = (bis[0] / bl, bis[1] / bl)
         half = math.acos(max(-1.0, min(1.0, a[0] * b[0] + a[1] * b[1]))) / 2
         sin_h, cos_h = math.sin(half), math.cos(half)
-        d_s = min(12.0 / sin_h, (P.FEED[0] - P.INSERT[0] - 1.0) / cos_h)   # the screw: clear of the tunnel feed slots
-        d_apex = (reb + 0.3 + P.ACRYLIC_R) / sin_h - P.ACRYLIC_R            # tip of the acrylic's rounded corner
-        found.append(((x1, y1), bis, d_s, d_apex + P.CLIP_OVER, min(la, lb)))
+        d_feed = (P.FEED[0] - P.INSERT[0] - 1.0) / cos_h
+        d_s = min(12.0 / sin_h, d_feed)                                     # the screw: clear of the tunnel feed slots
+        sharp = d_feed < 12.0 / sin_h
+        if (x1, y1) in merged:
+            # a spike: the screw goes down it to where both members are wide enough for the insert to clear their
+            # light tunnels (12 mm in from each edge) by 2 mm
+            d_s, sharp = (12.0 + 2.0 + P.INSERT[0]) / sin_h, False
+        d_apex = (reb + P.PANEL_GAP + P.ACRYLIC_R) / sin_h - P.ACRYLIC_R    # tip of the acrylic's rounded corner
+        # the head may not pass halfway along an edge to the next clip's corner (a concave one has no clip)
+        la_c = la if convex(pts[i - 2], pts[i - 1], pts[i]) else 1e9
+        lb_c = lb if convex(pts[i], pts[(i + 1) % m], pts[(i + 2) % m]) else 1e9
+        found.append(((x1, y1), bis, d_s, d_apex + P.CLIP_OVER, min(la_c, lb_c), sharp))
     corners = []
-    for (x1, y1), bis, d_s, reach, short in found:
-        far = min([math.hypot(x1 - x, y1 - y) for (x, y), *_ in found if (x, y) != (x1, y1)] + [1e9])
-        reach = min(reach, far / 2 - 2.0, short / 2 - 2.0)
+    for (x1, y1), bis, d_s, reach, short, sharp in found:
+        faceN, pocketN = (face2, pocket2) if sharp else (face4, pocket4)
+        others = [(x, y) for (x, y), *_ in found if (x, y) != (x1, y1)]
+        hx, hy = x1 + bis[0] * reach, y1 + bis[1] * reach
+        if any(math.hypot(hx - x, hy - y) < 45.0 for x, y in others):   # the head would crowd another corner's clip
+            far = min([math.hypot(x1 - x, y1 - y) for x, y in others] + [1e9])
+            reach = min(reach, far / 2 - 2.0)
+        reach = min(reach, short / 2 - 2.0)
         rho = min(P.CLIP_R, max(6.0, reach - d_s + 7.0))
         d_q = max(d_s, reach - rho)
         sx, sy = x1 + bis[0] * d_s, y1 + bis[1] * d_s
         qx, qy = x1 + bis[0] * d_q, y1 + bis[1] * d_q
         S = o3(sx, sy)
-        if door and S.z > zmid:
-            continue                                          # the latch holds the door's top
 
         def head(grow, d0, d1):
             wp = cq.Workplane(cq.Plane(origin=pl.origin - n * d0, xDir=pl.xDir, normal=n))
@@ -924,8 +1018,42 @@ def corner_clips(p):
                 sh.append(wp.polyline(quad).close().extrude(-(d1 - d0)).val())
             return union(sh)
 
-        clip = head(0.0, 0.0, P.CLIP_T).intersect(face4).cut(cyl(2.25, 10, (S + n).toTuple(), (n * -1).toTuple()))
-        pocket = head(0.2, -1.0, P.CLIP_T).intersect(pocket4)
+        clip = head(0.0, 0.0, P.CLIP_T).intersect(faceN).cut(cyl(2.25, 10, (S + n).toTuple(), (n * -1).toTuple()))
+        pocket = head(0.2, -1.0, P.CLIP_T).intersect(pocketN)
+        if clip.Volume() < 600.0 or clip.intersect(glass).Volume() < LAP_MIN:
+            # a corner too tight for a head (a short notch edge cuts it to a crumb, or holds it back short of the
+            # acrylic): an edge clip instead, on a neighbour edge 35 mm from the corner (the longer edge first), its
+            # round head lapping CLIP_OVER over the acrylic's edge. Only on an edge too short for a light tunnel:
+            # along a longer edge the insert would cross it
+            i0 = [k for k in range(m) if (pts[k][0], pts[k][1]) == (x1, y1)][0]
+            (xa, ya), (xb, yb) = pts[i0 - 1], pts[(i0 + 1) % m]
+            la_, lb_ = math.hypot(xa - x1, ya - y1), math.hypot(xb - x1, yb - y1)
+            sg = 1.0 if area > 0 else -1.0
+            runs = [((xb - x1) / lb_, (yb - y1) / lb_, lb_, 1.0), ((xa - x1) / la_, (ya - y1) / la_, la_, -1.0)]
+            rho_e, done = 9.0, False
+            wp0 = cq.Workplane(cq.Plane(origin=pl.origin, xDir=pl.xDir, normal=n))
+            wp1 = cq.Workplane(cq.Plane(origin=pl.origin + n * 1.0, xDir=pl.xDir, normal=n))
+            off = reb + P.PANEL_GAP + P.CLIP_OVER - rho_e
+            for dx, dy, L_, side in sorted(runs, key=lambda r: -r[2]):
+                nx_, ny_ = -dy * sg * side, dx * sg * side    # interior is left of a counter-clockwise run
+                if L_ >= 2 * P.FEED[1] + 30.0:
+                    continue
+                # from 35 mm out, slide along the edge until the head laps the acrylic: at a sharp corner the
+                # acrylic's own corner sits far back from the frame face's tip
+                for t in [35.0 + 5.0 * k for k in range(int((L_ - 35.0 - rho_e - 10.0) / 5.0) + 1)][:30]:
+                    ex_, ey_ = x1 + dx * t + nx_ * off, y1 + dy * t + ny_ * off
+                    S = o3(ex_, ey_)
+                    clip = wp0.center(ex_, ey_).circle(rho_e).extrude(-P.CLIP_T).val().intersect(face4).cut(
+                        cyl(2.25, 10, (S + n).toTuple(), (n * -1).toTuple()))
+                    if clip.intersect(glass).Volume() >= LAP_MIN:
+                        done = True
+                        break
+                if done:
+                    pocket = wp1.center(ex_, ey_).circle(rho_e + 0.2).extrude(-(P.CLIP_T + 1.0)).val().intersect(pocket4)
+                    break
+            if not done:
+                corner_clips.dropped.append(f"{_label(p)} corner ({x1:.0f}, {y1:.0f})")
+                continue
         insert = cyl(P.INSERT[0], P.INSERT[1], (S - n * (P.CLIP_T - 0.1)).toTuple(), (n * -1).toTuple())
         for c in corners:                                 # a short edge: two clips that meet become one
             if c["clip"].intersect(clip).Volume() > 1.0 or c["pocket"].intersect(pocket).Volume() > 1.0:
@@ -936,33 +1064,10 @@ def corner_clips(p):
                 break
         else:
             corners.append(dict(clip=clip, pocket=pocket, insert=insert, holes=[S]))
-    if door:
-        corners.append(_door_latch(p))
     return corners
 
 
-def _door_latch(p):
-    """Quarter-turn latch: a printed tab on an M4 pivot 10 mm in from the door's top edge, across the panel's
-    edge when locked; turn it 90 deg to open."""
-    n = p["n"]
-    poly = [V(*q) for q in p["poly"]]
-    edges = [(poly[i], poly[(i + 1) % len(poly)]) for i in range(len(poly))]
-    a, b = max(edges, key=lambda e: e[0].z + e[1].z)
-    e = (b - a).normalized()
-    t = n.cross(e).normalized()
-    m = (a + b) * 0.5
-    if sum((q - m).dot(t) for q in poly) < 0:
-        t = t * -1                                    # t points down the door, into the panel
-    piv = m + t * 10.0
-
-    def tab(x0, x1, w, d0, d1):
-        pl = cq.Plane(origin=(piv - n * d0).toTuple(), xDir=t.toTuple(), normal=n.toTuple())
-        return cq.Workplane(pl).center((x0 + x1) / 2, 0).rect(x1 - x0, 2 * w).extrude(-(d1 - d0)).val()
-
-    clip = tab(-6.0, 18.0, 8.0, 0.0, P.CLIP_T).cut(cyl(2.2, 10, (piv + n).toTuple(), (n * -1).toTuple()))
-    pocket = tab(-6.3, 18.3, 8.3, -1.0, P.CLIP_T)
-    insert = cyl(P.INSERT[0], P.INSERT[1], (piv - n * (P.CLIP_T - 0.1)).toTuple(), (n * -1).toTuple())
-    return dict(clip=clip, pocket=pocket, insert=insert, latch=True)
+corner_clips.dropped = []
 
 
 # ------------------------------------------------------------------ edges of the panel network
@@ -993,7 +1098,7 @@ def edges_of(panels):
             ts.sort()
             for t0, t1 in zip(ts, ts[1:]):
                 pa, pb = a + d * t0, a + d * t1
-                k = tuple(sorted([_key(pa.toTuple()), _key(pb.toTuple())]))
+                k = tuple(sorted([_key(pa.toTuple()), _key(pb.toTuple())], key=lambda q: (q[0], abs(q[1]), q[2], q[1])))
                 e = out.setdefault(k, dict(a=V(*k[0]), b=V(*k[1]), panels=set()))
                 e["panels"].add(i)
     return list(out.values())
@@ -1037,8 +1142,9 @@ def _section_prism(edge, panels, t0, t1, margin=0.6):
         pl = cq.Plane(origin=o, xDir=t, normal=e)
         w = max(P.MEM_W, P.WINDOW_IN_MAX) + 3.0 + 2 * margin   # the member plus its LED web
         h = P.LED_END + 2 * margin
+        k = _well_skew(edge, p) if len(edge["panels"]) == 1 else 0.0
         pts = []                                   # in-plane t (0..w) x inward -n (0..h)
-        for (u, v) in [(0, 0), (w, 0), (w, h), (0, h)]:
+        for (u, v) in [(0, 0), (w, 0), (w, h), (-k * h, h)]:
             q = o + t * u - n * v
             pts.append(((q - o).dot(pl.xDir), (q - o).dot(pl.yDir)))
         r = cq.Workplane(pl).polyline(pts).close().extrude(L).val()
@@ -1057,6 +1163,23 @@ def _section_prism(edge, panels, t0, t1, margin=0.6):
 
 
 FACES = []          # body faces, set by build(): single-panel members look up the open face beside them
+
+
+def _well_skew(edge, p):
+    """How far a single-panel member's section region leans out past its edge per mm of depth, where the open face
+    beside it is the gun-well floor at an obtuse angle. Square, it left a feather-edge wedge under the floor that only
+    a node could take, and that node then spanned the well and had to be split and glued (N09, and Micah's N11)."""
+    a, b = edge["a"], edge["b"]
+    if max(abs(a.y), abs(b.y)) > P.Y_SLOT + 1.0:
+        return 0.0
+    for f in FACES:
+        m = f["n"]
+        if abs(m.dot(p["n"])) > 0.999 or m.z < 0.3:
+            continue
+        if abs((a - f["c"]).dot(m)) < 0.2 and abs((b - f["c"]).dot(m)) < 0.2:
+            c = max(-1.0, min(1.0, -m.dot(p["n"])))
+            return min(math.tan(math.radians(30.0)), max(0.0, -c) / max(math.sqrt(1 - c * c), 0.3))
+    return 0.0
 
 
 def _open_angle(edge, p):
@@ -1141,6 +1264,13 @@ def section(frame, panels, log=print, seg_max=215.0):
     # each segment takes the frame inside its region minus the regions before it (only those it touches);
     # the nodes are what is left after cutting every region out one at a time (one big fused region made
     # OCC drop parts of the oblique front-slant edges)
+    # mirror-consistent order, long edges first (so mirrored members split the same way, and the cheek and notch
+    # segments take what's left rather than robbing a long member of its end)
+    def _mk(r):
+        ed_ = r[2]
+        mid = ed_["a"] + (ed_["b"] - ed_["a"]) * ((r[3] + r[4]) / 2)
+        return (-round((ed_["b"] - ed_["a"]).Length, 1), round(abs(mid.y), 1), round(mid.x, 1), round(mid.z, 1), mid.y > 0)
+    regions.sort(key=_mk)
     pieces, done = [], []
     for name, reg, ed, t0, t1 in regions:
         piece = _robust(frame.intersect, reg)
@@ -1160,6 +1290,8 @@ def section(frame, panels, log=print, seg_max=215.0):
     for reg in done:
         rest = _robust(rest.cut, reg)
     nodes = [s for s in rest.Solids() if s.Volume() > 50]
+    nodes.sort(key=lambda s: (round(abs(s.BoundingBox().center.y), 1), round(s.BoundingBox().center.x, 1),
+                              round(s.BoundingBox().center.z, 1), s.BoundingBox().center.y > 0))
     pieces, nodes = _merge_cheeks(pieces, nodes, log)
     split = 0
     for k, s in enumerate(nodes):
@@ -1168,7 +1300,67 @@ def section(frame, panels, log=print, seg_max=215.0):
         for j, part in enumerate(parts):
             pieces.append(dict(name=f"N{k:02d}" + (chr(97 + j) if len(parts) > 1 else ""), shape=part, edge=None, t0=None,
                                t1=None))
-    log(f"{len(pieces)} pieces ({len(nodes)} nodes, {split} extra glued splits to fit the bed)")
+    # a node that touches a segment is merged into it when the two still fit the bed together (fewer pieces and
+    # joints; Micah's E04S0 + N13 and E28S0 + N14); the smallest such union wins
+    merged = []
+    for nd in [q for q in pieces if q["edge"] is None]:
+        nb_ = nd["shape"].BoundingBox()
+        best = None
+        for sg in [q for q in pieces if q["edge"] is not None]:
+            sb = sg["shape"].BoundingBox()
+            if not (sb.xmin < nb_.xmax + 1 and nb_.xmin < sb.xmax + 1 and sb.ymin < nb_.ymax + 1 and nb_.ymin < sb.ymax + 1
+                    and sb.zmin < nb_.zmax + 1 and nb_.zmin < sb.zmax + 1):
+                continue
+            try:
+                if sg["shape"].distance(nd["shape"]) > 0.2:
+                    continue
+                u_ = sg["shape"].fuse(nd["shape"]).clean()
+            except Exception:
+                continue
+            if len(u_.Solids()) == 1 and fits_bed(u_, MERGE_BED) and (best is None or u_.Volume() < best[1].Volume()):
+                best = (sg, u_)
+        if best:
+            best[0]["shape"] = best[1]
+            best[0]["name"] += "+" + nd["name"]
+            merged.append(best[0]["name"])
+            pieces.remove(nd)
+    # a short segment with one neighbour off its own edge joins that neighbour when the two still fit the bed and
+    # lie flat (Micah's E28S0 + N14; the lone sticks at the rear-top corners): a fiddly print and a joint fewer.
+    # A neighbour on its own edge keeps its tenon (it now goes into the joined piece)
+    joined = []
+    for sm in sorted([q for q in pieces if q["edge"] is not None and q["shape"].Volume() < 60000.0],
+                     key=lambda q: (round(abs(q["shape"].BoundingBox().center.y), 1),
+                                    round(q["shape"].BoundingBox().center.x, 1), round(q["shape"].BoundingBox().center.z, 1),
+                                    q["shape"].BoundingBox().center.y > 0)):
+        if sm not in pieces:
+            continue
+        mb = sm["shape"].BoundingBox()
+        nbs = []
+        for q in pieces:
+            qb = q["shape"].BoundingBox()
+            if q is sm or not (qb.xmin < mb.xmax + 1 and mb.xmin < qb.xmax + 1 and qb.ymin < mb.ymax + 1 and
+                               mb.ymin < qb.ymax + 1 and qb.zmin < mb.zmax + 1 and mb.zmin < qb.zmax + 1):
+                continue
+            try:
+                if q["shape"].distance(sm["shape"]) <= 0.2:
+                    nbs.append(q)
+            except Exception:
+                nbs.append(q)
+        nbs = [q for q in nbs if q["edge"] is not sm["edge"]]
+        if len(nbs) != 1:
+            continue
+        try:
+            u_ = nbs[0]["shape"].fuse(sm["shape"]).clean()
+        except Exception:
+            continue
+        if len(u_.Solids()) == 1 and fits_bed(u_, MERGE_BED) and _obb_dims(u_)[2] <= 75.0:
+            nbs[0]["shape"] = u_
+            nbs[0]["name"] += "+" + sm["name"]
+            joined.append(nbs[0]["name"])
+            pieces.remove(sm)
+    log(f"{len(pieces)} pieces ({len(nodes)} nodes, {split} extra glued splits to fit the bed; "
+        f"{len(merged)} nodes merged into a neighbouring segment: {', '.join(merged)}; "
+        f"short segments joined to their one neighbour: {', '.join(joined) or 'none'})")
     return pieces, edges
 
 
@@ -1232,12 +1424,30 @@ def _merge_cheeks(pieces, nodes, log):
     return out_p + cheeks, out_n
 
 
-def _split_to_bed(s, bed=245.0):
-    """Halve a node along its longest side until it fits the bed (the nodes round the speaker pockets join up
-    into one big piece); the halves are glued."""
+def _obb_dims(s):
+    """Extents (largest first) of a shape's oriented box: principal axes of its tessellated vertices."""
+    import numpy as np
+    vs, _ = s.tessellate(2.0, 0.5)
+    A = np.array([v.toTuple() for v in vs])
+    A = A - A.mean(0)
+    _, _, vt = np.linalg.svd(A, full_matrices=False)
+    ext = A @ vt.T
+    return sorted((ext.max(0) - ext.min(0)).tolist(), reverse=True)
+
+
+MERGE_BED = tuple(b - 2.0 for b in P.BED)    # merges keep 2 mm: joints cut later can tilt the oriented box
+
+
+def fits_bed(s, bed=P.BED):
+    """Printable on the CC1/CC2: its oriented box fits the usable volume, no diagonal tricks."""
+    return all(d <= b for d, b in zip(_obb_dims(s), sorted(bed, reverse=True)))
+
+
+def _split_to_bed(s, bed=None):
+    """Halve a node along its longest side until it fits the bed (each half gets a flat cut face to print on);
+    the halves are glued."""
     bb = s.BoundingBox()
-    dims = sorted([bb.xlen, bb.ylen, bb.zlen])
-    if dims[1] <= bed and dims[2] <= 330.0:
+    if fits_bed(s):
         return [s]
     k = max(range(3), key=lambda i: (bb.xlen, bb.ylen, bb.zlen)[i])
     c = bb.center
@@ -1250,14 +1460,16 @@ def _split_to_bed(s, bed=245.0):
         cut = s.intersect(box(a[0], b[0], a[1], b[1], a[2], b[2]))
         for sol in cut.Solids():
             if sol.Volume() > 50:
-                out += _split_to_bed(sol, bed)
+                out += _split_to_bed(sol)
     return out
 
 
 def add_joints(pieces, panels, log=print):
     """Tapered tenon on each segment end, mortise + M4 cross-screw hole in its neighbour."""
     tw, th, tl, tt = P.TENON
-    ok = skipped = glued = 0
+    ok = skipped = glued = flipped = small = 0
+    loose, detached = [], []
+    add_joints.screws = []                                # the cross screws' clearance holes, for later checks
     shapes = {p["name"]: p["shape"] for p in pieces}
     for p in pieces:
         ed = p["edge"]
@@ -1273,9 +1485,11 @@ def add_joints(pieces, panels, log=print):
             core = core - e * e.dot(core - at)            # on the cut plane
             # neighbour = the piece that contains a point just past the cut
             probe = core + out * 4.0
-            nb = next((q for q in pieces if q is not p and q["shape"].isInside(probe, 0.1)), None)
+            nb = next((q for q in pieces if q is not p and shapes[q["name"]].isInside(probe, 0.1)), None)
             if nb is None:
-                skipped += 1
+                if not shapes[p["name"]].isInside(probe, 0.1):   # past the cut is this piece itself: a merged node
+                    skipped += 1
+                    loose.append(f"{p['name']} {end}")
                 continue
             # lower segment on an edge owns the tenon between two segments
             if nb["edge"] is ed and end == "lo":
@@ -1290,35 +1504,57 @@ def add_joints(pieces, panels, log=print):
                 ten = _frustum(core, out, u, w, size, length, taper)
                 if not fits(size, length, taper):
                     skipped += 1
+                    loose.append(f"{p['name']} {end} (no room for a tenon)")
                     continue
-            mort = _frustum(core - out * 0.01, out, u, w, tw + 2 * P.TENON_CLEAR, tl + 0.5, tt)
-            mid = core + out * (tl / 2)
+                small += 1
+            mort = _frustum(core - out * 0.01, out, u, w, size + 2 * P.TENON_CLEAR, length + 0.5, taper)
+            owner, other = p, nb
+            if _obb_dims(shapes[p["name"]])[0] > P.BED[0] - length - 1.0 and not fits_bed(
+                    shapes[p["name"]].fuse(_frustum(core - out * 0.5, out, u, w, size, length + 0.5, taper))):
+                # the tenon would push this piece past the bed (a merged node made it long): the neighbour carries
+                # it instead, pointing back into a mortise here, if it has the room and still fits
+                back = out * -1
+                t2 = _frustum(core + back * 0.3, back, u, w, size, length - 0.3, taper)
+                r2 = _frustum(core - back * 0.5, back, u, w, size, length + 0.5, taper)
+                if t2.intersect(shapes[p["name"]]).Volume() >= 0.95 * t2.Volume() and \
+                        fits_bed(shapes[nb["name"]].fuse(r2)):
+                    out, owner, other = back, nb, p
+                    ten = _frustum(core, out, u, w, size, length, taper)
+                    mort = _frustum(core - out * 0.01, out, u, w, size + 2 * P.TENON_CLEAR, length + 0.5, taper)
+                    flipped += 1
+            mid = core + out * (length / 2)
             clear_h = cyl(2.25, 45, (mid - u * 2).toTuple(), u.toTuple())
             pilot = cyl(1.65, 45, (mid - u * 3).toTuple(), u.toTuple())
             ps2 = [panels[i] for i in ed["panels"]]
             ps2 = [q for k, q in enumerate(ps2) if not any(abs(q["n"].dot(r["n"])) > 0.99 for r in ps2[:k])]
-            if len(ps2) == 2:
+            if len(ps2) == 2 or size < tw:
                 # a filled corner (corner_fills): every way in for a screw head is a surface seen through the acrylic
-                # or the LED ridge, so this joint is a tapered tenon glued with epoxy, no cross screw
+                # or the LED ridge, so this joint is a tapered tenon glued with epoxy, no cross screw (and a small
+                # 5 mm tenon is glued too: a pilot would leave it no wall)
                 clear_h = pilot = cyl(0.01, 0.01, mid.toTuple(), u.toTuple())
                 glued += 1
+            else:
+                add_joints.screws.append(clear_h)
             # the fused tenon starts 0.5 mm inside its own piece: OCC doesn't always merge solids that only touch
             root = _frustum(core - out * 0.5, out, u, w, size, length + 0.5, taper)
-            shapes[p["name"]] = shapes[p["name"]].fuse(root).cut(pilot).clean()
+            shapes[owner["name"]] = shapes[owner["name"]].fuse(root).cut(pilot).clean()
+            if len(shapes[owner["name"]].Solids()) > 1:
+                detached.append(f"{owner['name']} {end}")
             hole = mort.fuse(ten).fuse(clear_h)
             hb = hole.BoundingBox()
             for q in pieces:                              # every piece the tenon reaches (a joint can sit across two)
-                if q is p:
+                if q is owner:
                     continue
                 qb = shapes[q["name"]].BoundingBox()
                 if hb.xmin < qb.xmax and qb.xmin < hb.xmax and hb.ymin < qb.ymax and qb.ymin < hb.ymax and \
-                        hb.zmin < qb.zmax and qb.zmin < hb.zmax and (q is nb or shapes[q["name"]].intersect(ten).Volume() > 1.0):
+                        hb.zmin < qb.zmax and qb.zmin < hb.zmax and (q is other or shapes[q["name"]].intersect(ten).Volume() > 1.0):
                     shapes[q["name"]] = shapes[q["name"]].cut(hole).clean()
             ok += 1
     for p in pieces:
         p["shape"] = shapes[p["name"]]
-    log(f"joints: {ok} tapered tenons, {ok - glued} with M4 cross screws and {glued} glued (filled corners), "
-        f"{skipped} ends without a neighbour piece")
+    log(f"joints: {ok} tapered tenons ({small} small), {ok - glued} with M4 cross screws and {glued} glued (filled "
+        f"corners, small tenons), {flipped} carried by the neighbour to keep a piece on the bed; segment ends with no "
+        f"neighbour piece: {', '.join(loose) or 'none'}" + (f"; TENON NOT ATTACHED: {detached}" if detached else ""))
     return ok
 
 

@@ -105,7 +105,8 @@ FRAME_X = AX_X + WHEEL_R + 3.0 + RAIL_W     # outside face of the end rails
 
 # ------------------------------------------------------------------ bumpers (FRC style)
 NOODLE_D = 2.5 * IN
-BUMP_BACK_T = 6.0
+BUMP_BACK_T = 0.25 * IN                      # 1/4 in plywood backing with #10-32 T-nuts (thicker would put the
+                                            # robot over the 28 in door limit)
 BUMP_DEPTH = BUMP_BACK_T + NOODLE_D
 BUMP_Z = (GROUND_CLEAR, GROUND_CLEAR + 2 * NOODLE_D)
 
@@ -116,9 +117,27 @@ MEM_W, MEM_H = 19.0, 24.0                   # printed member: width on each pane
 REBATE_W = 7.0                              # panel edge overlaps the member by this much (rev C.2 had 14); the outer
                                             # lip stays MEM_W - REBATE_W = 12
 CLIP_T = 2.5                                # printed corner clips sit flush, panel sits CLIP_T below the face
-REBATE_D = CLIP_T + ACRYLIC_T + 0.3
+GASKET_T = 0.7                              # extra rebate depth for 1/16 in closed-cell foam tape on the ledge, so the
+                                            # clips clamp the panel instead of letting it rattle
+REBATE_D = CLIP_T + ACRYLIC_T + 0.3 + GASKET_T
+PANEL_GAP = 1.0                             # acrylic cut this much under the rebate outline per side (print tolerance)
 CLIP_R, CLIP_OVER = 15.0, 6.0               # corner clip: round head radius, how far it laps over the acrylic
-INSERT = (2.8, 10.0)                        # M4 heat-set insert hole: radius, depth (every panel screw is an M4 x 12)
+INSERT = (2.35, 6.5)                        # M4 x 6 heat-set insert (5 mm OD) hole: radius, depth; clips take M4 x 8
+INSERT_SHORT = (2.35, 4.6)                  # M4 x 4 insert, M4 x 6 screw: where two neighbours' clip screws would meet
+INSERT_1032 = (3.15, 10.5)                  # #10-32 x 3/8 in heat-set insert hole (6.3 mm drill): frame mounts
+TNUT = 3.2                                  # #10-32 4-prong T-nut hole through the bumper plywood (driven from the
+                                            # noodle side, barrel trimmed to 6 mm; 1/4 in ply is too thin for a wood insert)
+SIDE_MOUNT_X = (-280.0, -205.0, 100.0, 280.0)   # frame mount posts along each outer rail (clear of the x -105 seam
+                                            # and of the x -153 frame joint's cross screw)
+END_MOUNT_Y = (-170.0, 0.0, 170.0)          # ... and along each end rail (the outer two stand on the corner gussets)
+BUMP_SIDE_X = (-80.0, 0.0, 80.0)            # bumper screws through each outer rail, between the wheels, driven from
+                                            # the open bay under the robot; the four backings are one ring, so the
+                                            # ends need none (their rails are behind the wheels, the PDH and the bellypan)
+BUMP_CORNER = (50.0, 12.0)                  # printed corner bracket joining the ring: leg length, thickness
+MOUNT_TAB = (17.0, 14.0, 28.0)              # side mounts: tab on the frame's inner face over the rail (reach in, height,
+                                            # length); the side wall's bottom member sits right on the bumper, so the
+                                            # screw can't come up under it
+BED = (250.0, 250.0, 250.0)                 # usable print volume, Elegoo Centauri Carbon 1 and 2 (256 cube less margin)
 # corner and edge radii, one per kind (rev C.3.1: every corner radius is 2/3 of rev C.3's)
 WINDOW_R = 15.0                             # frame window corners (convex and concave)
 ACRYLIC_R = 18.7                            # acrylic panel corners, and the rebate they sit in (+0.3)
@@ -127,7 +146,7 @@ RAIL_EDGE_R = 2.5                           # the LED web's free back edge round
 NODE_SETBACK = 48.0
 PRINT_MAX = 240.0
 TENON = (6.5, 6.5, 12.0, 0.5)
-TENON_CLEAR = 0.15
+TENON_CLEAR = 0.3                           # per side, for a 0.6 mm nozzle (print a test joint first)
 # panel light (rev D.1.2, Micah 2026-11-04): the window wall IS the LED surface. Below the acrylic's ledge it runs
 # straight back, past the member as a thin web, and its last 10 mm (the strip) leans a little toward the panel on the
 # straight runs. No rail, no flange, no step but the ledge the acrylic sits on.
@@ -203,11 +222,11 @@ LIGHT_BAR = (330.0, 30.0, 45.0, 229.0, 120.0)   # front light bar (Zmoon 12 in s
 
 
 # ------------------------------------------------------------------ speakers (rev C.2)
-SPEAKER = (140.0, 146.0, 51.0)              # slim 100 W siren speaker: width, height, depth (drawn for the UBL 5.5 x 5.75 x 2 in; the SoundAlert is 2 in deep x 6 in)
+SPEAKER = (144.8, 139.7, 58.4)              # Xprite 200 W siren speaker (B01DMSR4L4): width, height (with its L foot), depth; 5.7 x 5.5 x 2.3 in from its drawing
 SPK_CLEAR, SPK_WALL, SPK_GRILLE = 4.0, 4.0, 4.0   # pocket clearance round it, printed cup wall, grille thickness
 SPEAKERS = [  # (tag, end of the front-side corner edge, distance along it, aim out from straight, aim up, seat depth,
               #  slid inboard). A bottom pair (22.5 out, 15 up) doesn't fit: see JUDGMENTS
-    ("top", "top", 90.0, 45.0, 30.0, 68.0, 0.0),        # sunk 13 mm deeper in rev C.3
+    ("top", "top", 90.0, 45.0, 30.0, 75.4, 0.0),        # sunk 13 mm deeper in rev C.3, 7.4 more for the Xprite (face unmoved)
 ]
 
 

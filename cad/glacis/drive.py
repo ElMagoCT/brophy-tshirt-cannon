@@ -270,7 +270,7 @@ def _scallop(lobes, y0, t, r_base=96.0, r_lobe=14.0):
 def wheel_parts(hand):
     """One 10 in mecanum, wheel-local (axle along +Y through the roller centre plane, +Y outboard).
 
-    Two PETG-CF hub halves split at the roller centre plane, each a face web + drum ring + boss + spokes + cups;
+    Two PETG hub halves split at the roller centre plane, each a face web + drum ring + boss + spokes + cups;
     the inboard half also carries the 116T teeth (its face web is the belt's outboard flange). Three flat 1/8 in
     aluminum plates (inboard belt flange, centre disc, outboard disc) on 8 x 1/4-20 through-bolts clamp the stack.
     10 rollers, each 2 x 608 2RS on a fixed M8 threaded rod that threads through a captured nyloc in the
@@ -309,10 +309,10 @@ def wheel_parts(hand):
         hub = max(hub.Solids(), key=lambda s: s.Volume())          # drop slivers the nut channels shave off the rim
         if outboard:
             out.append(("Wheel hub outboard", hub, "Mecanum hub, outboard half",
-                        "PETG-CF, 5 walls, 40% gyroid, face down; 10 x M8 nyloc captured"))
+                        "PETG, 5 walls, 40% gyroid, face down; 10 x M8 nyloc captured"))
         else:
             out.append(("Wheel hub inboard + 116T", hub, "Mecanum hub, inboard half + 116T pulley",
-                        "PETG-CF, 5 walls, 40% gyroid, teeth down"))
+                        "PETG, 5 walls, 40% gyroid, teeth down"))
     for tag, (y0, y1), r in (("inner", P.W_INNER_PLATE, P.FLANGE_R), ("centre", P.W_CENTRE_PLATE, 83.0),
                              ("outer", P.W_OUTER_PLATE, None)):
         pl = (cyl(r, y1 - y0, (0, y0, 0), (0, 1, 0)) if r else _scallop(_lobes(hand, True), y0, y1 - y0))
@@ -413,7 +413,7 @@ def build(log=print):
                 add(f"Roller tread {corner}{i:02d}", put(place(tread, c, axv)), "tpu", "drive",
                     bom="Mecanum roller tread (TPU 95A)", kind="print")
                 add(f"Roller core {corner}{i:02d}", put(place(core, c, axv)), "print_d", "drive",
-                    bom="Mecanum roller core (PETG-CF)", kind="print", note="2 x 608 2RS pressed in")
+                    bom="Mecanum roller core (PETG)", kind="print", note="2 x 608 2RS pressed in")
                 add(f"Roller rod {corner}{i:02d}", put(place(m8, c, axv)), "steel", "drive",
                     bom="M8 threaded rod, roller axle (cut 109 mm)", kind="stock",
                     note="Loctite 243 in the captured nyloc; slot the outboard end")

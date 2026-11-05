@@ -376,3 +376,18 @@ Micah's notes on the rev C.1 diagrams and follow-ups in the same session. Detail
 - Wall: ledge, straight chamfer, LED band. Shared corners are solid V ridges, with their 24 joints glued (no screw
   access). Frame strips are continuous, with easy-way bends into the feed slots (straight ends on 6 short slots).
 - Frame 5.17 L. 0 contacts.
+
+## 2026-11-05 - Glacis rev D.1.4: printable frame, mounts, bumper ring, Xprite speakers
+
+- Micah: hollow prints to 2 mm, estimate plates/PETG/hours (0.6 mm, 2 walls, 10%, frame only); clean up every part
+  and cut it to the CC1/CC2 beds; tie the frame to the chassis perimeter and the turret towers (#10-32, from below,
+  threaded inserts); bumpers that slide off the bottom, held from inside the chassis.
+- Not hollowed in CAD: the slicer's 2-wall shell already is the hollow (3 walls if "2 mm" means the wall).
+- Frame mounts: side tabs and rail posts, end posts, tower brackets on rivnuts, all for his 1/2 and 2-1/2 in screws.
+- Bumpers: one plywood ring, 6 side screws reachable from below, printed corner brackets, T-nuts instead of wood
+  inserts (1/4 in ply is too thin for them).
+- Clips: all lap the acrylic (spike corners merged); M4 x 6 / x 4 inserts as bought; battery doors get clips (latch
+  dropped). Acrylic cut 1 mm under, foam tape on the ledge.
+- Speakers: Xprite 200 W, TPA3255 on a 48 V boost (fork session's research); cups screwed to the frame.
+- A nine-agent review of all 121 printed body parts drove most of the fixes. JUDGMENTS N15-N27. Onshape version
+  "Glacis rev D.1.4".

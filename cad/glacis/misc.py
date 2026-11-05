@@ -57,7 +57,7 @@ def towers_and_pivot():
         blk = blk.cut(cyl(9.0, 800, (px, -400, pz), (0, 1, 0)))
         blk = blk.cut(bearing_seat(px, sgn * y0, pz, sgn, 7.94)).cut(bearing_seat(px, sgn * y1, pz, -sgn, 7.94))
         add(f"Pivot bearing block {side}", blk, "print_d", "frame", bom="Pivot bearing block", kind="print",
-            note="PA-CF, 3 x 1/4-20 through the tower")
+            note="PETG, 5 walls, 40% gyroid; 3 x 1/4-20 through the tower")
         for yb, d in ((y0, sgn), (y1, -sgn)):
             add(f"Pivot bearing {side} {yb:.0f}", fr8(px, sgn * yb, pz, d, hexbore=True), "steel", "frame",
                 bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
@@ -78,7 +78,7 @@ def towers_and_pivot():
                  box(px - 10.0, mx_ + 26.0, yo, yi, mz_ - 24.0, mz_ + 24.0)])        # arm out to the motor
     brk = brk.cut(cyl(18.3, 60, (mx_, yi + 5, mz_), (0, -1, 0)))
     add("Elevation motor bracket", brk, "print", "frame", bom="Elevation motor bracket", kind="print",
-        note="PA-CF, hangs from the right bearing block; slotted for belt tension")
+        note="PETG, 5 walls, 40% gyroid; hangs from the right bearing block; slotted for belt tension")
     circles = [(px, pz, P.pd(P.ELEV_T[1]) / 2), (mx_, mz_, P.pd(P.ELEV_T[0]) / 2)]
     pts = []
     for (x, z, r) in circles:
@@ -388,10 +388,14 @@ def speakers():
     for pod in SPK.pods():
         a, q = pod["a"], pod["q"]
         cup = pod["cut"].intersect(plain).cut(pod["pocket"]).cut(pod["wire"])
+        for nm, at, dir_ in CUP_SCREWS:                   # M4 x 8 button heads through the side walls into the frame
+            if nm == pod["name"]:
+                cup = cup.cut(cyl(2.25, P.SPK_WALL + 2.0, (at - dir_ * (P.SPK_WALL + 1.0)).toTuple(), dir_.toTuple()))
         add(f"Speaker cup {pod['name']}", cup, "print", "body", bom="Speaker cup", kind="print",
-            note="lines the corner notch; 4 x M4 through its floor into the speaker's bracket holes")
-        add(f"Speaker {pod['name']}", pod["speaker"], "black", "power", mass=2.4,
-            bom="Slim 100 W siren speaker, 8 ohm (SoundAlert B08B3CLLHJ)", note="2 in deep x 6 in, 118-124 dB at 100 W")
+            note=f"lines the corner notch; {sum(nm == pod['name'] for nm, _, _ in CUP_SCREWS)} x M4 x 8 through its "
+                 "side walls into inserts in the frame; the speaker's L foot bolts through the cup's lower wall (M4)")
+        add(f"Speaker {pod['name']}", pod["speaker"], "black", "power", mass=2.27,
+            bom="Siren speaker 200 W, 8 ohm, aluminium (Xprite B01DMSR4L4)", note="5.7 x 5.5 x 2.3 in with its foot, 121-130 dB")
         add(f"Speaker grille {pod['name']}", pod["grille"], "print", "body", bom="Speaker grille", kind="print",
             note="3 walls, no top or bottom layers, 12% gyroid: an open mesh; glue or screw to the cup")
     # front light bar: Micah's Zmoon 12 in single-row bar (72 W, spot/flood combo) across the nose just above the
@@ -403,16 +407,29 @@ def speakers():
     bar = bar.cut(box(xf + db - 2.0, xf + db + 1.0, -L / 2 + 14.0, L / 2 - 14.0, zc - hb / 2 + 5.0, zc + hb / 2 - 5.0))  # one lens strip
     add("LED light bar front", bar, "black", "power", mass=0.37,
         bom="Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V", note="straight ahead")
+    nf = V(math.sin(math.radians(P.FRONT_ANGLE)), 0, math.cos(math.radians(P.FRONT_ANGLE)))
+    tf = V(-math.cos(math.radians(P.FRONT_ANGLE)), 0, math.sin(math.radians(P.FRONT_ANGLE)))
+    lip = P.MEM_W - P.REBATE_W                             # the solid lip below the acrylic's rebate
     for sg, side in ((1, "left"), (-1, "right")):
         brk = box(P.front_x(zc - hb / 2 - 6.0) - 20.0, xf + 6.0, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc - hb / 2)
-        brk = brk.fuse(box(xf - 6.0, xf, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc + hb / 2)).cut(plain)   # tab behind the bar
+        brk = brk.fuse(box(xf - 6.0, xf, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc + hb / 2))   # tab behind the bar
+        # a back plate lying on the slant's bottom lip, 30 mm wide, screwed to it with 2 x M4
+        pl_ = cq.Plane(origin=(P.FRAME_X, sg * yb, P.Z_WALL_BOT), xDir=tf.toTuple(), normal=nf.toTuple())
+        back = cq.Workplane(pl_).center(lip / 2, 0).rect(lip - 1.0, 30.0).extrude(5.0).val()
+        brk = brk.fuse(back).cut(plain)
+        brk = brk.cut(cyl(3.2, 10.0, (xf - 8.0, sg * yb, zc), (1, 0, 0)))   # the bar's own bolt, through the tab
+        for s_, at, dir_ in BAR_SCREWS:
+            if s_ == sg:
+                brk = brk.cut(cyl(2.25, 9.0, (at - dir_ * 7.0).toTuple(), dir_.toTuple()))
         add(f"LED light bar bracket {side}", brk, "print", "body", bom="Light bar bracket (printed)", kind="print",
-            note="2 x M4 into the front panel's bottom member; the bar's own bolt through its slot")
+            note=f"{sum(s_ == sg for s_, _, _ in BAR_SCREWS)} x M4 x 8 into inserts in the front's bottom lip; "
+                 "the bar's own bolt through its hole")
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
-    add("Audio amp (TPA3116D2)", box(-120.0, -25.0, 35.0, 95.0, zb, zb + 28.0), "pcb", "power",
-        bom="TPA3116D2 2 x 50 W amp board", note="one channel per speaker, on 24 V")
-    add("Audio boost 12-24 V 10 A", box(20.0, 85.0, -95.0, -35.0, zb, zb + 32.0), "black", "power",
-        bom="12 -> 24 V 10 A boost converter", note="feeds both amps from a PDH channel")
+    add("Audio amp (TPA3255)", box(-135.0, -13.0, 22.0, 95.0, zb, zb + 30.0), "pcb", "power",
+        bom="TPA3255 2 x 300 W amp board", note="one channel per speaker, about 100 W each on 48 V")
+    add("Audio boost 12-48 V 1500 W", box(-10.0, 120.0, -100.0, -24.0, zb, zb + 60.0), "black", "power",
+        bom="1500 W 30 A boost converter, set to 48 V", note="feeds the amp from a 40 A PDH channel; size not listed, "
+             "drawn 130 x 76 x 60")
 
 
 # ------------------------------------------------------------------ bumpers
@@ -428,28 +445,62 @@ def bumpers():
         "left": dict(axis="x", pos=yo, out=(0, 1), span=(-(xf + reach), xf + reach)),
         "right": dict(axis="x", pos=-yo, out=(0, -1), span=(-(xf + reach), xf + reach)),
     }
+    # the four backings are one ring: the end strips run the full width and the side strips butt into them, joined
+    # by a printed bracket outside each corner (2 x #10-32 x 1/2 in per leg from the rail side, heads counterbored
+    # flush in the ply, into heat-set inserts). Only the sides are screwed to the robot, between the wheels, where a
+    # driver reaches from the open bay underneath; with those 6 out the ring slides straight down
+    T_, L_ = P.BUMP_CORNER[1], P.BUMP_CORNER[0]
+    xo_, yo_ = xf + t, yo + t
+    zc0, zc1 = zb0 + 6.0, zb1 - 14.0
+    corners, ring_holes = [], []
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            end_leg = box(*sorted([sx * xo_, sx * (xo_ + T_)]), *sorted([sy * (yo_ - L_), sy * (yo_ + T_)]), zc0, zc1)
+            side_leg = box(*sorted([sx * (xf - L_), sx * (xo_ + T_)]), *sorted([sy * yo_, sy * (yo_ + T_)]), zc0, zc1)
+            brk = end_leg.fuse(side_leg)
+            for zs in (zb0 + 30.0, zb1 - 45.0):
+                ye = sy * (yo_ - 25.0)                    # through the end strip, along x
+                ring_holes.append(("end", sx, cyl(5.5, 2.6, (sx * (xf - 0.1), ye, zs), (sx, 0, 0)).fuse(
+                    cyl(2.6, t + 1.0, (sx * (xf - 0.5), ye, zs), (sx, 0, 0)))))
+                brk = brk.cut(cyl(P.INSERT_1032[0], P.INSERT_1032[1], (sx * (xo_ - 0.1), ye, zs), (sx, 0, 0)))
+                xe = sx * (xf - 25.0)                     # through the side strip, along y
+                ring_holes.append(("side", sy, cyl(5.5, 2.6, (xe, sy * (yo - 0.1), zs), (0, sy, 0)).fuse(
+                    cyl(2.6, t + 1.0, (xe, sy * (yo - 0.5), zs), (0, sy, 0)))))
+                brk = brk.cut(cyl(P.INSERT_1032[0], P.INSERT_1032[1], (xe, sy * (yo_ - 0.1), zs), (0, sy, 0)))
+            corners.append(brk)
+            add(f"Bumper corner bracket {'front' if sx > 0 else 'rear'} {'L' if sy > 0 else 'R'}", brk, "print", "bumper",
+                bom="Bumper corner bracket (printed)", kind="print",
+                note="joins the ring outside the corner, under the noodles; 4 x #10-32 x 1/2 in from the rail side "
+                     "into heat-set inserts. 4 walls, 25%")
+    corner_cut = union([c_.translate(V(0, 0, 0)) for c_ in corners])
     for name, sgm in segs.items():
         a0, a1 = sgm["span"]
         ox, oy = sgm["out"]
         if sgm["axis"] == "y":
             bx0, bx1 = sorted([sgm["pos"], sgm["pos"] + ox * t])
-            backing = box(bx0, bx1, -yo, yo, zb0, zb1 - 8)
+            backing = box(bx0, bx1, -yo_, yo_, zb0, zb1 - 8)
         else:
             by0, by1 = sorted([sgm["pos"], sgm["pos"] + oy * t])
             backing = box(-xf, xf, by0, by1, zb0, zb1 - 8)
-        n = math.ceil(abs((yo if sgm["axis"] == "y" else xf) * 2) / 230.0)
-        for k in range(n):
-            if sgm["axis"] == "y":
-                lo = -yo + 2 * yo * k / n
-                piece = backing.intersect(box(-1000, 1000, lo, lo + 2 * yo / n, -1000, 1000))
-            else:
-                lo = -xf + 2 * xf * k / n
-                piece = backing.intersect(box(lo, lo + 2 * xf / n, -1000, 1000, -1000, 1000))
-            if sgm["axis"] == "x":                    # side backings: pockets for the axle end screws
-                for sx in (-1, 1):
-                    piece = piece.cut(cyl(14.0, 40, (sx * P.AX_X, sgm["pos"] - 20 * oy, P.AXLE_Z), (0, oy, 0)))
-            add(f"Bumper backing {name} {k + 1}", piece, "print", "bumper", bom="Bumper backing segment", kind="print",
-                note="bolts through the rail with #10-32 + nylocks")
+        piece = backing
+        zr = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
+        if sgm["axis"] == "x":                        # side strips: open-bottom slots past the axle end screws (a
+            for sx in (-1, 1):                        # closed hole would catch the washer as the ring slides down)
+                piece = piece.cut(cyl(14.0, 40, (sx * P.AX_X, sgm["pos"] - 20 * oy, P.AXLE_Z), (0, oy, 0)))
+                piece = piece.cut(box(sx * P.AX_X - 8.0, sx * P.AX_X + 8.0, *sorted([sgm["pos"] - 5 * oy, sgm["pos"] + 12 * oy]),
+                                      zb0 - 1.0, P.AXLE_Z))
+            for x in P.BUMP_SIDE_X:
+                piece = piece.cut(cyl(P.TNUT, t + 2, (x, sgm["pos"] - oy, zr), (0, oy, 0)))
+            for kind, sg_, h_ in ring_holes:
+                if kind == "side" and sg_ == oy:
+                    piece = piece.cut(h_)
+        else:
+            for kind, sg_, h_ in ring_holes:
+                if kind == "end" and sg_ == ox:
+                    piece = piece.cut(h_)
+        add(f"Bumper backing {name}", piece, "wood", "bumper", bom="Bumper backing, 1/4 in plywood", kind="stock",
+            note=("#10-32 x 1/2 in from inside the outer rail into a 4-prong T-nut at x -80, 0, 80" if sgm["axis"] == "x"
+                  else "no screws to the robot: held by the side strips through the corner brackets"))
         for i, zc in enumerate((zb0 + r, zb0 + 3 * r)):
             if sgm["axis"] == "y":
                 c = sgm["pos"] + ox * (t + r)
@@ -459,6 +510,8 @@ def bumpers():
                 nd = _mitre(cyl(r, a1 - a0, (a0, c, zc), (1, 0, 0)), sgm, yo, xf, reach)
             nd = nd.cut(cyl(12.7, 3000, (c if sgm["axis"] == "y" else -1500, -1500 if sgm["axis"] == "y" else c, zc),
                             (0, 1, 0) if sgm["axis"] == "y" else (1, 0, 0)))
+            nd = nd.cut(corner_cut)                   # notched round the corner brackets (crumbs dropped)
+            nd = max(nd.Solids(), key=lambda x: x.Volume()) if len(nd.Solids()) > 1 else nd
             add(f"Pool noodle {name} {i + 1}", nd, "foam", "bumper", bom="Pool noodle 2.5 in (white)", kind="stock")
         if sgm["axis"] == "y":
             c0, c1 = sorted([sgm["pos"] + ox * t, sgm["pos"] + ox * (t + 2 * r + 1.5)])
@@ -476,7 +529,7 @@ def underglow():
     """Underglow: a printed 45 deg strip bracket under the outer and end rails, just inside the bumper backing, each
     carrying a 60/m strip aimed down and out. The light passes under the bumper (its bottom is 3 in up) and pools on
     the floor round the robot; a strip inside the bumper would mostly light the noodles."""
-    dz = -P.PLATE_T                                       # under the bottom corner gussets
+    dz = 0.0                                              # flat on the rail; relieved under the corner gussets
     sec = [(u, z + dz) for u, z in ((-19.0, 84.6), (-5.0, 98.6), (-5.0, 101.6), (-25.0, 101.6), (-25.0, 98.6), (-9.2, 98.6),
                                     (-21.1, 86.7))]
     c, d, nn = (-12.0, 91.6 + dz), (0.7071, 0.7071), (0.7071, -0.7071)
@@ -496,10 +549,35 @@ def underglow():
             q = [(ox * (pos + u), z) for u, z in pts]
             return cq.Workplane("XZ", origin=(0, a1, 0)).polyline(q).close().extrude(a1 - a0).val()
         n = math.ceil(2 * half / 230.0)
+        # where the rail is covered: the bottom corner gussets (relief in the flange's top) and the heads of the
+        # frame-mount posts' rail screws (a 12 mm hole through the flange)
+        if ox == 0:
+            ug = [box(*sorted([sg_ * (P.FRAME_X - 100.0), sg_ * (P.FRAME_X + 1.0)]), -400, 400, -1000, 1000) for sg_ in (-1, 1)]
+            heads = [(x_, oy * sum(P.OUTER_RAIL_Y) / 2) for x_ in P.SIDE_MOUNT_X]
+        else:
+            ug = [box(-500, 500, *sorted([sg_ * P.INNER_RAIL_Y[0], sg_ * 400.0]), -1000, 1000) for sg_ in (-1, 1)]
+            heads = [(ox * (P.FRAME_X - 7.0), y_) for y_ in P.END_MOUNT_Y]
+        under = union(ug)                                 # under a gusset the flange steps down by the plate
+        top = box(-1000, 1000, -1000, 1000, 98.2, 102.0)
+        clear_ = union([cyl(6.0, 30.0, (hx, hy, 80.0), (0, 0, 1)) for hx, hy in heads])
         for k in range(n):
             a0 = -half + 2 * half * k / n
-            add(f"Underglow bracket {tag} {k + 1}", prism(sec, a0 + 0.5, a0 + 2 * half / n - 0.5), "print", "bumper",
-                bom="Underglow bracket (printed, 45 deg)", kind="print", note="2 x M4 up into the rail; strip on its outer face")
+            b_lo, b_hi = a0 + 0.5, a0 + 2 * half / n - 0.5
+            low = prism([(-25.0, 95.0), (-5.0, 95.0), (-5.0, 98.2), (-25.0, 98.2)], b_lo, b_hi).intersect(under)
+            seg_ = prism(sec, b_lo, b_hi).cut(top.intersect(under)).fuse(low).cut(clear_).clean()
+            screws_ = []                                  # 2 x M4 up into the rail (or the gusset), clear of the post screws
+            for f_ in (0.25, 0.75, 0.4, 0.6, 0.1, 0.9):
+                at_ = b_lo + (b_hi - b_lo) * f_
+                xy = (at_, oy * (pos - 15.0)) if ox == 0 else (ox * (pos - 15.0), at_)
+                if clear_.intersect(cyl(6.0, 12.0, (xy[0], xy[1], 90.0), (0, 0, 1))).Volume() < 0.5 and \
+                        all(abs(at_ - o_) > 30.0 for o_ in screws_):
+                    seg_ = seg_.cut(cyl(2.25, 14.0, (xy[0], xy[1], 90.0), (0, 0, 1)))
+                    screws_.append(at_)
+                if len(screws_) == 2:
+                    break
+            add(f"Underglow bracket {tag} {k + 1}", seg_, "print", "bumper",
+                bom="Underglow bracket (printed, 45 deg)", kind="print",
+                note=f"{len(screws_)} x M4 up into the rail (into the corner gusset where it steps down); strip on its outer face")
         add(f"LED strip underglow {tag}", prism(strip, -half + 5.0, half - 5.0), "led", "bumper",
             bom="WS2812B strip 10 mm, 60/m (m)", kind="stock", note="aimed 45 deg down and out, under the bumper")
         total += 2 * half - 10.0
@@ -528,16 +606,91 @@ def _mitre(s, sgm, yo, xf, reach):
     return out
 
 
-def wall_standoffs():
-    """Printed posts on the outer rails; the side-wall frame bolts to their outer face (2 x M4, heat-set)."""
+def mount_points():
+    """Where the body frame screws down to the chassis: a #10-32 up from below into a heat-set insert in the frame.
+    (name, point on the frame's underside); the insert axis is +z. The side wall's bottom member sits right on the
+    bumper (1.5 mm over it), so each side station gets a tab on the frame's inner face, out over the outer rail, and
+    the insert goes in that. End inserts sit far enough in from the slanted face to keep a wall to the light tunnel."""
+    zb, out = P.Z_WALL_BOT, []
     for sgn, side in ((1, "L"), (-1, "R")):
-        y_in, y_out = P.OUTER_RAIL_Y
-        for x in (-280.0, -120.0, 100.0, 280.0):
-            v = box(x - 15, x + 15, min(sgn * y_in, sgn * y_out), max(sgn * y_in, sgn * y_out), P.RAIL_Z[1],
-                    P.Z_WALL_BOT - 0.5).fuse(box(x - 15, x + 15, min(sgn * y_out, sgn * 288.0), max(sgn * y_out, sgn * 288.0),
-                                                 P.Z_WALL_BOT - 6.0, P.Z_WALL_BOT - 0.5))
-            add(f"Wall standoff {side} {x:.0f}", v, "print", "body", bom="Wall standoff", kind="print",
-                note="#10-32 through the rail; the wall frame sits on its lip, 2 x M4 up into it")
+        for x in P.SIDE_MOUNT_X:
+            out.append((f"{side} {x:.0f}", V(x, sgn * (P.wall_y(zb, inner=True) - P.MOUNT_TAB[0] / 2 - 1.5), zb)))
+        out.append((f"tower {side}", V(sum(P.TOWER_X) / 2, sgn * (P.Y_SLOT + 10.0), P.Z_TOP - P.MEM_H)))
+    for sx, end, dh in ((1, "front", 22.0), (-1, "rear", 17.5)):
+        xe = P.front_x(zb) if sx > 0 else P.rear_x(zb)
+        for y in P.END_MOUNT_Y:
+            out.append((f"{end} {y:.0f}", V(xe - sx * dh, y, zb)))
+    return out
+
+
+def mount_tab(name, q):
+    """The side-station tab on the frame's inner face: MOUNT_TAB reach in from the face (plus 2 mm into the member),
+    height up from the frame's underside, length along the wall."""
+    sgn = 1 if name[0] == "L" else -1
+    reach, h, ln = P.MOUNT_TAB
+    yi = P.wall_y(P.Z_WALL_BOT, inner=True)
+    return box(q.x - ln / 2, q.x + ln / 2, min(sgn * (yi - reach), sgn * (yi + 2.0)), max(sgn * (yi - reach), sgn * (yi + 2.0)),
+               P.Z_WALL_BOT, P.Z_WALL_BOT + h)
+
+
+def frame_mounts():
+    """The chassis side of mount_points(), sized for Micah's own #10-32s. A printed post on each outer and end rail
+    station is held by a 2-1/2 in #10-32 up through the rail (and gusset) into a heat-set insert in its foot, with a
+    relief above the insert for the screw's tip. The frame's own 1/2 in #10-32 goes up through the post's 4 mm top
+    into the frame; its head sits in a pocket that opens outward, behind the bumper (take the bumper ring off and
+    every frame screw is in reach). Each turret tower gets a bracket on its outer face, held by two 1/2 in #10-32s in
+    vertical slots (set its height against the deck at assembly) into rivnuts in the tower wall, so nothing pokes
+    into the gun well."""
+    zb, zr0, zr1 = P.Z_WALL_BOT, P.RAIL_Z[0], P.RAIL_Z[1]
+    top_t = 4.0                                           # post top under the frame: 4 + 0.5 gap + 8.2 in the insert
+    clear = lambda q, t=top_t: cyl(2.6, t + 2.0, (q.x, q.y, q.z - 0.5 - t - 1.0), (0, 0, 1))
+
+    def foot(x, y, z0):                                   # the rail screw's insert, and room past it for its tip
+        return cyl(P.INSERT_1032[0], P.INSERT_1032[1], (x, y, z0), (0, 0, 1)).fuse(cyl(2.6, 13.5, (x, y, z0), (0, 0, 1)))
+    for name, q in mount_points():
+        if name.startswith(("L ", "R ")):
+            sgn = 1 if name[0] == "L" else -1
+            y_in, y_out = P.OUTER_RAIL_Y
+            yc = sgn * (y_in + y_out) / 2
+            post = box(q.x - 15, q.x + 15, min(sgn * y_in, sgn * y_out), max(sgn * y_in, sgn * y_out), zr1, zb - 0.5)
+            ya, yb_ = sorted([q.y - sgn * 6.0, sgn * (y_out + 3.0)])
+            pocket = box(q.x - 7, q.x + 7, ya, yb_, zr1 + 16.0, zb - 0.5 - top_t)
+            post = post.cut(pocket).cut(clear(q)).cut(foot(q.x, yc, zr1))
+            add(f"Frame mount {name}", post, "print", "body", bom="Frame mount post (printed)", kind="print",
+                note="2-1/2 in #10-32 up through the rail into its insert; the frame's 1/2 in #10-32 up from the outer "
+                     "pocket into the frame tab (bumper ring off first)")
+        elif name.startswith("tower"):
+            sgn = 1 if name.endswith("L") else -1
+            x0, x1 = P.TOWER_X
+            yt = P.INNER_RAIL_Y[1]                        # tower's outer face
+            web = box(x0, x1, min(sgn * yt, sgn * (yt + 8)), max(sgn * yt, sgn * (yt + 8)), q.z - 45.0, q.z - 0.5)
+            plate = box(x0, x1, min(sgn * yt, sgn * (q.y * sgn + 9.0)), max(sgn * yt, sgn * (q.y * sgn + 9.0)),
+                        q.z - 7.5, q.z - 0.5)
+            brk = web.fuse(plate).cut(clear(q, 7.0))
+            xm = (x0 + x1) / 2
+            for zs in (q.z - 18.0, q.z - 34.0):          # two #10-32 x 1/2 in into rivnuts, slotted +-3 mm
+                y0_, y1_ = sorted([sgn * (yt - 1.0), sgn * (yt + 9.0)])
+                brk = brk.cut(box(xm - 2.6, xm + 2.6, y0_, y1_, zs - 5.6, zs + 5.6))
+                brk = brk.cut(cyl(5.5, 1.2, (xm, sgn * yt, zs), (0, sgn, 0)))     # the rivnut's flange
+            add(f"Tower bracket {name[-1]}", brk, "print", "body", bom="Turret tower bracket (printed)", kind="print",
+                note="2 x #10-32 x 1/2 in in slots into rivnuts in the tower wall; the deck's 1/2 in #10-32 up "
+                     "through its plate. Print it on an end face (the L flat on the bed)")
+        else:
+            sx = 1 if name.startswith("front") else -1
+            xi, xo = sx * (P.FRAME_X - P.RAIL_W), sx * P.FRAME_X
+            z0 = zr1 + (P.PLATE_T if abs(q.y) + 15 > P.INNER_RAIL_Y[0] else 0.0)   # on the corner gusset
+            post = box(min(xi, xo), max(xi, xo), q.y - 15, q.y + 15, z0, zb - 0.5)
+            inner = q.x - sx * 6.0                        # the pocket's inner end, round the screw head
+            if (inner - xi) * sx < 3.0:                   # too close to the rail's inner edge: a cap over it,
+                cap_x = xi - sx * 7.0                     # high above the wheel, keeps 3 mm of skin
+                post = post.fuse(box(min(cap_x, xi), max(cap_x, xi), q.y - 15, q.y + 15, zb - 20.0, zb - 0.5))
+                inner = xi - sx * 4.0
+            pocket = box(min(inner, xo + sx * 3.0), max(inner, xo + sx * 3.0), q.y - 7, q.y + 7, z0 + 16.0,
+                         zb - 0.5 - top_t)
+            post = post.cut(pocket).cut(clear(q)).cut(foot(sx * (P.FRAME_X - 7.0), q.y, z0))
+            add(f"Frame mount {name}", post, "print", "body", bom="Frame mount post (printed)", kind="print",
+                note="2-1/2 in #10-32 up through the end rail" + (" and gusset" if z0 > zr1 else "") + " into its "
+                     "insert; the frame's 1/2 in #10-32 from the outer pocket (bumper ring off first)")
 
 
 REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 50.0, REAR_MAN[2], 14.0), (ESTOP[0], ESTOP[1], 23.0),
@@ -545,21 +698,142 @@ REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 50.0, REAR_
               (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0))
 
 
+CUP_SCREWS, BAR_SCREWS = [], []          # (point on the part's face, direction into the frame): set by body_parts
+
+
+def _overlaps(a, b, pad=0.0):
+    ba, bb = a.BoundingBox(), b.BoundingBox()
+    return ba.xmin - pad < bb.xmax and bb.xmin - pad < ba.xmax and ba.ymin - pad < bb.ymax and bb.ymin - pad < ba.ymax \
+        and ba.zmin - pad < bb.zmax and bb.zmin - pad < ba.zmax
+
+
+def _hits(shape, others):
+    return any(_overlaps(shape, o) and shape.intersect(o).Volume() > 0.5 for o in others)
+
+
+def _frame_insert(pieces, hole, avoid, share=0.95):
+    """Cut an insert hole into the frame piece that holds it if it lies `share` inside one piece and clear of every
+    solid in `avoid` (light tunnels, joint screws); True when cut."""
+    if _hits(hole, avoid):
+        return False
+    for p in pieces:
+        if _overlaps(p["shape"], hole) and p["shape"].intersect(hole).Volume() >= share * hole.Volume():
+            p["shape"] = p["shape"].cut(hole)
+            return True
+    return False
+
+
 def body_parts(log=print):
     body, frame, panels = B.build(log=log)
     pieces, edges = B.section(frame, panels, log=log)
     B.add_joints(pieces, panels, log=log)
-    slivers = 0
+    tun_list = list(B.build.tunnels or [])
+    screws = list(getattr(B.add_joints, "screws", []))
+    # #10-32 heat-set inserts where the frame screws down to the chassis and the turret towers
+    tun = union(B.build.tunnels) if B.build.tunnels else None
+    hit, miss, clash = 0, [], []
+    for name, q in mount_points():
+        if name.startswith(("L ", "R ")):           # side stations: a tab on the inner face first
+            tab = mount_tab(name, q)
+            tb = tab.BoundingBox()
+            near = [p for p in pieces if p["shape"].BoundingBox().xmin < tb.xmax and p["shape"].BoundingBox().xmax > tb.xmin
+                    and p["shape"].BoundingBox().ymin < tb.ymax and p["shape"].BoundingBox().ymax > tb.ymin
+                    and p["shape"].BoundingBox().zmin < tb.zmax and p["shape"].BoundingBox().zmax > tb.zmin]
+            own = max(near, key=lambda p: p["shape"].intersect(tab).Volume(), default=None)
+            if own is not None:
+                s = own["shape"].fuse(tab)
+                for o in near:
+                    if o is not own and o["shape"].intersect(tab).Volume() > 0.5:
+                        s = s.cut(o["shape"])
+                own["shape"] = s.clean()
+                if len(own["shape"].Solids()) != 1:
+                    clash.append(f"{name} tab left {own['name']} in {len(own['shape'].Solids())} solids")
+            if _hits(tab, screws):
+                clash.append(f"{name} tab blocks a frame joint's cross screw")
+            if _hits(tab, tun_list):
+                clash.append(f"{name} tab fills a light tunnel or feed slot")
+        hole = cyl(P.INSERT_1032[0], P.INSERT_1032[1] + 0.5, (q.x, q.y, q.z - 0.5), (0, 0, 1))
+        if _hits(hole, screws):
+            clash.append(f"{name} insert crosses a frame joint's cross screw")
+        got = False
+        for p in pieces:
+            bb = p["shape"].BoundingBox()
+            if bb.xmin - 1 < q.x < bb.xmax + 1 and bb.ymin - 1 < q.y < bb.ymax + 1 and bb.zmin - 1 < q.z < bb.zmax + 1:
+                v = p["shape"].intersect(hole).Volume()
+                if v > 1.0:
+                    if v < 0.6 * hole.Volume():
+                        clash.append(f"{name} only {v / hole.Volume() * 100:.0f}% in frame")
+                    p["shape"] = p["shape"].cut(hole)
+                    got = True
+        if tun is not None and tun.intersect(hole).Volume() > 0.5:
+            clash.append(f"{name} cuts a light tunnel")
+        hit += got
+        if not got:
+            miss.append(name)
+    log(f"frame mounts: {hit} #10-32 inserts in the frame" + (f"; no frame at {miss}" if miss else "")
+        + (f"; check {clash}" if clash else ""))
+    # speaker cups: 4 x M4 through each cup's side walls (the button heads sit in the clearance gap round the
+    # speaker) into inserts in the frame round the notch, where an insert is clear of tunnels and joint screws
+    CUP_SCREWS.clear()
+    w_, h_, _ = P.SPEAKER
+    for pod in SPK.pods():
+        a_, b1, b2, q0 = pod["a"], pod["b1"], pod["b2"], pod["q"]
+        chosen = []                                   # up to 2 per wall, 35 mm apart, where frame backs it
+        for axis, half_out, half_across, other in ((b1, h_ / 2, w_ / 2, b2), (b2, w_ / 2, h_ / 2, b1)):
+            for sg_ in (1, -1):
+                dir_, here = axis * sg_, 0
+                for dd in range(8, 92, 8):
+                    for acr in range(-int(half_across) + 10, int(half_across) - 9, 12):
+                        if here == 2 or len(chosen) == 4:
+                            break
+                        at = q0 + a_ * dd + dir_ * (half_out + P.SPK_CLEAR + P.SPK_WALL) + other * acr
+                        if any((at - c_).Length < 35.0 for c_, _ in chosen):
+                            continue
+                        hole = cyl(P.INSERT[0], P.INSERT[1], (at - dir_ * 0.1).toTuple(), dir_.toTuple())
+                        if _frame_insert(pieces, hole, tun_list + screws):
+                            chosen.append((at, dir_))
+                            here += 1
+        CUP_SCREWS.extend((pod["name"], at, dir_) for at, dir_ in chosen)
+        if len(chosen) < 4:
+            clash.append(f"speaker cup {pod['name']}: only {len(chosen)} of 4 screws found frame")
+    # light bar brackets: a plate on the front slant's bottom lip with 2 x M4 into inserts square to the face
+    BAR_SCREWS.clear()
+    nf = V(math.sin(math.radians(P.FRONT_ANGLE)), 0, math.cos(math.radians(P.FRONT_ANGLE)))
+    tf = V(-math.cos(math.radians(P.FRONT_ANGLE)), 0, math.sin(math.radians(P.FRONT_ANGLE)))
+    for sg in (1, -1):
+        for dy in (-8.0, 8.0):
+            at = V(P.FRAME_X, sg * P.LIGHT_BAR[4] + dy, P.Z_WALL_BOT) + tf * 8.5
+            hole = cyl(P.INSERT[0], P.INSERT[1], (at + nf * 0.1).toTuple(), (nf * -1).toTuple())
+            if _frame_insert(pieces, hole, tun_list + screws, share=0.9):
+                BAR_SCREWS.append((sg, at, nf * -1))
+            else:
+                clash.append(f"light bar bracket screw at y {sg * P.LIGHT_BAR[4] + dy:.0f} found no frame")
+    log(f"speaker cup screws: {len(CUP_SCREWS)} of 8, light bar bracket screws: {len(BAR_SCREWS)} of 4"
+        + (f"; check {clash}" if clash else ""))
+    # a chunk that came loose from its piece (cut off by a slot or an insert) goes to the piece it touches, if any
+    slivers = []
     for p in pieces:
         sol = sorted(p["shape"].Solids(), key=lambda x: -x.Volume())
         keep = [x for x in sol if x.Volume() > max(0.03 * sol[0].Volume(), min(2000.0, 0.06 * sol[0].Volume()))]
-        slivers += len(sol) - len(keep)
+        for x in sol:
+            if x in keep:
+                continue
+            home = next((o for o in pieces if o is not p and _overlaps(o["shape"], x, 0.3) and o["shape"].distance(x) < 0.2), None)
+            if home is not None:
+                fused = home["shape"].fuse(x).clean()
+                if len(fused.Solids()) == len(home["shape"].Solids()):
+                    home["shape"] = fused
+                    slivers.append(f"{p['name']} {x.Volume():.0f} mm3 -> {home['name']}")
+                    continue
+            slivers.append(f"{p['name']} {x.Volume():.0f} mm3 at ({x.Center().x:.0f}, {x.Center().y:.0f}, "
+                           f"{x.Center().z:.0f}) dropped")
         p["shape"] = keep[0] if len(keep) == 1 else cq.Compound.makeCompound(keep)
+    for p in pieces:
         add(f"Body frame {p['name']}", p["shape"], "print", "body", bom=f"Body frame piece {p['name']}", kind="print",
-            note="natural PETG, 4 walls, 15% gyroid")
+            note="PETG, 0.6 mm nozzle, 2 walls, 10% gyroid")
     nclip = 0
     for i, p in enumerate(panels):
-        a = B.slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + 0.3, P.CLIP_T, P.ACRYLIC_T, P.ACRYLIC_R)
+        a = B.slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + P.PANEL_GAP, P.CLIP_T, P.ACRYLIC_T, P.ACRYLIC_R)
         if p["n"].x < -0.9:                      # rear face: fill port, tank relief, E-stop, charge port, USB-C
             for (yb, zb, r) in REAR_HOLES:
                 a = a.cut(cyl(r, 30, (-P.FRAME_X - 10, yb, zb), (1, 0, 0)))
@@ -571,21 +845,18 @@ def body_parts(log=print):
         add(f"Panel {i:02d}{' (battery door)' if door else ''}", a, "acrylic", "body",
             bom="Frosted acrylic panel 1/8 in (owned)", kind="acrylic", note=f"{dims[1] / IN:.1f} x {dims[0] / IN:.1f} in outline")
         for k, c in enumerate(p["clips"]):
-            if c.get("latch"):
-                add(f"Battery door latch {i:02d}", c["clip"], "print", "body", bom="Battery door latch", kind="print",
-                    note="quarter-turn tab on an M4 shoulder screw into a heat-set insert")
-                continue
+            short_ = any(d_ < P.INSERT[1] for _, _, d_ in c.get("bores", []))
             add(f"Panel clip {i:02d}-{k}", c["clip"], "print", "body", bom="Panel corner clip", kind="print",
-                note="M4 x 12 into a heat-set insert")
+                note="M4 x 6 button head into an M4 x 4 insert" if short_ else "M4 x 8 button head into an M4 x 6 insert")
             nclip += 1
-        pieces = p.get("led_pieces") or []
-        for k, piece in enumerate(pieces):
-            add(f"LED loop panel {i:02d}" + (f" {chr(97 + k)}" if len(pieces) > 1 else ""), piece, "led", "body",
+        led = p.get("led_pieces") or []
+        for k, piece in enumerate(led):
+            add(f"LED loop panel {i:02d}" + (f" {chr(97 + k)}" if len(led) > 1 else ""), piece, "led", "body",
                 bom="WS2812B strip 10 mm, 60/m (m)", kind="stock",
                 note="on the rail behind the panel, LEDs across it; cut and jumped with 3 wires where a neighbour crosses")
     for tag, strip in B.build.frame_strips:
         add(f"LED strip frame {tag}", strip, "led", "body", bom="WS2812B strip 5 mm, 100/m (m)", kind="stock",
             note="pushed through the frame tunnel, LEDs out")
-    log(f"body: {len(pieces)} frame pieces ({slivers} slivers dropped), {len(panels)} panels, {nclip} clips, "
+    log(f"body: {len(pieces)} frame pieces (loose chunks: {slivers or 'none'}), {len(panels)} panels, {nclip} clips, "
         f"LED strip {B.build.strips[0] / 1000:.1f} m in panel loops + {B.build.strips[1] / 1000:.1f} m in the frame")
     return panels

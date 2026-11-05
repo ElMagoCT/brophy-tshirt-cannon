@@ -61,7 +61,7 @@ def build(elev=P.ELEV_SHOW):
     misc.bumpers()
     glow = misc.underglow()
     log(f"underglow: {glow / 1000:.1f} m of strip under the bumpers")
-    misc.wall_standoffs()
+    misc.frame_mounts()
     misc.body_parts(log)
     misc.speakers()
     for p in PARTS:
@@ -176,7 +176,7 @@ def envelope(parts, elev):
 
 
 DENS = {"steel": 7.85, "galv": 7.85, "alu": 2.70, "extr": 2.70 * 0.55, "brass": 8.5, "print": 1.27 * 0.4,
-        "print_d": 1.27 * 0.6, "tpu": 1.2 * 0.6, "acrylic": 1.19, "foam": 0.03, "fabric": 0.4, "belt": 1.2,
+        "print_d": 1.27 * 0.6, "tpu": 1.2 * 0.6, "acrylic": 1.19, "foam": 0.03, "wood": 0.6, "fabric": 0.4, "belt": 1.2,
         "black": 1.5, "pcb": 1.8, "red": 1.5, "tube": 1.15 * 0.3, "tank": 1.4, "falcon": 2.6, "battery": 2.4,
         "spot": 0.0, "led": 1.0, "pc": 1.2}
 
@@ -214,14 +214,13 @@ def mass_report(parts):
 
 
 def print_parts(parts):
+    import body as B_
     bad = []
     for p in parts:
         if p["kind"] != "print":
             continue
-        b = p["shape"].BoundingBox()
-        d = sorted([b.xlen, b.ylen, b.zlen])
-        if d[1] > 256 or d[2] > 340:
-            bad.append((p["name"], [round(x) for x in d]))
+        if not B_.fits_bed(p["shape"]):
+            bad.append((p["name"], [round(x) for x in B_._obb_dims(p["shape"])]))
     return bad
 
 
@@ -387,7 +386,7 @@ if __name__ == "__main__":
         for s in sw[:40]:
             log("   ", s)
         bad = print_parts(parts)
-        log(f"printed parts over a 256 mm bed: {len(bad)}", bad[:10])
+        log(f"printed parts that don't fit a 250 mm cube (CC1/CC2): {len(bad)}", bad[:10])
         split = [p["name"] for p in parts if len(p["shape"].Solids()) > 1]
         log(f"parts in more than one piece: {len(split)}", split[:10])
         for p in parts:

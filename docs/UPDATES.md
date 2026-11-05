@@ -10,7 +10,6 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 
 | Who (and which chat) | Started | Working on | Files |
 |---|---|---|---|
-| Micah's main Claude Code chat | 2026-11-04 | Glacis rev D.1.4: frame mounts to the chassis and turret towers, slide-off bumpers on plywood, print plan, printed-part cleanup, Xprite speakers + TPA3255 amp + 48 V boost | `cad/glacis/params.py`, `body.py`, `misc.py`, `robot.py`, `lib.py`, `render/`, `bom/glacis_bom.py`, `electrical/README.md` |
 
 ## Entry template
 
@@ -24,6 +23,38 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Not done: <Onshape import/version, Google Sheet, artifact, anything left for Micah>
 - Questions for Micah: <decisions that are his, or "none">
 ```
+
+## 2026-11-05 - Micah's main Claude Code chat - Glacis rev D.1.4: printable frame, mounts, bumper ring, Xprite speakers
+- Branch / commit: main (this commit)
+- Changed:
+  - the frame screws down to the chassis: side tabs on rail posts, end posts, tower brackets on rivnuts;
+  - all #10-32s are the 1/2 and 2-1/2 in lengths Micah has;
+  - bumpers are one plywood ring on T-nuts, held by 6 side screws reachable from below;
+  - every clip laps its acrylic;
+  - 45 mirrored, printable frame pieces;
+  - Xprite 200 W speakers on a TPA3255 and a 48 V boost, with their cups screwed to the frame;
+  - a print plan.
+  JUDGMENTS N15-N27.
+- Files:
+  - `cad/glacis/params.py`, `body.py`, `misc.py`, `robot.py`, `lib.py`, `gun.py`, `drive.py`;
+  - `render/print_plan.py`, `part_report.py`, `clip_check.py`;
+  - `cad/requirements.txt` (rtree);
+  - `bom/glacis_bom.py`;
+  - `electrical/README.md`;
+  - `docs/glacis/print_plan.md`, `part_report.md`, `JUDGMENTS.md`, `air_wiring_artifact.html`;
+  - `docs/decisions.md`, `CLAUDE.md`.
+- Checks (build 15):
+  - interference: only the two known fitting slivers;
+  - sweep clean;
+  - every printed part within 250 mm and one solid;
+  - every clip laps its acrylic, and no screws or inserts clash.
+- Parts list: $1,373.42. Added: T-nuts, rivnuts, M4 x 8 and x 6 screws, M4 x 4 inserts, foam tape. Speakers are -$54. The Sheet and the air & wiring page are synced.
+- Print estimate: 45 frame pieces on 11 plates, 2.97 kg PETG, about 37 h on CC1 + CC2.
+- Not done: Onshape import and version "Glacis rev D.1.4". The Onshape session expired, so it waits for Micah to sign in.
+- Questions for Micah:
+  - "100 W drivers" read as the amps: confirm;
+  - the T-nuts in place of wood inserts (1/4 in ply is too thin for them);
+  - the open items in JUDGMENTS N26.
 
 ## 2026-11-04 - Micah's main Claude Code chat - Glacis rev D.1.3
 - Branch / commit: main, 535d101 and 054765e

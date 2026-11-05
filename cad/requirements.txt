@@ -6,3 +6,4 @@ scipy==1.18.1
 matplotlib==3.11.2
 trimesh==5.2.0
 ezdxf==1.4.5
+rtree==1.4.1

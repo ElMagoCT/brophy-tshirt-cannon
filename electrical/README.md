@@ -19,7 +19,7 @@ FRC battery x2 (parallel, SB50) + charge port
      REV PDH (switched side: dead in standby)
         +--- Falcon 500 x4 (40 A), Spark MAX (goBILDA)
         +--- 20 A buck -> WS2812 LEDs only
-        +--- 24 V boost -> TPA3116 amp -> siren speakers
+        +--- (40 A channel) 48 V 1500 W boost -> TPA3255 amp -> two 200 W siren speakers
         +--- fog core relay(s) -> MOSFETs -> heater, pump, blower
         +--- 10 A channel -> STM32 MOSFET (PWM) -> front light bar (Zmoon 12 in, 72 W, ~6 A)
         +--- safety relay (coil: safety node + rear E-stop contact 1) -> 12 V valve rail -> firing + in valves
@@ -31,6 +31,10 @@ FRC battery x2 (parallel, SB50) + charge port
 - **The light bar is the STM32's**: on, off and dimming from the web UI, through one MOSFET channel's PWM
   (a few hundred Hz; if its driver flickers on PWM, run it on/off only).
 - **The logic rail is a buck-boost** (3-20 V in), so a drive sag can't reset the controllers.
+- **Frame strips run sealed in PETG tunnels:** cap the 100/m frame strips at about 20% white in firmware (heat in
+  the sun), and the front and rear bottom members have no tunnel, so a jumper wire runs round each (rev D.1.4).
+- **Siren speakers:** two Xprite 200 W, 8 ohm on a TPA3255 board fed by a 1500 W boost set to 48 V, on a 40 A PDH
+  channel: about 100 W a speaker, 20-25 A from the battery at full siren (rev D.1.4).
 - **Rear E-stop:** a 2NC mushroom. Contact 1 is in the safety relay coil (valves dead), contact 2 is in
   the contactor coil (whole PDH dead). Both in hardware; the STM32 can't override either.
 - **Remote E-stop, lost link, dead STM32 heartbeat, tank over 210 psi:** the safety node drops the

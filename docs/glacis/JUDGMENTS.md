@@ -830,3 +830,93 @@ N14. **Checks:**
      - Only the two known fitting slivers.
      - An independent code review caught and fixed: the joint counterbore cutting both LED bands, a corner-fill gap at
        mismatched corners, buried solder ends, and the contact check not seeing strips.
+
+## Rev D.1.4: printable frame, mounts, bumper ring, Xprite speakers (2026-11-05)
+Micah's asks:
+- hollow the prints to 2 mm and estimate plates, PETG and hours (0.6 mm nozzle, 2 walls, 10%, no slicing, frame only);
+- review and clean up every part (clip 01-2, E04S0 + N13, N11, E28S0 + N14) and cut everything to the CC1/CC2 beds;
+- tie the frame to the chassis perimeter and the turret towers (screwed from below into threaded inserts);
+- bumpers that slide off the bottom, held by #10-32s from inside the chassis into wood inserts.
+
+A nine-agent review of all 121 printed body parts then found 39 more problems (26 survived a skeptic, the
+critic added 13), and the fixes are below. Onshape version "Glacis rev D.1.4".
+
+N15. **Print plan** (docs/glacis/print_plan.md, from render/part_report.py):
+     - each part in the orientation it prints in;
+     - support from a ray cast, so tunnel roofs count as bridges;
+     - plates packed from the real footprints.
+     - **45 frame pieces on 11 plates: 2.97 kg PETG** (145 g of it support), **73 machine-hours, about 37 h with
+       the CC1 and CC2 both running** (0.6 mm, 2 walls, 10% gyroid). Treat it as +/-25%: a slicer run will be closer.
+     - At 3 walls (2 mm walls): 4.05 kg, about 50 h on both printers.
+     - The other printed body parts (78 clips, posts, brackets, cups, grilles at 4 walls, 25%): 2.03 kg, 6 plates,
+       about 27 h on both printers.
+     - E13S0 and E31S0 touch the bed on a narrow strip: give them a brim.
+N16. **Nothing is hollowed in the CAD.** At 2 walls and 10% gyroid the slicer already prints every piece as a
+     1.3 mm shell over sparse infill, so a modelled 2 mm hollow would only add inner walls. If "2 mm" means the wall
+     thickness, that's 3 walls (the plan gives both).
+N17. **Your examples:**
+     - Clip 01-2 (and its mirror 05-0) lapped the acrylic by 0 mm³. That panel's face ends in a spike by the
+       speaker notch, and the acrylic's corner sits about 75 mm back from the tip. The two tip corners now act as
+       one: the clip runs down the spike to the acrylic's corner, with its screw where both members are wide
+       enough to clear their light tunnels. Every clip now has to lap at least 120 mm³; all 38 do.
+     - E04S0 is part of the cheek, and N13 (now N12) is merged into its neighbour.
+     - E28S0 + N14 (now E29S0 + N10 + E28S0) and its mirror are merged, along with the two lone sticks at the
+       rear-top corners. Short segments merge into their one off-edge neighbour when the union fits the bed and
+       lies flat.
+     - N11 (now N00): the node across the gun well's front is still the only glued split. Its halves are merged
+       into E05S0 and E05S1, and both fit the bed.
+     - The rear one (N09) is gone: its region now leans out along the well floor.
+     - 45 frame pieces, mirrored left and right (a mirror-consistent cut order), 51 tenons, no loose ends.
+N18. **Frame to chassis.** Sized for your #10-32s (1/2 and 2-1/2 in):
+     - **Side walls:** the bottom member sits right on the bumper, so each side station has a tab on the frame's
+       inner face, out over the outer rail. A post on the rail holds it: 2-1/2 in up through the rail into the
+       post's foot insert, then 1/2 in up from the post's outer pocket into the tab.
+     - **Ends:** posts on the end rails at y 0 and +/-170. The outer two stand on the corner gussets.
+     - **Towers:** a bracket on each tower's outer face, two 1/2 in screws in +/-3 mm slots into rivnuts. Nothing
+       pokes into the gun well, and you set the height against the deck at assembly.
+     - The x -150 station moved to -205: there its tab blocked a frame joint's cross screw. The build now checks
+       every tab and insert against the joint screws and tunnels.
+N19. **Bumpers are one ring.**
+     - **Screws:** the old front, rear and outer side screws were unreachable (behind the wheels, the PDH and the
+       bellypan). The 6 that hold the ring are at x -80, 0, 80 through each side rail, driven from the open bay
+       underneath.
+     - **Corners:** printed brackets join the four plywood strips (2 x 1/2 in per leg from the rail side, heads
+       counterbored flush).
+     - **T-nuts:** #10-32 4-prong T-nuts replace the wood inserts. A 10 mm insert doesn't fit 1/4 in ply. The T-nut
+       goes in from the noodle side, so the screw pulls its flange into the ply; file its barrel to 6 mm.
+     - **Axle screws:** the side strips have open-bottom slots past the axle-end screws.
+N20. **Clips and panels:**
+     - **Inserts and screws:** M4 x 6 inserts (5 mm OD, 4.7 mm hole, as bought) with M4 x 8 screws. Where two
+       neighbouring panels' clip screws met inside a node (10 pairs), or a face was close, a short M4 x 4 insert
+       and an M4 x 6 screw (12 clips).
+     - **Battery doors:** ordinary clips. The quarter-turn latch couldn't turn in its pocket, and its insert ran
+       through a light tunnel.
+     - **Acrylic:** cut 1 mm under per side, with 1/16 in foam tape on the ledge (the rebate is 0.7 mm deeper) so
+       the clips clamp it.
+N21. **Speakers: Xprite 200 W (B01DMSR4L4).**
+     - **Cups:** sunk 7.4 mm deeper so the face stays put. Each cup is screwed to the frame by 4 M4 through its
+       walls (it was only sitting in the notch).
+     - **Amp:** "100 W drivers" read as the amps: a TPA3255 board on a 1500 W boost set to 48 V, about 100 W a
+       speaker, on a 40 A PDH channel. If you meant something else, say.
+N22. **Light bar brackets:** a plate on the front slant's bottom lip with 2 x M4 into inserts. The front and rear
+     bottom members lose their light tunnel: it ran under the acrylic's rebate with paper-thin walls. A jumper wire
+     goes round each. The front's LED web moved in to 23 mm, so those pieces have a flat face to print on.
+N23. **Underglow brackets** sit flat on the rails again, stepping down under the corner gussets. Each has 2 x M4 and
+     a clearance hole round the post screws' heads.
+N24. **Joints:** TENON_CLEAR is 0.3 mm a side for the 0.6 mm nozzle; print a test joint first. Small 5 mm tenons get
+     their own mortise and are glued. Where a tenon would push a piece past the bed, the neighbour carries it.
+     Merges keep 2 mm of bed margin.
+N25. **PETG for everything.** The notes that said PA-CF or PETG-CF now say PETG, 5 walls, 40% gyroid.
+N26. **Still open (your call, or later):**
+     - Diagonal placement on the 256 bed would allow longer segments and fewer joints.
+     - The glow through 2-wall gyroid will show the infill: the plan suggests a 100% modifier on the lit lip.
+     - Cap the 100/m frame strips' brightness in firmware: heat in PETG in the sun.
+     - The rivnut grip range is [UNVERIFIED].
+N27. **Checks (build 15):**
+     - interference: only the two known fitting slivers (146 and 64 mm³);
+     - the 0-45 deg sweep is clean;
+     - every printed part fits the 250 mm bed, and every part is one solid;
+     - every clip laps its acrylic, no two clip screws meet, and no clip insert crosses a light tunnel;
+     - every segment end has a neighbour piece;
+     - every insert found frame clear of the tunnels and joint screws: 16 frame-mount, 8 speaker-cup, 4 light-bar;
+     - LED strips: 0 overlaps, 0 jumpers.

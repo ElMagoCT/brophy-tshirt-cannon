@@ -189,7 +189,7 @@ def _build(xv):
     for xs in xs_list:
         sad = box(xs - 14, xs + 14, -CRADLE_Y0, CRADLE_Y0, H[1], H[0]).cut(cyls[0]).cut(cyls[1]).cut(lanes)
         gadd(f"Chamber saddle {xs:.0f}", sad, "print", bom="Chamber saddle", kind="print",
-             note="PETG-CF, screws through both cradle plates; caps close the outer halves")
+             note="PETG, 5 walls, 40% gyroid; screws through both cradle plates; caps close the outer halves")
         for k, h in enumerate(H):
             s = OUT[k]
             z0, z1 = (h + 0.5, h + 200) if s > 0 else (h - 200, h - 0.5)
@@ -201,7 +201,7 @@ def _build(xv):
                          max(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)), fz0, fz1)
                 cap = cap.fuse(fl.cut(cyl(2.75, 20, (xs, sy * yh, fz0 - 1), (0, 0, 1))))
             gadd(f"Chamber cap {TAGS[k]} {xs:.0f}", cap.clean(), "print", bom="Chamber cap", kind="print",
-                 note="PETG-CF, 2 x M5 into heat-set inserts in the saddle")
+                 note="PETG, 5 walls, 40% gyroid; 2 x M5 into heat-set inserts in the saddle")
     for k, h in enumerate(H):
         vk = P.VALVES[k]
         x0v, x1v = xv - vk["L"], xv
@@ -264,7 +264,7 @@ def _build(xv):
              bom="1/2 in hex shaft, steel (pivot stub)", kind="stock", note=f"{(y_hi - y_lo) / IN:.1f} in, 1/4-20 tapped end")
         y_h = sy * (CRADLE_Y0 + P.PLATE_T)
         hub = cyl(16.0, 10.0, (0, y_h, 0), (0, sy, 0)).cut(hex_prism(12.9, 14.0, (0, y_h - sy, 0), (0, sy, 0)))
-        gadd(f"Axle hub {tag}", hub, "print_d", bom="Axle hub", kind="print", note="PA-CF, 6 x M3 to the cradle plate")
+        gadd(f"Axle hub {tag}", hub, "print_d", bom="Axle hub", kind="print", note="PETG, 5 walls, 40% gyroid; 6 x M3 to the cradle plate")
     pul = elevation_pulley().translate(V(0, -P.ELEV_PULLEY_Y[1], 0))
     gadd(f"Elevation pulley {P.ELEV_T[1]}T", pul, "print_d", bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm", kind="print",
          note="hex bore")
