@@ -104,7 +104,7 @@ def adapter():
 
 
 VALVE_INFO = (("U.S. Solid USS-HSV04", "Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi", 1.75),
-              ("Atlantic Valves SZW-25", "Firing valve: Atlantic Valves SZW-25 1 in NPT stainless solenoid, 12 V DC, NC", 1.0))
+              ("U.S. Solid USS-HSV04", "Firing valve bottom: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi", 1.75))
 
 
 def _cannon(k, xf):
@@ -131,7 +131,7 @@ def _cannon(k, xf):
     ci = Chain((xv - hl, 0, h), (-1, 0, 0), "F", gadd, f"{tag} chamber ")
     ci.nipple("1", bom="1 in Sch 40 close nipple (1-1/2 in)")
     r = P.RED
-    red_bom = "Chamber: 3 x 1 black malleable reducing coupling, 150 lb"
+    red_bom = "Chamber: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI)"
     vol = ci.reducer("1", P.CH_PIPE, r["L"], r["OD_IN"], r["OD_OUT"], r["BAND_IN"], r["BAND_OUT"], bom=red_bom,
                      mass=r["MASS"])
     nl = P.CH_NIPPLE_L[k]
@@ -140,18 +140,15 @@ def _cannon(k, xf):
                       mass=r["MASS"])
     vol += math.pi * (BORE_PIPE / 2) ** 2 * nl / 1000.0
     CH_VOL[k] = vol
-    ci.bushing("1", "1/4", 34.9, 7.0, bom="1 x 1/4 NPT black malleable hex bushing (Supply Giant CNCV3003)")
+    ci.bushing("1", "1/4", 34.9, 7.0, bom="1 in MNPT x 1/4 FNPT hex bushing, 304 stainless, 350 psi")
     ci.nipple("1/4", color="brass", bom="1/4 NPT brass close nipple 7/8 in")
     ports = ci.block("1/4", side=32.0, sides=((0, 0, s), (0, 1, 0)),     # transducer left, tubes run right
                      bom="1/4 NPT brass cross (ChillWaves)")
     ci.male_end("fill push-to-connect", 22.0, 15.0, bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     tip = ci.at(ci.s)
-    if k == 0:                                               # the top chamber runs to 190 psi (rev D)
-        ports[0].male_end("relief 200 psi", 44.0, 19.0, bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
-                          extra=relief_cap)
-    else:
-        ports[0].male_end("relief 125 psi", 44.0, 19.0, bom="Relief valve 125 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
-                          extra=relief_cap)
+    # both chambers run to full tank pressure (rev D.2: capped at 190 in software, 200 psi relief on each)
+    ports[0].male_end("relief 200 psi", 44.0, 19.0, bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
+                      extra=relief_cap)
     ports[1].male_end("transducer 0-300 psi", 56.0, 20.0, color="steel",
                       bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH) (+ 1/4 x 1/8 bushing)")
     return tip, ax0

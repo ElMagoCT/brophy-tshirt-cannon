@@ -104,11 +104,11 @@ WHEEL_FREE_FPS = FALCON_FREE_RPM / RATIO * math.pi * 10 / 60 / 12
 FRAME_X = AX_X + WHEEL_R + 3.0 + RAIL_W     # outside face of the end rails
 
 # ------------------------------------------------------------------ bumpers (FRC style)
-NOODLE_D = 2.5 * IN
-BUMP_BACK_T = 0.25 * IN                      # 1/4 in plywood backing with #10-32 T-nuts (thicker would put the
-                                            # robot over the 28 in door limit)
-BUMP_DEPTH = BUMP_BACK_T + NOODLE_D
-BUMP_Z = (GROUND_CLEAR, GROUND_CLEAR + 2 * NOODLE_D)
+FOAM_D, FOAM_H = 2.0 * IN, 5.0 * IN          # rev D.2: GoTo Foam 43 ILD strips, 2 in deep x 5 in tall (was 2 stacked 2.5 in noodles)
+BUMP_BACK_T = 0.75 * IN                      # rev D.2 (Micah): a 1x6 ripped to 5 in. 1/2 in thicker than the old 1/4 ply, so
+                                            # the foam is 2 in deep: still 27.75 in over the bumpers (door limit 28)
+BUMP_DEPTH = BUMP_BACK_T + FOAM_D
+BUMP_Z = (GROUND_CLEAR, GROUND_CLEAR + FOAM_H)
 
 # ------------------------------------------------------------------ body (printed frame + recessed acrylic)
 ACRYLIC_T = 0.125 * IN
@@ -126,7 +126,7 @@ INSERT = (2.35, 6.5)                        # M4 x 6 heat-set insert (5 mm OD) h
 INSERT_SHORT = (2.35, 4.6)                  # M4 x 4 insert, M4 x 6 screw: where two neighbours' clip screws would meet
 INSERT_1032 = (3.15, 10.5)                  # #10-32 x 3/8 in heat-set insert hole (6.3 mm drill): frame mounts
 TNUT = 3.2                                  # #10-32 4-prong T-nut hole through the bumper plywood (driven from the
-                                            # noodle side, barrel trimmed to 6 mm; 1/4 in ply is too thin for a wood insert)
+                                            # foam side; rev D.2: 3/4 in board, #10-32 x 1-1/4 in screws)
 SIDE_MOUNT_X = (-280.0, -205.0, 100.0, 280.0)   # frame mount posts along each outer rail (clear of the x -105 seam
                                             # and of the x -153 frame joint's cross screw)
 END_MOUNT_Y = (-170.0, 0.0, 170.0)          # ... and along each end rail (the outer two stand on the corner gussets)
@@ -150,7 +150,7 @@ TENON_CLEAR = 0.3                           # per side, for a 0.6 mm nozzle (pri
 # panel light (rev D.1.2, Micah 2026-11-04): the window wall IS the LED surface. Below the acrylic's ledge it runs
 # straight back, past the member as a thin web, and its last 10 mm (the strip) leans a little toward the panel on the
 # straight runs. No rail, no flange, no step but the ledge the acrylic sits on.
-LED_BAND = (10.0, 25.0, 10.0, 2.5)          # strip width (a 10 mm strip; ~8 is enough to stick to), strip centre this
+LED_BAND = (10.0, 25.0, 17.5, 2.5)          # strip width (a 10 mm strip; ~8 is enough to stick to), strip centre this
                                             # far behind the acrylic's back face, lean toward the panel (deg) on the
                                             # straight runs, web thickness below the member
 LED_STRIP_T = 1.6                           # 60/m strip thickness on the band
@@ -238,7 +238,7 @@ BARREL_OD, BARREL_WALL, BARREL_LEN = 3.0 * IN, 0.125 * IN, 36.0 * IN   # clear p
 N_BARRELS = 2
 VALVE = dict(L=82.6, W=66.0, BODY=(-28.0, 30.0), COIL_R=25.0, COIL_TOP=86.0)  # Atlantic Valves SZW-25 (1 in NPT)
 HSV04 = dict(L=131.1, W=64.3, BODY=(-27.0, 27.0), COIL_R=24.0, COIL_TOP=75.4)  # U.S. Solid USS-HSV04, 5.16 x 2.53 x 4.03 in
-VALVES = (HSV04, VALVE)                     # (top, bottom) firing valves (rev D.1)
+VALVES = (HSV04, HSV04)                     # (top, bottom) firing valves (rev D.2: both HSV04, both to full tank pressure)
 # chamber: 2 in Sch 40 x 8 in nipple between two 2 x 1 black malleable reducing couplings (about 0.53 L; a longer
 # nipple swings the chamber low enough at the back to open the rear face down through its controls)
 CH_PIPE, CH_NIPPLE_L = "3", (12.0 * IN, 10.0 * IN)   # rev D.1: 3 in Sch 40, top 12 in, bottom 10 in

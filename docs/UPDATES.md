@@ -24,6 +24,22 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-06 (evening) - Micah's main Claude Code chat - Glacis rev D.2 green light: CAD, Sheet, Onshape
+- Branch / commit: main (this commit)
+- Changed (Micah's follow-ups, JUDGMENTS "Rev D.2, Micah's follow-ups" F1-F8):
+  - bottom cannon to full tank pressure: a second HSV04, MSI couplings on both chambers, 200 psi relief on both, caps 190;
+  - fill line: female plug on the 1-1/2 in nipple through the panel, F x F elbow, male x male check valve, street elbow;
+  - LED lean 17.5 deg; bumper backing a 1x6 ripped to 5 in with 2 in x 5 in foam (envelope unchanged);
+  - electronics shelf: ESP32-P4 + C5 board, music ESP32, ADS1115, valve arm relay, one contactor; no PWM gate;
+  - a second MOSFET 10-pack (the safety node's coil channel);
+  - Micah's own Sheet edits folded into the script (TPA3255 $27.00, breakout board row, PETG $40, acrylic $150, tanks ordered).
+- Files: `cad/glacis/params.py`, `gun.py`, `misc.py`, `pneu_parts.py`; `bom/glacis_bom.py` (+ csv/json);
+  `docs/glacis/air_wiring_artifact.html`, `docs/glacis/img/elbow_ff.jpg`, `docs/glacis/JUDGMENTS.md`, `CLAUDE.md`.
+- Checks (robot.py --checks, 56 min on this Mac under heavy swap): interference only the two known fitting slivers (146, 64 mm3) plus one new 53 mm3 nipple/check-valve overlap, fixed by modelling the F x F elbow at 17 mm per leg (re-checked in isolation: 0); elevation sweep 0-45 deg clean; every print fits the 250 mm bed; no multi-piece parts; LED strips 0 overlaps, every loop kept 100%; 47 frame pieces; envelope 37.7 x 27.7 in over the bumpers; gun 21.1 kg balanced on the pivot (valves at x 174.5).
+- Parts list: $1,702.75 (D.1.4 $1,373.42; this round's changes +$129.59, Micah's Sheet edits +$199.74). Sheet synced.
+- Onshape: ONSHAPE_PLACEHOLDER
+- Questions for Micah: the breakout board row (which board, what price); the tanks' real port layout vs your custom tank.
+
 ## 2026-11-06 - Micah's main Claude Code chat - Glacis rev D.2 proposal: listing re-check, one controller, bumper foam
 - Branch / commit: main (this commit)
 - Changed (proposal, parts list and artifact only; no CAD):

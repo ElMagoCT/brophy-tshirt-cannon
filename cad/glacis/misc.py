@@ -91,7 +91,7 @@ def towers_and_pivot():
     face = cq.Face.makeFromWires(w.offset2D(0.9, "arc")[0], [w.offset2D(-0.9, "arc")[0]])
     add("Elevation belt", cq.Solid.extrudeLinear(face, V(0, -9.0, 0)), "belt", "frame",
         bom=f"HTD 5M 9 mm belt, {P.ELEV_BELT_T}T", note=f"{per:.0f} mm pitch length")
-    # arm-angle pot on the end of the axle, outboard of the left bearing block (read by the STM32 ADC)
+    # arm-angle pot on the end of the axle, outboard of the left bearing block (read by the main controller's ADC)
     yb = P.BEARING_BLOCK_Y[1]
     add("Pot coupler", cyl(9.0, 16.0, (px, yb + 1.0, pz), (0, 1, 0)).cut(cyl(7.45, 14.0, (px, yb + 0.5, pz), (0, 1, 0))),
         "print_d", "frame", bom="Pot coupler (1/2 hex to 1/4 in D)", kind="print")
@@ -191,18 +191,23 @@ def air():
     add("Main valve push-to-connect", PP.ptc_straight(vc - V(0, 22.5, 0), (0, -1, 0)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     MAIN_OUT[:] = [vc - V(0, 22.5 + 18.0, 0)]
-    # fill: universal-coupler M plug outside the panel, a nipple through it, then a U behind the panel through the
-    # check valve (along +y) into the manifold's back face
-    add("Fill plug (M-style)", PP.m_plug(V(xo - 2.0, yb, mz), (-1, 0, 0)), "brass", "pneu",
-        bom="Fill plug: 1/4 MNPT industrial (M-style) plug, brass (Foster 10-3B)", note="your universal coupler snaps on")
-    xn0, xn1 = xo - 2.0 + 10.2, xu - 14.0 + 10.0              # from the plug's thread to the elbow's port
-    add("Fill nipple", PP.close_nipple(V((xn0 + xn1) / 2, yb, mz), (1, 0, 0), length=xn1 - xn0, hexed=False), "brass", "pneu",
-        bom="1/4 NPT brass nipple x 1-1/2 in")
-    add("Fill elbow panel", PP.street_elbow(V(xu, yb, mz), (-1, 0, 0), (0, 1, 0)), "brass", "pneu",
-        bom="1/4 NPT brass street elbow")
-    add("Fill check valve", PP.check_valve(V(xu, yb + 17.0, mz), (0, 1, 0)), "brass", "pneu",
-        bom="Fill check valve, brass, 1/4 FNPT x 1/4 MNPT, 250 psi (Control Devices P2525-1WA)",
-        note="holds the tanks behind the open plug")
+    # fill (rev D.2): a FEMALE M-style plug (Milton 728) outside the panel on the 1-1/2 in nipple through it, then
+    # behind the panel a female x female elbow turns along +y, the male x male check valve, and a street elbow into the
+    # manifold's back face
+    e14 = 10.2
+    xp = xo - e14 - 4.2                                    # the nipple's outer tip: the plug's hex sits clear outside the panel
+    add("Fill plug (M-style, female)", PP.m_plug_f(V(xp, yb, mz), (-1, 0, 0)), "steel", "pneu",
+        bom="Fill plug: Milton 728, 1/4 FNPT (female) M-style plug", note="your universal coupler snaps on")
+    ce = 17.0                                              # F x F barstock elbow, centre to port face (nominal)
+    xn1 = xu - ce + e14                                    # nipple tip inside the elbow's port
+    add("Fill nipple", PP.close_nipple(V((xp + xn1) / 2, yb, mz), (1, 0, 0), length=xn1 - xp, hexed=False), "brass", "pneu",
+        bom="1/4 NPT brass nipple x 1-1/2 in", note="through the rear panel")
+    add("Fill elbow panel (F x F)", PP.elbow_ff(V(xu, yb, mz), (-1, 0, 0), (0, 1, 0)), "brass", "pneu",
+        bom="1/4 NPT brass 90 deg elbow, FNPT x FNPT (ChillWaves)")
+    y0, y1 = yb + ce - e14, y_fill - 14.0 + e14
+    add("Fill check valve", PP.check_valve_mm(V(xu, y0, mz), (0, 1, 0), length=y1 - y0), "brass", "pneu",
+        bom="Fill check valve, brass, 1/4 MNPT x 1/4 MNPT, 250 psi (American Made B076K8SLBZ)",
+        note="holds the tanks behind the open plug; flow arrow toward the manifold")
     add("Fill elbow manifold", PP.street_elbow(V(xu, y_fill, mz), (0, -1, 0), (1, 0, 0)), "brass", "pneu",
         bom="1/4 NPT brass street elbow")
     add("Tank relief valve 200 psi", PP.relief_valve(ports[5][0], ports[5][1], length=ports[5][0].x - (xo - 4.0)), "brass",
@@ -341,21 +346,22 @@ def batteries_and_electronics():
         shelf = shelf.fuse(box(x - 5, x + 5, y - 5, y + 5, zb, 150.0))
     add("Electronics shelf", shelf, "print", "power", bom="Electronics shelf", kind="print")
     z = 154.0
-    boards = [("STM32 Nucleo-F446RE (main controller)", -375, -305, -98, -16, 20, "pcb", "STM32 Nucleo-64 NUCLEO-F446RE"),
-              ("ESP32-S3 WiFi bridge", -298, -229, -48, -20, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8"),
-              ("ESP32-S3 safety node", -298, -229, -84, -56, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8"),
-              ("PWM gate (74AHCT125)", -298, -248, -12, 14, 12, "pcb", "SN74AHCT125N quad buffer + perfboard"),
+    boards = [("Main controller ESP32-P4 + C5 (WTDKP4C5-S1)", -375, -295, -98, -38, 18, "pcb",
+               "Main controller: ESP32-P4 + ESP32-C5 board, Wireless Tag WTDKP4C5-S1 (N16R32)"),
+              ("ESP32-S3 safety node", -290, -221, -98, -70, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8 (owned)"),
+              ("Bluetooth music ESP32 (WROOM-32)", -290, -235, -64, -36, 12, "pcb", "Bluetooth music: ESP32-WROOM-32 dev board, USB-C (AITRIP B0DF2YJSHN)"),
+              ("ADS1115 ADC", -375, -347, -32, -14, 6, "pcb", "ADS1115 16-bit 4-channel ADC module, I2C (B0FLPZMQJY)"),
               ("Spark MAX (elevation)", -220, -185, -98, -28, 25, "black", "REV Spark MAX (owned)"),
-              ("Safety relay 40 A", -220, -192, -20, -2, 36, "black", "12 V 40 A SPDT relay + socket"),
-              ("Valve + fog drivers (relays, ULN2803A)", -378, -308, -6, 54, 32, "pcb", "12 V 40 A SPDT relay + socket"),
+              ("Valve arm relay 40 A", -220, -192, -20, -2, 36, "black", "12 V 40 A SPDT relay + socket"),
+              ("Valve + fog drivers (MOSFETs, relays, ULN2803A)", -378, -308, -6, 54, 32, "pcb", "MOSFET switch modules + 12 V 40 A relays + ULN2803A"),
               ("Buck 12-5 V 20 A", -300, -244, 45, 95, 25, "black", "12->5 V 20 A buck (B089M5R3NJ)")]   # under the main valve
-    boards.append(("Logic supply 5 V (PM02 buck-boost)", -378, -352, 60, 85, 10, "pcb",
-                   "Logic supply: 5 V 5 A buck-boost (PM02, 3-20 V in)"))
+    boards.append(("Logic supply 5 V (buck-boost)", -378, -352, 60, 85, 10, "pcb",
+                   "Logic supply: 5 V 5 A buck-boost, 3.6-32 V in (diymore)"))
     for name, x0, x1, y0, y1, h, col, bom in boards:
         add(name, box(x0, x1, y0, y1, z, z + h), col, "power", bom=bom)
     add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power",
-        bom="Contactor 12 V 200 A continuous duty, isolated coil, 4 terminal, 2-pack (Hamolar RD-200)",
-        note="main breaker -> contactor -> PDH; the STM32 closes it, the E-stop opens its coil")
+        bom="Contactor 12 V 200 A continuous duty, isolated coil, 4-pin (B07T48QKQB)",
+        note="main breaker -> contactor -> PDH; coil through the rear E-stop, the safety node and the main controller in series")
     # bottom of the rear panel: E-stop, standby charge port (fill port and tank relief come out of the manifold)
     ey, ez = ESTOP
     xo = P.rear_x(ez)
@@ -364,14 +370,14 @@ def batteries_and_electronics():
         cyl(20.0, 30.0, (xi + 34.0, ey, ez), (-1, 0, 0))).fuse(
         cq.Solid.makeSphere(22.0, V(xo - 2.0, ey, ez), angleDegrees1=0, angleDegrees2=90).rotate(
             V(xo - 2.0, ey, ez), V(xo - 2.0, ey + 1, ez), -90))
-    add("E-stop", est, "red", "power", bom="Latching mushroom E-stop, 22 mm, NC", note="rear panel, bottom; in series with the safety relay coil")
+    add("E-stop", est, "red", "power", bom="Latching mushroom E-stop, 22 mm, NC", note="rear panel, bottom; contact 1 in the contactor coil, contact 2 in the valve arm relay coil")
     cy, cz = CHARGE
     xc = P.rear_x(cz)
     add("Charge port (SB50 panel mount)", box(xc - 4.0, xc + 26.0, cy - 18.0, cy + 18.0, cz - 14.0, cz + 14.0), "red", "power",
         bom="Anderson SB50 panel-mount charge port", note="rear panel, bottom: charge or run on standby power with the batteries in")
     xu = P.rear_x(USB[1])
     add("USB-C panel pass-through", cyl(8.5, 28.0, (xu - 2.0, USB[0], USB[1]), (1, 0, 0)), "black", "power",
-        bom="Panel-mount USB-C extension (to the STM32)")
+        bom="Panel-mount USB-C extension (to the main controller)")
 
 
 ESTOP = (-215.0, 255.0)     # (y, z) on the rear panel, bottom strip under the open middle
@@ -399,7 +405,7 @@ def speakers():
         add(f"Speaker grille {pod['name']}", pod["grille"], "print", "body", bom="Speaker grille", kind="print",
             note="3 walls, no top or bottom layers, 12% gyroid: an open mesh; glue or screw to the cup")
     # front light bar: Micah's Zmoon 12 in single-row bar (72 W, spot/flood combo) across the nose just above the
-    # bumper, on two printed brackets screwed into the front panel's bottom member; the STM32 switches (and can PWM-dim)
+    # bumper, on two printed brackets screwed into the front panel's bottom member; the main controller switches (and can PWM-dim)
     # it through a MOSFET channel
     L, hb, db, zc, yb = P.LIGHT_BAR
     xf = P.front_x(zc - hb / 2) + 8.0                      # bar's back, clear of the slant at its bottom edge (the front leans back)
@@ -435,10 +441,10 @@ def speakers():
 # ------------------------------------------------------------------ bumpers
 def bumpers():
     zb0, zb1 = P.BUMP_Z
-    r = P.NOODLE_D / 2
+    fd = P.FOAM_D
     t = P.BUMP_BACK_T
     xf, yo = P.FRAME_X, P.OUTER_RAIL_Y[1]
-    reach = t + P.NOODLE_D
+    reach = t + fd
     segs = {
         "front": dict(axis="y", pos=xf, out=(1, 0), span=(-(yo + reach), yo + reach)),
         "rear": dict(axis="y", pos=-xf, out=(-1, 0), span=(-(yo + reach), yo + reach)),
@@ -470,7 +476,7 @@ def bumpers():
             corners.append(brk)
             add(f"Bumper corner bracket {'front' if sx > 0 else 'rear'} {'L' if sy > 0 else 'R'}", brk, "print", "bumper",
                 bom="Bumper corner bracket (printed)", kind="print",
-                note="joins the ring outside the corner, under the noodles; 4 x #10-32 x 1/2 in from the rail side "
+                note="joins the ring outside the corner, inside the foam; 4 x #10-32 x 1/2 in from the rail side "
                      "into heat-set inserts. 4 walls, 25%")
     corner_cut = union([c_.translate(V(0, 0, 0)) for c_ in corners])
     for name, sgm in segs.items():
@@ -478,10 +484,10 @@ def bumpers():
         ox, oy = sgm["out"]
         if sgm["axis"] == "y":
             bx0, bx1 = sorted([sgm["pos"], sgm["pos"] + ox * t])
-            backing = box(bx0, bx1, -yo_, yo_, zb0, zb1 - 8)
+            backing = box(bx0, bx1, -yo_, yo_, zb0, zb1)
         else:
             by0, by1 = sorted([sgm["pos"], sgm["pos"] + oy * t])
-            backing = box(-xf, xf, by0, by1, zb0, zb1 - 8)
+            backing = box(-xf, xf, by0, by1, zb0, zb1)
         piece = backing
         zr = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
         if sgm["axis"] == "x":                        # side strips: open-bottom slots past the axle end screws (a
@@ -498,27 +504,25 @@ def bumpers():
             for kind, sg_, h_ in ring_holes:
                 if kind == "end" and sg_ == ox:
                     piece = piece.cut(h_)
-        add(f"Bumper backing {name}", piece, "wood", "bumper", bom="Bumper backing, 1/4 in plywood", kind="stock",
-            note=("#10-32 x 1/2 in from inside the outer rail into a 4-prong T-nut at x -80, 0, 80" if sgm["axis"] == "x"
+        add(f"Bumper backing {name}", piece, "wood", "bumper", bom="Bumper backing, 1x6 ripped to 5 in (3/4 x 5 in)", kind="stock",
+            note=("#10-32 x 1-1/4 in from inside the outer rail into a pronged T-nut at x -80, 0, 80" if sgm["axis"] == "x"
                   else "no screws to the robot: held by the side strips through the corner brackets"))
-        for i, zc in enumerate((zb0 + r, zb0 + 3 * r)):
-            if sgm["axis"] == "y":
-                c = sgm["pos"] + ox * (t + r)
-                nd = _mitre(cyl(r, a1 - a0, (c, a0, zc), (0, 1, 0)), sgm, yo, xf, reach)
-            else:
-                c = sgm["pos"] + oy * (t + r)
-                nd = _mitre(cyl(r, a1 - a0, (a0, c, zc), (1, 0, 0)), sgm, yo, xf, reach)
-            nd = nd.cut(cyl(12.7, 3000, (c if sgm["axis"] == "y" else -1500, -1500 if sgm["axis"] == "y" else c, zc),
-                            (0, 1, 0) if sgm["axis"] == "y" else (1, 0, 0)))
-            nd = nd.cut(corner_cut)                   # notched round the corner brackets (crumbs dropped)
-            nd = max(nd.Solids(), key=lambda x: x.Volume()) if len(nd.Solids()) > 1 else nd
-            add(f"Pool noodle {name} {i + 1}", nd, "foam", "bumper", bom="Pool noodle 2.5 in (white)", kind="stock")
+        # one foam strip per side (cut from 24 in lengths of the GoTo block, butt-joined under the cover), mitred at the corners
         if sgm["axis"] == "y":
-            c0, c1 = sorted([sgm["pos"] + ox * t, sgm["pos"] + ox * (t + 2 * r + 1.5)])
+            f0, f1 = sorted([sgm["pos"] + ox * t, sgm["pos"] + ox * (t + fd)])
+            fm = box(f0, f1, a0, a1, zb0, zb1)
+        else:
+            f0, f1 = sorted([sgm["pos"] + oy * t, sgm["pos"] + oy * (t + fd)])
+            fm = box(a0, a1, f0, f1, zb0, zb1)
+        fm = _mitre(fm, sgm, yo, xf, reach).cut(corner_cut)           # notched round the corner brackets
+        fm = max(fm.Solids(), key=lambda x: x.Volume()) if len(fm.Solids()) > 1 else fm
+        add(f"Bumper foam {name}", fm, "foam", "bumper", bom="Bumper foam strip 2 x 5 in (GoTo Foam 43 ILD)", kind="stock")
+        if sgm["axis"] == "y":
+            c0, c1 = sorted([sgm["pos"] + ox * t, sgm["pos"] + ox * (t + fd + 1.5)])
             outer = box(c0, c1, -(yo + reach) + 1, yo + reach - 1, zb0 - 1, zb1 + 1)
             inner = box(c0 + (0 if ox > 0 else 1.5), c1 - (1.5 if ox > 0 else 0), -(yo + reach), yo + reach, zb0, zb1)
         else:
-            c0, c1 = sorted([sgm["pos"] + oy * t, sgm["pos"] + oy * (t + 2 * r + 1.5)])
+            c0, c1 = sorted([sgm["pos"] + oy * t, sgm["pos"] + oy * (t + fd + 1.5)])
             outer = box(-(xf + reach) + 1, xf + reach - 1, c0, c1, zb0 - 1, zb1 + 1)
             inner = box(-(xf + reach), xf + reach, c0 + (0 if oy > 0 else 1.5), c1 - (1.5 if oy > 0 else 0), zb0, zb1)
         add(f"Bumper cover {name}", _mitre(outer.cut(inner), sgm, yo, xf, reach), "foam", "bumper",
@@ -528,7 +532,7 @@ def bumpers():
 def underglow():
     """Underglow: a printed 45 deg strip bracket under the outer and end rails, just inside the bumper backing, each
     carrying a 60/m strip aimed down and out. The light passes under the bumper (its bottom is 3 in up) and pools on
-    the floor round the robot; a strip inside the bumper would mostly light the noodles."""
+    the floor round the robot; a strip inside the bumper would mostly light the foam."""
     dz = 0.0                                              # flat on the rail; relieved under the corner gussets
     sec = [(u, z + dz) for u, z in ((-19.0, 84.6), (-5.0, 98.6), (-5.0, 101.6), (-25.0, 101.6), (-25.0, 98.6), (-9.2, 98.6),
                                     (-21.1, 86.7))]

@@ -979,3 +979,33 @@ D12 (rev D.2). **Money**: $1,373.42 -> **$1,382.62 (+$9.20)**: cost-downs -$73.9
 Queued for the next Onshape update (after the green light): LED lean 10 -> 10.75 deg ("0.75 closer to the panels";
 read as degrees, to confirm), 1x6 backing + 2 in foam, the fill line re-route, the real tank ports and feet, one
 controller board + music board + ADS1115 + one contactor on the shelf, MSI couplings and stainless bushings on top.
+
+### Rev D.2, Micah's follow-ups and the green light (2026-11-06)
+F1. **Bottom cannon to full tank pressure** ("the bottom has to do the full 200"): a second U.S. Solid HSV04 ($98.19)
+    replaces the SZW-25 (now spare, listed 0-90 psi); MSI 150-300 psi couplings on both chambers (the Supply Giant pair
+    is gone); a 200 psi relief on both chambers (four 48435K72 at 200, the 125 psi one is gone). Both caps 190 psi: the
+    tanks are rated 200, so a chamber can't usefully exceed the tank, and 190 keeps the 200 psi reliefs from simmering.
+    +$106.11. The gun re-balances itself (gun.py solves the CoM onto the axle).
+F2. **Fill line, corrected again:** the check valve can't pass through the panel (its 1/4 NPT male end is ~10 mm and
+    the panel is 5.7 mm, leaving ~4 mm for the plug). Final chain: female Milton 728 outside <- the owned 1-1/2 in
+    nipple through the panel (the elbow sits 27.7 mm behind the outer face, so the nipple reaches the plug with ~3 mm to
+    spare) -> 1/4 FNPT x FNPT 90 deg elbow (ChillWaves 2-pack, $7.99, 1,200 psi) <- male x male check valve -> street
+    elbow -> rear manifold. Street elbows used: 2.
+F3. **Open ports audit:** rear manifold ends 2 + up to 3 spare bungs per tank (photos show 3-4) = 8 of the 10 hex plugs;
+    the valve cross and chamber crosses have no open port. One low tank plug doubles as the drain.
+F4. **LED lean 17.5 deg** (Micah; supersedes the 10.75 reading of "0.75 closer"). params.LED_BAND.
+F5. **Bumper backing 1x6 ripped to 5 in** (3/4 in), foam 2 in deep x 5 in: the envelope stays 27.75 x 37.74 in and the
+    5 in bumper height, so nothing above it moves. Foam modelled as one mitred strip per side (cut from 24 in lengths).
+F6. **E-stop placement** (his question): stays in the contactor's coil circuit, a hardwired power wire, not data. A 22 mm
+    E-stop's contacts are rated ~10 A and the main line peaks near 160 A; the contactor switches the current, the
+    E-stop cuts its coil, so no software can hold power on. The 120 A breaker is the main-line manual kill.
+F7. **Compute headroom (estimate)** for the ESP32-P4: with the web UI to 8 browsers, 1 kHz control, 1,680 LEDs at
+    60 fps on 8 PARLIO lanes, audio mixing, 720p H.264 to one viewer and a lidar: ~30% of the network/camera core and
+    ~20% of the control core busy (65-75% headroom each); ~500 KB of 768 KB SRAM and ~20 of 32 MB PSRAM free. Video
+    bandwidth through the C5 link and WiFi airtime is the real limit (one 720p or two 480p streams, ~10-20 Mbps).
+F8. **Barrels, cheaper pipe:** clear PC (K-mac) $91.62 for two vs one 10 ft stick of 3 in Sch 40 solid PVC (Charlotte,
+    $37.31 at Home Depot) for both: -$54.31, but opaque, 3.04 in bore, 3.5 in OD (spigot and four prints resize).
+    Not changed: Micah's call.
+D12 (rev D.2 final). **Money:** $1,373.42 -> **$1,496.72 (+$123.30)**: cost-downs -$73.98, fixes +$34.33 (incl. the
+    FxF elbow), Micah's changes +$162.95 (controller swap +$11.87, ADS1115 +$7.99, music board +$8.99, foam +$9.99,
+    1x6 est. +$18.00, bottom cannon to 200 psi +$106.11).

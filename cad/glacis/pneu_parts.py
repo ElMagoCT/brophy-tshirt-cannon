@@ -180,6 +180,36 @@ def check_valve(p, d, length=36.0):
     return place(s, p, d)
 
 
+def elbow_ff(p, d, d2, c2e=17.0, size="1/4"):
+    """Brass 90 deg elbow, female both ends (rev D.2 fill line). p = corner centre; legs toward d and d2."""
+    s = union([cq.Solid.makeSphere(8.5, V(0, 0, 0)), cyl(8.5, c2e, (0, 0, 0), (0, 0, 1)), cyl(8.5, c2e, (0, 0, 0), (1, 0, 0))])
+    s = s.cut(_port(c2e - ENG[size])).cut(cyl(OD[size] / 2 + 0.1, ENG[size], (c2e - ENG[size], 0, 0), (1, 0, 0)))
+    s = s.cut(cyl(3.5, c2e, (0, 0, 0), (0, 0, 1))).cut(cyl(3.5, c2e, (0, 0, 0), (1, 0, 0)))
+    return place(s, p, d, d2)
+
+
+def check_valve_mm(p, d, length=49.4):
+    """Inline check valve MNPT x MNPT (American Made B076K8SLBZ): inlet thread tip at p, hex, round body with a flow
+    arrow, outlet thread at the far end (flow along d)."""
+    e = ENG["1/4"]
+    s = union([cyl(OD["1/4"] / 2, e, (0, 0, 0)), hex_prism(19.0, 12.0, (0, 0, e)), cyl(9.0, length - 2 * e - 12.0, (0, 0, e + 12.0)),
+               cyl(OD["1/4"] / 2, e, (0, 0, length - e))])
+    arrow = cq.Workplane("YZ").polyline([(-2.0, 14.0), (2.0, 14.0), (2.0, 20.0), (4.0, 20.0), (0, 25.0), (-4.0, 20.0),
+                                         (-2.0, 20.0)]).close().extrude(10.0).val().translate(V(0, 0, e + 8.0))
+    s = s.fuse(arrow).cut(cyl(3.5, length + 1.0, (0, 0, -0.5)))
+    return place(s, p, d)
+
+
+def m_plug_f(p, d, length=28.0):
+    """Industrial (M-style) coupler plug with a 1/4 FNPT body (Milton 728): the male thread it screws onto ends at p
+    (behind p, inside the hex); the nipple with its locking groove points out along d."""
+    e = ENG["1/4"]
+    s = union([hex_prism(15.9, e + 5.0, (0, 0, -e - 1.0)), cyl(6.5, length - 14.0, (0, 0, 4.0)), cyl(4.7, 10.0, (0, 0, length - 10.0))])
+    s = s.cut(cyl(OD["1/4"] / 2 + 0.1, e + 1.1, (0, 0, -e - 1.1))).cut(tube(7.0, 5.4, 2.0, (0, 0, length - 16.0)))
+    s = s.cut(cyl(3.0, length + e + 4.0, (0, 0, -e - 2.0)))
+    return place(s, p, d)
+
+
 def m_plug(p, d, length=26.0):
     """Industrial (M-style) coupler plug: thread behind p, hex, the nipple with its locking groove out along d."""
     s = union([cyl(OD["1/4"] / 2, ENG["1/4"], (0, 0, -ENG["1/4"])), hex_prism(14.3, 6.0), cyl(6.5, length - 16.0, (0, 0, 6.0)),

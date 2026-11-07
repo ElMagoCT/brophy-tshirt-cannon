@@ -22,9 +22,9 @@ STASH = "Standard FRC stash part; buy only if the stash is out"
 OLD = "From the old cannon"
 ROWS = [
     ("FROM THE OLD CANNON - reused, $0", None),
-    ("Atlantic Valves SZW-25 1 in NPT stainless solenoid valve, NC, Viton (old cannon)", "Owned", 1, 0.00,
+    ("Atlantic Valves SZW-25 1 in NPT stainless solenoid valve, NC, Viton (old cannon)", "Owned", 0, 0.00,
      "https://www.electricsolenoidvalves.com/1-inch-12-volt-dc-stainless-steel-electric-solenoid-valve/", "Motion",
-     "Firing valve, bottom cannon (rev D.2: cap 90 psi until you read the plate on yours)", f"{OLD}. 1 in female NPT, Cv 12, 16 W. Atlantic Valves' page for the 12 V DC SZW-25 now lists 0-90 psi (the old note said 0-115); above its rating it may not open ({V}, L)"),
+     "Spare (rev D.2): the bottom cannon runs to full tank pressure now, and this valve's listing says 0-90 psi", f"{OLD}. 1 in female NPT, Cv 12, 16 W ({V}, L)"),
     ("Grey 1 gal steel ASME air tank with a 1 in NPT end port (old cannon)", "Owned", 0, 0.00, "", "Motion",
      "Not used: too big for the gun (rev D.1); the top chamber is 3 in pipe like the bottom", f"{OLD}; spare"),
     ("Longacre 5 gal aluminum tank, 125 psi (old cannon)", "Owned", 0, 0.00,
@@ -33,12 +33,12 @@ ROWS = [
 
     ("PRESSURE SIDE - tanks, rear manifold, main valve and in valves (200 psi)", None),
     ('Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT, aluminum (your pick)', 'Aliexpress', 2, 56.60, 'https://www.aliexpress.us/item/3256804024554756.html', 'Motion', 'Two, 12 L: left and right over the front wheels. The CAD test-fit found no room for a third alongside them; 9-15 shots at 120 ft per 150-200 psi charge with a fast top valve, 6-10 with a slow one', f'200 psi, 1/4 NPT female bungs (photos: 2 along the side, one in an end); it ships with welded feet the CAD saddles ignore. $56.60 list; a $46.81 welcome deal shows for new shoppers. 4.9 stars, 90 sold ({V}, L)'),
-    ('Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (McMaster 48435K72, set 200 psi)', 'McMaster', 3, 6.67, 'https://www.mcmaster.com/48435K72/', 'Motion', 'Tank zone (rear manifold; its ring at the rear panel is the hand dump), the valve cross, and the top chamber', f'1/4 NPT male, ASME BPVC VIII, silicone seal, -15 to 250 F; set 200 psi in the page\'s Set Pressure box (125 and 200 are both offered at $6.67) ({V}, L)'),
+    ('Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (McMaster 48435K72, set 200 psi)', 'McMaster', 4, 6.67, 'https://www.mcmaster.com/48435K72/', 'Motion', 'Tank zone (rear manifold; its ring at the rear panel is the hand dump), the valve cross, and both chambers (the ring is each chamber\'s bleed)', f'1/4 NPT male, ASME BPVC VIII, silicone seal, -15 to 250 F; set 200 psi in the page\'s Set Pressure box (125 and 200 are both offered at $6.67) ({V}, L)'),
     ("Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)", "Amazon", 3, 17.69, "https://www.amazon.com/dp/B0CRQWKDNC",
      "Electrical", "One part number for all three: tank and both chambers (rev C.3; the 0-200 psi one is gone)",
      f"1/8-27 NPT male (photo), 0.5-4.5 V on 5 V, +/-1% FS, 316 stainless, ceramic cell, harness included ({V}, L)"),
-    ('Fill plug: Milton 728, 1/4 FNPT (female) M-style plug, box of 10 (B000PDUQOW)', 'Amazon', 1, 9.99, 'https://www.amazon.com/dp/B000PDUQOW', 'Motion', 'Fill port at the rear panel: threads straight onto the check valve, and your universal couplers (EVOULTES kit) snap on. Female, as you said: the male McMaster 1077T17 could not thread onto anything there', f'1/4 FNPT, plated steel, 300 psi and 40 SCFM per Lord Co. and Toolsid (the Amazon page states no psi). 9 spares for tools ({V}, L)'),
-    ('Fill check valve, brass, 1/4 MNPT x 1/4 MNPT, 250 psi (American Made B076K8SLBZ)', 'Amazon', 1, 15.87, 'https://www.amazon.com/dp/B076K8SLBZ', 'Motion', 'Passes through the rear panel: the female plug threads on outside, a street elbow inside. Holds the tanks shut when the hose comes off (a plug is an open pipe)', f'Male on both ends (listing photo), not FNPT x MNPT as the old note hoped. 250 psi, 250 F, fluorocarbon O-rings, brass. Fit it with the flow arrow pointing in ({V}, L)'),
+    ('Fill plug: Milton 728, 1/4 FNPT (female) M-style plug, box of 10 (B000PDUQOW)', 'Amazon', 1, 9.99, 'https://www.amazon.com/dp/B000PDUQOW', 'Motion', 'Fill port outside the rear panel: threads onto the 1-1/2 in nipple through the panel, and your universal couplers (EVOULTES kit) snap on. Female, as you said: the male McMaster 1077T17 could not thread onto the male nipple', f'1/4 FNPT, plated steel, 300 psi and 40 SCFM per Lord Co. and Toolsid (the Amazon page states no psi). 9 spares for tools ({V}, L)'),
+    ('Fill check valve, brass, 1/4 MNPT x 1/4 MNPT, 250 psi (American Made B076K8SLBZ)', 'Amazon', 1, 15.87, 'https://www.amazon.com/dp/B076K8SLBZ', 'Motion', 'Behind the panel, between the female elbow and the street elbow. Holds the tanks shut when the hose comes off (a plug is an open pipe)', f'Male on both ends (listing photo), not FNPT x MNPT as the old note hoped. 250 psi, 250 F, fluorocarbon O-rings, brass. Fit it with the flow arrow pointing in ({V}, L)'),
     ("In valves: Aignep 02F 2/2 NC direct-acting 12 V DC, 1/4 NPTF, 2 mm (02F03102N0N10201)", "Hose Warehouse", 2, 41.36,
      "https://hosewarehouse.com/products/02f03102n0n10201-aignep-fluidity-series-fluidity-02f-directacting-solenoid-valve-2-2-nc-nbr-seal-1-4-nptf-2-mm-12v-dc",
      "Electrical", "One in valve per chamber, metering it against its transducer; they now hold tank pressure all session",
@@ -52,11 +52,12 @@ ROWS = [
      "NPT, 1200 psi (2026-11-02, L)"),
     ("1/4 NPT brass close nipple 7/8 in, 5-pack (Legines)", "Amazon", 2, 7.99, "https://www.amazon.com/dp/B07L5G7CN3",
      "Motion", "Rear manifold, the three valves to the valve cross, chamber bushings to their crosses", "NPT, 1200 psi (2026-11-02, L)"),
-    ("1/4 NPT brass nipple 1-1/2 in (you think you have one)", "Owned", 0, 0.00, "https://www.amazon.com/dp/B07L5HNKQC",
-     "Motion", "Not needed now (rev D.2): the check valve itself passes through the panel", "Spare"),
-    ('1/4 NPT brass street elbow 90 deg, MNPT x FNPT, 5-pack (B0D8KV5CMM)', 'Amazon', 1, 11.99, 'https://www.amazon.com/dp/B0D8KV5CMM', 'Motion', '3 used: main valve off the rear manifold, and two on the fill line behind the panel. The CAD had them; the parts list did not', f'Forged brass, 1/4 MNPT x 1/4 FNPT; no psi on the listing (forged brass 1/4 street elbows are commonly 1,000+ psi: check the box) ({V}, L)'),
+    ("1/4 NPT brass nipple 1-1/2 in (you think you have one)", "Owned", 1, 0.00, "https://www.amazon.com/dp/B07L5HNKQC",
+     "Motion", "Through the rear panel: the female plug outside, the female elbow inside. A check valve's 10 mm male end is too short to cross the panel itself", "If not: Legines 5-pack $10.99, or one loose at a hardware store"),
+    ('1/4 NPT brass 90 deg elbow, FNPT x FNPT, 2-pack (ChillWaves B0B7544Y62)', 'Amazon', 1, 7.99, 'https://www.amazon.com/dp/B0B7544Y62', 'Motion', 'Fill line behind the panel: the nipple in one side, the male x male check valve in the other (1 spare)', f'1/4 NPT female both ends, barstock brass, 1,200 psi; 8 left ({V}, L)'),
+    ('1/4 NPT brass street elbow 90 deg, MNPT x FNPT, 5-pack (B0D8KV5CMM)', 'Amazon', 1, 11.99, 'https://www.amazon.com/dp/B0D8KV5CMM', 'Motion', '2 used: main valve off the rear manifold, and the check valve into the rear manifold (3 spare). The CAD had them; the parts list did not', f'Forged brass, 1/4 MNPT x 1/4 FNPT; no psi on the listing (forged brass 1/4 street elbows are commonly 1,000+ psi: check the box) ({V}, L)'),
     ("1/4 NPT brass hex plug, 5-pack (Legines)", "Amazon", 2, 7.99, "https://www.amazon.com/dp/B0757HRRX9",
-     "Motion", "Spare tank ports (two tanks) and the ends of the rear manifold", f"1200 psi ({D}, L)"),
+     "Motion", "Every open port (rev D.2 audit): 2 rear-manifold ends + up to 3 spare bungs per tank (photos show 3-4 ports; one is the outlet) = 8 of 10. The valve cross and chamber crosses have no open port", f"1/4 NPT male, 1200 psi. Put one tank's lowest plug where water collects: it's the drain ({V}, L)"),
     ('1/4 NPT male x 1/8 NPT female hex bushing, nickel-plated brass (McMaster 9151K91)', 'McMaster', 3, 2.16, 'https://www.mcmaster.com/9151K91/', 'Motion', '3 transducers', 'Was $12.98 for two Amazon 2-packs (2026-11-04, L)'),
     ('DOT nylon air-brake tube 1/4 in OD, SAE J844, 25 ft (B0DT687V3Q)', 'Amazon', 1, 16.16, 'https://www.amazon.com/dp/B0DT687V3Q', 'Motion', 'Every air line, including the two service loops to the gun (about 15 ft used)', f'1/4 OD, SAE J844, max 1,150 psi ({V}, L)'),
     ("DOT push-to-connect 1/4 tube x 1/4 NPT, straight, 10-pack (Boeray)", "Amazon", 1, 19.99, "https://www.amazon.com/dp/B0D8PX7Z94",
@@ -65,13 +66,12 @@ ROWS = [
      "Motion", "2 used: tank outlets (3 spare)", f"1/4 tube x 1/4 NPT male, 250 psi, SAE J1131 ({V}, L)"),
     ('Pipe thread sealant, RectorSeal T Plus 2 (B0002YPAFY)', 'Amazon', 1, 8.78, 'https://www.amazon.com/dp/B0002YPAFY', 'Tool', 'Every NPT joint', "Skip it if you have pipe dope or PTFE tape (Home Depot's $4.25 isn't one of your sellers) (2026-11-04, L)"),
     ('1 in cam-buckle strap 1 m, 4-pack', 'Aliexpress', 1, 5.2, 'https://www.aliexpress.us/item/3256813026868231.html', 'Structure', '4 used: two per side tank', 'Free shipping; 12 sold, 5 stars. Was $8.99 on Amazon (2026-11-04, L)'),
-    ("GUN (rev D.1 proposal) - 3 in pipe chambers: top 1.59 L on a 725 psi valve (to 190 psi), bottom 1.35 L, 110 psi; 36 in barrels", None),
-    ("Top firing valve: U.S. Solid USS-HSV04, 1 in NPT, 12 V DC, NC, pilot-operated, 1-50 bar (725 psi), PTFE seal", "Other", 1, 98.19,
+    ("GUN (rev D.2) - 3 in pipe chambers: top 1.59 L, bottom 1.35 L, both on HSV04 valves to 190 psi; 36 in barrels", None),
+    ("Firing valves: U.S. Solid USS-HSV04, 1 in NPT, 12 V DC, NC, pilot-operated, 1-50 bar (725 psi), PTFE seal", "Other", 2, 98.19,
      "https://ussolid.com/products/high-pressure-solenoid-valve-1-12v-dc-brass-50-bar-300-high-pressure-high-temperature-solenoid-valve-html",
-     "Electrical", "Firing valve, top cannon: runs its 3 in x 12 in chamber up to 190 psi (the 200 ft shot)",
+     "Electrical", "One per cannon (rev D.2: the bottom one too, so both run to full tank pressure, capped at 190 under the 200 psi reliefs)",
      f"In stock, one version only. Thread is listed as NPT / G (a dual thread, no option to pick), so true NPT is NOT confirmed: test-fit a 1 in NPT nipple before trusting it at 190 psi. Cv 11.67, 25 mm, PTFE seal, junction box. Opening time unpublished: bench-test before cutting barrels ({V}, L)"),
-    ('Bottom chamber: 3 x 1 black malleable reducing coupling, Class 150 (Supply Giant CNSD5003)', 'Amazon', 2, 23.99, 'https://www.amazon.com/dp/B016F1LPTW', 'Motion', 'Both ends of the bottom chamber (90-110 psi, 125 psi relief). 4.28 in across, which sets the barrel spacing', f'3 FNPT x 1 FNPT. Listing: "pressures up to 150 lb": fine for the bottom, not the 190 psi top ({V}, L)'),
-    ('Top chamber: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI Products A203084816)', 'Global Industrial', 2, 27.95, 'https://www.globalindustrial.com/p/3-x-1-150lb-black-malleable-iron-reducing-coupling-150-300-psi', 'Motion', 'Both ends of the top chamber, which runs to 190 psi (the 200 ft shot)', f'Same class, but this listing states a 150-300 psi working rating (ASME B16.3 gives Class 150 malleable 300 psi up to 150 F); NPT per ASME B1.20.1. Not one of your sellers; shipping not checked ({V}, L)'),
+    ('Chambers: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI Products A203084816)', 'Global Industrial', 4, 27.95, 'https://www.globalindustrial.com/p/3-x-1-150lb-black-malleable-iron-reducing-coupling-150-300-psi', 'Motion', 'Both ends of both chambers, which run to 190 psi. 4.28 in across, which sets the barrel spacing', f'Same class as the Supply Giant one ("up to 150 lb" on Amazon), but this listing states a 150-300 psi working rating (ASME B16.3 gives Class 150 malleable 300 psi up to 150 F); NPT per ASME B1.20.1. Not one of your sellers; shipping not checked ({V}, L)'),
     ('Bottom chamber: 3 in Sch 40 black steel nipple x 10 in (Supply Giant OQCM3010)', 'Amazon', 1, 28.99, 'https://www.amazon.com/dp/B016Y8C7D4', 'Motion', 'Bottom chamber body: about 1.35 L with the couplings, 3.5 in OD', f'3 MNPT both ends, Sch 40 black steel; the listing states no psi ({V}, L)'),
     ('Top chamber: 3 in Sch 40 black steel nipple x 12 in (Supply Giant OQCM3012)', 'Amazon', 1, 26.99, 'https://www.amazon.com/dp/B016Y8CB1C', 'Motion', 'Top chamber body: about 1.59 L with the couplings', f'3 MNPT both ends, Sch 40 black steel; the listing states no psi ({V}, L)'),
     ('1 in MNPT x 1/4 FNPT hex bushing, 304 stainless, 350 psi (B0C7N73YVZ)', 'Amazon', 2, 7.99, 'https://www.amazon.com/dp/B0C7N73YVZ', 'Motion', 'Back of each chamber to its brass cross', f'Replaces the Supply Giant malleable one, whose listing says "up to 150 lb" (the top runs to 190). 350 psi max working pressure ({V}, L)'),
@@ -79,8 +79,7 @@ ROWS = [
     ("1 in - 11-1/2 NPT pipe tap", "Amazon", 1, 16.99, "https://www.amazon.com/dp/B0BB3H8ZHP", "Tool",
      "Cuts the 1 in NPT threads inside the two aluminum breech adapters (stash 6061 bar)",
      f"Borrow one if the shop has it. 4.6 stars ({D}, S)"),
-    ('Relief valve 125 psi, 1/4 NPT male, ASME, ring pull, brass (McMaster 48435K72, set 125 psi)', 'McMaster', 1, 6.67, 'https://www.mcmaster.com/48435K72/', 'Motion', 'Bottom chamber; the ring is its manual bleed (the top chamber takes a 200 psi relief)', 'Same part as the 200 psi ones, 125 psi set (listed in the table; pick it on the page). Sits above the 110 psi software cap. Was Milton 1090-125 $16.87 (2026-11-04, L)'),
-    ('MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger, 10-pack (B0GGHY11RL)', 'Amazon', 1, 6.29, 'https://www.amazon.com/dp/B0GGHY11RL', 'Electrical', '10 used: firing valves (2), in valves (2), fog heater (2), fog pump, blower, PDH contactor coil, front light bar (PWM). No spare', f'Triggers from 3.3 V, so the controller drives them directly (no buffer). Flyback diode across each valve coil; was two 6-packs $10.98 ({V}, L)'),
+    ('MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger, 10-pack (B0GGHY11RL)', 'Amazon', 2, 6.29, 'https://www.amazon.com/dp/B0GGHY11RL', 'Electrical', '11 used: firing valves (2), in valves (2), fog heater (2), fog pump, blower, light bar (PWM), and the contactor coil twice in series (one channel for the main controller, one for the safety node); 9 spare', f'Triggers from 3.3 V, so the controller drives them directly (no buffer). Flyback diode across each valve coil; was two 6-packs $10.98 ({V}, L)'),
     ('Barrels: clear extruded polycarbonate tube 3.00 in OD x 2.75 ID x 1/8 wall x 36 in (K-mac B09NLCGBWB)', 'Amazon', 2, 45.81, 'https://www.amazon.com/dp/B09NLCGBWB', 'Structure', 'Two 36 in barrels as they come. Six smoke holes each', f'Same tube as McMaster 8585K38 ($66.05), free delivery; only 2 left. No pressure rating (none published at McMaster either); clamp it. Not acrylic: it shatters ({V}, L)'),
     ("SMOKE - custom 12 V fogger (one 200 W core, room for a second), barrel collar, front and rear trail vents", None),
     ('Fog heater core 12 V 200 W, cast heat exchanger 97 x 32 x 36 mm', 'Aliexpress', 1, 26.38, 'https://www.aliexpress.us/item/3256805556610953.html', 'Cosmetic', 'The fogger: about 17.5 A on its own 30 A PDH channel', f'$24.39 + $1.99 shipping at your logged-in price now (was $34.39). No thermostat or fuse on the listing; the KSD301 below is the backstop ({V}, L)'),
@@ -168,16 +167,16 @@ ROWS = [
     ("BUMPERS - FRC style ring, slides off downward", None),
     ("Bumper backing: 1x6 board (3/4 x 5-1/2 in actual), two 8 ft lengths (your call, 2026-11-06)", "Other", 2, 9.00, "", "Structure",
      "Four strips joined into one ring with printed corner brackets; 6 #10-32s through the side rails hold it and with them out it slides straight down. "
-     "Replaces the 1/4 in plywood. The CAD still shows the plywood: the next CAD update swaps it",
-     "Hardware-store lumber, not one of your three sellers; $9 each is a guess [ESTIMATE]. 3/4 in is 1/2 in thicker per side, so cut the foam 2 in deep "
-     "(not 2.5) to stay 27.75 in wide under the 28 in door limit. 5-1/2 in tall vs 5 in of foam: rip it to 5 in or let the canvas cover the step"),
+     "Replaces the 1/4 in plywood. Modelled in rev D.2",
+     "Rip it to 5 in (the foam height); the CAD keeps the 5 in bumper. Hardware-store lumber, not one of your three sellers; $9 each is a guess [ESTIMATE]. 3/4 in is 1/2 in thicker per side, so cut the foam 2 in deep "
+     "(not 2.5) to stay 27.75 in wide under the 28 in door limit."),
     ("#10-32 pronged tee nuts, Hillman 8991, 3-pack (B00G5J0AQY)", "Amazon", 2, 4.16,
      "https://www.amazon.com/dp/B00G5J0AQY", "Structure",
      "6 used: x -80, 0, 80 on each side strip, driven in from the foam side, so the screw from inside the rail pulls the flange into the 1x6. "
      "With 3/4 in wood the screws become your 1-1/4 in #10-32s",
      f"Two 3-packs instead of a 100-pack ($10.95); prong count not stated ({V}, L)"),
     ('Bumper foam: GoTo Foam 5 x 24 x 24 in, 43 ILD firm, 1.8 lb density (your pick, B07SDNP781)', 'Amazon', 1, 19.99, 'https://www.amazon.com/dp/B07SDNP781', 'Structure', 'Replaces the pool noodles: cut 2 in strips, each 5 in tall x 2 in deep x 24 in (2 in, not 2.5, because the 1x6 backing is 1/2 in thicker). The ring needs about 120 in (two 27.75 in ends, two 32.2 in sides): 6 strips of the 12 a block gives', f'5 in H x 24 W x 24 L, firm 43 ILD, CertiPUR, made in the USA; in stock. Cut with an electric knife or band saw; butt joints hide under the canvas ({V}, L)'),
-    ('Heavy-duty 12 oz cotton duck canvas, 59 in wide (per yard) (B0H753WH6F)', 'Amazon', 2, 13.99, 'https://www.amazon.com/dp/B0H753WH6F', 'Cosmetic', 'Bumper covers wrapped round the noodles and plywood backing', "Pick white if it's offered [UNVERIFIED colour]; the $10/yd one was canvasetc.com (2026-11-04, S)"),
+    ('Heavy-duty 12 oz cotton duck canvas, 59 in wide (per yard) (B0H753WH6F)', 'Amazon', 2, 13.99, 'https://www.amazon.com/dp/B0H753WH6F', 'Cosmetic', 'Bumper covers wrapped round the foam and the 1x6 backing', "Pick white if it's offered [UNVERIFIED colour]; the $10/yd one was canvasetc.com (2026-11-04, S)"),
     ("CONTROLS, FAILSAFE + POWER - back bottom bay", None),
     ("FRC 12 V battery + charger (owned)", "Stash", 2, 0.00, "", "Electrical", "One per side on its own slide-out sled", "Owned"),
     ("REV PDH + ATO breakers, 120 A main breaker, SB50s, wire and lugs", "Stash", 1, 0.00, "", "Electrical", "Main power",
@@ -187,6 +186,7 @@ ROWS = [
     ('ADS1115 16-bit 4-channel ADC module, I2C (B0FLPZMQJY)', 'Amazon', 1, 7.99, 'https://www.amazon.com/dp/B0FLPZMQJY', 'Electrical', 'The three pressure transducers + the 5 V reference, on I2C to the main controller (the ESP32 ADC stays for the pot and battery volts)', f'Settled call: ESP32 ADCs are too nonlinear for pressure. AliExpress has them for less if you add one to an order ({V}, S)'),
     ("ESP32-S3 boards (your two)", "Owned", 2, 0.00, "", "Electrical",
      "1: safety node (ESP-NOW to the remote; holds the PDH contactor in only while the remote and the main controller are alive). 2: spare", "Owned"),
+    ("Breakout board (your row)", "Other", 1, 0.00, "", "Electrical", "You added this row in the Sheet (2026-11-06): which board and its price are yours to fill in", "Your row"),
     ('Bluetooth music: ESP32-WROOM-32 dev board, USB-C (AITRIP B0DF2YJSHN)', 'Amazon', 1, 8.99, 'https://www.amazon.com/dp/B0DF2YJSHN', 'Electrical', 'A phone pairs to it as a Bluetooth speaker (A2DP). It streams the music by I2S into the main controller, which mixes the horn and effects on top and sends volume and pause back over a UART', f'Only the original ESP32 (and the brand-new S31) do Bluetooth Classic audio; the P4 board\'s C5 is Bluetooth LE only. If it dies, only phone music stops: the horn still works ({V}, S)'),
     ('SN74AHCT125N quad buffer, 10-pack', 'Aliexpress', 1, 2.77, 'https://www.aliexpress.us/item/3256801332816593.html', 'Electrical', 'LED data only now: 3.3 -> 5 V for 8 strip lanes (2 chips). The PWM safety gate is gone (rev D.2): the contactor is the cut-off', '458 sold (2026-11-04, L)'),
     ('12 V 40 A relay with pre-wired socket', 'Aliexpress', 3, 2.02, 'https://www.aliexpress.us/item/3256810529693206.html', 'Electrical', 'Valve arm relay (valve rail, fed from the PDH) and one per fog core (the second for a second core); flyback diode on every coil', '4-pin option; 211 sold. Replaces the Nilight 5-pack ($12.14) and the Gebildet 2-pack ($7.99) (2026-11-04, L)'),
@@ -202,7 +202,7 @@ ROWS = [
     ('Safety remote: 18650 battery shield V8 (charging, 5 V out) + a stash 18650 cell', 'Aliexpress', 1, 3.29, 'https://www.aliexpress.us/item/3256807394809647.html', 'Electrical', 'Remote power, charged over USB', '(2026-11-04, L)'),
     ("AUDIO - two siren speakers in the front corners (replaces the horn)", None),
     ('Siren speaker 200 W, 8 ohm, 121-130 dB, aluminium, 5.7 x 5.5 x 2.3 in (Xprite B01DMSR4L4)', 'Amazon', 2, 32.88, 'https://www.amazon.com/dp/B01DMSR4L4', 'Electrical', 'One high in each front-side corner, in a printed cup, aimed 45 deg out and 30 deg up; its L foot bolts through the cup', '4.3 stars (682), 50+ bought last month; 5 lb each. Replaces the SoundAlert ($59.99) (2026-11-04, L)'),
-    ('TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm', 'Aliexpress', 1, 17.26, 'https://www.aliexpress.us/item/3256807353596235.html', 'Electrical', 'One channel per speaker; about 100 W each into 8 ohm on 48 V', '$15.27 + $1.99 shipping, logged-in price; 727 sold, 4.9 stars. Amazon: B0DSSZZR5Q $25.99 (2026-11-04, L)'),
+    ('TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm', 'Aliexpress', 1, 27.00, 'https://www.aliexpress.us/item/3256807353596235.html', 'Electrical', 'One channel per speaker; about 100 W each into 8 ohm on 48 V', '$27.00 is your price in the Sheet (2026-11-06; it was $15.27 + $1.99 on 2026-11-04). 727 sold, 4.9 stars. Amazon: B0DSSZZR5Q $25.99'),
     ('1500 W 30 A boost converter, 10-60 V in, 12-97 V out (set to 48 V)', 'Aliexpress', 1, 16.18, 'https://www.aliexpress.us/item/3256806808745565.html', 'Electrical', 'Feeds the amp from a 40 A PDH channel: 20-25 A from the battery at full siren', 'SKU "1500W 30A": $14.19 + $1.99 shipping, logged-in price; 372 g; size not listed, drawn 130 x 76 x 60 [UNVERIFIED]. The $1.09 1200 W SKU is a welcome price. Amazon: Gebildet potted 12->48 V 6 A B0D66NDXLN $15.99 (2026-11-04, L)'),
     ('PCM5102A I2S DAC module', 'Aliexpress', 1, 2.44, 'https://www.aliexpress.us/item/3256809226289251.html', 'Electrical', 'I2S from the main controller to line level for the amp: the mix of horn, effects and phone music', '482 sold, 4.9 stars (2026-11-04, L)'),
     ("Printed speaker cups (2) and grilles (2)", "Owned", 1, 0.00, "", "Structure",
@@ -215,7 +215,14 @@ ROWS = [
     ("LATER - not designed in yet, not in the total", None),
     ("Video (from your list)", "Other", 0, 0.00, "", "Other", "Not designed in yet",
      "Deferred (Micah, 2026-11-03). Rev D.2: the P4 board has a 2-lane MIPI-CSI camera port and a hardware JPEG/H.264 encoder, so a $10-20 camera module can stream from the main board itself"),
+
+    ("OTHER MATERIALS - your rows (2026-11-06)", None),
+    ("PETG filament (your row)", "Amazon", 1, 40.00, "https://www.amazon.com/dp/B0D86D5SHS", "Structure",
+     "Every printed part: the print plan puts the frame at about 3 kg and the other body prints at about 2 kg", "Your row in the Sheet (2026-11-06)"),
+    ("Acrylic (your row)", "Other", 1, 150.00, "", "Cosmetic", "Body panels",
+     "Your row in the Sheet (2026-11-06); the 'Frosted acrylic (owned)' row under Frame + body stays at $0"),
 ]
+ORDERED = ("Air tank 6 L",)   # rows marked Ordered in the Sheet (keep them ticked when the tab is rewritten)
 
 
 def main():
@@ -242,7 +249,7 @@ def main():
             kinds.append("section")
             continue
         name, seller, q, u, link, typ, purpose, notes = r
-        out.append([name, False, seller, q, u, f"=D{row}*E{row}", f'=HYPERLINK("{link}","Link")' if link else "",
+        out.append([name, name.startswith(ORDERED), seller, q, u, f"=D{row}*E{row}", f'=HYPERLINK("{link}","Link")' if link else "",
                     typ, purpose, notes])
         kinds.append("item")
     json.dump(dict(rows=out, kinds=kinds, last=3 + len(ROWS)), open(os.path.join(here, "glacis_bom_sheet.json"), "w"))
