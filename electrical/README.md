@@ -1,5 +1,22 @@
 # electrical/
 
+**Rev D.2 proposal (2026-11-06), waiting on Micah's green light.** It changes the control side; the sections below are
+rev C.3/D and still describe the power tree and sensors, except where this box says otherwise.
+- **One controller:** an ESP32-P4 + ESP32-C5 board (Wireless Tag WTDKP4C5-S1) replaces the STM32F411, the ESP32-C5
+  bridge and their UART. WiFi 6 on 2.4 + 5 GHz from the C5 on the same board; MIPI camera port; 16 parallel LED lanes.
+  An ADS1115 reads the three transducers + the 5 V reference; the P4's ADC reads the pot, battery and PDH volts.
+- **No PWM gate.** The contactor is the cut-off. Its coil: logic tap -> rear E-stop contact 1 -> safety node switch ->
+  main controller MOSFET (all in series). The safety node holds it only while the remote's and the controller's
+  heartbeats are alive; it no longer drives a separate safety relay or gate.
+- **Valve arm relay** (was the safety relay): coil fed from the PDH through rear E-stop contact 2, armed by the
+  controller, so the valve rail dies with the contactor and a stuck MOSFET can't fire a disarmed gun.
+- **Audio:** the P4 mixes horn, effects and phone music to the PCM5102A. Phone music comes from a classic ESP32
+  (Bluetooth A2DP sink) over I2S; volume/pause go back over a UART.
+- MOSFET modules trigger from 3.3 V (no buffer); 74AHCT125s only level-shift LED data. One contactor, a diymore
+  3.6-32 V buck-boost for the logic rail.
+- Details and alternatives: `docs/glacis/JUDGMENTS.md`, "Rev D.2 proposal"; the "Glacis air & wiring" artifact has a
+  power sim of all of this.
+
 Glacis electrical design as of rev C.3 (2026-11-03). The drawing is the "Glacis air & wiring" artifact
 (source `docs/glacis/air_wiring_artifact.html`); parts are in `bom/glacis_bom.py`. Pin map: firmware phase.
 

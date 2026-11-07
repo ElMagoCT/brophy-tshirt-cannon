@@ -921,3 +921,61 @@ N27. **Checks (build 15):**
      - every segment end has a neighbour piece;
      - every insert found frame clear of the tunnels and joint screws: 16 frame-mount, 8 speaker-cup, 4 light-bar;
      - LED strips: 0 overlaps, 0 jumpers.
+
+## Rev D.2 proposal: listing re-check, one controller, bumper foam (2026-11-06)
+Micah's asks: review every part (pneumatics with every thread confirmed from its listing, electronics), find better or
+cheaper parts, a stronger single-board controller with WiFi (and Bluetooth for music the dashboard still controls),
+drop the PWM gate, GoTo Foam for the bumpers, a female fill valve, a 1x6 bumper backing at the next CAD update, the LED
+lean 0.75 closer to the panels at the next Onshape update; no Onshape changes until he green-lights the parts list.
+Artifact "Glacis air & wiring" (same URL) is now four tabs: an air sim, a power sim, the parts list, the review.
+
+P1. **Fill line genders were wrong.** The male McMaster 1077T17 plug went onto a male 1-1/2 in nipple, and the
+    "FNPT x MNPT" check valve (B076K8SLBZ) is male on both ends (listing photo). Now: Milton 728 1/4 FNPT M-style plug
+    (300 psi per Lord Co./Toolsid; box of 10, $9.99) threaded onto the check valve, which itself passes through the
+    rear panel, then two street elbows into the manifold. The 1-1/2 in nipple is freed. Micah: "the fill valve should
+    be female".
+P2. **Three street elbows were missing** from the parts list (the CAD has them: main valve, fill line). 5-pack $11.99.
+P3. **Top chamber fittings: listing ratings below 190 psi.** Supply Giant's 3 x 1 coupling and 1 x 1/4 bushing both say
+    "pressures up to 150 lb". ASME B16.3 rates Class 150 malleable iron at 300 psi up to 150 F, but the rule is rated
+    parts by their listing. Proposed: 304 stainless 1 x 1/4 bushings, 350 psi (B0C7N73YVZ, $7.99, cheaper) on both
+    chambers; MSI Products 3 x 1 couplings "150-300 psi" (Global Industrial, $27.95) on the top only. Micah's call: those,
+    or cap the top at 150.
+P4. **HSV04 thread is "NPT / G"**, one version, no option (the old note said to pick NPT). Test-fit a 1 in NPT nipple
+    before trusting it at 190 psi. Price $98.19 confirmed.
+P5. **SZW-25 listing now says 0-90 psi** for the 12 V DC valve (old note: 0-115). Bottom capped at 90 until Micah reads
+    the plate. The 125 psi relief stays.
+P6. **Tank**: photos show 2 side bungs + an end port and welded feet; the CAD has 3 bungs underneath and strap saddles.
+    $56.60 list ($46.81 is a new-shopper deal). Fix at the next CAD update.
+P7. Confirmed from listings (2026-11-06): relief 48435K72 1/4 MNPT, ASME VIII, 125 and 200 set options, $6.67;
+    transducer 1/8-27 MNPT, 0.5-4.5 V, +/-1% FS; 9151K91 1/4 M x 1/8 F, 1,000 psi; crosses 1/4 FNPT x4; close nipples
+    and plugs 1/4 MNPT, 1,200 psi; DOT tube 1/4 OD J844 1,150 psi; push-to-connects 1/4 tube x 1/4 MNPT 250 psi J1131;
+    Aignep 02F 1/4 NPTF both ends, 2 mm, 0-35 bar, $41.36. Not re-read: the Dwyer ball valve (Zoro blocks reads) and
+    McMaster 44615K416. No psi stated: the 3 in nipples, the street elbows, the barrels.
+E1. **One controller: ESP32-P4 + ESP32-C5 on one board** (Wireless Tag WTDKP4C5-S1, $29.29 AliExpress). Replaces the
+    STM32F411 + ESP32-C5 bridge + their UART. Keeps 2.4 + 5 GHz WiFi 6, adds MIPI-CSI + H.264 (camera), 16 parallel LED
+    lanes, a UART for a lidar. ADS1115 ($7.99) for the transducers (settled: ESP32 ADCs too nonlinear); the P4 ADC reads
+    the pot and battery volts. Catches: new board (3 sold), ESP-IDF wanted for camera/LEDs, Arduino partial.
+    Considered: ESP32-S31 (the only one-chip WiFi + Bluetooth Classic, but 2.4 GHz only, ESP-IDF preview, no Arduino),
+    Arduino GIGA R1 WiFi ($65.54, 2.4 GHz only, no A2DP in the Arduino libraries, Mbed core being retired), Pico 2 W.
+E2. **Bluetooth music** needs Bluetooth Classic (A2DP); only the original ESP32 and the S31 have it. A $8.99 ESP32
+    WROOM board is the phone's speaker and streams I2S into the P4, which mixes the horn/effects and sends volume/pause
+    back over a UART. If it dies only phone music stops. Alternative: songs stored on the robot, picked from the dashboard.
+E3. **PWM gate removed** (Micah). The contactor is the cut-off: its coil runs through rear E-stop contact 1, the safety
+    node's switch and the main controller's MOSFET in series. The safety node's only job is holding that coil while the
+    remote's and the controller's heartbeats are alive. The valve arm relay stays (coil from the PDH through E-stop
+    contact 2, armed by the controller). 74AHCT125s now only level-shift the LED data; the new MOSFET modules trigger
+    from 3.3 V.
+E4. Firmware latch modelled in the sim: power lost without a command = stays off until Enable is pressed again.
+B1. **Bumper foam**: GoTo Foam 5 x 24 x 24 in, 43 ILD, $19.99 (Micah's pick) replaces the noodles. **Backing becomes a
+    1x6** (Micah, next CAD update): 3/4 in is 1/2 in thicker per side than the 1/4 ply, so the foam is cut 2 in deep
+    (not 2.5) to stay 27.75 in wide under the 28 in door limit; 5-1/2 in tall vs 5 in of foam (rip it or let the canvas
+    cover the step); T-nut screws become the 1-1/4 in #10-32s. Lumber price is an estimate ($9 a board).
+C1. Cost-downs: barrels to K-mac on Amazon (same 3.00 x 2.75 x 1/8 x 36 in PC tube, $45.81 vs $66.05), fog core now
+    $26.38 at his price, one contactor ($12.99), diymore logic buck-boost ($8.17), MOSFET 10-pack ($6.29), Hillman tee
+    nuts, FogUp gallon for a quart's price, light bar $17.99, McMaster shipping $10 (no long box). Kept: TPA3255 + 48 V
+    boost (100 W into 8 ohm needs ~28 V RMS), Xprite speakers (cheapest real 200 W), the potted 20 A buck.
+D12 (rev D.2). **Money**: $1,373.42 -> **$1,382.62 (+$9.20)**: cost-downs -$73.98, fixes +$26.34, Micah's changes
+    +$56.84 (controller swap +$11.87, ADS1115 +$7.99, music board +$8.99, foam +$9.99, 1x6 est. +$18.00).
+Queued for the next Onshape update (after the green light): LED lean 10 -> 10.75 deg ("0.75 closer to the panels";
+read as degrees, to confirm), 1x6 backing + 2 in foam, the fill line re-route, the real tank ports and feet, one
+controller board + music board + ADS1115 + one contactor on the shelf, MSI couplings and stainless bushings on top.

@@ -24,6 +24,25 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-06 - Micah's main Claude Code chat - Glacis rev D.2 proposal: listing re-check, one controller, bumper foam
+- Branch / commit: main (this commit)
+- Changed (proposal, parts list and artifact only; no CAD):
+  - every pneumatic listing re-read for thread size and gender; fill line fixed (female Milton 728 plug on the male x
+    male check valve, which passes through the panel); 3 missing street elbows added;
+  - top chamber fittings: the Amazon listings say "up to 150 lb" at 190 psi, so 304 stainless bushings (350 psi) and
+    MSI couplings (150-300 psi) are proposed; HSV04 thread is "NPT / G" (test-fit); SZW-25 listing says 0-90 psi;
+  - one ESP32-P4 + C5 board replaces the STM32 + C5 bridge; ADS1115; a classic ESP32 for Bluetooth music; PWM gate gone;
+  - GoTo Foam bumpers, 1x6 backing (next CAD update), cost-downs (K-mac barrels, fog core, contactor, logic supply...).
+  JUDGMENTS "Rev D.2 proposal".
+- Files: `bom/glacis_bom.py` (+ csv/json), `docs/glacis/air_wiring_artifact.html`, `docs/glacis/parts_section.py`,
+  `docs/glacis/img/` (product photos), `docs/glacis/JUDGMENTS.md`, `electrical/README.md`, `CLAUDE.md`.
+- Checks: no CAD change. The artifact's shot model matches `range_model.py` (43.16 m/s, 245 ft at 190 psi top).
+- Parts list: $1,373.42 -> $1,382.62 (+$9.20; the 1x6 boards are an $18 estimate).
+- Not done (waiting on Micah's green light): Onshape update (queued: LED lean 10 -> 10.75 deg, 1x6 backing, fill line,
+  tank ports and feet, controller shelf, top fittings), the Google Sheet (still D.1.4).
+- Questions for Micah: top couplings (MSI) vs a 150 psi top cap; read the SZW-25 plate; keep the music board?;
+  "0.75 closer" = degrees?
+
 ## 2026-11-05 - Micah's main Claude Code chat - Glacis rev D.1.4: printable frame, mounts, bumper ring, Xprite speakers
 - Branch / commit: main, 230889f (+ the Onshape note after it)
 - Changed:
