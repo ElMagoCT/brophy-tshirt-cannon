@@ -10,7 +10,6 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 
 | Who (and which chat) | Started | Working on | Files |
 |---|---|---|---|
-| Micah's Windows computer (Claude Code) | 2026-11-08 | Printable mini kit (gun on a filament pin) + sliced projects for 2 CC2 / 2 CC1 | `cad/glacis/mini.py`, `mini_3mf.py`, `mini_orca/`, `out/mini/`, `docs/glacis/mini_model.md` (all new) |
 
 ## Entry template
 
@@ -24,6 +23,44 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Not done: <Onshape import/version, Google Sheet, artifact, anything left for Micah>
 - Questions for Micah: <decisions that are his, or "none">
 ```
+
+## 2026-11-08 - Micah's Windows computer (Claude Code) - Printable mini kit of Glacis
+- Branch / commit: `micah-windows/mini-model` (PR below)
+- Changed (no change to the robot design):
+  - a 1:9 desk mini of the rev D.2 body form (2.22 in wheelbase; Micah's floor is 2 in, 1:10), built from the real
+    model (`body.body_solid`, `panels_for`, speaker pods, light bar, `gun.build` parts and pivot);
+  - the gun elevates on a 1.75 mm filament pin, in a 2.05 mm hole that is open on the left bearing block and blind
+    in the right;
+  - colour comes from glue-in pieces, not in-place colour (that took 10-16 h and 265-469 filament changes):
+    - red windows;
+    - black speakers, light bar, and chambers (the chambers peg onto the cradle);
+    - the body prints black below the bumper;
+  - four sliced OrcaSlicer projects, one per printer, all printing at once:
+    - CC2 #1 body, 4 h 21 m Balanced (~2 h 55 m Ludicrous);
+    - CC2 #2 gun, 1 h 22 m;
+    - CC1 #1 black kit, 25 m;
+    - CC1 #2 red windows, 17 m;
+  - PETG, 0.4 nozzle, Orca's 0.20 mm Standard; organic slim supports from the plate only, with PLA interface;
+  - the scale is the largest whose slowest plate fits about 3 h on Ludicrous (`mini_3mf.py --fit` found 1:8.91);
+  - print and assembly guide: `docs/glacis/mini_model.md`.
+- Files:
+  - `cad/glacis/mini.py`, `mini_3mf.py` (new);
+  - `cad/glacis/mini_orca/` (Orca's Elegoo CC1/CC2 presets, flattened);
+  - `cad/glacis/out/mini/` (STLs, 4 projects, previews, kit.json, slice_report.json);
+  - `docs/glacis/mini_model.md`.
+- Checks:
+  - `robot.py --checks` (85 min on this PC): interference is only the two known fitting slivers (146, 64 mm3); the
+    elevation sweep is 0-45 deg clean; no part comes out in more than one piece; 47 frame pieces;
+  - the mini's own checks:
+    - the gun swing, every 5 deg from 0 to 45, is clear of the body with every glue-in in place;
+    - each glue-in is clear of its seat;
+    - every piece is one solid and fits the bed;
+    - the pin hole is blind.
+  - The Ludicrous times are Orca's Balanced estimate / 1.5; the Ludicrous % (166) comes from CC1 reviews, so the
+    times are unverified on a real print.
+- Parts list: no change.
+- Not done: nothing printed yet; no Onshape or Sheet change needed.
+- Questions for Micah: none.
 
 ## 2026-11-06 (evening) - Micah's main Claude Code chat - Glacis rev D.2 green light: CAD, Sheet, Onshape
 - Branch / commit: main (this commit)
