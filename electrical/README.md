@@ -52,10 +52,12 @@ FRC battery x2 (parallel, SB50) + charge port
   the sun), and the front and rear bottom members have no tunnel, so a jumper wire runs round each (rev D.1.4).
 - **Siren speakers:** two Xprite 200 W, 8 ohm on a TPA3255 board fed by a 1500 W boost set to 48 V, on a 40 A PDH
   channel: about 100 W a speaker, 20-25 A from the battery at full siren (rev D.1.4).
-- **Rear E-stop:** a 2NC mushroom. Contact 1 is in the safety relay coil (valves dead), contact 2 is in
-  the contactor coil (whole PDH dead). Both in hardware; the STM32 can't override either.
-- **Remote E-stop, lost link, dead STM32 heartbeat, tank over 210 psi:** the safety node drops the
-  safety relay and disables the PWM gate, as before. The STM32 also opens the contactor on any of these.
+- **Rear E-stop (rev D.2):** a 2NC mushroom. Contact 1 is in the contactor coil (whole PDH dead), contact 2
+  is in the valve arm relay coil (valves dead). Both in hardware; the controller can't override either.
+- **Remote E-stop, lost link, dead controller heartbeat (rev D.2):** the safety node opens its MOSFET in the
+  contactor coil, so the whole PDH drops. There is no PWM gate. Nothing trips on PT1 in D.2 (the old "tank
+  over 210 psi" trip went with the safety node's sensor wiring); the 200 psi relief on the rear manifold is
+  the tank limit. A firmware alarm on PT1 is undecided.
 - **No precharge** on the contactor. At 12 V with FRC loads it's the same event as closing a main breaker.
 - **Never switch the negative.** Grounds are common; only +12 V goes through the contactor.
 - **Storage:** flip the main breaker off. Standby draws about 2 W.
