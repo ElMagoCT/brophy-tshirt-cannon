@@ -240,19 +240,29 @@ def main():
             w.writerow([name, seller, q, f"{u:.2f}", f"{q * u:.2f}", link, typ, purpose, notes])
         w.writerow([])
         w.writerow(["Total", "", "", "", f"{tot:.2f}"])
-    # sheet rows from row 4: section rows and item rows with formulas
-    out, kinds = [], []
-    for i, r in enumerate(ROWS):
-        row = 4 + i
+    # Sheet rows for the "Glacis BOM" tab, laid out like the Broncobots budget's order tabs (2026-11-09):
+    # B Item | C Price Per Unit | D Quantity | E Total Price | F Provider | G Notes | H Link | I Purchased?, from row 4.
+    # Row 2 is the band: C2 "Total Cost (W/ Tax)" =SUM(E4:E)*1.091, E2 "Shipping" (the SHIPPING rows' total, so they
+    # are not table rows), G2 "Total Cost (W/ Taxes + Shipping)" =F2+D2. Each item's listing notes go in its B cell note.
+    out, kinds, cell_notes, shipping, skip = [], [], {}, 0.0, False
+    for r in ROWS:
         if r[1] is None:
-            out.append([r[0], "", "", "", "", "", "", "", "", ""])
-            kinds.append("section")
+            skip = r[0].startswith("SHIPPING")
+            if not skip:
+                out.append([r[0]] + [""] * 7)
+                kinds.append("section")
             continue
         name, seller, q, u, link, typ, purpose, notes = r
-        out.append([name, name.startswith(ORDERED), seller, q, u, f"=D{row}*E{row}", f'=HYPERLINK("{link}","Link")' if link else "",
-                    typ, purpose, notes])
+        if skip:
+            shipping += q * u
+            continue
+        row = 4 + len(out)
+        out.append([name, u, q, f"=C{row}*D{row}", seller, purpose, f'=HYPERLINK("{link}","Link")' if link else "",
+                    name.startswith(ORDERED)])
         kinds.append("item")
-    json.dump(dict(rows=out, kinds=kinds, last=3 + len(ROWS)), open(os.path.join(here, "glacis_bom_sheet.json"), "w"))
+        cell_notes[f"B{row}"] = notes
+    json.dump(dict(rows=out, kinds=kinds, notes=cell_notes, shipping=round(shipping, 2), first_cell="B4", last=3 + len(out)),
+              open(os.path.join(here, "glacis_bom_sheet.json"), "w"))
     print(f"{len(ROWS)} rows, total ${tot:,.2f}")
 
 
