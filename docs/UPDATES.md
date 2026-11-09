@@ -10,6 +10,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 
 | Who (and which chat) | Started | Working on | Files |
 |---|---|---|---|
+| Micah's Windows computer (Claude Code) | 2026-11-08 | Printable 1:10 mini model, gun articulates on a filament pin | `cad/glacis/mini.py` (new), `cad/glacis/out/mini/` (new), `docs/glacis/mini_model.md` (new) |
 
 ## Entry template
 
