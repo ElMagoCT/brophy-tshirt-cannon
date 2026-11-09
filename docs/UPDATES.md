@@ -25,7 +25,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 ```
 
 ## 2026-11-08 - Micah's Windows computer (Claude Code) - Printable mini kit of Glacis
-- Branch / commit: `micah-windows/mini-model` (PR below)
+- Branch / commit: `micah-windows/mini-model`, https://github.com/ElMagoCT/brophy-tshirt-cannon/pull/1
 - Changed (no change to the robot design):
   - a 1:9 desk mini of the rev D.2 body form (2.22 in wheelbase; Micah's floor is 2 in, 1:10), built from the real
     model (`body.body_solid`, `panels_for`, speaker pods, light bar, `gun.build` parts and pivot);
