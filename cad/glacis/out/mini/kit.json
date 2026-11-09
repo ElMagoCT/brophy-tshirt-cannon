@@ -1,0 +1,136 @@
+{
+ "scale": 9.0,
+ "pin_mm": 35.5,
+ "pieces": [
+  {
+   "name": "window front",
+   "file": "window_front.stl",
+   "colour": "red",
+   "size": [
+    35.3,
+    62.5,
+    0.6
+   ]
+  },
+  {
+   "name": "window right front",
+   "file": "window_right_front.stl",
+   "colour": "red",
+   "size": [
+    49.5,
+    43.2,
+    0.6
+   ]
+  },
+  {
+   "name": "window right rear",
+   "file": "window_right_rear.stl",
+   "colour": "red",
+   "size": [
+    28.5,
+    43.2,
+    0.6
+   ]
+  },
+  {
+   "name": "window deck right",
+   "file": "window_deck_right.stl",
+   "colour": "red",
+   "size": [
+    50.8,
+    8.1,
+    0.6
+   ]
+  },
+  {
+   "name": "window deck left",
+   "file": "window_deck_left.stl",
+   "colour": "red",
+   "size": [
+    50.8,
+    8.1,
+    0.6
+   ]
+  },
+  {
+   "name": "window left front",
+   "file": "window_left_front.stl",
+   "colour": "red",
+   "size": [
+    49.5,
+    43.2,
+    0.6
+   ]
+  },
+  {
+   "name": "window left rear",
+   "file": "window_left_rear.stl",
+   "colour": "red",
+   "size": [
+    28.5,
+    43.2,
+    0.6
+   ]
+  },
+  {
+   "name": "window rear",
+   "file": "window_rear.stl",
+   "colour": "red",
+   "size": [
+    43.5,
+    62.3,
+    0.6
+   ]
+  },
+  {
+   "name": "speaker left",
+   "file": "speaker_left.stl",
+   "colour": "black",
+   "size": [
+    23.3,
+    22.7,
+    7.43
+   ]
+  },
+  {
+   "name": "speaker right",
+   "file": "speaker_right.stl",
+   "colour": "black",
+   "size": [
+    23.3,
+    22.7,
+    7.43
+   ]
+  },
+  {
+   "name": "light bar",
+   "file": "light_bar.stl",
+   "colour": "black",
+   "size": [
+    3.3,
+    36.7,
+    8.51
+   ]
+  },
+  {
+   "name": "chamber top",
+   "file": "chamber_top.stl",
+   "colour": "black",
+   "size": [
+    12.1,
+    12.1,
+    23.09
+   ]
+  },
+  {
+   "name": "chamber bottom",
+   "file": "chamber_bottom.stl",
+   "colour": "black",
+   "size": [
+    12.1,
+    12.1,
+    17.44
+   ]
+  }
+ ]
+}

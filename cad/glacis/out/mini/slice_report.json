@@ -1,0 +1,35 @@
+{
+ "scale": 9.0,
+ "target_ludicrous_h": 3.0,
+ "ludicrous_gain": 1.5,
+ "plates": {
+  "glacis_mini_CC2-1_body.3mf": {
+   "time": "4h 21m 2s",
+   "hours": 4.35,
+   "ludicrous_h": 2.9,
+   "grams": "82.76, 25.60, 1.26",
+   "changes": 8
+  },
+  "glacis_mini_CC2-2_gun.3mf": {
+   "time": "1h 22m 17s",
+   "hours": 1.37,
+   "ludicrous_h": 0.91,
+   "grams": "23.06, 1.32",
+   "changes": 20
+  },
+  "glacis_mini_CC1-1_black_kit.3mf": {
+   "time": "24m 46s",
+   "hours": 0.41,
+   "ludicrous_h": 0.28,
+   "grams": "5.07",
+   "changes": 0
+  },
+  "glacis_mini_CC1-2_red_windows.3mf": {
+   "time": "16m 30s",
+   "hours": 0.28,
+   "ludicrous_h": 0.18,
+   "grams": "7.12",
+   "changes": 0
+  }
+ }
+}

@@ -1,0 +1,7 @@
+scale 1:9
+body 106.5 x 78.3 x 75.3 mm
+gun 172.0 long
+sweep worst 0.0000 mm3
+kit pieces 13
+pin hole 2.05 mm, filament 35.5 mm
+checks clean
