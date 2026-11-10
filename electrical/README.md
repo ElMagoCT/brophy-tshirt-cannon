@@ -1,7 +1,7 @@
 # electrical/
 
 **Rev D.2.1 (2026-11-09), Micah's picks on top of D.2.** Where this box and the D.2 box below disagree, this one wins.
-- **Controller: Waveshare ESP32-P4-Module-DEV-KIT** (ESP32-P4 + ESP32-C6) replaces the WTDKP4C5-S1: 1 USB-A + 2 USB-C,
+- **Controller: Waveshare ESP32-P4-Module-DEV-KIT** (ESP32-P4 + ESP32-C6) replaces the WTDKP4C5-S1: 4 USB-A (two stacked pairs in the product photo) + 2 USB-C,
   RJ45, a 40-pin Pi-style header with 28 GPIO, an ES8311 codec + NS4150B 2 W speaker amp. WiFi is 2.4 GHz only now.
   5 V from the logic rail on its SH1.0 header. A **PCA9685** (I2C, 16 PWM) takes the drive PWM (4 Falcons + Spark MAX),
   fog (heater x2, pump, blower), the light bar and both battery relays; its OE is pulled up and held low by the
