@@ -10,6 +10,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 
 | Who (and which chat) | Started | Working on | Files |
 |---|---|---|---|
+| Micah's Windows computer (Claude Code) | 2026-11-10 | Brophy Borealis: recessed light bar + 3 in sensor band, 20x20 rails on the deck and gun, self-sealing quick disconnects, two-order BOM, pivoting Onshape assembly with an angle setting | `cad/glacis/params.py`, `body.py`, `misc.py`, `gun.py`, `robot.py`, `pneu_parts.py`, new `lightbar.py`; `bom/glacis_bom*`; `CLAUDE.md`; `docs/glacis/JUDGMENTS.md`; Onshape doc; Glacis BOM Sheet tab |
 | Micah's Windows computer (Claude Code) | 2026-11-08 | Printable mini kit (gun on a filament pin) + sliced projects for 2 CC2 / 2 CC1 | `cad/glacis/mini.py`, `mini_3mf.py`, `mini_orca/`, `out/mini/`, `docs/glacis/mini_model.md` (all new) |
 
 ## Entry template
