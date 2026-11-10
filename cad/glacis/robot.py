@@ -66,6 +66,7 @@ def build(elev=P.ELEV_SHOW):
     misc.frame_mounts()
     misc.body_parts(log)
     misc.deck_rails()
+    misc.front_rails()
     misc.speakers()
     for p in PARTS:
         if p["moving"]:
@@ -83,9 +84,9 @@ def build(elev=P.ELEV_SHOW):
     for f0, f1 in zip(misc.FOG_OUT, fx):
         routes["Fog loop (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(f1.x + 60.0, f1.y, f1.z - 120.0), V(f1.x, f1.y, f1.z - 50.0), f1]
     for tag, pts in routes.items():
-        r = 6.35 if tag.startswith("Fog") else 3.175
+        r = P.SMOKE_R if tag.startswith("Fog") else 3.175
         lib.add(tag, misc.tube_path([p.toTuple() for p in pts], r=r), "tube", "pneu" if r < 5 else "power",
-                bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 3/8 ID x 1/2 OD (ft)", kind="stock")
+                bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 1/2 ID x 5/8 OD (ft)", kind="stock")
     log(f"built {len(PARTS)} parts in {time.time() - t:.0f} s")
     return PARTS
 
@@ -118,6 +119,7 @@ ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the
     ("Service loop", "push-to-connect"), ("Tank elbow", "Air tank"), ("Gun tube", "Service loop"),
     ("Fog loop", "Fog vent"), ("Fog loop", "Gun smoke tube"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
     ("Gun smoke tube", "Smoke collar"),
+    ("In valve", "nipple"), ("Valve cross", "In valve"), ("Chamber outlet nipple", "Firing valve"), ("Chamber outlet nipple", "Chamber front disc"),   # threads / weld
 ]
 
 
@@ -225,7 +227,9 @@ def print_parts(parts):
     for p in parts:
         if p["kind"] != "print":
             continue
-        if not B_.fits_bed(p["shape"]):
+        b = p["shape"].BoundingBox()                   # a near-square part's principal axes can come out at 45 deg
+        square = all(d <= m for d, m in zip(sorted((b.xlen, b.ylen, b.zlen), reverse=True), sorted(P.BED, reverse=True)))
+        if not square and not B_.fits_bed(p["shape"]):
             bad.append((p["name"], [round(x) for x in B_._obb_dims(p["shape"])]))
     return bad
 
@@ -275,7 +279,7 @@ def tabs(parts):
         c = _corner(n) if g == "drive" else None
         if n.startswith(("LED ", "Speaker", "Light bar")):
             out["Lights & speakers"].append(p)
-        elif n.startswith("Rail 20x20 deck"):
+        elif n.startswith("Rail 20x20"):
             out["Add-on rails"].append(p)
         elif g == "frame" or (g == "drive" and c is None):
             out["Chassis, pivot & drive"].append(p)

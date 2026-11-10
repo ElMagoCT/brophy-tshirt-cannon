@@ -11,7 +11,6 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 | Who (and which chat) | Started | Working on | Files |
 |---|---|---|---|
 | Micah's Windows computer (Claude Code) | 2026-11-08 | Printable mini kit (gun on a filament pin) + sliced projects for 2 CC2 / 2 CC1 | `cad/glacis/mini.py`, `mini_3mf.py`, `mini_orca/`, `out/mini/`, `docs/glacis/mini_model.md` (all new) |
-| Micah's Windows computer (Claude Code) | 2026-11-10 | Front light bar hole: bumper to 4.5 in above it, open at the bottom, no liner; 20x20 rails inside carry the bar | `cad/glacis/lightbar.py`, `params.py`, `misc.py`, `body.py`, `robot.py`, `bom/`, `docs/glacis/JUDGMENTS.md` |
 
 ## Entry template
 
@@ -25,6 +24,22 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Not done: <Onshape import/version, Google Sheet, artifact, anything left for Micah>
 - Questions for Micah: <decisions that are his, or "none">
 ```
+
+## 2026-11-10 - Micah's Windows computer (Claude Code) - Borealis pass 2: front hole, in-well rails, welded chambers, 85 deg, GOGO valves
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS "Brophy Borealis" B9-B13):
+  - **Front light bar hole:** a plain hole from the bumper to 4.5 in above it, open at the bottom, no liner (the front acrylic is one U-shaped sheet; 8 panels). Two 372 mm 20x20 rails cross it behind the shell, screwed from inside (M4 x 8 into inserts); the bar stands on the lower one on its own brackets. Front frame mounts: 2 posts at y +-205 (was 3).
+  - **In-well rails:** one 470 mm rail each side inside the gun well over the cut-down towers. The bearing blocks sit on them (pivot z 645 -> 656), and a 1/8 in tower plate wraps each tower, runs the rail's length and climbs the block. M4 x 30s across the rail into the well-edge member. Tower brackets, rivnuts and the deck acrylic's U-slots are gone.
+  - **Welded chambers** (3 in Sch 40 + 3/8 in discs, 1.56 / 1.32 L, the valve on a 1 in nipple welded through the front disc, a 1/4 NPT bung near the front). Each chamber's transducer and relief moved to a cross after its in valve on the chassis. The gun is 18.9 kg (was 21.4).
+  - **Elevation 0-85 deg** (was 45). The well floor reaches z 281 under the axle.
+  - **GOGO GPG-M03 in valves** with G1/4 x 1/4 NPT hex nipples. The valve cross moved 51 mm back to clear the rear Falcon.
+  - **Smaller items:** 1/2 in smoke line and passages; M4 hardware throughout; joints whose tenon only shed a crumb aren't reported as loose any more; the print-bed check accepts near-square parts that fit square.
+  - **Acrylic:** cut plan for two 24 x 48 sheets on the 18 x 36 laser (`docs/glacis/acrylic_cuts/`: saw lines + one DXF per strip, mm).
+- Files: `cad/glacis/` (gun, misc, lightbar, params, pneu_parts, body, robot), `bom/glacis_bom.py` (+ csv/json), `docs/glacis/JUDGMENTS.md`, `docs/glacis/acrylic_cuts/`
+- Checks: robot.py (55 min on 14 cores): interference 1 pair over 30 mm3 (the 64 mm3 fill elbow / rear manifold sliver from rev D.2; the 146 mm3 valve cross one is gone), elevation sweep 0-85 deg 0 clashes, every print fits the bed (the electronics shelf is 200 x 200 mm; it was flagged only because the oriented-box check turned it 45 deg, and the check is fixed), 0 multi-piece parts, 49 frame pieces, 57 tenons, speaker cups 8/8, front rail screws 4/4, in-well rail screws 10/10, LEDs 0 overlaps.
+- Parts list: `bom/glacis_bom.py` now mirrors the Sheet (both order tabs folded in, Micah's column J notes and the answers in COMMENTS). Then: acrylic $150 -> $86.98 (Lesnlok 24 x 48 2-pack), close nipples 2 packs -> 1, rivnuts 0, counts for this pass, tower plates (stash). Pre-tax $1,505.06 (Order 1 $1,057.97 + $10 shipping, Order 2 $437.09). Sheet cells updated to match.
+- Not done: Onshape re-import of the changed tabs (the pivot moved, so the Pivot mate connectors move too).
+- Questions for Micah: none.
 
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Brophy Borealis
 - Branch / commit: `micah-windows/borealis` (PR, not merged)

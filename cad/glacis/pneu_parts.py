@@ -157,6 +157,30 @@ def solenoid_02f(p, d, up, length=37.0):
     return place(s, p, d, up)
 
 
+def solenoid_gogo(p, d, up, plug=1):
+    """In valve (Brophy Borealis, Micah via the Mac chat): GOGO GPG-M03 2/2 NC direct-acting, G1/4 both ends, from the
+    seller drawing: brass body 40 along the flow x 26 across, port centre 9 above its bottom, 76 overall to the top
+    nut, coil 38 wide, coil + DIN plug 82 long (24 from the valve centre to the coil's far side, 58 to the plug end).
+    p = body centre on the port axis, d = flow, up = the coil; plug = which side the DIN plug points (+1 / -1)."""
+    g = 6.6                                            # G1/4 male OD 13.16
+    body = _box(-9.0, 17.0, -13.0, 13.0, -20.0, 20.0)
+    for z0, dz in ((-20.0, 1), (20.0, -1)):
+        body = body.cut(cyl(g + 0.1, 12.0, (0, 0, z0 - dz * 0.01), (0, 0, dz)))
+    s = union([body, cyl(6.0, 4.0, (17.0, 0, 0), (1, 0, 0)), _box(21.0, 59.0, -24.0, 14.0, -15.0, 15.0),
+               cyl(4.5, 4.0, (59.0, 0, 0), (1, 0, 0)), hex_prism(12.0, 4.0, (63.0, 0, 0), (1, 0, 0)),
+               _box(27.0, 55.0, 14.0, 58.0, -13.0, 13.0)])
+    if plug < 0:
+        s = s.mirror("XZ")
+    return place(s, p, d, up)
+
+
+def hex_nipple_g(p, d):
+    """G1/4 BSPP male x 1/4 NPT male hex nipple, 304: the G1/4 end (12 mm) behind p in the valve's port, a 19 mm hex at
+    p, the 1/4 NPT end out along d (3.8 mm of it left showing when it's made up)."""
+    s = union([cyl(6.58, 12.0, (0, 0, -12.0)), hex_prism(19.0, 8.0), cyl(OD["1/4"] / 2, 14.0, (0, 0, 8.0))])
+    return place(s.cut(cyl(3.5, 40.0, (0, 0, -15.0))), p, d)
+
+
 def relief_valve(p, d, length=44.0, ring=True):
     """Relief valve with a pull ring: thread behind p, hex, spring body, cap, ring on the stem. length = how far it
     stands out of the port."""

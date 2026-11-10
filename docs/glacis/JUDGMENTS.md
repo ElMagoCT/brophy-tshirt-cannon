@@ -1086,8 +1086,69 @@ B8. **Onshape:** each of the 9 sub-assemblies has one rigid group of all its par
     Downmost (the revolute swapped for a fastened lock at 45 or 0 deg). **Known issue:** Onshape keeps one stored
     position for every configuration and doesn't re-solve on a switch: server renders of all four settings are the
     same 45 deg pose, even after re-saving the lock in Downmost. Dragging in Range/Free is the reliable way to set an
-    angle; the fix would be a separate gun instance per fixed setting, shown by configured suppression.
-D14 (Borealis). **Money:** $2,002.43 before the review -> **$1,777.71** (Order 1 $1,259.68 + $10 shipping, Order 2
-    $508.03). Open for Micah: swap the MSI chamber couplings for the Supply Giant B016F1LPTW ($23.99)?
+    angle; the fix would be a separate gun instance per fixed setting, shown by configured suppression. Micah
+    (2026-11-10): "Range drag is fine", so the fixed settings stay as they are.
+B9. **Front light bar hole** (Micah, same day: "it should start from the bottom and just be a hole, not plastic frame",
+    aluminum extrusions inside to mount the light and other things, "from the bumper to 4.5in above the bumper").
+    Replaces B4's pocket and liner. The hole runs from the body's bottom edge (z 204.7, on the bumper) to z 317.5
+    (4.5 in above the bumper's top), |y| < 175, open at the bottom; its edges are plain 19 mm frame members, and the
+    front acrylic is now one U-shaped sheet round it (8 panels, was 9). Two 372 mm 20x20 rails cross it behind the
+    shell, lying flat on the frame's inner face (tilted with the 60 deg slant), one along the bottom and one level with
+    the top (372 mm: at 380 their ends touched the LED walls of the windows beside the hole's top corners), each held
+    by one M4 x 8 per end from inside, through a hole CNC'd across the rail into an M4 x 4 insert in the inner face
+    of the frame member beside the hole: screws through that member from outside hit its LED light tunnel near the
+    bottom, and from inside no heads show on the front. The bar
+    stands on the lower rail on its own end brackets (M4 x 8 into T-nuts; its side bolts set the aim), bottom at
+    z 241, clear of the fogger, 4 mm behind the slant at its top edge; the upper rail is free for sensors. The front
+    end of the chassis now has 2 frame mount posts at y +-205 (was 3 at 0 and +-170, which the hole left without frame
+    over them).
+B10. **In-well rails and the pivot mount** (Micah, same day, from a screenshot of the deck rail beside the bearing
+    block: "move the extrusion to be inside the cannon section, not on top of the panel, it can go through the 1x2
+    going up holding the pivot", "push the pivot up a smidge", "cut off the 1x2 at the extrusion and run a plate from it
+    to the extrusion and to the bearing", "outside is fine, just make sure it wraps the frame, i want the extrusion and
+    the frame to be seamless"). Each deck rail is now one 470 mm piece inside the gun well (x -320 to 150), flush with
+    the tower's and bearing block's outboard face (|y| 109.35-129.35) and 2 mm under the deck (z 608-628). The 1x1
+    tower stops under it, the bearing block sits on it (2 x M4 x 12 into T-nuts), and the pivot went up 11 mm
+    (z 645 -> 656). A 1/8 in tower plate on the outboard side (not the inside: the 112T pulley sits just inboard of the
+    right block) runs the rail's length between it and the deck's well-edge member, wraps the tower's outboard, front
+    and back faces (4 rivets) and runs up the block (its 1/4-20s); the axle and pot coupler pass through a hole in it.
+    The rail's screws are M4 x 30s through holes CNC'd across its core (8 mm head access from the well) and the plate
+    into inserts in the member's inner face at z 618, under the member's light tunnel (z 620-623). The elevation motor
+    bracket's web now stops under the right rail and bolts into its bottom slot. The turret tower brackets and their 4
+    rivnuts are gone: the rail screws over the tower hold the deck to it. The deck acrylic's U-slots are gone too.
+B11. **Welded chambers and the Mac chat's batch** (Micah's calls in the Sheet's column J; the Mac chat's answers in
+    column K, now kept in `bom/glacis_bom.py` COMMENTS). 3 in Sch 40 plain-end pipe (top 12.9 in, 1.56 L; bottom
+    10.9 in, 1.32 L) between two 3/8 in A36 discs, 3.5 in OD, flush with the pipe (waterjet). The valve screws onto half
+    of a 1 x 4 in nipple welded through the front disc's 1.33 in hole, flush with its inner face (24 mm between the
+    valve and the disc for the weld). The back disc is blank. The 1/4 NPT weld bung sits 1 in behind the front disc
+    on the tube-lane side (-y), turned 30 deg toward the axis, with a swivel push-to-connect elbow pointing forward to
+    where its tube drops out of the core. At 45 deg straight toward the axis, the two cannons' elbows met between the
+    chambers. The reducing couplings, bushings and the crosses, reliefs and transducers on the chambers' backs are gone.
+    Each chamber's transducer and 200 psi relief now sit on a brass cross right after its in valve on the chassis,
+    modelled at the ChillWaves cross's ~33 mm across the ports (at the generic 25.4 mm the hexes collided). The gun
+    lost 2.5 kg (18.9 kg) and rebalanced with the valves 55 mm further forward. The smoke line is 1/2 in ID x 5/8 OD:
+    the splitter's gun barb is 1/2 in (10 mm bore, was 7 mm), and the breech block, mantlet and collar passages are
+    opened to suit (collar's inner passages 10.5 mm). M4 throughout: every insert M4 x 4 (holes and screw lengths as
+    drawn), cradle-plate rail holes 4.5 mm with M4 x 8s, chamber caps on M4 x 12s. The fill plug comes from the
+    Lnrueg M-style kit and the fill check valve is the 304 stainless male x male one. PITCH stays 112 mm, so the 23 mm
+    gap between the chambers keeps room for the tubes. Cannon A's cross sits beside the left tower, so its transducer
+    stands up and its relief hangs down through a notch in the electronics shelf; cannon B's lie flat (pointing down,
+    its relief hit the main breaker).
+B12. **Elevation 0-85 deg** (Micah, same day: "the gun should swing to 85"; read as 85 deg). The welded chambers are
+    shorter and the pivot is higher, so at 85 deg the chambers' back ends reach about z 290 just behind the pivot. The
+    gun well's floor (cut from the swing) now reaches z 281 under the axle (351 at 45 deg). Precheck: 0 clashes from 0
+    to 85 deg against everything outside the body; the full build's sweep and interference checks cover the body.
+B13. **GOGO in valves** (Micah, via the Mac chat): GOGO GPG-M03 2/2 NC direct-acting 12 V, G1/4 (BSPP) ports,
+    modelled from the seller drawing (40 x 26 mm body, 76 mm to the top nut, coil + DIN plug 82 mm long), coil up,
+    flow toward the chamber. Each port takes a G1/4 x 1/4 NPT 304 hex nipple (19 mm hex drawn) with a bonded seal; the
+    QD on the inlet side isn't drawn. The runs got about 20 mm longer, so the valve cross moved 51 mm back (x -300).
+    That clears the rear-left Falcon, which cannon A's chamber cross hit. Cannon A's DIN plug points +y: pointed -y,
+    it met cannon B's valve. The left tank tube's run behind the valves rose to z 282, over that plug. The valve cross
+    is now drawn at the ChillWaves part's real ~33 mm across the ports (was 25.4), which also cleared the 146 mm3
+    valve cross / line relief sliver that had been on main since rev D.2.
+D14 (Borealis). **Money:** $2,002.43 before the review -> $1,777.71, then $1,600.79 after Micah's Sheet changes
+    (welded chambers, the M-style QD kit, M4 hardware, cheaper transducers and boost; Order 1 $1,082.69 + $10 shipping,
+    Order 2 $508.10), then $1,584.06 with the GOGO in valves (Order 1 $1,065.96 + $10). The MSI vs Supply Giant coupling
+    question is moot: the chambers are welded.
 Not changed (already on main): two pneumatic fitting slivers in the interference check (valve cross / 200 psi relief
 146 mm3, fill elbow / rear manifold 64 mm3), from rev D.2.

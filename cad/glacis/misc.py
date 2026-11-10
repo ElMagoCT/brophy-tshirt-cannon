@@ -39,13 +39,43 @@ def post(name, x, y, z0, z1):
 
 
 # ------------------------------------------------------------------ pivot, elevation, angle sensor
+def tower_plate(sgn):
+    """The 1/8 in plate on the outboard side of one tower (Micah: "cut off the 1x2 at the extrusion and run a plate from
+    it to the extrusion and to the bearing", "make sure it wraps the frame"): a strip the length of the in-well rail
+    between the rail and the deck's well-edge member, a tab down the tower's outboard face with flanges bent round its
+    front and back faces, and a tab up the bearing block's outboard face (a hole for the axle and pot coupler)."""
+    t = P.PLATE_T
+    x0, x1 = P.TOWER_X
+    (rx0, rx1), (ry0, ry1), (rz0, rz1) = P.DECK_RAIL["x"], P.DECK_RAIL["y"], P.DECK_RAIL["z"]
+    px, pz = P.PIVOT
+    ya, yb = ry1, ry1 + t                                  # outboard of the rail, the tower and the block
+    zt = rz0 - 50.0                                        # how far down the tower
+    pl = union([box(rx0, rx1, ya, yb, rz0, rz1),                          # along the rail
+                box(x0 - t, x1 + t, ya, yb, zt, rz0 + 1.0),               # down the tower
+                box(x0 - t, x0, P.INNER_RAIL_Y[0] + 4.0, yb, zt, rz0),    # flanges round its back and front faces
+                box(x1, x1 + t, P.INNER_RAIL_Y[0] + 4.0, yb, zt, rz0),
+                box(x1, px + 25.0, ya, yb, rz1 - 1.0, pz + 28.0)])         # up the bearing block
+    pl = pl.cut(cyl(10.0, 20.0, (px, ya - 5.0, pz), (0, 1, 0)))
+    for x_, z_ in ((x0 + 6.0, zt + 12.0), (x1 - 6.0, zt + 12.0), (x0 + 6.0, rz0 - 12.0), (x1 - 6.0, rz0 - 12.0)):
+        pl = pl.cut(cyl(2.45, 20.0, (x_, ya - 5.0, z_), (0, 1, 0)))       # 3/16 rivets into the tower
+    for x_ in (x1 + 25.0, (x1 + px) / 2.0, px - 20.0):
+        pl = pl.cut(cyl(3.4, 20.0, (x_, ya - 5.0, pz - 14.0 if x_ > px - 30 else rz1 + 26.0), (0, 1, 0)))   # 1/4-20s
+    for x_ in DECK_RAIL_SCREWS:
+        pl = pl.cut(cyl(2.25, 20.0, (x_, ya - 5.0, P.DECK_RAIL["screw_z"]), (0, 1, 0)))
+    if sgn < 0:
+        pl = pl.mirror("XZ")
+    return pl
+
+
 def towers_and_pivot():
     px, pz = P.PIVOT
     x0, x1 = P.TOWER_X
     y0, y1 = P.BEARING_BLOCK_Y
     for sgn, side in ((1, "L"), (-1, "R")):
         yc = sgn * IY
-        post(f"Turret tower {side} (1x1)", (x0 + x1) / 2, yc, P.RAIL_Z[1], pz + 28.0)   # flush with the block top
+        # Brophy Borealis (Micah, 2026-11-10): the tower stops under the in-well rail, the rail runs over it and the
+        # bearing block sits on the rail; one 1/8 in plate on the outboard side wraps the tower and ties the three
+        post(f"Turret tower {side} (1x1)", (x0 + x1) / 2, yc, P.RAIL_Z[1], P.DECK_RAIL["z"][0])
         for xf, d in ((x0, -1), (x1, 1)):
             leg_v = box(min(xf, xf + d * P.PLATE_T), max(xf, xf + d * P.PLATE_T), yc - 12.7, yc + 12.7,
                         P.RAIL_Z[1], P.RAIL_Z[1] + 60)
@@ -58,7 +88,8 @@ def towers_and_pivot():
         blk = blk.cut(cyl(9.0, 800, (px, -400, pz), (0, 1, 0)))
         blk = blk.cut(bearing_seat(px, sgn * y0, pz, sgn, 7.94)).cut(bearing_seat(px, sgn * y1, pz, -sgn, 7.94))
         add(f"Pivot bearing block {side}", blk, "print_d", "frame", bom="Pivot bearing block", kind="print",
-            note="PETG, 5 walls, 40% gyroid; 3 x 1/4-20 through the tower")
+            note="PETG, 5 walls, 40% gyroid; sits on the in-well rail (2 x M4 x 12 down into T-nuts in its top slot), "
+                 "3 x 1/4-20 through the tower plate into heat-set inserts")
         for yb, d in ((y0, sgn), (y1, -sgn)):
             add(f"Pivot bearing {side} {yb:.0f}", fr8(px, sgn * yb, pz, d, hexbore=True), "steel", "frame",
                 bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
@@ -75,11 +106,12 @@ def towers_and_pivot():
         cyl(4.1, 40, (mx_, -yb_ - 5, mz_), (0, 1, 0)))
     add("Elevation pinion 16T", pin, "print_d", "frame", bom="Elevation pinion 16T HTD 9 mm (8 mm REX bore)", kind="print")
     yi, yo = y_face - 2.0, -P.Y_SLOT + 2.0                  # the bracket stays inside the gun well
-    brk = union([box(px - 10.0, px + 25.0, yo, yi, mz_ - 20.0, pz - 28.0),          # web under the bearing block
+    brk = union([box(px - 10.0, px + 25.0, yo, yi, mz_ - 20.0, P.DECK_RAIL["z"][0]),   # web up to the right rail
                  box(px - 10.0, mx_ + 26.0, yo, yi, mz_ - 24.0, mz_ + 24.0)])        # arm out to the motor
     brk = brk.cut(cyl(18.3, 60, (mx_, yi + 5, mz_), (0, -1, 0)))
     add("Elevation motor bracket", brk, "print", "frame", bom="Elevation motor bracket", kind="print",
-        note="PETG, 5 walls, 40% gyroid; hangs from the right bearing block; slotted for belt tension")
+        note="PETG, 5 walls, 40% gyroid; hangs from the right in-well rail (2 x M4 x 12 up into T-nuts in its bottom "
+             "slot); slotted for belt tension")
     circles = [(px, pz, P.pd(P.ELEV_T[1]) / 2), (mx_, mz_, P.pd(P.ELEV_T[0]) / 2)]
     pts = []
     for (x, z, r) in circles:
@@ -101,8 +133,9 @@ def towers_and_pivot():
     zb0 = max(pz - 30.0, P.Z_TOP + 1.0)                    # above the deck when the pivot is that high
     bri = box(px - 30, px + 30, yb + 37.0, yb + 40.2, zb0, pz + 10).cut(cyl(5.0, 10, (px, yb + 35, pz), (0, 1, 0)))
     for sx in (-1, 1):
-        bri = bri.fuse(box(px + sx * 24 - 3, px + sx * 24 + 3, yb, yb + 37.0, zb0, pz + 10))
-    add("Pot bracket", bri, "print", "frame", bom="Pot bracket", kind="print", note="screws to the left bearing block")
+        bri = bri.fuse(box(px + sx * 24 - 3, px + sx * 24 + 3, yb + P.PLATE_T + 0.2, yb + 37.0, zb0, pz + 10))
+    add("Pot bracket", bri, "print", "frame", bom="Pot bracket", kind="print",
+        note="screws through the left tower plate into the bearing block")
     return per
 
 
@@ -120,8 +153,13 @@ def _tank_shell(axis, c):
 REAR_MAN = (-347.0, 93.5, 250.0)             # rear manifold centre, back bottom, behind the rear panel
 MAIN_Y = 40.0                                # main ball valve's elbow off the manifold's back face (y)
 MAIN_OUT = []
-FILL = (-248.6, 55.0, 200.0)                 # fill block centre (5-port), back bottom bay
+FILL = (-300.0, 55.0, 200.0)                 # valve cross centre (the tanks' side of the in valves), back bottom bay;
+                                             # Borealis: 51 mm further back so the longer GOGO runs clear the rear Falcon
+# the two in-valve runs off the valve cross: (flow direction, cannon, the chamber cross's branch axis, DIN plug side)
+VALVE_RUNS = ((V(1, 0, 0), "A (top cannon)", V(0, 0, 1), -1), (V(0, -1, 0), "B (bottom cannon)", V(-1, 0, 0), -1))
+LINE_RELIEF = V(0, 1, 0)                     # the valve cross's own 200 psi relief
 CHECKS = []                                  # outlets of the two in valves (service loops start here)
+RELIEF_AT = []                               # the chamber crosses' relief ports (the electronics shelf is notched round A's)
 FOG_OUT = []                                 # fog splitter barb for the gun's smoke line
 
 
@@ -192,13 +230,13 @@ def air():
     add("Main valve push-to-connect", PP.ptc_straight(vc - V(0, 22.5, 0), (0, -1, 0)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     MAIN_OUT[:] = [vc - V(0, 22.5 + 18.0, 0)]
-    # fill (rev D.2): a FEMALE M-style plug (Milton 728) outside the panel on the 1-1/2 in nipple through it, then
+    # fill (rev D.2; Borealis: the plug is from the Lnrueg M-style kit): a FEMALE M-style plug outside the panel on the 1-1/2 in nipple through it, then
     # behind the panel a female x female elbow turns along +y, the male x male check valve, and a street elbow into the
     # manifold's back face
     e14 = 10.2
     xp = xo - e14 - 4.2                                    # the nipple's outer tip: the plug's hex sits clear outside the panel
     add("Fill plug (M-style, female)", PP.m_plug_f(V(xp, yb, mz), (-1, 0, 0)), "steel", "pneu",
-        bom="Fill plug: Milton 728, 1/4 FNPT (female) M-style plug", note="your universal coupler snaps on")
+        bom="Fill plug: M-style plug, 1/4 FNPT (female), from the Lnrueg 45-pc kit", note="your universal coupler snaps on")
     ce = 17.0                                              # F x F barstock elbow, centre to port face (nominal)
     xn1 = xu - ce + e14                                    # nipple tip inside the elbow's port
     add("Fill nipple", PP.close_nipple(V((xp + xn1) / 2, yb, mz), (1, 0, 0), length=xn1 - xp, hexed=False), "brass", "pneu",
@@ -207,7 +245,7 @@ def air():
         bom="1/4 NPT brass 90 deg elbow, FNPT x FNPT (ChillWaves)")
     y0, y1 = yb + ce - e14, y_fill - 14.0 + e14
     add("Fill check valve", PP.check_valve_mm(V(xu, y0, mz), (0, 1, 0), length=y1 - y0), "brass", "pneu",
-        bom="Fill check valve, brass, 1/4 MNPT x 1/4 MNPT, 250 psi (American Made B076K8SLBZ)",
+        bom="Fill check valve, 304 stainless, 1/4 NPT male x male (AliExpress)",
         note="holds the tanks behind the open plug; flow arrow toward the manifold")
     add("Fill elbow manifold", PP.street_elbow(V(xu, y_fill, mz), (0, -1, 0), (1, 0, 0)), "brass", "pneu",
         bom="1/4 NPT brass street elbow")
@@ -218,22 +256,45 @@ def air():
     # other cannon's shot from reaching it (no check valves). Main valve to in-valve seats is all brass at tank
     # pressure, so the cross carries its own 200 psi relief.
     fx, fy, fz = FILL
-    sx1 = fx - 12.7 - 1.8
+    vc = 16.5                                              # ChillWaves cross: ~33 mm across its ports
+    sx1 = fx - vc - 1.8
 
-    add("Valve cross push-to-connect", PP.ptc_straight(V(fx - 12.7, fy, fz), (-1, 0, 0)), "brass", "pneu",
+    add("Valve cross push-to-connect", PP.ptc_straight(V(fx - vc, fy, fz), (-1, 0, 0)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-    add("Valve cross", PP.npt_cross(V(fx, fy, fz), (1, 0, 0), (0, 1, 0)), "brass", "pneu",
+    add("Valve cross", PP.npt_cross(V(fx, fy, fz), (1, 0, 0), (0, 1, 0), c2e=vc), "brass", "pneu",
         bom="1/4 NPT brass cross (ChillWaves)", note="close nipples to the in valves")
-    add("Line relief valve 200 psi", PP.relief_valve(V(fx, fy + 12.7, fz), (0, 1, 0)), "brass", "pneu",
+    add("Line relief valve 200 psi", PP.relief_valve(V(fx, fy, fz) + LINE_RELIEF * vc, LINE_RELIEF), "brass", "pneu",
         bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)")
     CHECKS.clear()
-    for d, tag in ((V(1, 0, 0), "A (top cannon)"), (V(0, -1, 0), "B (bottom cannon)")):
-        a0 = V(fx, fy, fz) + d * (12.7 + 1.8)
-        add(f"In valve {tag}", PP.solenoid_02f(a0 + d * 18.5, d, (0, 0, 1)), "brass", "pneu",
-            bom="2/2 NC 12 V direct-acting solenoid valve, 1/4 NPT (Aignep 02F)", note="coil up")
-        add(f"In valve {tag} push-to-connect", PP.ptc_straight(a0 + d * 37.0, d), "brass", "pneu",
+    RELIEF_AT.clear()
+    for d, tag, up, plug in VALVE_RUNS:
+        # Brophy Borealis (Micah via the Mac chat): GOGO GPG-M03 in valves, G1/4 ports, a G1/4 x 1/4 NPT hex nipple in
+        # each (its QD on the inlet side isn't drawn); coil up, flow toward the chamber. The chamber's transducer and
+        # 200 psi relief sit on a brass cross right after it; one hose (with a QD) runs on to the chamber's bung
+        a0 = V(fx, fy, fz) + d * (vc + 11.8)              # the valve's inlet face
+        add(f"In valve {tag} inlet nipple", PP.hex_nipple_g(a0, -d), "steel", "pneu",
+            bom="G1/4 BSPP male x 1/4 NPT male hex nipple, 304")
+        add(f"In valve {tag}", PP.solenoid_gogo(a0 + d * 20.0, d, (0, 0, 1), plug=plug), "brass", "pneu",
+            bom="In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm", note="coil up; flow arrow toward the chamber")
+        o = a0 + d * 40.0                                  # the outlet face
+        add(f"In valve {tag} outlet nipple", PP.hex_nipple_g(o, d), "steel", "pneu",
+            bom="G1/4 BSPP male x 1/4 NPT male hex nipple, 304")
+        ce = 16.5                                          # the ChillWaves cross is ~33 mm across its ports
+        c = o + d * (11.8 + ce)                             # A's cross sits beside the left tower: its branches stand
+                                                           # up and down (the shelf is notched for the relief); B's lie
+                                                           # flat (down, its relief would hit the main breaker)
+        if up.z > 0.5:
+            RELIEF_AT.append(c - up * ce)
+        add(f"Chamber cross {tag}", PP.npt_cross(c, d, up, c2e=ce), "brass", "pneu", bom="1/4 NPT brass cross (ChillWaves)",
+            note="the chamber's transducer and relief on its branches, the hose on")
+        add(f"Chamber transducer {tag}", PP.transducer(c + up * ce, up), "steel", "pneu",
+            bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)")
+        add(f"Chamber relief valve 200 psi {tag}", PP.relief_valve(c - up * ce, -up), "brass", "pneu",
+            bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
+            note="the chamber's own relief and hand bleed (the in valve's closed seat seals it off from the tanks)")
+        add(f"Chamber cross {tag} push-to-connect", PP.ptc_straight(c + d * ce, d), "brass", "pneu",
             bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-        CHECKS.append(a0 + d * 55.0)
+        CHECKS.append(c + d * (ce + 18.0))
     # tubes: tanks -> rear manifold, rear manifold -> main valve
     for side, dy in (("left", 35.0), ("right", -45.0)):
         t = tank_out[side]
@@ -242,12 +303,13 @@ def air():
         # posts and across to the manifold above the sled rails
         xr = -295.0 if sg > 0 else -330.0                 # the right one rises behind service loop B
         e = tops[side]
-        pts = [t, (t[0], sg * 98.0, 262.0), (xr, sg * 98.0, 245.0), (xr, sg * 98.0, 330.0),
+        zr = 282.0 if sg > 0 else 245.0                   # the left one passes over in valve A's DIN plug
+        pts = [t, (t[0], sg * 98.0, max(262.0, zr)), (xr, sg * 98.0, zr), (xr, sg * 98.0, 330.0),
                (e.x, e.y, 330.0), e.toTuple()]
         add(f"Tube tank {side}", tube_path(pts), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
     m0 = MAIN_OUT[0]
     tf = [m0.toTuple(), (m0.x, m0.y - 12.0, mz), (sx1 - 40.0, m0.y - 12.0, mz - 20.0), (sx1 - 40.0, fy, mz - 25.0),
-          (sx1 - 40.0, fy, fz), (fx - 12.7 - 18.0, fy, fz)]
+          (sx1 - 40.0, fy, fz), (fx - vc - 18.0, fy, fz)]
     add("Tube main valve to cross", tube_path(tf), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
 
 
@@ -285,9 +347,9 @@ def fog():
     for sy in (1, -1):                                     # trail lines out the sides, the gun line out the top
         hub = hub.fuse(tube(11.0, 8.5, 16.0, (cx, sy * 28.0, z1 + 29), (0, sy, 0)))
         barbs.append((cx, sy * 44.0, z1 + 29))
-    hub = hub.fuse(tube(5.4, 3.5, 16.0, (cx - 10, 0, z1 + 44), (0, 0, 1)))
+    hub = hub.fuse(tube(7.0, 5.0, 16.0, (cx - 10, 0, z1 + 44), (0, 0, 1)))        # 1/2 in barb (was 3/8, 7 mm bore)
     add("Fog splitter 1-3", hub, "print", "power", bom="Fog splitter 1 -> 3 (printed)", kind="print",
-        note="22 mm barbs for the two trail tubes, a 3/8 barb for the gun's silicone line")
+        note="22 mm barbs for the two trail tubes, a 1/2 in barb (10 mm bore) for the gun's silicone line")
     FOG_OUT[:] = [V(cx - 10, 0, z1 + 60)]
     # front: down through the bellypan just ahead of the machine
     side_b = barbs[0]
@@ -345,6 +407,8 @@ def batteries_and_electronics():
     shelf = box(-380.0, -180.0, -100.0, 100.0, 150.0, 154.0)          # between the inner rails (|y| 104+)
     for (x, y) in ((-372, -92), (-372, 92), (-188, -92), (-188, 92)):
         shelf = shelf.fuse(box(x - 5, x + 5, y - 5, y + 5, zb, 150.0))
+    for r_ in RELIEF_AT:                                   # clear of the chamber reliefs that hang down past it
+        shelf = shelf.cut(cyl(14.0, 400.0, (r_.x, r_.y, -100.0), (0, 0, 1)))
     add("Electronics shelf", shelf, "print", "power", bom="Electronics shelf", kind="print")
     z = 154.0
     boards = [("Main controller ESP32-P4 + C5 (WTDKP4C5-S1)", -375, -295, -98, -38, 18, "pcb",
@@ -405,29 +469,15 @@ def speakers():
             bom="Siren speaker 200 W, 8 ohm, aluminium (Xprite B01DMSR4L4)", note="5.7 x 5.5 x 2.3 in with its foot, 121-130 dB")
         add(f"Speaker grille {pod['name']}", pod["grille"], "print", "body", bom="Speaker grille", kind="print",
             note="3 walls, no top or bottom layers, 12% gyroid: an open mesh; glue or screw to the cup")
-    # front light bar (Brophy Borealis): Micah's Zmoon 12 in single-row bar, recessed in a pocket in the front slant
-    # with a 3 in band above it left blank for crowd sensors; a printed liner in two halves (split at y = 0 for the
-    # bed) lines the pocket, screws to the frame round it, and carries the bar on its two back bolts. The main
-    # controller switches (and can PWM-dim) it through a MOSFET channel
-    d = LB.dims()
+    # front light bar (Brophy Borealis): Micah's Zmoon 12 in single-row bar in the plain hole at the bottom of the
+    # front slant, standing on the lower of the two 20x20 rails that cross the hole (front_rails), on its own end
+    # brackets. The main controller switches (and can PWM-dim) it through a MOSFET channel
     add("LED light bar front", LB.bar(), "black", "power", mass=0.37,
         bom="Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V",
-        note=f"recessed {P.BAR_POCKET['recess']:.0f} mm behind the slant; straight ahead")
-    liner = LB.cut().intersect(plain).cut(LB.pocket())
-    yb = P.LIGHT_BAR[4]
-    zc = (d["zb"][0] + d["zb"][1]) / 2
-    for sg in (1, -1):                                     # the bar's two back bolts (M6) and its cable
-        liner = liner.cut(cyl(3.3, 30.0, (d["xi"] + 5.0, sg * yb, zc), (-1, 0, 0)))
-    liner = liner.cut(cyl(6.0, 30.0, (d["xi"] + 5.0, 0.0, zc), (-1, 0, 0)))
-    for _, at, dir_ in BAR_SCREWS:                         # M4 x 8 button heads through the liner into the frame
-        liner = liner.cut(cyl(2.25, P.BAR_POCKET["wall"] + 4.0, (at - dir_ * (P.BAR_POCKET["wall"] + 2.0)).toTuple(),
-                              dir_.toTuple()))
-    for sg, side in ((1, "left"), (-1, "right")):
-        half = liner.intersect(box(-3000, 3000, 0.25 if sg > 0 else -3000, 3000 if sg > 0 else -0.25, -3000, 3000))
-        n_ = sum(at.y * sg > 0 for _, at, _ in BAR_SCREWS)
-        add(f"Light bar pocket liner {side}", half.clean(), "print", "body", bom="Light bar pocket liner half", kind="print",
-            note=f"PETG; {n_} x M4 x 8 into inserts in the frame; the bar's M6 back bolt through it; the upper "
-                 f"{P.BAR_POCKET['sensor'] / IN:.0f} in of its back wall is left blank for crowd sensors")
+        note="in the front hole, on the lower rail; aimed straight ahead")
+    for br, side in zip(LB.brackets(), ("left", "right")):
+        add(f"Light bar bracket {side}", br, "steel", "power", bom="Light bar end bracket (comes with the bar)",
+            kind="cots", note="its foot on the lower front rail (M4 x 8 into a drop-in T-nut), the bar's side bolt through its ear")
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
     add("Audio amp (TPA3255)", box(-135.0, -13.0, 22.0, 95.0, zb, zb + 30.0), "pcb", "power",
         bom="TPA3255 2 x 300 W amp board", note="one channel per speaker, about 100 W each on 48 V")
@@ -437,21 +487,46 @@ def speakers():
 
 
 # ------------------------------------------------------------------ deck rails (Brophy Borealis)
-DECK_RAIL_SCREWS = []                     # (x, y) of each rail's M5 screws, set by body_parts
+DECK_RAIL_SCREWS = []                     # x of each in-well rail's M4 screws (mirrored), set by body_parts
 
 
 def deck_rails():
-    """A 20x20 T-slot rail on the deck each side of the gun well, outboard of the pivot's bearing blocks, for
-    add-ons. Each sits on the well-edge frame member, held by M5 screws up through the member into drop-in T-nuts."""
-    y0, y1 = P.DECK_RAIL["y"]
+    """A 20x20 T-slot rail inside the gun well along each side (Micah, 2026-11-10: "inside the cannon section, not on
+    top of the panel"), one piece over the cut-down tower, the pivot's bearing block on top of it, the tower plate
+    between it and the deck's well-edge member. M4 x 30s through holes CNC'd across the rail's core (8 mm head access from the well side) and the plate into heat-set inserts in the member's inner face."""
+    (x0, x1), (y0, y1), (z0, z1) = P.DECK_RAIL["x"], P.DECK_RAIL["y"], P.DECK_RAIL["z"]
+    n_ = len(DECK_RAIL_SCREWS)
     for sg, side in ((1, "left"), (-1, "right")):
         ys = (y0, y1) if sg > 0 else (-y1, -y0)
-        for x0, x1, end in P.DECK_RAIL_PIECES:          # aft and fore of the pivot's pot and axle stub
-            n_ = sum(1 for x, y in DECK_RAIL_SCREWS if y * sg > 0 and x0 < x < x1)
-            add(f"Rail 20x20 deck {side} {end}", t_slot(x0, x1, ys, (P.Z_TOP, P.Z_TOP + P.RAIL20)), "alu", "body",
-                bom="20x20 T-slot extrusion (owned spare, cut)", kind="stock", mass=0.47 * (x1 - x0) / 1000.0,
-                note=f"{x1 - x0:.0f} mm; {n_ or 2} x M5 x 30 up through the deck member and a U-slot in the acrylic's edge "
-                     "(from inside the well) into drop-in T-nuts; it clamps that edge too")
+        r = t_slot(x0, x1, ys, (z0, z1))
+        for x_ in DECK_RAIL_SCREWS:                       # the CNC'd cross holes: 4.5 through, 8 mm head access
+            zs = P.DECK_RAIL["screw_z"]
+            r = r.cut(cyl(2.25, 30.0, (x_, sg * (y0 - 5.0), zs), (0, sg, 0)))
+            r = r.cut(cyl(4.0, 7.0, (x_, sg * (y0 - 1.0), zs), (0, sg, 0)))          # to the core: the head sits on it
+        add(f"Rail 20x20 well {side}", r, "alu", "body", bom="20x20 T-slot extrusion (owned spare, cut)", kind="stock",
+            mass=0.47 * (x1 - x0) / 1000.0,
+            note=f"{x1 - x0:.0f} mm inside the gun well, over the cut-down tower; {n_} x M4 x 30 through CNC'd cross holes "
+                 "(8 mm head access from the well side, the head on the core) and the tower plate into inserts in the deck's well-edge member; the bearing "
+                 "block on top, the elevation motor bracket under the right one")
+        add(f"Tower plate {side} (1/8 Al)", tower_plate(sg), "alu", "frame", bom="Tower plate (1/8 Al, bent)", kind="stock",
+            note="waterjet and bend: wraps the tower's outboard, front and back faces, runs the length of the in-well rail "
+                 "between it and the deck's well-edge member, and up over the bearing block; 4 x 3/16 rivets into the "
+                 "tower, the rail's M4s through it, the block's 1/4-20s")
+
+
+def front_rails():
+    """Two 20x20 T-slot rails across the front light bar hole, flat on the frame's inner face behind it: the bar
+    stands on the lower one, the upper one is free for sensors and the like."""
+    for name, q0 in LB.rails():
+        n_ = sum(1 for nm, _ in FRONT_RAIL_SCREWS if nm == name)
+        r = LB.rail(q0)
+        for nm, y_ in FRONT_RAIL_SCREWS:
+            if nm == name:
+                r = r.cut(LB.rail_holes(q0, y_))
+        add(f"Rail 20x20 front {name}", r, "alu", "body", bom="20x20 T-slot extrusion (owned spare, cut)",
+            kind="stock", mass=0.47 * P.BAR_HOLE["rail_len"] / 1000.0,
+            note=f"{P.BAR_HOLE['rail_len']:.0f} mm across the front hole; {n_} x M4 x 8 from inside, through holes CNC'd "
+                 "across the rail into M4 x 4 inserts in the frame member beside the hole")
 
 
 # ------------------------------------------------------------------ bumpers
@@ -576,7 +651,7 @@ def underglow():
             heads = [(x_, oy * sum(P.OUTER_RAIL_Y) / 2) for x_ in P.SIDE_MOUNT_X]
         else:
             ug = [box(-500, 500, *sorted([sg_ * P.INNER_RAIL_Y[0], sg_ * 400.0]), -1000, 1000) for sg_ in (-1, 1)]
-            heads = [(ox * (P.FRAME_X - 7.0), y_) for y_ in P.END_MOUNT_Y]
+            heads = [(ox * (P.FRAME_X - 7.0), y_) for y_ in (P.FRONT_MOUNT_Y if ox > 0 else P.END_MOUNT_Y)]
         under = union(ug)                                 # under a gusset the flange steps down by the plate
         top = box(-1000, 1000, -1000, 1000, 98.2, 102.0)
         clear_ = union([cyl(6.0, 30.0, (hx, hy, 80.0), (0, 0, 1)) for hx, hy in heads])
@@ -635,10 +710,11 @@ def mount_points():
     for sgn, side in ((1, "L"), (-1, "R")):
         for x in P.SIDE_MOUNT_X:
             out.append((f"{side} {x:.0f}", V(x, sgn * (P.wall_y(zb, inner=True) - P.MOUNT_TAB[0] / 2 - 1.5), zb)))
-        out.append((f"tower {side}", V(sum(P.TOWER_X) / 2, sgn * (P.Y_SLOT + 10.0), P.Z_TOP - P.MEM_H)))
+        # (Brophy Borealis: no tower station any more: the in-well rail's M4s into the deck's well-edge member, right
+        # over the cut-down tower and its plate, hold the deck to the tower)
     for sx, end, dh in ((1, "front", 22.0), (-1, "rear", 17.5)):
         xe = P.front_x(zb) if sx > 0 else P.rear_x(zb)
-        for y in P.END_MOUNT_Y:
+        for y in (P.FRONT_MOUNT_Y if sx > 0 else P.END_MOUNT_Y):
             out.append((f"{end} {y:.0f}", V(xe - sx * dh, y, zb)))
     return out
 
@@ -658,9 +734,8 @@ def frame_mounts():
     station is held by a 2-1/2 in #10-32 up through the rail (and gusset) into a heat-set insert in its foot, with a
     relief above the insert for the screw's tip. The frame's own 1/2 in #10-32 goes up through the post's 4 mm top
     into the frame; its head sits in a pocket that opens outward, behind the bumper (take the bumper ring off and
-    every frame screw is in reach). Each turret tower gets a bracket on its outer face, held by two 1/2 in #10-32s in
-    vertical slots (set its height against the deck at assembly) into rivnuts in the tower wall, so nothing pokes
-    into the gun well."""
+    every frame screw is in reach). (The turret towers' brackets and rivnuts went with Brophy Borealis: the in-well
+    rails tie the deck to the towers now.)"""
     zb, zr0, zr1 = P.Z_WALL_BOT, P.RAIL_Z[0], P.RAIL_Z[1]
     top_t = 4.0                                           # post top under the frame: 4 + 0.5 gap + 8.2 in the insert
     clear = lambda q, t=top_t: cyl(2.6, t + 2.0, (q.x, q.y, q.z - 0.5 - t - 1.0), (0, 0, 1))
@@ -718,7 +793,8 @@ REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 50.0, REAR_
               (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0))
 
 
-CUP_SCREWS, BAR_SCREWS = [], []          # (point on the part's face, direction into the frame): set by body_parts
+CUP_SCREWS = []                          # (point on the part's face, direction into the frame): set by body_parts
+FRONT_RAIL_SCREWS = []                   # (rail, y) of each front-hole rail's M4 screw: set by body_parts
 
 
 def _overlaps(a, b, pad=0.0):
@@ -816,59 +892,35 @@ def body_parts(log=print):
         CUP_SCREWS.extend((pod["name"], at, dir_) for at, dir_ in chosen)
         if len(chosen) < 4:
             clash.append(f"speaker cup {pod['name']}: only {len(chosen)} of 4 screws found frame")
-    # light bar pocket liner: M4 screws through its floor, side walls and back wall into inserts in the frame round
-    # the pocket, two per wall where frame backs it, at least 35 mm apart
-    BAR_SCREWS.clear()
-    d = LB.dims()
-    w_ = P.BAR_POCKET["wall"]
-    # the frame round the pocket is only the members along its opening (the shell is MEM_H deep behind the slant),
-    # so every screw sits close behind the opening: down through the floor, out through each side wall
-    fx = lambda z, k: P.front_x(z) - k                    # k mm behind the slant at height z
-    zfl = d["zf"] - w_
-    walls = [(V(0, 0, -1), [V(fx(zfl - 3.0, k), sg * y, zfl) for sg in (1, -1) for y in (50.0, 110.0, 150.0, 80.0)
-                            for k in (9.0, 13.0)])] +             [(V(0, sg, 0), [V(fx(z, k), sg * (d["yi"] + w_), z) for z in (d["zf"] + 12.0, d["zb"][1] + 20.0,
-                                                                         d["zb"][1] + 45.0, d["zf"] + 30.0)
-                            for k in (10.0, 15.0)]) for sg in (1, -1)]
-    for dir_, cands in walls:
+    # front hole rails: one M4 x 8 each end from inside, through the rail into an insert in the inner face of the
+    # frame member beside the hole (clear of the member's light tunnel, which runs near its outer face)
+    FRONT_RAIL_SCREWS.clear()
+    for name, q0 in LB.rails():
         for sg in (1, -1):
-            got = 0
-            for at in cands:
-                if got == 2 or (dir_.y == 0 and at.y * sg <= 0) or (dir_.y != 0 and dir_.y != sg):
-                    continue
-                if any((at - c_).Length < 35.0 for _, c_, _ in BAR_SCREWS):
-                    continue
-                hole = cyl(P.INSERT[0], P.INSERT[1], (at - dir_ * 0.1).toTuple(), dir_.toTuple())
-                if _frame_insert(pieces, hole, tun_list + screws, share=0.9):
-                    BAR_SCREWS.append((sg, at, dir_))
-                    got += 1
-    if len(BAR_SCREWS) < 6:
-        clash.append(f"light bar liner: only {len(BAR_SCREWS)} screws found frame")
-    # deck rails: 2 x M5 clearance holes per piece, straight down through the well-edge member, clear of its light tunnel
+            for yy in (183.0, 181.0, 185.0, 179.0, 187.0, 180.0, 186.0):
+                if _frame_insert(pieces, LB.screw_hole(q0, sg * yy), tun_list + screws, share=0.9):
+                    FRONT_RAIL_SCREWS.append((name, sg * yy))
+                    break
+            else:
+                clash.append(f"front rail {name} {'left' if sg > 0 else 'right'}: no frame for its screw")
+    # in-well rails: M4 x 4 inserts in the well-edge member's inner face, below its light tunnel; the same x both sides
     DECK_RAIL_SCREWS.clear()
-    ry0, ry1 = P.DECK_RAIL["y"]
-    for sg in (1, -1):
-        found = []
-        for target, lo, hi in [(t, a + 15.0, b - 15.0) for a, b, _ in P.DECK_RAIL_PIECES for t in (a + 35.0, b - 35.0)]:
-            for dx in (0, 10, -10, 20, -20, 30, -30, 40, -40, 50, -50):
-                # the member's light tunnel runs at |y| 137-142 under the rail's inboard half, so the screws go
-                # outboard of it, through a U-slot in the deck acrylic's edge (cut below): the top 8 mm there is the
-                # acrylic's ledge, so the member holds ~60% of the hole's length, not 70
-                for yy, share in ((148.5, 0.55), (147.5, 0.55), (149.5, 0.55), ((ry0 + ry1) / 2, 0.7)):
-                    x_ = target + dx
-                    if not lo <= x_ <= hi:
-                        continue
-                    hole = cyl(2.75, P.MEM_H + 4.0, (x_, sg * yy, P.Z_TOP + 1.0), (0, 0, -1))
-                    if _frame_insert(pieces, hole, tun_list + screws, share=share):
-                        found.append((x_, sg * yy))
-                        break
-                else:
-                    continue
+    rx0, rx1 = P.DECK_RAIL["x"]
+    zs = P.DECK_RAIL["screw_z"]
+    for target in P.DECK_RAIL["screws_x"]:
+        for dx in (0, 10, -10, 20, -20, 30, -30):
+            x_ = target + dx
+            holes = [cyl(P.INSERT_SHORT[0], P.INSERT_SHORT[1], (x_, sg * (P.Y_SLOT - 0.1), zs), (0, sg, 0)) for sg in (1, -1)]
+            if all(not _hits(h, tun_list + screws) and any(_overlaps(p["shape"], h) and
+                   p["shape"].intersect(h).Volume() >= 0.9 * h.Volume() for p in pieces) for h in holes):
+                for h in holes:
+                    _frame_insert(pieces, h, [], share=0.9)
+                DECK_RAIL_SCREWS.append(x_)
                 break
-        DECK_RAIL_SCREWS.extend(found)
-        if len(found) < 4:
-            clash.append(f"deck rail {'left' if sg > 0 else 'right'}: only {len(found)} of 4 screws found frame")
-    log(f"speaker cup screws: {len(CUP_SCREWS)} of 8, light bar liner screws: {len(BAR_SCREWS)}, deck rail screws: "
-        f"{len(DECK_RAIL_SCREWS)} of 8" + (f"; check {clash}" if clash else ""))
+        else:
+            clash.append(f"in-well rails: no frame for the screw near x {target:.0f}")
+    log(f"speaker cup screws: {len(CUP_SCREWS)} of 8, front rail screws: {len(FRONT_RAIL_SCREWS)} of 4, in-well rail screws: "
+        f"{2 * len(DECK_RAIL_SCREWS)} of {2 * len(P.DECK_RAIL['screws_x'])}" + (f"; check {clash}" if clash else ""))
     # a chunk that came loose from its piece (cut off by a slot or an insert) goes to the piece it touches, if any
     slivers = []
     for p in pieces:
@@ -896,15 +948,6 @@ def body_parts(log=print):
         if p["n"].x < -0.9:                      # rear face: fill port, tank relief, E-stop, charge port, USB-C
             for (yb, zb, r) in REAR_HOLES:
                 a = a.cut(cyl(r, 30, (-P.FRAME_X - 10, yb, zb), (1, 0, 0)))
-        if p["n"].z > 0.9:                        # deck: the add-on rails' M5 screws pass the acrylic's edge
-            ab = a.BoundingBox()
-            for x_, y_ in DECK_RAIL_SCREWS:
-                if ab.xmin - 3 < x_ < ab.xmax + 3 and ab.ymin - 3 < y_ < ab.ymax + 3:
-                    # a U-slot open to the acrylic's edge (146 from the centre line), not a hole 0.25 mm from it
-                    sl = cyl(2.75, 40, (x_, y_, P.Z_TOP + 5), (0, 0, -1)).fuse(
-                        box(x_ - 2.75, x_ + 2.75, *sorted((y_, (abs(y_) - 10.0) * (1 if y_ > 0 else -1))),
-                            P.Z_TOP - 35, P.Z_TOP + 5))
-                    a = a.cut(sl)
         u, w = B._plane_basis(p["n"])
         us = [V(*q).dot(u) for q in p["poly"]]
         ws = [V(*q).dot(w) for q in p["poly"]]
@@ -915,7 +958,7 @@ def body_parts(log=print):
         for k, c in enumerate(p["clips"]):
             short_ = any(d_ < P.INSERT[1] for _, _, d_ in c.get("bores", []))
             add(f"Panel clip {i:02d}-{k}", c["clip"], "print", "body", bom="Panel corner clip", kind="print",
-                note="M4 x 6 button head into an M4 x 4 insert" if short_ else "M4 x 8 button head into an M4 x 6 insert")
+                note="M4 x 6 button head into an M4 x 4 insert" if short_ else "M4 x 8 button head into an M4 x 4 insert (at the top of the 6.5 mm hole)")
             nclip += 1
         led = p.get("led_pieces") or []
         for k, piece in enumerate(led):

@@ -43,7 +43,7 @@ def _tumble_prism(inset):
 
 
 def notch_cuts():
-    """Every pocket cut into the body: the two speaker corners and the light bar's pocket in the front."""
+    """Every notch cut into the body: the two speaker corners and the light bar hole at the bottom of the front."""
     return SPK.cuts() + LB.cuts()
 
 
@@ -126,8 +126,8 @@ def _wire_pts(wire):
 
 
 def face_info(solid):
-    """Planar faces with outward normal and outer-wire vertices (3D). A face with a hole in it (the front, round the
-    light bar pocket) comes back as its two halves either side of y = 0, each one outline running round half the
+    """Planar faces with outward normal and outer-wire vertices (3D). A face with a hole in it (none since the light
+    bar hole opened to the bottom) comes back as its two halves either side of y = 0, each one outline running round half the
     hole."""
     out = []
     for f in solid.Faces():
@@ -1620,8 +1620,13 @@ def add_joints(pieces, panels, log=print):
                 add_joints.screws.append(clear_h)
             # the fused tenon starts 0.5 mm inside its own piece: OCC doesn't always merge solids that only touch
             root = _frustum(core - out * 0.5, out, u, w, size, length + 0.5, taper)
-            shapes[owner["name"]] = shapes[owner["name"]].fuse(root).cut(pilot).clean()
-            if len(shapes[owner["name"]].Solids()) > 1:
+            fused = shapes[owner["name"]].fuse(root).cut(pilot).clean()
+            big = lambda sh: [x for x in sh.Solids() if x.Volume() > 200.0]   # (a sectioning crumb isn't a loose tenon)
+            if len(big(fused)) > 1:                       # OCC left the tenon loose: root it deeper, fuzzy fuse
+                deep = _frustum(core - out * 1.5, out, u, w, size, length + 1.5, taper)
+                fused = _robust(shapes[owner["name"]].fuse, deep).cut(pilot).clean()
+            shapes[owner["name"]] = fused
+            if len(big(shapes[owner["name"]])) > 1:
                 detached.append(f"{owner['name']} {end}")
             hole = mort.fuse(ten).fuse(clear_h)
             hb = hole.BoundingBox()

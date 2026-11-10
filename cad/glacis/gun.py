@@ -1,5 +1,7 @@
 """The elevating gun (rev C.1): two in-line cannons stacked one above the other; the pivot axis passes
-between them.
+between them. Brophy Borealis (2026-11-10): the chambers are welded (3 in Sch 40 pipe between two 3/8 in discs, the
+valve on a 1 in nipple welded through the front one, a 1/4 NPT bung near the front for the fill line); the notes
+below describe the threaded chambers they replace.
 
 Each cannon, back to front on one axis: 1/4 NPT brass cross (fill push-to-connect at the back, 125 psi relief
 outward, transducer to the side) -> 1 x 1/4 bushing -> chamber (2 x 1 reducing coupling, 2 in Sch 40 x 8 in
@@ -17,6 +19,7 @@ import math
 import cadquery as cq
 from cadquery import Vector as V
 import params as P
+import pneu_parts as PP
 from lib import add, box, cyl, tube, hex_prism, union, C, t_slot
 from fittings import Chain, OD, ENG, BORE, relief_cap
 
@@ -25,7 +28,7 @@ ENG.setdefault("3", 26.0)
 BORE.setdefault("3", 77.9)
 
 IN = P.IN
-R_CH = P.RED["OD_OUT"] / 2                                   # widest part of a chamber
+R_CH = OD[P.CH_PIPE] / 2                                     # widest part of a chamber (welded: the pipe itself)
 R_PIPE = OD[P.CH_PIPE] / 2
 BORE_PIPE = BORE[P.CH_PIPE]
 CRADLE_Y0 = P.CRADLE_Y0                                      # inner faces of the two cradle plates
@@ -128,29 +131,40 @@ def _cannon(k, xf):
         bar = bar.cut(cyl(2.5, 20, (xh, 0, h), (0, math.cos(a), math.sin(a))))
     gadd(f"Barrel {tag}", bar, "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock",
          note=f"{P.BARREL_LEN / IN:.1f} in; 6 x 5 mm smoke holes {SMOKE_HOLE_X:.0f} mm from the breech end")
-    ci = Chain((xv - hl, 0, h), (-1, 0, 0), "F", gadd, f"{tag} chamber ")
-    ci.nipple("1", bom="1 in Sch 40 close nipple (1-1/2 in)")
-    r = P.RED
-    red_bom = "Chamber: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI)"
-    vol = ci.reducer("1", P.CH_PIPE, r["L"], r["OD_IN"], r["OD_OUT"], r["BAND_IN"], r["BAND_OUT"], bom=red_bom,
-                     mass=r["MASS"])
-    nl = P.CH_NIPPLE_L[k]
-    ci.nipple(P.CH_PIPE, length=nl, bom=f"Chamber: 3 in Sch 40 black steel nipple x {nl / IN:.0f} in")
-    vol += ci.reducer(P.CH_PIPE, "1", r["L"], r["OD_OUT"], r["OD_IN"], r["BAND_OUT"], r["BAND_IN"], bom=red_bom,
-                      mass=r["MASS"])
-    vol += math.pi * (BORE_PIPE / 2) ** 2 * nl / 1000.0
-    CH_VOL[k] = vol
-    ci.bushing("1", "1/4", 34.9, 7.0, bom="1 in MNPT x 1/4 FNPT hex bushing, 304 stainless, 350 psi")
-    ci.nipple("1/4", color="brass", bom="1/4 NPT brass close nipple 7/8 in")
-    ports = ci.block("1/4", side=32.0, sides=((0, 0, s), (0, 1, 0)),     # transducer left, tubes run right
-                     bom="1/4 NPT brass cross (ChillWaves)")
-    ci.male_end("fill push-to-connect", 22.0, 15.0, bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-    tip = ci.at(ci.s)
-    # both chambers run to full tank pressure (rev D.2: capped at 190 in software, 200 psi relief on each)
-    ports[0].male_end("relief 200 psi", 44.0, 19.0, bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
-                      extra=relief_cap)
-    ports[1].male_end("transducer 0-300 psi", 56.0, 20.0, color="steel",
-                      bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH) (+ 1/4 x 1/8 bushing)")
+    # Brophy Borealis welded chamber (Micah, 2026-11-10): half of a 1 x 4 in nipple (its threaded end into the valve)
+    # welded through a 3/8 in A36 front disc (1.33 in hole), flush with the disc's inner face; 3 in Sch 40 plain-end
+    # pipe between the two 3.5 in discs; the back disc is blank. The 1/4 NPT weld bung sits 1 in behind the front disc
+    # on the tube-lane side (-y), turned 30 deg toward the axis, with a swivel push-to-connect elbow.
+    # The transducer and relief moved to a cross after the in valve on the chassis (misc.air)
+    e1, T = ENG["1"], P.CH_DISC_T
+    xr0 = xv - hl                                            # the valve's rear face
+    toe = P.CH_TOE_L
+    xpi = xr0 + e1 - toe                                     # pipe's front end = the front disc's inner face
+    nl = P.CH_PIPE_L[k]
+    gadd(f"Chamber outlet nipple {tag}", tube(OD["1"] / 2, BORE["1"] / 2, toe, (xpi, 0, h), (1, 0, 0)), "steel",
+         bom="Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc", kind="stock")
+    disc_f = cyl(R_PIPE, T, (xpi, 0, h), (1, 0, 0)).cut(cyl(1.33 * IN / 2, T + 2, (xpi - 1, 0, h), (1, 0, 0)))
+    gadd(f"Chamber front disc {tag}", disc_f, "steel", bom="Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)",
+         kind="machined", note="1.33 in hole for the outlet nipple; welded to the pipe and the nipple")
+    gadd(f"Chamber pipe {tag}", tube(R_PIPE, BORE_PIPE / 2, nl, (xpi - nl, 0, h), (1, 0, 0)), "steel",
+         bom="Chamber: 3 in Sch 40 steel pipe, plain end (cut)", kind="stock", note=f"{nl / IN:.1f} in")
+    gadd(f"Chamber back disc {tag}", cyl(R_PIPE, T, (xpi - nl - T, 0, h), (1, 0, 0)), "steel",
+         bom="Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)", kind="machined", note="blank; welded on")
+    CH_VOL[k] = math.pi * (BORE_PIPE / 2) ** 2 * nl / 1000.0
+    xb_ = xpi - P.CH_BUNG_X                                  # the inlet bung, 1 in behind the front disc
+    dn = V(0, -math.sin(math.radians(60)), -s * 0.5)         # toward the tube lane, 30 deg toward the axis (the two
+                                                             # elbows then clear each other between the chambers)
+    base = V(xb_, 0, h) + dn * (R_PIPE - 6.0)
+    top = V(xb_, 0, h) + dn * (R_PIPE + P.CH_BUNG_H)
+    bung = cyl(11.0, P.CH_BUNG_H + 6.0, base.toTuple(), dn.toTuple()).cut(
+        cyl(7.0, P.CH_BUNG_H + 8.0, (base - dn * 1.0).toTuple(), dn.toTuple())).cut(
+        cyl(R_PIPE, 60, (xb_ - 30, 0, h), (1, 0, 0)))
+    gadd(f"Chamber inlet bung {tag}", bung, "steel", bom="Chamber inlet: 1/4 NPT female steel weld-on bung", kind="stock",
+         note="welded over a 1/2 in hole in the pipe wall")
+    out = V(1, 0, 0)                                         # forward, to where its tube drops out of the core
+    gadd(f"Chamber inlet elbow {tag}", PP.ptc_elbow(top, dn.toTuple(), out.toTuple()), "brass",
+         bom="DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)")
+    tip = top + dn * 13.0 + out * 16.0
     return tip, ax0
 
 
@@ -180,16 +194,16 @@ def _build(xv):
                        (xv - 40, zo - 12), (xv - 40, -zo + 12)):
             pl = pl.cut(cyl(3.3, 10, (x, y0 - 2, z), (0, 1, 0)))
         # Brophy Borealis: a 20x20 T-slot rail inside each plate along its top edge, flush with it, for add-ons;
-        # 3 x M5 through the plate into drop-in T-nuts in the rail's outer slot (clear of the plate's own holes)
+        # 3 x M4 x 8 through the plate into drop-in T-nuts in the rail's outer slot (clear of the plate's own holes)
         rx0, rx1 = x0 + 22.0, min(xv - 58.0, x0 + 22.0 + 300.0)
         ry = (CRADLE_Y0 - P.RAIL20, CRADLE_Y0) if sy > 0 else (-CRADLE_Y0, -CRADLE_Y0 + P.RAIL20)
         rz = (zo - P.RAIL20, zo)
         for xs_ in (rx0 + 30.0, (rx0 + rx1) / 2, rx1 - 30.0):
-            pl = pl.cut(cyl(2.75, 10, (xs_, y0 - 2, zo - P.RAIL20 / 2), (0, 1, 0)))
+            pl = pl.cut(cyl(2.25, 10, (xs_, y0 - 2, zo - P.RAIL20 / 2), (0, 1, 0)))
         gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al)", kind="stock")
         gadd(f"Rail 20x20 gun {tag}", t_slot(rx0, rx1, ry, rz), "alu", bom="20x20 T-slot extrusion (owned spare, cut)",
              kind="stock", mass=0.47 * (rx1 - rx0) / 1000.0,
-             note=f"{rx1 - rx0:.0f} mm; 3 x M5 x 10 through the cradle plate into drop-in T-nuts; top flush with the plate")
+             note=f"{rx1 - rx0:.0f} mm; 3 x M4 x 8 through the cradle plate into M4 drop-in T-nuts; top flush with the plate")
     # chamber saddles: one block between the two nipples at each station, a printed cap bolted over each outer half
     cyls = [cyl(R_PIPE + 0.5, 1200, (xr - 1100, 0, h), (1, 0, 0)) for h in H]
     lanes = union([cyl(3.8, 1200, (xr - 1100, y, 0), (1, 0, 0)) for y in FILL_LANES])   # fill lines pass through
@@ -202,13 +216,13 @@ def _build(xv):
             z0, z1 = (h + 0.5, h + 200) if s > 0 else (h - 200, h - 0.5)
             cap = tube(R_PIPE + 6.0, R_PIPE + 0.5, 20.0, (xs - 10, 0, h), (1, 0, 0)).intersect(box(xs - 11, xs + 11, -200, 200, z0, z1))
             fz0, fz1 = (h + 0.5, h + 6.5) if s > 0 else (h - 6.5, h - 0.5)
-            yh = (R_PIPE + 3.0 + CRADLE_Y0 - 0.5) / 2 + 0.5       # M5 head clears the cap's ring
-            for sy in (1, -1):                                  # flanges onto the saddle, one M5 each into an insert
+            yh = (R_PIPE + 3.0 + CRADLE_Y0 - 0.5) / 2 + 0.5       # M4 head clears the cap's ring
+            for sy in (1, -1):                                  # flanges onto the saddle, one M4 each into an insert
                 fl = box(xs - 10, xs + 10, min(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)),
                          max(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)), fz0, fz1)
-                cap = cap.fuse(fl.cut(cyl(2.75, 20, (xs, sy * yh, fz0 - 1), (0, 0, 1))))
+                cap = cap.fuse(fl.cut(cyl(2.25, 20, (xs, sy * yh, fz0 - 1), (0, 0, 1))))
             gadd(f"Chamber cap {TAGS[k]} {xs:.0f}", cap.clean(), "print", bom="Chamber cap", kind="print",
-                 note="PETG, 5 walls, 40% gyroid; 2 x M5 into heat-set inserts in the saddle")
+                 note="PETG, 5 walls, 40% gyroid; 2 x M4 x 12 into M4 x 4 heat-set inserts in the saddle")
     for k, h in enumerate(H):
         vk = P.VALVES[k]
         x0v, x1v = xv - vk["L"], xv
@@ -223,7 +237,7 @@ def _build(xv):
     bb = box(ax0 + AD_BODY - 2.0, xb1, -CRADLE_Y0, CRADLE_Y0, -bz, bz)
     for h in H:
         bb = bb.cut(cyl(P.BARREL_OD / 2 + 0.3, 200, (ax0, 0, h), (1, 0, 0))).cut(cyl(25.5, 40, (ax0 - 5, 0, h), (1, 0, 0)))
-    bb = bb.cut(cyl(6.6, 200, (ax0 - 50, SMOKE_Y, 0), (1, 0, 0)))             # smoke line channel, split by the halves
+    bb = bb.cut(cyl(P.SMOKE_R + 0.35, 200, (ax0 - 50, SMOKE_Y, 0), (1, 0, 0)))             # smoke line channel, split by the halves
     for z0, z1, tag in ((0.0, bz, "upper"), (-bz, 0.0, "lower")):
         gadd(f"Breech block {tag}", bb.intersect(box(-1000, 1000, -500, 500, z0 + (0.5 if z0 == 0 else 0), z1 - (0.5 if z1 == 0 else 0))),
              "print", bom="Breech block half", kind="print", note="the halves clamp both barrels onto their spigots")
@@ -242,7 +256,7 @@ def _build(xv):
     man = man.cut(cq.Solid.makeLoft([_rrect(*s) for s in inner], False))
     for h in H:
         man = man.cut(cyl(rb + 1.0, 80, (mz0 - 5, 0, h), (1, 0, 0)))
-    man = man.cut(cyl(6.9, 80, (mz0 - 5, SMOKE_Y, 0), (1, 0, 0)))
+    man = man.cut(cyl(P.SMOKE_R + 0.65, 80, (mz0 - 5, SMOKE_Y, 0), (1, 0, 0)))
     man = man.cut(_groove(mz0 + 14.0, (W0 + secs[1][1]) / 2, (H0 + secs[1][2]) / 2, 23.0))
     gadd("Mantlet", man.clean(), "print", bom="Mantlet (printed, one piece, LED groove)", kind="print",
          note="slides on from the muzzle first and screws to the breech block; a 5 mm strip in its groove")
@@ -253,8 +267,8 @@ def _build(xv):
     col = _rounded_prism(xc - 16, 32.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
     for h in H:
         col = col.cut(cyl(rb + 0.3, 40, (xc - 20, 0, h), (1, 0, 0))).cut(tube(rb + 5.0, rb, 14.0, (xc - 7, 0, h), (1, 0, 0)))
-    col = col.cut(cyl(6.5, 10.0, (xc - 17, SMOKE_Y, 0), (1, 0, 0))).cut(cyl(3.5, 9.0, (xc - 8, SMOKE_Y, 0), (1, 0, 0)))
-    col = col.cut(cyl(3.5, SMOKE_Y + 1.0, (xc, SMOKE_Y, 0), (0, -1, 0)))
+    col = col.cut(cyl(P.SMOKE_R + 0.25, 10.0, (xc - 17, SMOKE_Y, 0), (1, 0, 0))).cut(cyl(5.25, 9.0, (xc - 8, SMOKE_Y, 0), (1, 0, 0)))
+    col = col.cut(cyl(5.25, SMOKE_Y + 1.0, (xc, SMOKE_Y, 0), (0, -1, 0)))
     gadd("Smoke collar", col, "print", bom="Smoke collar (printed, one piece)", kind="print",
          note="slides on from the muzzle; seals on the barrels with a bead of RTV; the smoke line plugs into its rear port")
     xe = b0s[0] + P.BARREL_LEN
@@ -276,22 +290,20 @@ def _build(xv):
     gadd(f"Elevation pulley {P.ELEV_T[1]}T", pul, "print_d", bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm", kind="print",
          note="hex bore")
     # every tube runs inside the core and drops out of its bottom just behind the pivot: each fill line from its
-    # chamber's push-to-connect round the back, forward in the valley between the chambers (through the saddles),
-    # out beside the bottom reducer; the smoke line from the collar back along the barrels' valley, through the
-    # mantlet and breech block, between the valves
+    # chamber's inlet elbow back between the chambers, then out beside the bottom one; the smoke line from the collar
+    # back along the barrels' valley, through the mantlet and breech block, between the valves
     z_exit = -(zo + 4.0)
     exits = []
     for k, t in enumerate(fills):
         xd, yd = FILL_DOWN[k]
-        xb = t.x - 18.0
-        pts = [t, V(xb, 0, t.z), V(xb, FILL_LANES[k], 0), V(xd, FILL_LANES[k], 0), V(xd, yd, 0), V(xd, yd, z_exit)]
+        pts = [t, V(xd, t.y, t.z), V(xd, yd, t.z), V(xd, yd, z_exit)]
         gadd(f"Gun tube {TAGS[k]}", _tube_path(pts), "tube", bom="DOT nylon tube 1/4 OD (ft)", kind="stock",
              note="inside the core; leaves the bottom behind the pivot")
         exits.append(pts[-1])
     xd, yd = SMOKE_DOWN
     xt = xv - 40.0                                           # crosses over beside the valves, where the reducers are clear
     pts = [V(xc - 7.5, SMOKE_Y, 0), V(xt, SMOKE_Y, 0), V(xt, yd, 0), V(xd, yd, 0), V(xd, yd, z_exit)]
-    gadd("Gun smoke tube", _tube_path(pts, r=6.35), "tube", bom="Silicone tube 3/8 ID x 1/2 OD (ft)", kind="stock",
+    gadd("Gun smoke tube", _tube_path(pts, r=P.SMOKE_R), "tube", bom="Silicone tube 1/2 ID x 5/8 OD (ft)", kind="stock",
          note="collar to the bottom of the core")
     return exits, [pts[-1]]
 
