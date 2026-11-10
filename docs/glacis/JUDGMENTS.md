@@ -1009,3 +1009,39 @@ F8. **Barrels, cheaper pipe:** clear PC (K-mac) $91.62 for two vs one 10 ft stic
 D12 (rev D.2 final). **Money:** $1,373.42 -> **$1,496.72 (+$123.30)**: cost-downs -$73.98, fixes +$34.33 (incl. the
     FxF elbow), Micah's changes +$162.95 (controller swap +$11.87, ADS1115 +$7.99, music board +$8.99, foam +$9.99,
     1x6 est. +$18.00, bottom cannon to 200 psi +$106.11).
+
+## Rev D.2.1: Waveshare controller, speaker tap, battery relays (2026-11-09)
+Micah's asks: a board with the USB plugs (he picked the Waveshare ESP32-P4-Module-DEV-KIT on Amazon), use its speaker
+output for the amp at a low volume instead of buying a line converter, his spare ESP32-C3 SuperMinis, and "a relay to
+one of the battery leads and voltage checking to both so it can automatically disconnect the lower battery until they
+are close enough in voltage".
+
+W1. **Controller:** Waveshare ESP32-P4-Module-DEV-KIT, $28.79 (Amazon B0FDWZ6KWT, sold by UeeKKoo, 3.6 stars from 10).
+    Gains USB-A + 2 USB-C, RJ45, a Pi-style 40-pin header (28 GPIO, takes Pi HATs), ES8311 + NS4150B + mic + speaker.
+    Loses 5 GHz (the C6 is 2.4 GHz): the D.2 reason for the C5 (crowded gyms) is gone, so the AP runs 2.4 GHz.
+W2. **Pins:** D.2 needs about 38 signals (5 drive PWM, 10 MOSFET outputs, valve arm relay, 8 LED lanes, I2C, 1-Wire,
+    lidar UART, music I2S + UART, pot, heartbeat, 2 battery relays) against 28 header GPIO. A PCA9685 ($5.99) takes 12
+    slow outputs (drive PWM, fog, light bar, battery relays; one ~200 Hz frequency, full-on/off for switches); OE pulled
+    up and driven low by the controller so a crash turns them off. Valves, LED data and the contactor stay direct.
+    Battery, bus and PDH volts move to a second ADS1115 (a 2-pack for the single's $7.99); the P4 ADC reads only the pot.
+W3. **Speaker output to the amp:** not straight in at low volume. The NS4150B is a filterless bridge-tied class-D amp:
+    each speaker wire switches 0-5 V at a few hundred kHz around 2.5 V DC whatever the volume (volume only changes the
+    duty cycle difference between the two wires), and the amp's input ground is the robot ground, so wiring SPK- to it
+    shorts the amp's output. The tap: SPK+ through two 1k/10 nF low-pass stages (16 kHz each, the carrier drops ~1000x)
+    and a 1 uF cap (blocks the 2.5 V) into the TPA3255 input; SPK- unconnected. One wire gives about half the swing, up
+    to ~1.8 V RMS, against the ~1.4 V RMS the TPA3255 needs for 100 W at 26 dB gain, so no divider. Parts from the kit,
+    $0; the PCM5102A ($2.44) moves to LATER as the fallback if the amp whines. The $7 speaker-to-line converter is
+    not needed.
+W4. **Battery relays: two, not one.** One relay can only hold off the pack it's on; if the fuller pack is on the
+    unswitched side, the robot would run on the emptier one and the gap would grow. So each pack gets a 200 A relay
+    (the contactor's part, $12.99, 0.15 A coil) on a ULN2803 channel. Normally open + a 4.7 ohm 5 W bypass across each:
+    power-up and a dead controller leave both open, the bypass still feeds the logic rail and trickle-balances the packs,
+    and the contactor drops anyway. Close rule: within 0.3 V (about 10 A of rush), comparing the connected pack under
+    load with the other at rest, which is the difference the rush sees. Normally closed 100 A+ relays weren't found
+    under $40 (Amazon search, 2026-11-09), and a diode-OR logic feed would have needed its own master switch.
+W5. **Remote:** one of Micah's C3 SuperMinis replaces the $3.79 S3 SuperMini (ESP-NOW is the same). They can't be the
+    phone-music board: Bluetooth LE only, no A2DP. The $8.99 WROOM stays for that.
+D13 (rev D.2.1). **Money:** $1,702.75 -> **$1,733.78 (+$31.03)**: controller -$0.50, PCM5102A to LATER -$2.44,
+    ADS1115 2-pack $0, PCA9685 +$5.99, two battery relays +$25.98, bypass resistors +$5.79, C3 remote -$3.79.
+Queued for the next CAD update: the Waveshare board's footprint on the shelf (dimensions not on its page), two more
+200 A relays and their bypass resistors by the battery bay, the PCA9685 and the second ADS1115.

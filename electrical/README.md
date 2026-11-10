@@ -1,5 +1,38 @@
 # electrical/
 
+**Rev D.2.1 (2026-11-09), Micah's picks on top of D.2.** Where this box and the D.2 box below disagree, this one wins.
+- **Controller: Waveshare ESP32-P4-Module-DEV-KIT** (ESP32-P4 + ESP32-C6) replaces the WTDKP4C5-S1: 1 USB-A + 2 USB-C,
+  RJ45, a 40-pin Pi-style header with 28 GPIO, an ES8311 codec + NS4150B 2 W speaker amp. WiFi is 2.4 GHz only now.
+  5 V from the logic rail on its SH1.0 header. A **PCA9685** (I2C, 16 PWM) takes the drive PWM (4 Falcons + Spark MAX),
+  fog (heater x2, pump, blower), the light bar and both battery relays; its OE is pulled up and held low by the
+  controller, so a reset turns them all off. Valves, LED data and the contactor stay on the board's own pins. A
+  **second ADS1115** reads battery A, battery B, the bus and the PDH; the P4's own ADC only reads the pot.
+- **Audio: the board's speaker output feeds the TPA3255** (the PCM5102A is now only a fallback). SPK+ -> 1k/10 nF ->
+  1k/10 nF -> 1 uF -> amp input, L and R together; SPK- stays unconnected. Not straight in at low volume: the NS4150B
+  is bridge-tied and filterless, so each wire is a 5 V square wave at a few hundred kHz on 2.5 V DC at any volume, and
+  grounding SPK- shorts the amp. Software sets the volume and mix; the amp's gain pot sets the top end.
+- **Battery relays:** each FRC battery's + lead runs through its own 200 A relay (the contactor's part) to the bus,
+  with a 4.7 ohm 5 W resistor across each relay. Two relays, because with one, a fuller pack on the unswitched side
+  could never be held off.
+
+```
+Battery A --SB50--+--[relay A]---+
+                  +--[4.7 ohm]---+
+                                 +-- bus (charge port) -- 120 A main breaker -- logic tap, contactor -- PDH
+Battery B --SB50--+--[relay B]---+
+                  +--[4.7 ohm]---+
+```
+
+  Firmware: both relays closed while the packs are within 0.3 V (about 10 A of rush through the ~0.03 ohm of two
+  batteries and their wiring). Further apart, only the fuller pack stays connected, and the other closes when the
+  fuller one, read under load, comes within 0.3 V. While charging (bus over 13.4 V) it's the reverse: the emptier pack
+  takes the charge first. Swap: tap Swap A/B on the dashboard so that relay opens first, and the fresh pack goes in
+  with no spark and no rush; a plain pull-and-plug still works (the bus jumps, the firmware opens a relay to find the
+  emptier pack). The relays are normally open: at power-up or with a dead controller both are open, and the bypass
+  resistors feed the logic rail (about 1 V drop at standby draw) and balance the packs at well under 1 A. The battery
+  dividers sit on the battery side of each relay; with both relays closed they read the same voltage, so the firmware
+  trims channel B to channel A then.
+
 **Rev D.2 proposal (2026-11-06), waiting on Micah's green light.** It changes the control side; the sections below are
 rev C.3/D and still describe the power tree and sensors, except where this box says otherwise.
 - **One controller:** an ESP32-P4 + ESP32-C5 board (Wireless Tag WTDKP4C5-S1) replaces the STM32F411, the ESP32-C5
@@ -160,8 +193,9 @@ About 25 A on average at an event. Two 18 Ah FRC batteries give roughly an hour 
 loses capacity at high draw), so swap one battery every ~30 minutes at long events. LEDs and fog are
 the big steady draws; dim the LEDs first if a game runs long.
 
-Live swap: pull the low battery first, then plug in the fresh one. Expect a short 20-40 A rush between
-them and a small spark at the SB50.
+Live swap (rev D.2.1): tap Swap on the dashboard first, so that battery's relay opens; then pull it and plug in the
+fresh one. The firmware runs on the fuller pack and reconnects the other when they're within 0.3 V. (Before D.2.1:
+a 20-40 A rush between them and a small spark at the SB50.)
 
 ## Wiring notes
 
