@@ -27,26 +27,16 @@ W = "2026-11-09"   # rev D.2.1: Waveshare controller, speaker tap, battery relay
 STASH = "Standard FRC stash part; buy only if the stash is out"
 OLD = "From the old cannon"
 ROWS = [
-    ("FROM THE OLD CANNON - reused, $0", None),
-    ("Atlantic Valves SZW-25 1 in NPT stainless solenoid valve, NC, Viton (old cannon)", "Owned", 0, 0.00,
-     "https://www.electricsolenoidvalves.com/1-inch-12-volt-dc-stainless-steel-electric-solenoid-valve/", "Motion",
-     "Spare (rev D.2): the bottom cannon runs to full tank pressure now, and this valve's listing says 0-90 psi", f"{OLD}. 1 in female NPT, Cv 12, 16 W ({V}, L)"),
-    ("Grey 1 gal steel ASME air tank with a 1 in NPT end port (old cannon)", "Owned", 0, 0.00, "", "Motion",
-     "Not used: too big for the gun (rev D.1); the top chamber is 3 in pipe like the bottom", f"{OLD}; spare"),
-    ("Longacre 5 gal aluminum tank, 125 psi (old cannon)", "Owned", 0, 0.00,
-     "https://toolsid.com/longacre/5-gal-horizontal-silver-lightweight-air-tank-mpn-52-50305.html", "Motion",
-     "Not used: 125 psi is below the 200 psi tank zone", f"{OLD}; spare"),
-
     ("PRESSURE SIDE - tanks, rear manifold, main valve and in valves (200 psi)", None),
     ('Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT, aluminum (your pick)', 'Aliexpress', 2, 56.60, 'https://www.aliexpress.us/item/3256804024554756.html', 'Motion', 'Two, 12 L: left and right over the front wheels. The CAD test-fit found no room for a third alongside them; 9-15 shots at 120 ft per 150-200 psi charge with a fast top valve, 6-10 with a slow one', f'200 psi, 1/4 NPT female bungs (photos: 2 along the side, one in an end); it ships with welded feet the CAD saddles ignore. $56.60 list; a $46.81 welcome deal shows for new shoppers. 4.9 stars, 90 sold ({V}, L)'),
     ('Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (McMaster 48435K72, set 200 psi)', 'McMaster', 4, 6.67, 'https://www.mcmaster.com/48435K72/', 'Motion', 'Tank zone (rear manifold; its ring at the rear panel is the hand dump), the valve cross, and both chambers (the ring is each chamber\'s bleed)', f'1/4 NPT male, ASME BPVC VIII, silicone seal, -15 to 250 F; set 200 psi in the page\'s Set Pressure box (125 and 200 are both offered at $6.67) ({V}, L)'),
-    ("Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)", "Amazon", 3, 17.69, "https://www.amazon.com/dp/B0CRQWKDNC",
-     "Electrical", "One part number for all three: tank and both chambers (rev C.3; the 0-200 psi one is gone)",
-     f"1/8-27 NPT male (photo), 0.5-4.5 V on 5 V, +/-1% FS, 316 stainless, ceramic cell, harness included ({V}, L)"),
+    ("Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless (pick the 300 PSI option)", "Aliexpress", 3, 10.69,
+     "https://www.aliexpress.us/item/3256803311817295.html", "Electrical", "One part number for all three: tank and both chambers (rev C.3; the 0-200 psi one is gone)",
+     f"Universal 5 V sender, 30-1000 psi options, connector included; 3K+ sold, 4.8 stars, $10.69 ({B2}, L). Was the FUSCH on Amazon at $17.69 each (B0CRQWKDNC). Check the 0.5-4.5 V output on the option page before ordering"),
     ('Fill plug: 303 stainless industrial (M-style) plug, 1/4 coupling, 1/4 NPTF female (McMaster 6718K52)', 'McMaster', 1, 9.97, 'https://www.mcmaster.com/6718K52/', 'Motion', 'Fill port outside the rear panel (Brophy Borealis "better plug"): threads onto the 1-1/2 in nipple through the panel, and your universal couplers (EVOULTES kit) snap on. Stainless, so it will not rust or gall like the plated Milton 728', f'1/4 NPTF female, open flow, 300 psi, "delivers tomorrow" ({B2}, L). Still an open plug, so the check valve behind it stays. No M-style plug with its own shut-off exists: only sockets have one'),
-    ('Interior quick disconnects: ISO 7241-1 B plug, 1/4, steel, both halves self-sealing (McMaster 95825K86)', 'McMaster', 5, 14.57, 'https://www.mcmaster.com/95825K86/', 'Motion', 'Brophy Borealis: each subsystem comes apart without venting the rest. 5 pairs: tank line to the main valve, rear manifold to each in valve (2), each in valve to its chamber service loop (2). ISO-B halves will not mate with the M-style fill, so nobody plugs a shop hose into an interior line', f'1/4 NPTF female, 3,500 psi, zinc-plated steel, valved ({B2}, L; stock not shown). Listed for hydraulics: Buna-N poppets are fine for 200 psi air (our judgment). Vent one side before reconnecting. Cheaper: eBay QD0250 ISO-B 1/4 NPT set $13.99 + ship, no rating stated [UNVERIFIED]: buy one and gauge the thread first'),
-    ('Interior quick disconnects: ISO 7241-1 B socket, 1/4, sleeve lock, steel (McMaster 95825K81)', 'McMaster', 5, 34.15, 'https://www.mcmaster.com/95825K81/', 'Motion', 'The other half of each of the 5 pairs above: socket on the supply side, so the live side is the one that seals hardest', f'1/4 NPTF female, 3,500 psi, zinc-plated steel, valved ({B2}, L; stock not shown). Brass version 52495K41/52495K61 is $59.88 a pair'),
-    ('DOT push-to-connect 1/4 tube x 1/4 NPT male, straight, 10-pack (Boeray) - for the quick disconnects', 'Amazon', 1, 19.99, 'https://www.amazon.com/dp/B0D8PX7Z94', 'Motion', 'Both ISO-B halves are female 1/4 NPT: a male push-to-connect in each of the 10 halves puts them inline on the nylon tube', 'Same listing as the Boeray 10-pack below (the existing 8-used pack has no spares for these) [stock not re-checked today: Amazon blocks automated checks]'),
+    ('Interior quick disconnects: Milton 715 M-style coupler, 1/4 FNPT, brass, 5-pack (B01620M8WY)', 'Amazon', 1, 29.89, 'https://www.amazon.com/dp/B01620M8WY', 'Motion', 'Brophy Borealis QDs, 5 joints: tank line to the main valve, rear manifold to each in valve (2), each in valve to its chamber service loop (2). The coupler (socket) has the built-in shut-off valve: it goes on the supply side of every joint, so the pressurized side seals the moment it is unplugged', f'Genuine Milton #715, 300 psi max working, 40 SCFM, Buna-N (Milton S-210 listing, {B2}, L). Replaces 5 McMaster ISO-B pairs ($243.60): ISO-B also seals the plug half, but nothing downstream of these joints needs that (an in valve is closed, a chamber should vent when its loop comes off). Also mates with your shop hoses, so any interior line can be filled or bled from a hose'),
+    ('Interior quick disconnects: Milton 728 M-style plug, 1/4 FNPT (female), box of 10 (B000PDUQOW)', 'Amazon', 1, 9.99, 'https://www.amazon.com/dp/B000PDUQOW', 'Motion', 'The plug half of the 5 QD joints (downstream side); 5 spare', f'Same listing as the old fill plug: 1/4 FNPT, plated steel, 300 psi per Lord Co. and Toolsid ({B2}, L)'),
+    ('DOT push-to-connect 1/4 tube x 1/4 NPT male, straight, 10-pack (Boeray) - for the quick disconnects', 'Amazon', 1, 19.99, 'https://www.amazon.com/dp/B0D8PX7Z94', 'Motion', 'The 715 coupler and 728 plug are both female 1/4 NPT: a male push-to-connect in each of the 10 halves puts them inline on the nylon tube', 'Same listing as the Boeray 10-pack below (the existing 8-used pack has no spares for these) [stock not re-checked today: Amazon blocks automated checks]'),
     ('Fill check valve, brass, 1/4 MNPT x 1/4 MNPT, 250 psi (American Made B076K8SLBZ)', 'Amazon', 1, 15.87, 'https://www.amazon.com/dp/B076K8SLBZ', 'Motion', 'Behind the panel, between the female elbow and the street elbow. Holds the tanks shut when the hose comes off (a plug is an open pipe)', f'Male on both ends (listing photo), not FNPT x MNPT as the old note hoped. 250 psi, 250 F, fluorocarbon O-rings, brass. Fit it with the flow arrow pointing in ({V}, L)'),
     ("In valves: Aignep 02F 2/2 NC direct-acting 12 V DC, 1/4 NPTF, 2 mm (02F03102N0N10201)", "Hose Warehouse", 2, 41.36,
      "https://hosewarehouse.com/products/02f03102n0n10201-aignep-fluidity-series-fluidity-02f-directacting-solenoid-valve-2-2-nc-nbr-seal-1-4-nptf-2-mm-12v-dc",
@@ -80,7 +70,7 @@ ROWS = [
      "https://ussolid.com/products/high-pressure-solenoid-valve-1-12v-dc-brass-50-bar-300-high-pressure-high-temperature-solenoid-valve-html",
      "Electrical", "One per cannon (rev D.2: the bottom one too, so both run to full tank pressure, capped at 190 under the 200 psi reliefs)",
      f"In stock, one version only. Thread is listed as NPT / G (a dual thread, no option to pick), so true NPT is NOT confirmed: test-fit a 1 in NPT nipple before trusting it at 190 psi. Cv 11.67, 25 mm, PTFE seal, junction box. Opening time unpublished: bench-test before cutting barrels ({V}, L)"),
-    ('Chambers: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI Products A203084816)', 'Global Industrial', 4, 27.95, 'https://www.globalindustrial.com/p/3-x-1-150lb-black-malleable-iron-reducing-coupling-150-300-psi', 'Motion', 'Both ends of both chambers, which run to 190 psi. 4.28 in across, which sets the barrel spacing', f'Same class as the Supply Giant one ("up to 150 lb" on Amazon), but this listing states a 150-300 psi working rating (ASME B16.3 gives Class 150 malleable 300 psi up to 150 F); NPT per ASME B1.20.1. Not one of your sellers; shipping not checked ({V}, L)'),
+    ('Chambers: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI Products A203084816)', 'Global Industrial', 4, 27.95, 'https://www.globalindustrial.com/p/3-x-1-150lb-black-malleable-iron-reducing-coupling-150-300-psi', 'Motion', 'Both ends of both chambers, which run to 190 psi. 4.28 in across, which sets the barrel spacing', f'Same class as the Supply Giant one ("up to 150 lb" on Amazon), but this listing states a 150-300 psi working rating (ASME B16.3 gives Class 150 malleable 300 psi up to 150 F); NPT per ASME B1.20.1. Not one of your sellers; shipping not checked. Cheaper, same Class 150 malleable: Supply Giant CNSD5003 $23.99 on Amazon (B016F1LPTW), saves about $16: kept MSI because you picked it in D.2 for its stated rating; your call ({V}, L)'),
     ('Bottom chamber: 3 in Sch 40 black steel nipple x 10 in (Supply Giant OQCM3010)', 'Amazon', 1, 28.99, 'https://www.amazon.com/dp/B016Y8C7D4', 'Motion', 'Bottom chamber body: about 1.35 L with the couplings, 3.5 in OD', f'3 MNPT both ends, Sch 40 black steel; the listing states no psi ({V}, L)'),
     ('Top chamber: 3 in Sch 40 black steel nipple x 12 in (Supply Giant OQCM3012)', 'Amazon', 1, 26.99, 'https://www.amazon.com/dp/B016Y8CB1C', 'Motion', 'Top chamber body: about 1.59 L with the couplings', f'3 MNPT both ends, Sch 40 black steel; the listing states no psi ({V}, L)'),
     ('1 in MNPT x 1/4 FNPT hex bushing, 304 stainless, 350 psi (B0C7N73YVZ)', 'Amazon', 2, 7.99, 'https://www.amazon.com/dp/B0C7N73YVZ', 'Motion', 'Back of each chamber to its brass cross', f'Replaces the Supply Giant malleable one, whose listing says "up to 150 lb" (the top runs to 190). 350 psi max working pressure ({V}, L)'),
@@ -200,7 +190,7 @@ ROWS = [
     ("REV PDH + ATO breakers, 120 A main breaker, SB50s, wire and lugs", "Stash", 1, 0.00, "", "Electrical", "Main power",
      "Owned / " + STASH),
     ('Anderson SB50 flush-mount bracket + dust cover kit', 'Aliexpress', 1, 3.68, 'https://www.aliexpress.us/item/3256806307889526.html', 'Electrical', 'Standby charge / shore-power port, bottom of the rear panel (a stash SB50 housing goes in it)', '5 stars, 68 sold. Was $9.99 (2026-11-04, L)'),
-    ('Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)', 'Amazon', 1, 28.79, 'https://www.amazon.com/dp/B0FDWZ6KWT', 'Electrical', 'One board does it all (rev D.2.1): web UI and WebSocket on 2.4 GHz WiFi 6 (the C6 on the board), valves and chamber metering, elevation loop, every LED strip, audio mixing out of its own speaker amp into the siren amp, MIPI camera later, lidar on a UART, the PDH contactor and both battery relays. 5 V from the logic rail on its SH1.0 power header', f'Micah picked it 2026-11-09 over the WTDKP4C5-S1 ($29.29) for the USB plugs: 1 USB-A + 2 USB-C, RJ45 (PoE header), a 40-pin Pi-style header with 28 GPIO (takes Pi HATs), ES8311 codec + NS4150B 2 W speaker amp + mic, speaker included. 2.4 GHz only, so the access point runs 2.4 GHz. Sold by UeeKKoo, 3.6 stars (10); Waveshare store $19.99 + shipping, AliExpress from $27.89 ({W}, L)'),
+    ('Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)', 'Amazon', 1, 28.79, 'https://www.amazon.com/dp/B0FDWZ6KWT', 'Electrical', 'One board does it all (rev D.2.1): web UI and WebSocket on 2.4 GHz WiFi 6 (the C6 on the board), valves and chamber metering, elevation loop, every LED strip, audio mixing out of its own speaker amp into the siren amp, MIPI camera later, lidar on a UART, the PDH contactor and both battery relays. 5 V from the logic rail on its SH1.0 power header', f'Micah picked it 2026-11-09 over the WTDKP4C5-S1 ($29.29) for the USB plugs: 4 USB-A + 2 USB-C, RJ45 (PoE header), a 40-pin Pi-style header with 28 GPIO (takes Pi HATs), ES8311 codec + NS4150B 2 W speaker amp + mic, speaker included. 2.4 GHz only, so the access point runs 2.4 GHz. Sold by UeeKKoo, 3.6 stars (10); Waveshare store $19.99 + shipping, AliExpress from $27.89 ({W}, L)'),
     ('ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)', 'Amazon', 1, 7.99, 'https://www.amazon.com/dp/B0DZSP4CG8', 'Electrical', '#1: the three pressure transducers + the 5 V reference. #2: battery A, battery B, the bus and the PDH volts, so the battery relays compare the two packs to a few mV. Both on I2C to the main controller (its own ADC only reads the pot)', f'Settled call: ESP32 ADCs are too nonlinear for pressure. Two for the price of the single (B0FLPZMQJY, $7.99); 5 stars (3), 50+ bought last month ({W}, L)'),
     ('PWM expander: PCA9685 16-channel, I2C (Dorhea B07RMTN4NZ)', 'Amazon', 1, 5.99, 'https://www.amazon.com/dp/B07RMTN4NZ', 'Electrical', '12 of 16 used: drive PWM to the 4 Falcons and the elevation Spark MAX, fog heater (2), pump, blower, light bar, both battery relays. Valves, LED data and the contactor stay on the board\'s own pins (timing and safety). OE is pulled up and held low by the controller, so a reset or crash turns every output off', f'The 28 header pins can\'t take all ~38 D.2 signals; this frees 12. One PWM frequency for all 16 (about 200 Hz suits the Falcons, Spark MAX and light bar; on/off loads use full-on/full-off). 4.5 stars (104), 200+ bought last month ({W}, L)'),
     ("ESP32-S3 boards (your two)", "Owned", 2, 0.00, "", "Electrical",
@@ -225,18 +215,13 @@ ROWS = [
     ('Siren speaker 200 W, 8 ohm, 121-130 dB, aluminium, 5.7 x 5.5 x 2.3 in (Xprite B01DMSR4L4)', 'Amazon', 2, 32.88, 'https://www.amazon.com/dp/B01DMSR4L4', 'Electrical', 'One high in each front-side corner, in a printed cup, aimed 45 deg out and 30 deg up; its L foot bolts through the cup', '4.3 stars (682), 50+ bought last month; 5 lb each. Replaces the SoundAlert ($59.99) (2026-11-04, L)'),
     ('TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm', 'Aliexpress', 1, 27.00, 'https://www.aliexpress.us/item/3256807353596235.html', 'Electrical', 'One channel per speaker; about 100 W each into 8 ohm on 48 V', '$27.00 is your price in the Sheet (2026-11-06; it was $15.27 + $1.99 on 2026-11-04). 727 sold, 4.9 stars. Amazon: B0DSSZZR5Q $25.99'),
     ('1500 W 30 A boost converter, 10-60 V in, 12-97 V out (set to 48 V)', 'Aliexpress', 1, 16.18, 'https://www.aliexpress.us/item/3256806808745565.html', 'Electrical', 'Feeds the amp from a 40 A PDH channel: 20-25 A from the battery at full siren', 'SKU "1500W 30A": $14.19 + $1.99 shipping, logged-in price; 372 g; size not listed, drawn 130 x 76 x 60 [UNVERIFIED]. The $1.09 1200 W SKU is a welcome price. Amazon: Gebildet potted 12->48 V 6 A B0D66NDXLN $15.99 (2026-11-04, L)'),
-    ("Speaker tap: 2 x 1k + 2 x 10 nF low-pass + 1 uF cap (from the kit)", "Stash", 1, 0.00, "", "Electrical", "Replaces the PCM5102A: one wire of the board's speaker output (SPK+) through a two-stage 1k/10 nF low-pass and a 1 uF cap into the TPA3255's input (L and R together). Volume and mix are set in software; the amp's gain pot sets the top end", "Not straight in at low volume: the NS4150B is bridge-tied and filterless, so each speaker wire carries a 5 V square wave at a few hundred kHz plus 2.5 V DC at any volume, and grounding SPK- shorts the amp. SPK- stays unconnected. If the amp still whines, the PCM5102A in LATER is the fallback"),
+    ("Speaker tap: 2 x 1k + 2 x 10 nF low-pass + 1 uF cap (from the kit)", "Stash", 1, 0.00, "", "Electrical", "Replaces the PCM5102A: one wire of the board's speaker output (SPK+) through a two-stage 1k/10 nF low-pass and a 1 uF cap into the TPA3255's input (L and R together). Volume and mix are set in software; the amp's gain pot sets the top end", "Not straight in at low volume: the NS4150B is bridge-tied and filterless, so each speaker wire carries a 5 V square wave at a few hundred kHz plus 2.5 V DC at any volume, and grounding SPK- shorts the amp. SPK- stays unconnected. If the amp still whines, a PCM5102A I2S DAC module ($2.44, aliexpress.us/item/3256809226289251) is the fallback"),
     ("Printed speaker cups (2) and grilles (2)", "Owned", 1, 0.00, "", "Structure",
      "Cup lines each corner notch, 4 x M4 x 8 through its walls into the frame; the speaker's foot bolts through it; grille: 3 walls, no top/bottom layers, 12% gyroid",
      "Filament assumed owned"),
 
     ("SHIPPING - what the unit prices above don't include", None),
     ('McMaster shipping, one order (estimate)', 'McMaster', 1, 10.0, '', 'Other', 'Relief valves, 1/4 x 1/8 bushings and 1 in nipples in one small box (the barrels moved to Amazon)', 'McMaster bills actual UPS cost; $10 is a guess for a small box [ESTIMATE]'),
-
-    ("LATER - not designed in yet, not in the total", None),
-    ("Video (from your list)", "Other", 0, 0.00, "", "Other", "Not designed in yet",
-     "Deferred (Micah, 2026-11-03). Rev D.2: the P4 board has a 2-lane MIPI-CSI camera port and a hardware JPEG/H.264 encoder, so a $10-20 camera module can stream from the main board itself"),
-    ('PCM5102A I2S DAC module (fallback for the speaker tap)', 'Aliexpress', 0, 2.44, 'https://www.aliexpress.us/item/3256809226289251.html', 'Electrical', 'Only if the speaker tap whines: I2S from a spare port to line level for the amp', '482 sold, 4.9 stars (2026-11-04, L)'),
 
     ("OTHER MATERIALS - your rows (2026-11-06)", None),
     ("PETG filament (your row)", "Amazon", 1, 40.00, "https://www.amazon.com/dp/B0D86D5SHS", "Structure",
@@ -250,7 +235,7 @@ ORDERED = ()   # rows ticked Purchased in the Sheet (keep them ticked when the t
 # section title prefix -> order (1: pneumatics, important electronics, speakers; 2: materials, LEDs, smoke)
 ORDER_OF = {"FROM THE OLD CANNON": 1, "PRESSURE SIDE": 1, "GUN": 1, "DRIVE": 1, "ELEVATION": 1, "CONTROLS": 1,
             "AUDIO": 1, "SHIPPING": 1, "SMOKE": 2, "FRAME + BODY": 2, "RAILS": 2, "LIGHTS": 2, "BUMPERS": 2,
-            "OTHER MATERIALS": 2, "LATER": 2}
+            "OTHER MATERIALS": 2, "LATER": 2, "ALREADY HAVE": 2}
 ORDER_TITLES = {1: "Borealis Order 1 - pneumatics, electronics, speakers",
                 2: "Borealis Order 2 - materials, LEDs, smoke"}
 
@@ -262,13 +247,27 @@ def order_of(section):
     raise KeyError(f"section {section!r} has no order")
 
 
+HAVE = ("Owned", "Stash")       # sellers of rows we already have: listed below each order, not in it
+
+
 def orders():
-    """{1: [rows], 2: [rows]}: each order's sections in ROWS order."""
-    out, cur = {1: [], 2: []}, None
+    """{1: [rows], 2: [rows]}: each order's sections in ROWS order, with the rows we already have (owned, stash)
+    pulled out of their sections into one ALREADY HAVE section at the end; sections left empty are dropped."""
+    out, have, cur = {1: [], 2: []}, {1: [], 2: []}, None
     for r in ROWS:
         if r[1] is None:
             cur = order_of(r[0])
-        out[cur].append(r)
+            out[cur].append(r)
+        elif r[1] in HAVE:
+            have[cur].append(r)
+        else:
+            out[cur].append(r)
+    for k in (1, 2):
+        rows = out[k]
+        rows[:] = [r for i, r in enumerate(rows) if r[1] is not None or (i + 1 < len(rows) and rows[i + 1][1] is not None)]
+        if have[k]:
+            rows.append(("ALREADY HAVE - owned or FRC stash, $0, nothing to buy", None))
+            rows.extend(have[k])
     return out
 
 
