@@ -1045,3 +1045,49 @@ D13 (rev D.2.1). **Money:** $1,702.75 -> **$1,733.78 (+$31.03)**: controller -$0
     ADS1115 2-pack $0, PCA9685 +$5.99, two battery relays +$25.98, bypass resistors +$5.79, C3 remote -$3.79.
 Queued for the next CAD update: the Waveshare board's footprint on the shelf (dimensions not on its page), two more
 200 A relays and their bypass resistors by the battery bay, the PCA9685 and the second ADS1115.
+
+## Brophy Borealis (2026-11-10, Micah's Windows Claude Code chat)
+
+Micah's asks (via his Mac chat): name it Brophy Borealis; two orders; a better fill plug and self-sealing interior
+quick disconnects; the light bar recessed into the front panel with a 3 in gap above it for crowd sensors; 20x20
+extrusion each side of the top and the cannon hub, symmetrical and clear of the pivot; an Onshape assembly that pivots
+with an Upmost / Downmost / Range / Free setting; then a BOM review, a steeper LED lean, and a faster build.
+
+B1. **Name:** "Brophy Borealis" on the Onshape document, CLAUDE.md and the Sheet; the code stays `cad/glacis/`.
+B2. **Two orders** (Sheet tabs "Borealis Order 1 - pneumatics, electronics, speakers" and "Borealis Order 2 -
+    materials, LEDs, smoke"), each with an ALREADY HAVE block under it (owned and stash rows, $0). Old-cannon spares
+    and LATER rows are gone.
+B3. **Plugs:** fill plug is a 303 stainless industrial M-style plug (McMaster 6718K52); the five interior joints are
+    Milton 715 couplers + 728 plugs (300 psi; the coupler seals the supply side when it's pulled), on DOT
+    push-to-connects. $39.88 for all five against $243.60 for McMaster ISO-B pairs. Still rated metal parts: nothing
+    printed on the pressure side.
+B4. **Light bar pocket:** the Zmoon bar sits 20 mm back from the front slant in a pocket with a level floor (z 266),
+    level roof and upright back wall, so the bar and anything mounted on the 3 in blank band above it point straight
+    ahead. A printed liner in two halves (split at y = 0 for the bed) lines it and carries the bar; 6 screws into the
+    frame. The front fog tube was rerouted under the pocket floor (it clashed with the liner).
+B5. **20x20 rails** (Micah's spares, $0): one inside each gun cradle plate (300 mm, 3 x M5 x 10 each), and two pieces
+    each side of the deck along the gun well (245 mm behind the pivot, 155 mm ahead), with a 70 mm gap round the
+    axle stub, angle pot, coupler and its bracket, which the one-piece rail ran into. All mirrored about y = 0 and
+    clear of the 0-45 deg swing. The deck pieces' M5 x 30 screws come up from inside the well; the member's LED light
+    tunnel runs under the rail's inboard half (|y| 137-142), so the screws go outboard of it (|y| 148.5), through a
+    U-slot in the deck acrylic's edge, and the rail clamps that edge. 8 of 8 screws find frame.
+B6. **LED lean 22.5 deg** (was 17.5), reached 15 mm after each corner arc (was 40 mm square + 40 mm ramp), smoothstep
+    so there's no flat spot. A 2 mm square lead-in stays: with 0, OCC built an invalid window loft on the rear panel
+    and the window cut deleted the whole frame (body.build now stops on an invalid window cut or a collapsed frame).
+    Checks: LED strips 0 overlaps, every loop kept 100%, 0 jumpers.
+B7. **Build speed:** `par.py` runs the slow independent OCC jobs on 90% of the cores (14 of 16 here; GLACIS_JOBS=1
+    for serial): frame sectioning, the piece contact table (Shape.distance on the twisted members was ~1.5 h serial),
+    node-merge trial fuses, joint neighbour lookups, interference pairs, the elevation sweep and the STEP export (one
+    tab per worker). Full robot.py: ~2 h 40 min -> 55 min, same results (52 pieces, 54 tenons).
+B8. **Onshape:** each of the 9 sub-assemblies has one rigid group of all its parts and an "Origin" mate connector;
+    Chassis & drive and Gun also have a "Pivot" connector on the axle line (x -40, z 645). At the top, every
+    sub-assembly but the gun is fastened to the origin, the gun has a revolute on the pivot connectors (+ = barrels
+    up, configured limits), and a "Gun angle" configuration: Range (0-45 limits), Free (no limits), Upmost and
+    Downmost (the revolute swapped for a fastened lock at 45 or 0 deg). **Known issue:** Onshape keeps one stored
+    position for every configuration and doesn't re-solve on a switch: server renders of all four settings are the
+    same 45 deg pose, even after re-saving the lock in Downmost. Dragging in Range/Free is the reliable way to set an
+    angle; the fix would be a separate gun instance per fixed setting, shown by configured suppression.
+D14 (Borealis). **Money:** $2,002.43 before the review -> **$1,777.71** (Order 1 $1,259.68 + $10 shipping, Order 2
+    $508.03). Open for Micah: swap the MSI chamber couplings for the Supply Giant B016F1LPTW ($23.99)?
+Not changed (already on main): two pneumatic fitting slivers in the interference check (valve cross / 200 psi relief
+146 mm3, fill elbow / rear manifold 64 mm3), from rev D.2.

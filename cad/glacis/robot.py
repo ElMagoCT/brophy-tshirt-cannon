@@ -33,11 +33,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
 LOG = []
+T0 = time.time()
 
 
 def log(*a):
     s = " ".join(str(x) for x in a)
-    print(s, flush=True)
+    t = int(time.time() - T0)
+    print(f"[{t // 3600}:{t // 60 % 60:02d}:{t % 60:02d}] {s}", flush=True)
     LOG.append(s)
 
 
@@ -129,22 +131,20 @@ def allowed(n1, n2):
 
 
 def check_interference(parts, tol=30.0):
+    import par
     boxes = [bb(p["shape"]) for p in parts]
-    hits = []
     n = len(parts)
     order = sorted(range(n), key=lambda i: boxes[i][0])
+    cand = []
     for ii, i in enumerate(order):
         for j in order[ii + 1:]:
             if boxes[j][0] >= boxes[i][3]:
                 break
-            if not overlap(boxes[i], boxes[j], 0.05):
-                continue
-            pi, pj = parts[i], parts[j]
-            if allowed(pi["name"], pj["name"]):
-                continue
-            v = common_volume(pi["shape"], pj["shape"])
-            if v > tol:
-                hits.append((round(v), pi["name"], pj["name"]))
+            if overlap(boxes[i], boxes[j], 0.05) and not allowed(parts[i]["name"], parts[j]["name"]):
+                cand.append((i, j))
+    paths = {k: par.save(parts[k]["shape"], f"part{k}") for k in sorted({k for c in cand for k in c})}
+    vols = par.run(par.pair_volume, [(paths[i], paths[j]) for i, j in cand], chunk=8)
+    hits = [(round(v), parts[i]["name"], parts[j]["name"]) for (i, j), v in zip(cand, vols) if v > tol]
     hits.sort(reverse=True)
     return hits
 
@@ -154,16 +154,21 @@ def check_sweep(parts, angles=range(int(P.ELEV_RANGE[0]), int(P.ELEV_RANGE[1]) +
     parts = [p for p in parts if not p["name"].startswith(("Service loop", "Fog loop"))]   # flexible, follow the gun
     fixed = [p for p in parts if not p["moving"]]
     fboxes = [bb(p["shape"]) for p in fixed]
+    import par
     hits = defaultdict(set)
+    cand = []
     for a in angles:
-        for m in movers:
-            s = pose(m["local"], a)
-            mb = bb(s)
-            for f, fb in zip(fixed, fboxes):
+        for mi, m in enumerate(movers):
+            mb = bb(pose(m["local"], a))
+            for fi, (f, fb) in enumerate(zip(fixed, fboxes)):
                 if overlap(mb, fb, 0.05) and not allowed(m["name"], f["name"]):
-                    v = common_volume(s, f["shape"])
-                    if v > tol:
-                        hits[(m["name"], f["name"])].add(a)
+                    cand.append((a, mi, fi))
+    mp = {mi: par.save(movers[mi]["local"], f"mover{mi}") for mi in {c[1] for c in cand}}
+    fp = {fi: par.save(fixed[fi]["shape"], f"fixed{fi}") for fi in {c[2] for c in cand}}
+    vols = par.run(par.swept_volume, [(mp[mi], a, fp[fi], tuple(P.PIVOT)) for a, mi, fi in cand], chunk=8)
+    for (a, mi, fi), v in zip(cand, vols):
+        if v > tol:
+            hits[(movers[mi]["name"], fixed[fi]["name"])].add(a)
     return sorted(((sorted(v), k[0], k[1]) for k, v in hits.items()), key=lambda r: r[1])
 
 
@@ -308,21 +313,18 @@ def export(parts):
     for f in os.listdir(d):
         os.remove(os.path.join(d, f))
     manifest = []
-    for tab, sel in tabs(parts).items():
+    import par
+    jobs, k = [], 0
+    for tab, sel in tabs(parts).items():          # one tab per core; each worker splits its own tab to fit
         sel = sorted(sel, key=lambda p: p["shape"].BoundingBox().center.x)
-        for nparts in range(1, 9):
-            chunks = [sel[i * len(sel) // nparts:(i + 1) * len(sel) // nparts] for i in range(nparts)]
-            files = []
-            for i, ch in enumerate(chunks):
-                label = tab if nparts == 1 else f"{tab} {i + 1} of {nparts}"
-                fn = re.sub(r"[^a-z0-9]+", "_", label.lower()).strip("_")
-                path = os.path.join(d, f"{fn}.step")
-                names = _save_step(ch, label, path)
-                files.append((label, path, names, len(ch)))
-            if max(os.path.getsize(f[1]) for f in files) <= STEP_MAX:
-                break
-            for f in files:
-                os.remove(f[1])
+        items = []
+        for p in sel:
+            shape = pose(p["local"], GUN_EXPORT_ELEV) if p["moving"] else p["shape"]
+            items.append(dict(name=p["name"], color=p["color"], bom=p["bom"], kind=p["kind"], group=p["group"],
+                              path=par.save(shape, f"exp{k}")))
+            k += 1
+        jobs.append((tab, items, d, STEP_MAX))
+    for files in par.run(par.export_tab, jobs):
         for label, path, names, n in files:
             json.dump(names, open(path[:-5] + ".names.json", "w"), indent=0)
             manifest.append(dict(tab=label, file=os.path.basename(path), parts=n, bytes=os.path.getsize(path)))

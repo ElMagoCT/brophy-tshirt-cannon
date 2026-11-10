@@ -150,12 +150,15 @@ TENON_CLEAR = 0.3                           # per side, for a 0.6 mm nozzle (pri
 # panel light (rev D.1.2, Micah 2026-11-04): the window wall IS the LED surface. Below the acrylic's ledge it runs
 # straight back, past the member as a thin web, and its last 10 mm (the strip) leans a little toward the panel on the
 # straight runs. No rail, no flange, no step but the ledge the acrylic sits on.
-LED_BAND = (10.0, 25.0, 17.5, 2.5)          # strip width (a 10 mm strip; ~8 is enough to stick to), strip centre this
+LED_BAND = (10.0, 25.0, 22.5, 2.5)          # strip width (a 10 mm strip; ~8 is enough to stick to), strip centre this
                                             # far behind the acrylic's back face, lean toward the panel (deg) on the
                                             # straight runs, web thickness below the member
 LED_STRIP_T = 1.6                           # 60/m strip thickness on the band
-LED_TWIST = 40.0                            # runs stay square this far from each corner (a strip can't bend round a
-                                            # cone), then the lean ramps in over the next LED_TWIST
+LED_SQUARE = 2.0                            # runs stay square this far from each corner (a strip can't bend round a
+                                            # cone; the corner arc itself stays square). 0 made OCC build an invalid
+                                            # window loft on the rear panel that took the whole frame with it
+LED_TWIST = 15.0                            # then the lean ramps in over this (Micah 2026-11-10: lean 5 deg more, reach
+                                            # it quicker at the corners, no flat spots; was 40 square + 40 ramp)
 WINDOW_IN = dict(coplanar=MEM_W, open=MEM_W, notch=MEM_W, notch_top=MEM_W, slot=24.0, shared=MEM_W)
                                             # window edge (= LED surface) in from each panel edge, before the checks:
                                             # a shared edge then moves in until its web and strip stay on their own side
@@ -228,8 +231,11 @@ BAR_POCKET = dict(clear=4.0, wall=4.0, sensor=3.0 * IN, floor_z=266.0, recess=20
 # 20x20 T-slot rails for add-ons (Micah's spares): one each side of the deck along the gun well, one inside each
 # gun cradle plate, all mirrored about y = 0 and clear of the pivot
 RAIL20 = 20.0
-DECK_RAIL = dict(y=(133.5, 153.5), x=(-320.0, 150.0))   # |y| band (outboard of the pivot bearing blocks, which stop at
-                                            # 129.4, and of the well's 133), x span along the flat deck
+DECK_RAIL = dict(y=(133.5, 153.5), x=(-320.0, 150.0), gap=(-75.0, -5.0))   # gap: each rail is two pieces either
+                                            # side of the pivot (the axle stub, pot, coupler and its bracket at x -70..-10)
+DECK_RAIL_PIECES = ((DECK_RAIL["x"][0], DECK_RAIL["gap"][0], "aft"), (DECK_RAIL["gap"][1], DECK_RAIL["x"][1], "fore"))
+# y: the |y| band, outboard of the pivot bearing blocks (which stop at 129.4) and of the well's 133; x: the span
+# along the flat deck
 
 
 

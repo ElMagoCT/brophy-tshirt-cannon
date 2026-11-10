@@ -295,7 +295,7 @@ def fog():
     add("Fog vent front", tube(13.0, 10.0, 14.0, (vx, vy, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1)).fuse(
         tube(16.0, 10.0, 3.0, (vx, vy, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1))), "print", "power",
         bom="Fog vent nozzle (under bumper)", kind="print", note="through a hole in the bellypan")
-    add("Fog tube front", tube_path([side_b, (side_b[0] + 30, vy, side_b[2]), (vx, vy, P.BELLY_Z + 10.0),
+    add("Fog tube front", tube_path([side_b, (side_b[0] + 15, vy, side_b[2] - 10.0), (vx, vy, P.BELLY_Z + 10.0),
                                      (vx, vy, P.BELLY_Z - P.PLATE_T)], r=11.0),
         "tube", "power", bom="Fog tube (owner's flexible tube)", kind="stock")
     # back: along the bellypan centreline, under the gun's swing, down through the bellypan just ahead of the
@@ -443,14 +443,15 @@ DECK_RAIL_SCREWS = []                     # (x, y) of each rail's M5 screws, set
 def deck_rails():
     """A 20x20 T-slot rail on the deck each side of the gun well, outboard of the pivot's bearing blocks, for
     add-ons. Each sits on the well-edge frame member, held by M5 screws up through the member into drop-in T-nuts."""
-    (y0, y1), (x0, x1) = P.DECK_RAIL["y"], P.DECK_RAIL["x"]
+    y0, y1 = P.DECK_RAIL["y"]
     for sg, side in ((1, "left"), (-1, "right")):
         ys = (y0, y1) if sg > 0 else (-y1, -y0)
-        n_ = sum(1 for _, y in DECK_RAIL_SCREWS if y * sg > 0)
-        add(f"Rail 20x20 deck {side}", t_slot(x0, x1, ys, (P.Z_TOP, P.Z_TOP + P.RAIL20)), "alu", "body",
-            bom="20x20 T-slot extrusion (owned spare, cut)", kind="stock", mass=0.47 * (x1 - x0) / 1000.0,
-            note=f"{x1 - x0:.0f} mm; {n_ or 3} x M5 x 30 up through the deck member (from inside the well) into "
-                 "drop-in T-nuts")
+        for x0, x1, end in P.DECK_RAIL_PIECES:          # aft and fore of the pivot's pot and axle stub
+            n_ = sum(1 for x, y in DECK_RAIL_SCREWS if y * sg > 0 and x0 < x < x1)
+            add(f"Rail 20x20 deck {side} {end}", t_slot(x0, x1, ys, (P.Z_TOP, P.Z_TOP + P.RAIL20)), "alu", "body",
+                bom="20x20 T-slot extrusion (owned spare, cut)", kind="stock", mass=0.47 * (x1 - x0) / 1000.0,
+                note=f"{x1 - x0:.0f} mm; {n_ or 2} x M5 x 30 up through the deck member and a U-slot in the acrylic's edge "
+                     "(from inside the well) into drop-in T-nuts; it clamps that edge too")
 
 
 # ------------------------------------------------------------------ bumpers
@@ -842,27 +843,32 @@ def body_parts(log=print):
                     got += 1
     if len(BAR_SCREWS) < 6:
         clash.append(f"light bar liner: only {len(BAR_SCREWS)} screws found frame")
-    # deck rails: 3 x M5 clearance holes each, straight down through the well-edge member, clear of its light tunnel
+    # deck rails: 2 x M5 clearance holes per piece, straight down through the well-edge member, clear of its light tunnel
     DECK_RAIL_SCREWS.clear()
-    (ry0, ry1), (rx0, rx1) = P.DECK_RAIL["y"], P.DECK_RAIL["x"]
+    ry0, ry1 = P.DECK_RAIL["y"]
     for sg in (1, -1):
         found = []
-        for target in (rx0 + 35.0, (rx0 + rx1) / 2, rx1 - 35.0):
+        for target, lo, hi in [(t, a + 15.0, b - 15.0) for a, b, _ in P.DECK_RAIL_PIECES for t in (a + 35.0, b - 35.0)]:
             for dx in (0, 10, -10, 20, -20, 30, -30, 40, -40, 50, -50):
-                for yy in ((ry0 + ry1) / 2, ry0 + 5.0, ry1 - 5.0):
+                # the member's light tunnel runs at |y| 137-142 under the rail's inboard half, so the screws go
+                # outboard of it, through a U-slot in the deck acrylic's edge (cut below): the top 8 mm there is the
+                # acrylic's ledge, so the member holds ~60% of the hole's length, not 70
+                for yy, share in ((148.5, 0.55), (147.5, 0.55), (149.5, 0.55), ((ry0 + ry1) / 2, 0.7)):
                     x_ = target + dx
+                    if not lo <= x_ <= hi:
+                        continue
                     hole = cyl(2.75, P.MEM_H + 4.0, (x_, sg * yy, P.Z_TOP + 1.0), (0, 0, -1))
-                    if _frame_insert(pieces, hole, tun_list + screws, share=0.7):
+                    if _frame_insert(pieces, hole, tun_list + screws, share=share):
                         found.append((x_, sg * yy))
                         break
                 else:
                     continue
                 break
         DECK_RAIL_SCREWS.extend(found)
-        if len(found) < 3:
-            clash.append(f"deck rail {'left' if sg > 0 else 'right'}: only {len(found)} of 3 screws found frame")
+        if len(found) < 4:
+            clash.append(f"deck rail {'left' if sg > 0 else 'right'}: only {len(found)} of 4 screws found frame")
     log(f"speaker cup screws: {len(CUP_SCREWS)} of 8, light bar liner screws: {len(BAR_SCREWS)}, deck rail screws: "
-        f"{len(DECK_RAIL_SCREWS)} of 6" + (f"; check {clash}" if clash else ""))
+        f"{len(DECK_RAIL_SCREWS)} of 8" + (f"; check {clash}" if clash else ""))
     # a chunk that came loose from its piece (cut off by a slot or an insert) goes to the piece it touches, if any
     slivers = []
     for p in pieces:
@@ -890,6 +896,15 @@ def body_parts(log=print):
         if p["n"].x < -0.9:                      # rear face: fill port, tank relief, E-stop, charge port, USB-C
             for (yb, zb, r) in REAR_HOLES:
                 a = a.cut(cyl(r, 30, (-P.FRAME_X - 10, yb, zb), (1, 0, 0)))
+        if p["n"].z > 0.9:                        # deck: the add-on rails' M5 screws pass the acrylic's edge
+            ab = a.BoundingBox()
+            for x_, y_ in DECK_RAIL_SCREWS:
+                if ab.xmin - 3 < x_ < ab.xmax + 3 and ab.ymin - 3 < y_ < ab.ymax + 3:
+                    # a U-slot open to the acrylic's edge (146 from the centre line), not a hole 0.25 mm from it
+                    sl = cyl(2.75, 40, (x_, y_, P.Z_TOP + 5), (0, 0, -1)).fuse(
+                        box(x_ - 2.75, x_ + 2.75, *sorted((y_, (abs(y_) - 10.0) * (1 if y_ > 0 else -1))),
+                            P.Z_TOP - 35, P.Z_TOP + 5))
+                    a = a.cut(sl)
         u, w = B._plane_basis(p["n"])
         us = [V(*q).dot(u) for q in p["poly"]]
         ws = [V(*q).dot(w) for q in p["poly"]]

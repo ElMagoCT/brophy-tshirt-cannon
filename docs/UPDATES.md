@@ -10,7 +10,6 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 
 | Who (and which chat) | Started | Working on | Files |
 |---|---|---|---|
-| Micah's Windows computer (Claude Code) | 2026-11-10 | Brophy Borealis: recessed light bar + 3 in sensor band, 20x20 rails on the deck and gun, self-sealing quick disconnects, two-order BOM, pivoting Onshape assembly with an angle setting | `cad/glacis/params.py`, `body.py`, `misc.py`, `gun.py`, `robot.py`, `pneu_parts.py`, new `lightbar.py`; `bom/glacis_bom*`; `CLAUDE.md`; `docs/glacis/JUDGMENTS.md`; Onshape doc; Glacis BOM Sheet tab |
 | Micah's Windows computer (Claude Code) | 2026-11-08 | Printable mini kit (gun on a filament pin) + sliced projects for 2 CC2 / 2 CC1 | `cad/glacis/mini.py`, `mini_3mf.py`, `mini_orca/`, `out/mini/`, `docs/glacis/mini_model.md` (all new) |
 
 ## Entry template
@@ -25,6 +24,36 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Not done: <Onshape import/version, Google Sheet, artifact, anything left for Micah>
 - Questions for Micah: <decisions that are his, or "none">
 ```
+
+## 2026-11-10 - Micah's Windows computer (Claude Code) - Brophy Borealis
+- Branch / commit: `micah-windows/borealis` (PR, not merged)
+- Changed (Micah's asks, JUDGMENTS "Brophy Borealis" B1-B8):
+  - name Brophy Borealis (Onshape, CLAUDE.md, Sheet); the BOM split into two orders with owned/stash under each;
+  - Milton M-style interior quick disconnects (5 joints) and an M-style stainless fill plug;
+  - the light bar recessed 20 mm in a lined pocket in the front slant, with a 3 in blank sensor band above it;
+  - 20x20 rails: one inside each gun cradle plate, two pieces each side of the deck (split round the pivot); the deck
+    screws go outboard of the member's light tunnel through U-slots in the deck acrylic's edge;
+  - LED lean 22.5 deg, reached 15 mm after each corner arc (no flat stretch), 2 mm square lead-in;
+  - `par.py`: the slow OCC steps run on 90% of the cores; robot.py ~2 h 40 min -> 55 min, same results;
+  - BOM review: unused rows gone, cheaper transducers and QDs.
+- Files: `cad/glacis/params.py`, `body.py`, `misc.py`, `gun.py`, `robot.py`, `lightbar.py`, `par.py` (new), `lib.py`;
+  `bom/glacis_bom.py` (+ csv/json); `CLAUDE.md`; `docs/glacis/JUDGMENTS.md`.
+- Checks (robot.py, 55 min, 14 workers): interference only the two known fitting slivers from rev D.2 (146, 64 mm3);
+  elevation sweep 0-45 deg clean; every print fits the 250 mm bed; no multi-piece parts; LED strips 0 overlaps, loops
+  100%, 0 jumpers; 52 frame pieces, 54 tenons (38 screwed, 16 glued), 46 clips; deck rail screws 8 of 8, light bar
+  liner 6, speaker cups 8 of 8. body.build now stops on an invalid window cut (a 0 mm square lead-in deleted the frame).
+- Parts list: $2,002.43 -> **$1,777.71** (Order 1 $1,259.68 + $10 shipping, Order 2 $508.03). Sheet tabs synced.
+- Onshape ("TC5 - Brophy Borealis"): version "Before Borealis rebuild swap (2026-11-10)", then body frame (9 tabs),
+  lights (3), panels, add-on rails and power & smoke swapped into their sub-assemblies (part counts match the export);
+  each sub-assembly has an "All parts (rigid)" group and an "Origin" connector, Chassis and Gun a "Pivot" connector;
+  every sub-assembly but the gun fastened to the origin; gun revolute + "Gun angle" configuration (Range / Free /
+  Upmost / Downmost). Version "Brophy Borealis (2026-11-10)". His custom tank instances, Part Studio 1 and Variable
+  Studio 1 untouched.
+- Not done: the Upmost / Downmost settings don't re-pose the gun. Onshape keeps one stored position for every
+  configuration and doesn't re-solve on a switch (server renders of all four settings are identical, 45 deg up).
+  Range / Free drag works.
+- Questions for Micah: MSI chamber couplings or the Supply Giant B016F1LPTW ($23.99)? Is a drag-to-angle Range good
+  enough, or should Upmost / Downmost become separate gun instances shown per setting?
 
 ## 2026-11-09 - Micah's Mac Claude Code chat ("Product photos for Cannon component boxes") - Glacis rev D.2.1: Waveshare controller, speaker tap, battery relays
 - Branch / commit: main, eeb953a. **Overlap:** the Windows "Brophy Borealis" claim (c0acf20) landed while this was being
