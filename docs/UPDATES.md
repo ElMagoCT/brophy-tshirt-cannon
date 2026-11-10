@@ -26,6 +26,24 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-09 - Micah's Mac Claude Code chat ("Product photos for Cannon component boxes") - Glacis rev D.2.1: Waveshare controller, speaker tap, battery relays
+- Branch / commit: main, eeb953a. **Overlap:** the Windows "Brophy Borealis" claim (c0acf20) landed while this was being
+  edited, and both touch `bom/glacis_bom.py` (+ csv/json) and `docs/glacis/JUDGMENTS.md`. Windows chat: `git pull`
+  before your BOM edits and keep these rows; this chat won't touch those files or the Sheet tab until your entry lands.
+- Changed (Micah's asks, JUDGMENTS "Rev D.2.1" W1-W5):
+  - controller: Waveshare ESP32-P4-Module-DEV-KIT (P4 + C6, 2.4 GHz only, USB-A + 2 USB-C, 40-pin header), $28.79 Amazon;
+  - a PCA9685 for 12 slow outputs and a second ADS1115 (2-pack) for battery A/B, bus and PDH volts;
+  - audio: the board's ES8311 + NS4150B speaker output into the TPA3255 through a two-stage RC tap; PCM5102A to LATER;
+  - battery relays: a 200 A relay (the contactor's part) in each FRC battery's + lead with a 4.7 ohm bypass; firmware
+    keeps only the fuller pack connected until the two are within 0.3 V (electrical/README, D.2.1 box);
+  - safety remote: one of Micah's C3 SuperMinis instead of the $3.79 S3.
+- Files: `bom/glacis_bom.py` (+ csv/json), `electrical/README.md`, `docs/glacis/JUDGMENTS.md`.
+- Checks: no CAD change, so no robot.py run. glacis_bom.py runs clean: 119 rows.
+- Parts list: $1,702.75 -> $1,733.78 (+$31.03).
+- Not done: Google Sheet tab (claimed by the Windows chat), CAD/Onshape shelf (Waveshare footprint, two relays,
+  PCA9685, second ADS1115), the "Glacis air & wiring" artifact. The Sidenote Cannon boards are updated.
+- Questions for Micah: none.
+
 ## 2026-11-06 (evening) - Micah's main Claude Code chat - Glacis rev D.2 green light: CAD, Sheet, Onshape
 - Branch / commit: main (this commit)
 - Changed (Micah's follow-ups, JUDGMENTS "Rev D.2, Micah's follow-ups" F1-F8):
