@@ -215,8 +215,21 @@ def front_x(z, inner=False):
     return x - MEM_H / math.sin(math.radians(FRONT_ANGLE)) if inner else x
 
 
-LIGHT_BAR = (330.0, 30.0, 45.0, 229.0, 120.0)   # front light bar (Zmoon 12 in single row): length, height, depth, z of its
-                                            # centre (just above the bumper), |y| of its two brackets
+LIGHT_BAR = (330.0, 30.0, 45.0, 285.0, 120.0)   # front light bar (Zmoon 12 in single row): length, height, depth, z of its
+                                            # centre, |y| of its two end bolts
+# Brophy Borealis (2026-11-10, Micah): the bar sits recessed in a pocket in the front slant, with a 3 in band above it
+# left blank inside the pocket for crowd sensors later. The pocket is cut straight back (level floor and roof, upright
+# back wall); a printed liner in two halves lines it and carries the bar.
+BAR_POCKET = dict(clear=4.0, wall=4.0, sensor=3.0 * IN, floor_z=266.0, recess=20.0)
+                                            # clearance round the bar, liner wall, blank band above the bar, the liner
+                                            # floor's top (high enough that the panel strip under the pocket keeps a
+                                            # window, and clear of the fogger's top at z 237.6), how far the bar's face
+                                            # sits behind the slant at the floor
+# 20x20 T-slot rails for add-ons (Micah's spares): one each side of the deck along the gun well, one inside each
+# gun cradle plate, all mirrored about y = 0 and clear of the pivot
+RAIL20 = 20.0
+DECK_RAIL = dict(y=(133.5, 153.5), x=(-320.0, 150.0))   # |y| band (outboard of the pivot bearing blocks, which stop at
+                                            # 129.4, and of the well's 133), x span along the flat deck
 
 
 

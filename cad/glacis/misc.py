@@ -8,7 +8,8 @@ from cadquery import Vector as V
 import params as P
 import body as B
 import speakers as SPK
-from lib import add, box, cyl, tube, hex_prism, union
+import lightbar as LB
+from lib import add, box, cyl, tube, hex_prism, union, t_slot
 from drive import tube_part, fr8, _hull, bearing_seat
 import pneu_parts as PP
 
@@ -404,38 +405,52 @@ def speakers():
             bom="Siren speaker 200 W, 8 ohm, aluminium (Xprite B01DMSR4L4)", note="5.7 x 5.5 x 2.3 in with its foot, 121-130 dB")
         add(f"Speaker grille {pod['name']}", pod["grille"], "print", "body", bom="Speaker grille", kind="print",
             note="3 walls, no top or bottom layers, 12% gyroid: an open mesh; glue or screw to the cup")
-    # front light bar: Micah's Zmoon 12 in single-row bar (72 W, spot/flood combo) across the nose just above the
-    # bumper, on two printed brackets screwed into the front panel's bottom member; the main controller switches (and can PWM-dim)
-    # it through a MOSFET channel
-    L, hb, db, zc, yb = P.LIGHT_BAR
-    xf = P.front_x(zc - hb / 2) + 8.0                      # bar's back, clear of the slant at its bottom edge (the front leans back)
-    bar = box(xf, xf + db, -L / 2, L / 2, zc - hb / 2, zc + hb / 2)
-    bar = bar.cut(box(xf + db - 2.0, xf + db + 1.0, -L / 2 + 14.0, L / 2 - 14.0, zc - hb / 2 + 5.0, zc + hb / 2 - 5.0))  # one lens strip
-    add("LED light bar front", bar, "black", "power", mass=0.37,
-        bom="Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V", note="straight ahead")
-    nf = V(math.sin(math.radians(P.FRONT_ANGLE)), 0, math.cos(math.radians(P.FRONT_ANGLE)))
-    tf = V(-math.cos(math.radians(P.FRONT_ANGLE)), 0, math.sin(math.radians(P.FRONT_ANGLE)))
-    lip = P.MEM_W - P.REBATE_W                             # the solid lip below the acrylic's rebate
+    # front light bar (Brophy Borealis): Micah's Zmoon 12 in single-row bar, recessed in a pocket in the front slant
+    # with a 3 in band above it left blank for crowd sensors; a printed liner in two halves (split at y = 0 for the
+    # bed) lines the pocket, screws to the frame round it, and carries the bar on its two back bolts. The main
+    # controller switches (and can PWM-dim) it through a MOSFET channel
+    d = LB.dims()
+    add("LED light bar front", LB.bar(), "black", "power", mass=0.37,
+        bom="Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V",
+        note=f"recessed {P.BAR_POCKET['recess']:.0f} mm behind the slant; straight ahead")
+    liner = LB.cut().intersect(plain).cut(LB.pocket())
+    yb = P.LIGHT_BAR[4]
+    zc = (d["zb"][0] + d["zb"][1]) / 2
+    for sg in (1, -1):                                     # the bar's two back bolts (M6) and its cable
+        liner = liner.cut(cyl(3.3, 30.0, (d["xi"] + 5.0, sg * yb, zc), (-1, 0, 0)))
+    liner = liner.cut(cyl(6.0, 30.0, (d["xi"] + 5.0, 0.0, zc), (-1, 0, 0)))
+    for _, at, dir_ in BAR_SCREWS:                         # M4 x 8 button heads through the liner into the frame
+        liner = liner.cut(cyl(2.25, P.BAR_POCKET["wall"] + 4.0, (at - dir_ * (P.BAR_POCKET["wall"] + 2.0)).toTuple(),
+                              dir_.toTuple()))
     for sg, side in ((1, "left"), (-1, "right")):
-        brk = box(P.front_x(zc - hb / 2 - 6.0) - 20.0, xf + 6.0, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc - hb / 2)
-        brk = brk.fuse(box(xf - 6.0, xf, sg * yb - 8.0, sg * yb + 8.0, zc - hb / 2 - 6.0, zc + hb / 2))   # tab behind the bar
-        # a back plate lying on the slant's bottom lip, 30 mm wide, screwed to it with 2 x M4
-        pl_ = cq.Plane(origin=(P.FRAME_X, sg * yb, P.Z_WALL_BOT), xDir=tf.toTuple(), normal=nf.toTuple())
-        back = cq.Workplane(pl_).center(lip / 2, 0).rect(lip - 1.0, 30.0).extrude(5.0).val()
-        brk = brk.fuse(back).cut(plain)
-        brk = brk.cut(cyl(3.2, 10.0, (xf - 8.0, sg * yb, zc), (1, 0, 0)))   # the bar's own bolt, through the tab
-        for s_, at, dir_ in BAR_SCREWS:
-            if s_ == sg:
-                brk = brk.cut(cyl(2.25, 9.0, (at - dir_ * 7.0).toTuple(), dir_.toTuple()))
-        add(f"LED light bar bracket {side}", brk, "print", "body", bom="Light bar bracket (printed)", kind="print",
-            note=f"{sum(s_ == sg for s_, _, _ in BAR_SCREWS)} x M4 x 8 into inserts in the front's bottom lip; "
-                 "the bar's own bolt through its hole")
+        half = liner.intersect(box(-3000, 3000, 0.25 if sg > 0 else -3000, 3000 if sg > 0 else -0.25, -3000, 3000))
+        n_ = sum(at.y * sg > 0 for _, at, _ in BAR_SCREWS)
+        add(f"Light bar pocket liner {side}", half.clean(), "print", "body", bom="Light bar pocket liner half", kind="print",
+            note=f"PETG; {n_} x M4 x 8 into inserts in the frame; the bar's M6 back bolt through it; the upper "
+                 f"{P.BAR_POCKET['sensor'] / IN:.0f} in of its back wall is left blank for crowd sensors")
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
     add("Audio amp (TPA3255)", box(-135.0, -13.0, 22.0, 95.0, zb, zb + 30.0), "pcb", "power",
         bom="TPA3255 2 x 300 W amp board", note="one channel per speaker, about 100 W each on 48 V")
     add("Audio boost 12-48 V 1500 W", box(-10.0, 120.0, -100.0, -24.0, zb, zb + 60.0), "black", "power",
         bom="1500 W 30 A boost converter, set to 48 V", note="feeds the amp from a 40 A PDH channel; size not listed, "
              "drawn 130 x 76 x 60")
+
+
+# ------------------------------------------------------------------ deck rails (Brophy Borealis)
+DECK_RAIL_SCREWS = []                     # (x, y) of each rail's M5 screws, set by body_parts
+
+
+def deck_rails():
+    """A 20x20 T-slot rail on the deck each side of the gun well, outboard of the pivot's bearing blocks, for
+    add-ons. Each sits on the well-edge frame member, held by M5 screws up through the member into drop-in T-nuts."""
+    (y0, y1), (x0, x1) = P.DECK_RAIL["y"], P.DECK_RAIL["x"]
+    for sg, side in ((1, "left"), (-1, "right")):
+        ys = (y0, y1) if sg > 0 else (-y1, -y0)
+        n_ = sum(1 for _, y in DECK_RAIL_SCREWS if y * sg > 0)
+        add(f"Rail 20x20 deck {side}", t_slot(x0, x1, ys, (P.Z_TOP, P.Z_TOP + P.RAIL20)), "alu", "body",
+            bom="20x20 T-slot extrusion (owned spare, cut)", kind="stock", mass=0.47 * (x1 - x0) / 1000.0,
+            note=f"{x1 - x0:.0f} mm; {n_ or 3} x M5 x 30 up through the deck member (from inside the well) into "
+                 "drop-in T-nuts")
 
 
 # ------------------------------------------------------------------ bumpers
@@ -800,20 +815,54 @@ def body_parts(log=print):
         CUP_SCREWS.extend((pod["name"], at, dir_) for at, dir_ in chosen)
         if len(chosen) < 4:
             clash.append(f"speaker cup {pod['name']}: only {len(chosen)} of 4 screws found frame")
-    # light bar brackets: a plate on the front slant's bottom lip with 2 x M4 into inserts square to the face
+    # light bar pocket liner: M4 screws through its floor, side walls and back wall into inserts in the frame round
+    # the pocket, two per wall where frame backs it, at least 35 mm apart
     BAR_SCREWS.clear()
-    nf = V(math.sin(math.radians(P.FRONT_ANGLE)), 0, math.cos(math.radians(P.FRONT_ANGLE)))
-    tf = V(-math.cos(math.radians(P.FRONT_ANGLE)), 0, math.sin(math.radians(P.FRONT_ANGLE)))
+    d = LB.dims()
+    w_ = P.BAR_POCKET["wall"]
+    # the frame round the pocket is only the members along its opening (the shell is MEM_H deep behind the slant),
+    # so every screw sits close behind the opening: down through the floor, out through each side wall
+    fx = lambda z, k: P.front_x(z) - k                    # k mm behind the slant at height z
+    zfl = d["zf"] - w_
+    walls = [(V(0, 0, -1), [V(fx(zfl - 3.0, k), sg * y, zfl) for sg in (1, -1) for y in (50.0, 110.0, 150.0, 80.0)
+                            for k in (9.0, 13.0)])] +             [(V(0, sg, 0), [V(fx(z, k), sg * (d["yi"] + w_), z) for z in (d["zf"] + 12.0, d["zb"][1] + 20.0,
+                                                                         d["zb"][1] + 45.0, d["zf"] + 30.0)
+                            for k in (10.0, 15.0)]) for sg in (1, -1)]
+    for dir_, cands in walls:
+        for sg in (1, -1):
+            got = 0
+            for at in cands:
+                if got == 2 or (dir_.y == 0 and at.y * sg <= 0) or (dir_.y != 0 and dir_.y != sg):
+                    continue
+                if any((at - c_).Length < 35.0 for _, c_, _ in BAR_SCREWS):
+                    continue
+                hole = cyl(P.INSERT[0], P.INSERT[1], (at - dir_ * 0.1).toTuple(), dir_.toTuple())
+                if _frame_insert(pieces, hole, tun_list + screws, share=0.9):
+                    BAR_SCREWS.append((sg, at, dir_))
+                    got += 1
+    if len(BAR_SCREWS) < 6:
+        clash.append(f"light bar liner: only {len(BAR_SCREWS)} screws found frame")
+    # deck rails: 3 x M5 clearance holes each, straight down through the well-edge member, clear of its light tunnel
+    DECK_RAIL_SCREWS.clear()
+    (ry0, ry1), (rx0, rx1) = P.DECK_RAIL["y"], P.DECK_RAIL["x"]
     for sg in (1, -1):
-        for dy in (-8.0, 8.0):
-            at = V(P.FRAME_X, sg * P.LIGHT_BAR[4] + dy, P.Z_WALL_BOT) + tf * 8.5
-            hole = cyl(P.INSERT[0], P.INSERT[1], (at + nf * 0.1).toTuple(), (nf * -1).toTuple())
-            if _frame_insert(pieces, hole, tun_list + screws, share=0.9):
-                BAR_SCREWS.append((sg, at, nf * -1))
-            else:
-                clash.append(f"light bar bracket screw at y {sg * P.LIGHT_BAR[4] + dy:.0f} found no frame")
-    log(f"speaker cup screws: {len(CUP_SCREWS)} of 8, light bar bracket screws: {len(BAR_SCREWS)} of 4"
-        + (f"; check {clash}" if clash else ""))
+        found = []
+        for target in (rx0 + 35.0, (rx0 + rx1) / 2, rx1 - 35.0):
+            for dx in (0, 10, -10, 20, -20, 30, -30, 40, -40, 50, -50):
+                for yy in ((ry0 + ry1) / 2, ry0 + 5.0, ry1 - 5.0):
+                    x_ = target + dx
+                    hole = cyl(2.75, P.MEM_H + 4.0, (x_, sg * yy, P.Z_TOP + 1.0), (0, 0, -1))
+                    if _frame_insert(pieces, hole, tun_list + screws, share=0.7):
+                        found.append((x_, sg * yy))
+                        break
+                else:
+                    continue
+                break
+        DECK_RAIL_SCREWS.extend(found)
+        if len(found) < 3:
+            clash.append(f"deck rail {'left' if sg > 0 else 'right'}: only {len(found)} of 3 screws found frame")
+    log(f"speaker cup screws: {len(CUP_SCREWS)} of 8, light bar liner screws: {len(BAR_SCREWS)}, deck rail screws: "
+        f"{len(DECK_RAIL_SCREWS)} of 6" + (f"; check {clash}" if clash else ""))
     # a chunk that came loose from its piece (cut off by a slot or an insert) goes to the piece it touches, if any
     slivers = []
     for p in pieces:

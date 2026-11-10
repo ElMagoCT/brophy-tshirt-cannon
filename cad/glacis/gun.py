@@ -17,7 +17,7 @@ import math
 import cadquery as cq
 from cadquery import Vector as V
 import params as P
-from lib import add, box, cyl, tube, hex_prism, union, C
+from lib import add, box, cyl, tube, hex_prism, union, C, t_slot
 from fittings import Chain, OD, ENG, BORE, relief_cap
 
 OD.setdefault("3", 88.9)                                     # 3 in Sch 40 chambers (rev D.1)
@@ -179,7 +179,17 @@ def _build(xv):
         for (x, z) in ((x0 + 15, zo - 15), (x0 + 15, -zo + 15), (x1 - 25, zo - 30), (x1 - 25, -zo + 30),
                        (xv - 40, zo - 12), (xv - 40, -zo + 12)):
             pl = pl.cut(cyl(3.3, 10, (x, y0 - 2, z), (0, 1, 0)))
+        # Brophy Borealis: a 20x20 T-slot rail inside each plate along its top edge, flush with it, for add-ons;
+        # 3 x M5 through the plate into drop-in T-nuts in the rail's outer slot (clear of the plate's own holes)
+        rx0, rx1 = x0 + 22.0, min(xv - 58.0, x0 + 22.0 + 300.0)
+        ry = (CRADLE_Y0 - P.RAIL20, CRADLE_Y0) if sy > 0 else (-CRADLE_Y0, -CRADLE_Y0 + P.RAIL20)
+        rz = (zo - P.RAIL20, zo)
+        for xs_ in (rx0 + 30.0, (rx0 + rx1) / 2, rx1 - 30.0):
+            pl = pl.cut(cyl(2.75, 10, (xs_, y0 - 2, zo - P.RAIL20 / 2), (0, 1, 0)))
         gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al)", kind="stock")
+        gadd(f"Rail 20x20 gun {tag}", t_slot(rx0, rx1, ry, rz), "alu", bom="20x20 T-slot extrusion (owned spare, cut)",
+             kind="stock", mass=0.47 * (rx1 - rx0) / 1000.0,
+             note=f"{rx1 - rx0:.0f} mm; 3 x M5 x 10 through the cradle plate into drop-in T-nuts; top flush with the plate")
     # chamber saddles: one block between the two nipples at each station, a printed cap bolted over each outer half
     cyls = [cyl(R_PIPE + 0.5, 1200, (xr - 1100, 0, h), (1, 0, 0)) for h in H]
     lanes = union([cyl(3.8, 1200, (xr - 1100, y, 0), (1, 0, 0)) for y in FILL_LANES])   # fill lines pass through

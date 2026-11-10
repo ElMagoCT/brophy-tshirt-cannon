@@ -22,6 +22,7 @@ import cadquery as cq
 from cadquery import Vector as V
 import params as P
 import speakers as SPK
+import lightbar as LB
 from lib import add, box, cyl, union
 from OCP.BRepTools import BRepTools_WireExplorer
 from OCP.TopAbs import TopAbs_REVERSED
@@ -38,6 +39,11 @@ def _tumble_prism(inset):
     yb, yt = y0 + (P.Z_WALL_BOT - z0) * t, y0 - (z1 - P.Z_WALL_BOT) * t
     pts = [(-yb, z0), (yb, z0), (yt, z1), (-yt, z1)]
     return cq.Workplane("YZ", origin=(-2000, 0, 0)).polyline(pts).close().extrude(4000).val()
+
+
+def notch_cuts():
+    """Every pocket cut into the body: the two speaker corners and the light bar's pocket in the front."""
+    return SPK.cuts() + LB.cuts()
 
 
 SLOT_PTS = []          # gun well side profile (x, z), set from the gun's swing by set_slot_profile()
@@ -66,12 +72,13 @@ def slot_prism():
 
 
 def body_solid(notched=True):
-    """The body polyhedron; notched=True also cuts the four speaker pockets out of the front-side corners."""
+    """The body polyhedron; notched=True also cuts the speaker pockets out of the front-side corners and the light
+    bar's pocket into the front."""
     pts = [(x, z) for x, z in P.SIDE_OUTLINE]
     prism = (cq.Workplane("XZ", origin=(0, -P.Y_S - 200, 0)).polyline(pts).close().extrude(-2 * P.Y_S - 400)).val()
     solid = prism.intersect(_tumble_prism(0.0)).cut(slot_prism())
-    if notched and SPK.cuts():
-        solid = solid.cut(union(SPK.cuts()))
+    if notched and notch_cuts():
+        solid = solid.cut(union(notch_cuts()))
     return solid.clean()
 
 
@@ -106,14 +113,33 @@ def inner_solid(d=None):
     return prism.intersect(_tumble_prism(d)).cut(slot_prism()).clean()
 
 
+def _wire_pts(wire):
+    """A wire's corners in order round it."""
+    ex, pts = BRepTools_WireExplorer(wire.wrapped), []
+    while ex.More():
+        q = cq.Vertex(ex.CurrentVertex()).toTuple()
+        if not pts or max(abs(q[j] - pts[-1][j]) for j in range(3)) > 1e-4:
+            pts.append(q)
+        ex.Next()
+    return pts
+
+
 def face_info(solid):
-    """Planar faces with outward normal and outer-wire vertices (3D)."""
+    """Planar faces with outward normal and outer-wire vertices (3D). A face with a hole in it (the front, round the
+    light bar pocket) comes back as its two halves either side of y = 0, each one outline running round half the
+    hole."""
     out = []
     for f in solid.Faces():
         n = f.normalAt()
-        c = f.Center()
+        if f.innerWires():
+            for sg in (1, -1):
+                half = f.intersect(box(-3000, 3000, 0 if sg > 0 else -3000, 3000 if sg > 0 else 0, -3000, 3000))
+                for h in half.Faces():
+                    out.append(dict(face=h, n=n, c=h.Center(), verts=_wire_pts(h.outerWire()), area=h.Area(),
+                                    seam=True))
+            continue
         verts = [v.toTuple() for v in f.outerWire().Vertices()]
-        out.append(dict(face=f, n=n, c=c, verts=verts, area=f.Area()))
+        out.append(dict(face=f, n=n, c=f.Center(), verts=verts, area=f.Area()))
     return out
 
 
@@ -160,7 +186,7 @@ def is_open_face(fi):
     no panel."""
     if all(abs(v[1]) <= P.Y_SLOT + 0.5 for v in fi["verts"]):
         return True
-    return any(all(c.isInside(V(*v), 0.6) for v in fi["verts"]) for c in SPK.cuts())
+    return any(all(c.isInside(V(*v), 0.6) for v in fi["verts"]) for c in notch_cuts())
 
 
 FRONT_CUT = [None]
@@ -199,7 +225,7 @@ def panels_for(fi):
         return []
     poly = list(fi["verts"])
     if n.x > 0.5 and n.z > 0.2:
-        FRONT_CUT[0] = min(v[2] for v in poly if abs(v[1]) <= P.Y_SLOT + 0.5)
+        FRONT_CUT[0] = min(v[2] for v in poly if abs(abs(v[1]) - P.Y_SLOT) <= 0.5)   # the well's floor corners
         poly = _tidy(_clip3(poly, 2, FRONT_CUT[0], -1))
     side_wall = abs(n.y) > 0.9
     if _fits(poly, n) and not side_wall:
@@ -354,7 +380,7 @@ def build(log=print):
     # panel light: the web that carries the window wall back to the strip (kept out of the speaker pockets), then
     # the frame tunnels (their feed slots cut through it)
     webs = union([r for r in (led_web(p) for p in panels) if r is not None])
-    frame = frame.fuse(webs.cut(union(SPK.cuts())) if SPK.cuts() else webs).clean()
+    frame = frame.fuse(webs.cut(union(notch_cuts())) if notch_cuts() else webs).clean()
     loop = 0.0
     for p in panels:
         p["led"], length = led_loop(p)
@@ -410,7 +436,7 @@ def build(log=print):
                 c = x.BoundingBox().center
                 log(f"  strips {_label(q)} / {_label(p)} overlap {v:.0f} mm3 at ({c.x:.0f}, {c.y:.0f}, {c.z:.0f})")
     log(f"LED strips overlapping before trimming: {pairs} pairs, worst {worst:.0f} mm3")
-    spk = union(SPK.cuts()) if SPK.cuts() else None
+    spk = union(notch_cuts()) if notch_cuts() else None
     for i, p in enumerate(panels):
         if p["led"] is None:
             p["led_pieces"] = []
@@ -488,7 +514,7 @@ def edge_kinds(panels, log=None):
                         coplanar = True
                     else:
                         shared, nb = True, o["n"]
-            notch = any(c.isInside(mids[1], 1.0) for c in SPK.cuts())
+            notch = any(c.isInside(mids[1], 1.0) for c in notch_cuts())
             slot = all(abs(abs(q.y) - P.Y_SLOT) < 0.5 for q in (a, b))
             notch |= p["n"].z > 0.9 and all(abs(q.x - P.X_TOP_FRONT) < 1.0 for q in (a, b))   # deck front: over the cups
             kind = ("coplanar" if coplanar else "shared" if shared else

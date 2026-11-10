@@ -1,6 +1,10 @@
-"""Glacis parts list, rev D.2 proposal (2026-11-06; rev C first written 2026-11-02): source of the "Glacis BOM" tab in the parts-list Google Sheet.
+"""Brophy Borealis parts list (was Glacis; rev D.2 2026-11-06, Borealis changes 2026-11-10): source of the two order
+tabs in the parts-list Google Sheet ("Borealis Order 1" and "Borealis Order 2").
 
-    python glacis_bom.py            # writes glacis_bom.csv and glacis_bom_sheet.json (rows for the sheet)
+    python glacis_bom.py            # writes glacis_bom.csv and glacis_bom_sheet.json (rows for both order tabs)
+
+Two orders (Micah, 2026-11-10): Order 1 is the pneumatics, the important electronics and the speakers; Order 2 is the
+materials, the LEDs and the smoke. ORDER_OF maps each section to its order.
 
 Row = (name, seller, qty, unit $, link, type, purpose, notes). A row with qty None is a section header.
 Quantities come from cad/glacis/out/parts_from_cad.csv. Sellers: McMaster, Amazon and AliExpress first.
@@ -18,6 +22,7 @@ import os
 
 D = "2026-11-02"
 V = "2026-11-06"   # rev D.2 listing check
+B2 = "2026-11-09"  # Brophy Borealis listing check
 STASH = "Standard FRC stash part; buy only if the stash is out"
 OLD = "From the old cannon"
 ROWS = [
@@ -37,7 +42,10 @@ ROWS = [
     ("Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)", "Amazon", 3, 17.69, "https://www.amazon.com/dp/B0CRQWKDNC",
      "Electrical", "One part number for all three: tank and both chambers (rev C.3; the 0-200 psi one is gone)",
      f"1/8-27 NPT male (photo), 0.5-4.5 V on 5 V, +/-1% FS, 316 stainless, ceramic cell, harness included ({V}, L)"),
-    ('Fill plug: Milton 728, 1/4 FNPT (female) M-style plug, box of 10 (B000PDUQOW)', 'Amazon', 1, 9.99, 'https://www.amazon.com/dp/B000PDUQOW', 'Motion', 'Fill port outside the rear panel: threads onto the 1-1/2 in nipple through the panel, and your universal couplers (EVOULTES kit) snap on. Female, as you said: the male McMaster 1077T17 could not thread onto the male nipple', f'1/4 FNPT, plated steel, 300 psi and 40 SCFM per Lord Co. and Toolsid (the Amazon page states no psi). 9 spares for tools ({V}, L)'),
+    ('Fill plug: 303 stainless industrial (M-style) plug, 1/4 coupling, 1/4 NPTF female (McMaster 6718K52)', 'McMaster', 1, 9.97, 'https://www.mcmaster.com/6718K52/', 'Motion', 'Fill port outside the rear panel (Brophy Borealis "better plug"): threads onto the 1-1/2 in nipple through the panel, and your universal couplers (EVOULTES kit) snap on. Stainless, so it will not rust or gall like the plated Milton 728', f'1/4 NPTF female, open flow, 300 psi, "delivers tomorrow" ({B2}, L). Still an open plug, so the check valve behind it stays. No M-style plug with its own shut-off exists: only sockets have one'),
+    ('Interior quick disconnects: ISO 7241-1 B plug, 1/4, steel, both halves self-sealing (McMaster 95825K86)', 'McMaster', 5, 14.57, 'https://www.mcmaster.com/95825K86/', 'Motion', 'Brophy Borealis: each subsystem comes apart without venting the rest. 5 pairs: tank line to the main valve, rear manifold to each in valve (2), each in valve to its chamber service loop (2). ISO-B halves will not mate with the M-style fill, so nobody plugs a shop hose into an interior line', f'1/4 NPTF female, 3,500 psi, zinc-plated steel, valved ({B2}, L; stock not shown). Listed for hydraulics: Buna-N poppets are fine for 200 psi air (our judgment). Vent one side before reconnecting. Cheaper: eBay QD0250 ISO-B 1/4 NPT set $13.99 + ship, no rating stated [UNVERIFIED]: buy one and gauge the thread first'),
+    ('Interior quick disconnects: ISO 7241-1 B socket, 1/4, sleeve lock, steel (McMaster 95825K81)', 'McMaster', 5, 34.15, 'https://www.mcmaster.com/95825K81/', 'Motion', 'The other half of each of the 5 pairs above: socket on the supply side, so the live side is the one that seals hardest', f'1/4 NPTF female, 3,500 psi, zinc-plated steel, valved ({B2}, L; stock not shown). Brass version 52495K41/52495K61 is $59.88 a pair'),
+    ('DOT push-to-connect 1/4 tube x 1/4 NPT male, straight, 10-pack (Boeray) - for the quick disconnects', 'Amazon', 1, 19.99, 'https://www.amazon.com/dp/B0D8PX7Z94', 'Motion', 'Both ISO-B halves are female 1/4 NPT: a male push-to-connect in each of the 10 halves puts them inline on the nylon tube', 'Same listing as the Boeray 10-pack below (the existing 8-used pack has no spares for these) [stock not re-checked today: Amazon blocks automated checks]'),
     ('Fill check valve, brass, 1/4 MNPT x 1/4 MNPT, 250 psi (American Made B076K8SLBZ)', 'Amazon', 1, 15.87, 'https://www.amazon.com/dp/B076K8SLBZ', 'Motion', 'Behind the panel, between the female elbow and the street elbow. Holds the tanks shut when the hose comes off (a plug is an open pipe)', f'Male on both ends (listing photo), not FNPT x MNPT as the old note hoped. 250 psi, 250 F, fluorocarbon O-rings, brass. Fit it with the flow arrow pointing in ({V}, L)'),
     ("In valves: Aignep 02F 2/2 NC direct-acting 12 V DC, 1/4 NPTF, 2 mm (02F03102N0N10201)", "Hose Warehouse", 2, 41.36,
      "https://hosewarehouse.com/products/02f03102n0n10201-aignep-fluidity-series-fluidity-02f-directacting-solenoid-valve-2-2-nc-nbr-seal-1-4-nptf-2-mm-12v-dc",
@@ -120,23 +128,23 @@ ROWS = [
     ('HTD 5M 9 mm belt, 150T (750 mm) (uxcell B0DF57XRZ8)', 'Amazon', 1, 7.81, 'https://www.amazon.com/dp/B0DF57XRZ8', 'Motion', 'goBILDA 16T pinion to the printed 112T pivot pulley (CAD loop is exactly 750 mm)', "9 mm to match goBILDA's HTD pulleys (AliExpress only has 10 mm); was $8.99 at WCP (2026-11-04, L)"),
     ('10k linear pot RK097G, 6 mm knurled shaft, 5-pack', 'Aliexpress', 1, 0.64, 'https://www.aliexpress.us/item/2251832817477625.html', 'Electrical', 'Gun angle on the end of the left pivot stub, to the controller ADC', 'About 300 deg travel (RK097 type; not stated on the listing); 495 sold. Was $10.70 for a Bourns (2026-11-04, L)'),
     ("FRAME + BODY - box tube, printed frame, recessed acrylic", None),
-    ('Heat-set inserts M4 x 6, brass, OD 5 mm, 100 pcs', 'Aliexpress', 1, 4.04, 'https://www.aliexpress.us/item/2251832656703778.html', 'Structure', 'Panel clips, speaker cups (8), light bar brackets (4), standoffs: 4.7 mm hole, 6.5 deep', 'Was $15.97 for a 400-piece mixed kit (2026-11-04, L)'),
+    ('Heat-set inserts M4 x 6, brass, OD 5 mm, 100 pcs', 'Aliexpress', 1, 4.04, 'https://www.aliexpress.us/item/2251832656703778.html', 'Structure', 'Panel clips, speaker cups (8), light bar liner, standoffs: 4.7 mm hole, 6.5 deep', 'Was $15.97 for a 400-piece mixed kit (2026-11-04, L)'),
     ('Heat-set inserts M4 x 4, brass, OD 5 mm, 100 pcs (same listing, M4X4X5mm)', 'Aliexpress', 1, 3.56, 'https://www.aliexpress.us/item/2251832656703778.html', 'Structure', 'The 12 clips where two neighbouring panels\' clip screws would meet inside a node, or a slanted face is close: 4.6 mm deep', 'Logged-in price; ships with the M4 x 6 lot (2026-11-04, L)'),
     ('Heat-set inserts M5, brass (same listing, M5 option)', 'Aliexpress', 1, 4.04, 'https://www.aliexpress.us/item/2251832656703778.html', 'Structure', '8 for the chamber caps (2 x M5 each; the screws are stash)', "M5 option's price assumed the same as M4 [UNVERIFIED] (2026-11-04)"),
     ("M4 x 12 button head, 304 stainless, 100 pcs", "Amazon", 1, 7.40, "https://www.amazon.com/dp/B0DKXQQPWS",
      "Structure", "Frame-joint cross screws (35, self-tapping into the tenon's pilot) and standoffs", f"Only 2 left; backup 12.9 black-oxide B0CTH3FQLD $8.86 ({D}, L)"),
     ("M4 x 8 button head, 304 stainless, 100 pcs (B0DKXNTRTW)", "Amazon", 1, 6.74, "https://www.amazon.com/dp/B0DKXNTRTW",
-     "Structure", "Panel clips into M4 x 6 inserts, speaker cups (8), light bar brackets (4)", "4.4 stars (2026-11-04, L)"),
+     "Structure", "Panel clips into M4 x 6 inserts, speaker cups (8), light bar liner", "4.4 stars (2026-11-04, L)"),
     ("M4 x 6 button head, 304 stainless, 100 pcs (B0FPG4WXY6)", "Amazon", 1, 6.99, "https://www.amazon.com/dp/B0FPG4WXY6",
      "Structure", "The 12 short clips (into M4 x 4 inserts)", "4.7 stars (2026-11-04, L)"),
     ("Foam tape 1/4 in x 1/16 in closed cell, 65 ft (B07Z4QYYDK)", "Amazon", 1, 11.99, "https://www.amazon.com/dp/B07Z4QYYDK",
      "Structure", "About 13 m on the acrylic ledges, so the clips clamp the panels instead of letting them rattle (the rebate is 0.7 mm deeper for it)",
      "Yotache; 4.4 stars (2026-11-04, L)"),
-    ("Frosted acrylic 1/8 in (owned): 8 panels", "Owned", 8, 0.00, "", "Cosmetic",
+    ("Frosted acrylic 1/8 in (owned): 9 panels (the front is two halves round the light bar pocket)", "Owned", 9, 0.00, "", "Cosmetic",
      "Recessed in the printed frame, held by corner clips; cut 1 mm under the rebate outline all round",
      "Owned; outlines in the Onshape panels tab. Cut them after a dry assembly of the printed frame"),
     ("Printed body frame: 45 pieces incl. two front cheeks, 51 tapered tenons (33 cross-screwed, 18 glued), 38 corner clips, "
-     "2 light bar brackets, 14 underglow brackets, 14 frame mount posts, 2 turret tower brackets, 4 bumper corner brackets (PETG)",
+     "2 light bar pocket liner halves, 14 underglow brackets, 14 frame mount posts, 2 turret tower brackets, 4 bumper corner brackets (PETG)",
      "Owned", 1, 0.00, "", "Structure",
      "Holds the panels; a strip tunnel down every member (the frame glows); each window wall chamfers from the acrylic ledge to its LED strip",
      "Filament assumed owned. Frame pieces: 0.6 mm nozzle, 2 walls, 10% gyroid; mounts, brackets, clips: 4 walls, 25%. "
@@ -156,10 +164,19 @@ ROWS = [
      "The tapered tenons on the filled LED corners (no cross screw: every way in for a screw head is a surface seen through the acrylic), "
      "and the one glued split across the gun well's front. Push a strip offcut through the tunnel across each joint while it cures",
      "Owned / shop stock"),
+    ("RAILS - 20x20 T-slot add-on rails (Brophy Borealis): two on the deck, two on the gun, for add-ons later", None),
+    ("20x20 T-slot extrusion (your spares): 2 x 470 mm on the deck, 2 x 300 mm inside the gun's cradle plates", "Owned", 4, 0.00, "", "Structure",
+     "Deck: one each side of the gun well, outboard of the pivot's bearing blocks, on the well-edge frame member. Gun: one inside each cradle plate along its top edge, flush with it. All mirrored about the centreline and clear of the 0-45 deg swing", "Yours (Micah, 2026-11-10: 'I have a lot to spare'). Cut square; the CAD lengths are the cut lengths"),
+    ("M5 drop-in T-nuts for 20-series (6 mm slot), nickel-plated, 50 pcs", "Aliexpress", 1, 2.90, "https://www.aliexpress.us/item/3256806678200822.html", "Structure",
+     "12 used: 3 per rail. Drop in from the side after the rail is placed", "$2.90 ($1.09 new-shopper price) (2026-11-09, L)"),
+    ("M5 button head screws, ISO 7380, 10 mm and 30 mm, 20 pcs each", "Aliexpress", 2, 1.09, "https://www.aliexpress.us/item/3256808326585307.html", "Structure",
+     "6 x M5 x 10 through the cradle plates into the gun rails; 6 x M5 x 30 up through the deck member (from inside the gun well) into the deck rails",
+     "Price per length [UNVERIFIED]: $1.09 showed for the default 50 mm option (2026-11-09). Stash M5s work too"),
+
     ("LIGHTS - panel loops, glowing frame, underglow, front light bar", None),
     ('WS2812B LED strip 5 mm wide, 2020 LEDs, 100 LED/m, 5 m', 'Aliexpress', 2, 14.16, 'https://www.aliexpress.us/item/3256806570121908.html', 'Electrical', '7.6 m: one piece per frame member (the front and rear bottom members have no tunnel: a jumper wire runs round them), LEDs out, bent the easy way up into the feed slot at each end and soldered to the next at the slot mouth', '$13.61 a reel + $1.09 shipping split over the two; 77 sold, 5 stars. Logged-in price (2026-11-04, L)'),
     ('WS2812B LED strip 10 mm, 60 LED/m, 5 m, black PCB, IP30', 'Aliexpress', 3, 7.33, 'https://www.aliexpress.us/item/3256807802893080.html', 'Electrical', '11.2 m: one closed loop per panel on its window wall, centred 25 mm behind the acrylic, LEDs aimed across the panel; 2.5 m of underglow under the bumpers from the rest of the third reel', '3,000+ sold, 4.8 stars, Choice. Logged-in price; was $13.99 a reel on Amazon (2026-11-04, L)'),
-    ('Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V (your pick)', 'Amazon', 1, 17.99, 'https://www.amazon.com/dp/B07SWZ1LMM', 'Electrical', 'Across the nose just above the bumper on two printed brackets, aimed straight ahead. The main controller switches it (and can PWM-dim it) through a MOSFET channel; about 6 A at 12 V', f'72 W, 8000 lm claimed; now $17.99. Size not listed: modelled 330 x 30 x 45 mm [UNVERIFIED] ({V}, L)'),
+    ('Front light bar: Zmoon 12 in single-row LED bar, 72 W spot/flood combo, 12/24 V (your pick)', 'Amazon', 1, 17.99, 'https://www.amazon.com/dp/B07SWZ1LMM', 'Electrical', 'Recessed in a pocket in the front slant (Brophy Borealis), 20 mm behind the face, aimed straight ahead, with a 3 in blank band above it in the pocket for crowd sensors later; held by its two back bolts through a printed liner. The main controller switches it (and can PWM-dim it) through a MOSFET channel; about 6 A at 12 V', f'72 W, 8000 lm claimed; now $17.99. Size not listed: modelled 330 x 30 x 45 mm [UNVERIFIED] ({V}, L)'),
     ("12/24 V -> 5 V 20 A buck, potted", "Amazon", 1, 15.99, "https://www.amazon.com/dp/B089M5R3NJ",
      "Electrical", "LEDs only, on a PDH channel, so they go dark with the PDH",
      "About 1,680 LEDs: cap them at about 20% white in firmware; inject 5 V at every frame node (2026-11-02, L)"),
@@ -182,7 +199,7 @@ ROWS = [
     ("REV PDH + ATO breakers, 120 A main breaker, SB50s, wire and lugs", "Stash", 1, 0.00, "", "Electrical", "Main power",
      "Owned / " + STASH),
     ('Anderson SB50 flush-mount bracket + dust cover kit', 'Aliexpress', 1, 3.68, 'https://www.aliexpress.us/item/3256806307889526.html', 'Electrical', 'Standby charge / shore-power port, bottom of the rear panel (a stash SB50 housing goes in it)', '5 stars, 68 sold. Was $9.99 (2026-11-04, L)'),
-    ('Main controller: ESP32-P4 + ESP32-C5 board, Wireless Tag WTDKP4C5-S1 (N16R32)', 'Aliexpress', 1, 29.29, 'https://www.aliexpress.us/item/3256812313570676.html', 'Electrical', 'One board does it all (rev D.2): web UI and WebSocket on 2.4 + 5 GHz WiFi 6 (the C5 on the same board), drive PWM, valves and chamber metering, elevation loop, smoke, every LED strip (16 parallel lanes), audio mixing, MIPI camera later, lidar on a UART, and the PDH contactor', f'Replaces the STM32 Black Pill + ESP32-C5 bridge and their UART link. Dual-core 360-400 MHz RISC-V, 16 MB flash, 32 MB PSRAM, 12 V jack or USB-C, 80 x 60 mm. 3 sold: new board; ESP-IDF (Arduino support is partial) ({V}, L)'),
+    ('Main controller: ESP32-P4 + ESP32-C5 board, Wireless Tag WTDKP4C5-S1 (N16R32)', 'Aliexpress', 1, 16.00, 'https://www.aliexpress.us/item/3256812313570676.html', 'Electrical', 'One board does it all (rev D.2): web UI and WebSocket on 2.4 + 5 GHz WiFi 6 (the C5 on the same board), drive PWM, valves and chamber metering, elevation loop, smoke, every LED strip (16 parallel lanes), audio mixing, MIPI camera later, lidar on a UART, and the PDH contactor', f'Replaces the STM32 Black Pill + ESP32-C5 bridge and their UART link. Dual-core 360-400 MHz RISC-V, 16 MB flash, 32 MB PSRAM, 12 V jack or USB-C, 80 x 60 mm. 3 sold: new board; ESP-IDF (Arduino support is partial) ({V}, L). $16.00 is your price from the Sheet (it was $29.29)'),
     ('ADS1115 16-bit 4-channel ADC module, I2C (B0FLPZMQJY)', 'Amazon', 1, 7.99, 'https://www.amazon.com/dp/B0FLPZMQJY', 'Electrical', 'The three pressure transducers + the 5 V reference, on I2C to the main controller (the ESP32 ADC stays for the pot and battery volts)', f'Settled call: ESP32 ADCs are too nonlinear for pressure. AliExpress has them for less if you add one to an order ({V}, S)'),
     ("ESP32-S3 boards (your two)", "Owned", 2, 0.00, "", "Electrical",
      "1: safety node (ESP-NOW to the remote; holds the PDH contactor in only while the remote and the main controller are alive). 2: spare", "Owned"),
@@ -222,30 +239,41 @@ ROWS = [
     ("Acrylic (your row)", "Other", 1, 150.00, "", "Cosmetic", "Body panels",
      "Your row in the Sheet (2026-11-06); the 'Frosted acrylic (owned)' row under Frame + body stays at $0"),
 ]
-ORDERED = ("Air tank 6 L",)   # rows marked Ordered in the Sheet (keep them ticked when the tab is rewritten)
+ORDERED = ()   # rows ticked Purchased in the Sheet (keep them ticked when the tabs are rewritten); none as of 2026-11-10
 
 
-def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(here, "glacis_bom.csv"), "w", newline="") as fh:
-        w = csv.writer(fh)
-        w.writerow(["Name", "Seller", "Amount", "Individual Price", "Price", "Link", "Type", "Purpose", "Alternative/Notes"])
-        tot = 0.0
-        for r in ROWS:
-            if r[1] is None:
-                w.writerow([r[0]])
-                continue
-            name, seller, q, u, link, typ, purpose, notes = r
-            tot += q * u
-            w.writerow([name, seller, q, f"{u:.2f}", f"{q * u:.2f}", link, typ, purpose, notes])
-        w.writerow([])
-        w.writerow(["Total", "", "", "", f"{tot:.2f}"])
-    # Sheet rows for the "Glacis BOM" tab, laid out like the Broncobots budget's order tabs (2026-11-09):
-    # B Item | C Price Per Unit | D Quantity | E Total Price | F Provider | G Notes | H Link | I Purchased?, from row 4.
-    # Row 2 is the band: C2 "Total Cost (W/ Tax)" =SUM(E4:E)*1.091, E2 "Shipping" (the SHIPPING rows' total, so they
-    # are not table rows), G2 "Total Cost (W/ Taxes + Shipping)" =F2+D2. Each item's listing notes go in its B cell note.
-    out, kinds, cell_notes, shipping, skip = [], [], {}, 0.0, False
+# section title prefix -> order (1: pneumatics, important electronics, speakers; 2: materials, LEDs, smoke)
+ORDER_OF = {"FROM THE OLD CANNON": 1, "PRESSURE SIDE": 1, "GUN": 1, "DRIVE": 1, "ELEVATION": 1, "CONTROLS": 1,
+            "AUDIO": 1, "SHIPPING": 1, "SMOKE": 2, "FRAME + BODY": 2, "RAILS": 2, "LIGHTS": 2, "BUMPERS": 2,
+            "OTHER MATERIALS": 2, "LATER": 2}
+ORDER_TITLES = {1: "Borealis Order 1 - pneumatics, electronics, speakers",
+                2: "Borealis Order 2 - materials, LEDs, smoke"}
+
+
+def order_of(section):
+    for k, v in ORDER_OF.items():
+        if section.startswith(k):
+            return v
+    raise KeyError(f"section {section!r} has no order")
+
+
+def orders():
+    """{1: [rows], 2: [rows]}: each order's sections in ROWS order."""
+    out, cur = {1: [], 2: []}, None
     for r in ROWS:
+        if r[1] is None:
+            cur = order_of(r[0])
+        out[cur].append(r)
+    return out
+
+
+def _sheet(rows):
+    """One order tab, laid out like the Broncobots budget's order tabs (2026-11-09):
+    B Item | C Price Per Unit | D Quantity | E Total Price | F Provider | G Notes | H Link | I Purchased?, from row 4.
+    Row 2 is the band: C2 "Total Cost (W/ Tax)" =SUM(E4:E)*1.091, E2 "Shipping" (the SHIPPING rows' total, so they
+    are not table rows), G2 "Total Cost (W/ Taxes + Shipping)" =F2+D2. Each item's listing notes go in its B cell note."""
+    out, kinds, cell_notes, shipping, skip, sub = [], [], {}, 0.0, False, 0.0
+    for r in rows:
         if r[1] is None:
             skip = r[0].startswith("SHIPPING")
             if not skip:
@@ -256,13 +284,44 @@ def main():
         if skip:
             shipping += q * u
             continue
+        sub += q * u
         row = 4 + len(out)
         out.append([name, u, q, f"=C{row}*D{row}", seller, purpose, f'=HYPERLINK("{link}","Link")' if link else "",
                     name.startswith(ORDERED)])
         kinds.append("item")
         cell_notes[f"B{row}"] = notes
-    json.dump(dict(rows=out, kinds=kinds, notes=cell_notes, shipping=round(shipping, 2), first_cell="B4", last=3 + len(out)),
-              open(os.path.join(here, "glacis_bom_sheet.json"), "w"))
+    return dict(rows=out, kinds=kinds, notes=cell_notes, shipping=round(shipping, 2), first_cell="B4",
+                last=3 + len(out), items=round(sub, 2))
+
+
+def main():
+    here = os.path.dirname(os.path.abspath(__file__))
+    od = orders()
+    tot = 0.0
+    with open(os.path.join(here, "glacis_bom.csv"), "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["Order", "Name", "Seller", "Amount", "Individual Price", "Price", "Link", "Type", "Purpose",
+                    "Alternative/Notes"])
+        for k in (1, 2):
+            sub = 0.0
+            w.writerow([k, ORDER_TITLES[k]])
+            for r in od[k]:
+                if r[1] is None:
+                    w.writerow([k, r[0]])
+                    continue
+                name, seller, q, u, link, typ, purpose, notes = r
+                sub += q * u
+                w.writerow([k, name, seller, q, f"{u:.2f}", f"{q * u:.2f}", link, typ, purpose, notes])
+            w.writerow([k, f"Order {k} total", "", "", "", f"{sub:.2f}"])
+            w.writerow([])
+            tot += sub
+        w.writerow(["", "Total", "", "", "", f"{tot:.2f}"])
+    sheets = {str(k): dict(title=ORDER_TITLES[k], **_sheet(od[k])) for k in (1, 2)}
+    json.dump(dict(orders=sheets), open(os.path.join(here, "glacis_bom_sheet.json"), "w"))
+    for k in (1, 2):
+        sh = sheets[str(k)]
+        print(f"order {k}: {sum(1 for x in sh['kinds'] if x == 'item')} rows, items ${sh['items']:,.2f} + shipping "
+              f"${sh['shipping']:,.2f}")
     print(f"{len(ROWS)} rows, total ${tot:,.2f}")
 
 

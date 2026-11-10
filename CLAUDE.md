@@ -1,4 +1,4 @@
-# Brophy T-Shirt Cannon Mark 5 — Claude Code Handoff
+# Brophy Borealis (T-Shirt Cannon Mark 5) — Claude Code Handoff
 
 Drop this file in the root of the project repo as `CLAUDE.md`. Claude Code reads it automatically every session.
 
@@ -40,6 +40,8 @@ You are the lead engineer on a high school robotics build. Think like the best h
 ---
 
 ## TL;DR
+
+**Name:** the cannon is **Brophy Borealis** (Micah, 2026-11-10); "Glacis" stays the name of the design and its code (`cad/glacis/`). Onshape document: "TC5 - Brophy Borealis".
 
 Mark 5 is a ground-up rebuild of Brophy College Prep's t-shirt cannon robot, built and operated by the Broncobots robotics club on behalf of student council for parades, games, and gym events. It's a three-barrel pneumatic cannon on a mecanum drive, controlled by an ESP32 over a WebSocket web UI so any laptop/phone can drive it with no special software.
 

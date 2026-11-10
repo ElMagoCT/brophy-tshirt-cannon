@@ -63,6 +63,7 @@ def build(elev=P.ELEV_SHOW):
     log(f"underglow: {glow / 1000:.1f} m of strip under the bumpers")
     misc.frame_mounts()
     misc.body_parts(log)
+    misc.deck_rails()
     misc.speakers()
     for p in PARTS:
         if p["moving"]:
@@ -230,6 +231,8 @@ GROUPS = {"chassis": ("frame", "drive"), "body": ("body",), "bumpers": ("bumper"
 
 
 STEP_MAX = 9.0e6                                   # Onshape blob upload takes <= 10 MB per call
+GUN_EXPORT_ELEV = 0.0                              # the gun goes to Onshape level (0 deg); a revolute mate on the pivot
+                                                   # axis then swings it (Brophy Borealis "Gun angle" configuration)
 
 
 def _save_step(sel, name, path):
@@ -241,8 +244,9 @@ def _save_step(sel, name, path):
         if seen[nm] > 1:
             nm = f"{nm} #{seen[nm]}"
         r, g, b_, a = p["color"]
-        asm.add(p["shape"], name=nm.replace("/", "-"), color=cq.Color(r, g, b_, a))
-        q = p["shape"].BoundingBox()
+        shape = pose(p["local"], GUN_EXPORT_ELEV) if p["moving"] else p["shape"]
+        asm.add(shape, name=nm.replace("/", "-"), color=cq.Color(r, g, b_, a))
+        q = shape.BoundingBox()
         names.append(dict(name=nm, c=[(q.xmin + q.xmax) / 2, (q.ymin + q.ymax) / 2, (q.zmin + q.zmax) / 2],
                           size=[q.xlen, q.ylen, q.zlen], color=p["color"], bom=p["bom"], kind=p["kind"],
                           purpose=pneu_parts.purpose(p["name"]) if p["group"] in ("pneu", "gun") else ""))
@@ -264,8 +268,10 @@ def tabs(parts):
     for p in parts:
         g, n = p["group"], p["name"]
         c = _corner(n) if g == "drive" else None
-        if n.startswith(("LED ", "Speaker")):
+        if n.startswith(("LED ", "Speaker", "Light bar")):
             out["Lights & speakers"].append(p)
+        elif n.startswith("Rail 20x20 deck"):
+            out["Add-on rails"].append(p)
         elif g == "frame" or (g == "drive" and c is None):
             out["Chassis, pivot & drive"].append(p)
         elif g == "drive" and n.startswith(WHEEL_PARTS):
@@ -279,7 +285,7 @@ def tabs(parts):
         elif g in ("body", "bumper"):
             out["Bumpers & wall standoffs"].append(p)
         elif g == "gun":
-            out["Gun (at 20 deg)"].append(p)
+            out["Gun (pivots)"].append(p)
         elif g == "pneu":
             out["Pneumatics"].append(p)
         else:                                   # power, spot
@@ -292,7 +298,7 @@ SUBASSEMBLIES = {"Body panels": ("Body panels & clips",), "Body frame": ("Body f
                  "Lights & speakers": ("Lights & speakers",), "Bumpers": ("Bumpers & wall standoffs",),
                  "Pneumatics": ("Pneumatics",), "Power & smoke": ("Power, electronics & smoke",),
                  "Chassis & drive": ("Chassis, pivot & drive", "Wheel FL", "Wheel FR", "Wheel RL", "Wheel RR"),
-                 "Gun": ("Gun (at 20 deg)",)}
+                 "Gun": ("Gun (pivots)",), "Add-on rails": ("Add-on rails",)}
 
 
 def export(parts):
