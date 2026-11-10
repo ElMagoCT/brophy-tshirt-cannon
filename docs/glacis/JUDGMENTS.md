@@ -1146,6 +1146,20 @@ B13. **GOGO in valves** (Micah, via the Mac chat): GOGO GPG-M03 2/2 NC direct-ac
     it met cannon B's valve. The left tank tube's run behind the valves rose to z 282, over that plug. The valve cross
     is now drawn at the ChillWaves part's real ~33 mm across the ports (was 25.4), which also cleared the 146 mm3
     valve cross / line relief sliver that had been on main since rev D.2.
+B14. **Elevation 0-90 deg; Onshape gun mate = one revolute with variable limits** (Micah, same day: "it should just
+    be the limits on the revolute that are variables in the configuration panel. no need for those other fastens. ...
+    at least 0-85 but you can go up to 90 if there's room"). A swing check of the pass-2 build (every gun part rotated
+    about the pivot against every other exported part, 80-95 deg) found no clash with the body, chassis or anything
+    fixed up to 95 deg, so ELEV_RANGE is 0-90. The only hits were with parts that ride on the gun (its two 20x20 rails)
+    or flex with it (service and fog loops). Next build re-cuts the well floor for 90 and its sweep checks 0-90.
+    Onshape: configuration = two variables, "Gun min angle" (default 0) and "Gun max angle" (default 90), 0-90 deg;
+    the "Gun pivot" revolute's limits are #Gun_min / #Gun_max (+ = barrels up: both Pivot connectors were turned 180
+    deg about X, which flips the sense without moving anything). The 8 fasten-to-origin mates and the angle-lock mate
+    are gone; the 8 non-gun sub-assemblies are locked in place instead. The gun's two 20x20 rails moved from the
+    Add-on rails sub-assembly into the Gun sub-assembly so they swing with it. The old Gun instance carried a stale
+    stored pose (60 deg and 487 mm sideways, off its pivot) that no solve cleared, so it was replaced with a fresh
+    instance. Onshape doesn't re-pose the gun when the variables change; drag it, or set both to one angle and
+    use the mate's "Apply limit position".
 D14 (Borealis). **Money:** $2,002.43 before the review -> $1,777.71, then $1,600.79 after Micah's Sheet changes
     (welded chambers, the M-style QD kit, M4 hardware, cheaper transducers and boost; Order 1 $1,082.69 + $10 shipping,
     Order 2 $508.10), then $1,584.06 with the GOGO in valves (Order 1 $1,065.96 + $10). The MSI vs Supply Giant coupling

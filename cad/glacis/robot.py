@@ -241,7 +241,7 @@ GROUPS = {"chassis": ("frame", "drive"), "body": ("body",), "bumpers": ("bumper"
 
 STEP_MAX = 9.0e6                                   # Onshape blob upload takes <= 10 MB per call
 GUN_EXPORT_ELEV = 0.0                              # the gun goes to Onshape level (0 deg); a revolute mate on the pivot
-                                                   # axis then swings it (Brophy Borealis "Gun angle" configuration)
+                                                   # axis then swings it (limits = the "Gun min / max angle" config variables)
 
 
 def _save_step(sel, name, path):

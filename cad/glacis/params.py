@@ -280,8 +280,8 @@ CRADLE_Y0 = 74.0                            # inner faces of the two cradle plat
                                             # and smoke lines that run beside them
 X_VALVE = 190.0                             # valve front faces ahead of the axis (from the balance calc, see gun.py)
 CH_SADDLE_S = (233.0, 352.0)                # chamber saddles, distance behind the valve front faces (both pipes there)
-ELEV_RANGE = (0.0, 85.0)                    # Brophy Borealis (Micah, 2026-11-10): 0-85 deg (rev D.1 had 45: the longer
-                                            # chambers swung down through the back)
+ELEV_RANGE = (0.0, 90.0)                    # Brophy Borealis (Micah, 2026-11-10): at least 0-85 deg, 90 if it fits.
+                                            # The pass-2 build clears to 95 deg (sweep90 check, B14), so 0-90.
 ELEV_SHOW = 20.0
 ELEV_T = (16, 112)                          # goBILDA 312 rpm pinion -> pulley on the right axle end (HTD 5M 9 mm), 7:1
 ELEV_BELT_T = 150

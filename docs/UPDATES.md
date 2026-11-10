@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-10 - Micah's Windows computer (Claude Code) - Onshape gun mate: variable limits, 0-90 deg
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B14): elevation range 0-90 deg (was 0-85; the pass-2 build clears to 95). Onshape top assembly: one "Gun pivot" revolute whose limits are the configuration variables "Gun min angle" / "Gun max angle" (0-90, + = barrels up); the 8 fastens and the angle-lock mate are deleted and the 8 non-gun sub-assemblies are locked; the gun's 20x20 rails now live in the Gun sub-assembly; the Gun instance was replaced (the old one was stuck off its pivot).
+- Files: `cad/glacis/params.py` (ELEV_RANGE), `cad/glacis/robot.py` (comment), `docs/glacis/JUDGMENTS.md`
+- Checks: swing check of the pass-2 STEP export, gun parts vs everything else at 80-95 deg: no clash with anything fixed (only the gun's own rails and the flexible loops, which move with it). No robot.py rebuild: the next one re-cuts the well floor for 90 and sweeps 0-90.
+- Parts list: no change.
+- Onshape: version "Gun pivot limits as config variables (2026-11-10)". Both mates OK; solved poses checked at 0 / 45 / 90 deg (muzzle level, up 45, straight up over the pivot). Changing the variables doesn't re-pose the gun in the viewport; drag it, or use the mate's "Apply limit position". Refresh any open Onshape tab.
+- Questions for Micah: none.
+
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Borealis pass 2: front hole, in-well rails, welded chambers, 85 deg, GOGO valves
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS "Brophy Borealis" B9-B13):
