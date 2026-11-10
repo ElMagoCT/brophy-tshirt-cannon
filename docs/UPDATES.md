@@ -11,6 +11,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 | Who (and which chat) | Started | Working on | Files |
 |---|---|---|---|
 | Micah's Windows computer (Claude Code) | 2026-11-08 | Printable mini kit (gun on a filament pin) + sliced projects for 2 CC2 / 2 CC1 | `cad/glacis/mini.py`, `mini_3mf.py`, `mini_orca/`, `out/mini/`, `docs/glacis/mini_model.md` (all new) |
+| Micah's Windows computer (Claude Code) | 2026-11-10 | Front light bar hole: bumper to 4.5 in above it, open at the bottom, no liner; 20x20 rails inside carry the bar | `cad/glacis/lightbar.py`, `params.py`, `misc.py`, `body.py`, `robot.py`, `bom/`, `docs/glacis/JUDGMENTS.md` |
 
 ## Entry template
 
