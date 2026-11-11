@@ -285,7 +285,10 @@ ELEV_RANGE = (0.0, 90.0)                    # Brophy Borealis (Micah, 2026-11-10
 ELEV_SHOW = 20.0
 ELEV_T = (16, 112)                          # goBILDA 312 rpm pinion -> pulley on the right axle end (HTD 5M 9 mm), 7:1
 ELEV_BELT_T = 150
-ELEV_PULLEY_Y = (95.0, 108.0)               # |y| of the elevation pulley, just outside the gun
+ELEV_STANDOFF = 10.0                        # Micah 2026-11-10: the gun pulley is a ring on standoffs off the right cradle
+                                            # plate, the belt centred between the plate and the bearing block
+ELEV_PULLEY_Y = (CRADLE_Y0 + PLATE_T + ELEV_STANDOFF, CRADLE_Y0 + PLATE_T + ELEV_STANDOFF + 13.0)   # |y| of both pulleys
+ELEV_MOTOR_FACE_Y = 110.0                   # |y| of the elevation motor's face (unchanged; the pinion moved out on the shaft)
 Y_GUN = CRADLE_Y0 + PLATE_T                 # half width of the gun over its cradle plates
 
 PIVOT = (-40.0, 656.0)                      # axle between the cannons; high enough that the gun's swing
@@ -298,7 +301,7 @@ X_SLOT_REAR = -2000.0                       # the well is open at the back: at 0
 # runs forward from each to the axle
 TOWER_X = (-182.7, -157.3)
 TOWER_L_X = TOWER_R_X = TOWER_X
-BEARING_BLOCK_Y = (ELEV_PULLEY_Y[1] + 1.0, INNER_RAIL_Y[1])
+BEARING_BLOCK_Y = (109.0, INNER_RAIL_Y[1])     # inner bearing face (was the old pulley's outer face + 1)
 ELEV_MOTOR_Z = 468.0                        # under the top speaker's LED rail, over the side tank
 ELEV_C = centre_for_belt(ELEV_BELT_T, pd(ELEV_T[0]), pd(ELEV_T[1]))
 ELEV_MOTOR_X = PIVOT[0] + math.sqrt(ELEV_C ** 2 - (PIVOT[1] - ELEV_MOTOR_Z) ** 2)

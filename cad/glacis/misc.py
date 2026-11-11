@@ -97,14 +97,18 @@ def towers_and_pivot():
     # belt on the right axle end (7:1, about 45 rpm free at the gun). Gearbox drawn at the 3-stage length (conservative)
     mx_, mz_ = P.ELEV_MOTOR_X, P.ELEV_MOTOR_Z
     ya, yb_ = P.ELEV_PULLEY_Y
-    y_face = -(yb_ + 2.0)
+    y_face = -P.ELEV_MOTOR_FACE_Y
+    # the 8 mm REX output shaft (FTC) ends flush with the pinion, now further out toward the gun (belt centred between
+    # the cradle plate and the bearing block)
     mot = cyl(18.0, 50.3, (mx_, y_face, mz_), (0, -1, 0)).fuse(cyl(18.75, 74.8, (mx_, y_face - 50.3, mz_), (0, -1, 0))).fuse(
-        cyl(4.0, 23.5, (mx_, y_face, mz_), (0, 1, 0)))
+        cyl(4.0, P.ELEV_MOTOR_FACE_Y - ya, (mx_, y_face, mz_), (0, 1, 0)))
     add("Elevation motor goBILDA 5203 19.2:1", mot, "black", "frame",
         bom="goBILDA 5203-2402-0019 Yellow Jacket 19.2:1, 312 rpm (FTC motor)", note="Spark MAX, brushed mode")
     pin = cyl(P.pd(P.ELEV_T[0]) / 2 + 2.5, yb_ - ya, (mx_, -yb_, mz_), (0, 1, 0)).cut(
         cyl(4.1, 40, (mx_, -yb_ - 5, mz_), (0, 1, 0)))
-    add("Elevation pinion 16T", pin, "print_d", "frame", bom="Elevation pinion 16T HTD 9 mm (8 mm REX bore)", kind="print")
+    add("Elevation pinion 16T", pin, "print_d", "frame", bom="Elevation pinion 16T HTD 9 mm (8 mm REX bore)", kind="print",
+        note="printed from Micah's own pulley design; sits out on the shaft so the belt is centred between the cradle plate "
+             "and the bearing block")
     yi, yo = y_face - 2.0, -P.Y_SLOT + 2.0                  # the bracket stays inside the gun well
     brk = union([box(px - 10.0, px + 25.0, yo, yi, mz_ - 20.0, P.DECK_RAIL["z"][0]),   # web up to the right rail
                  box(px - 10.0, mx_ + 26.0, yo, yi, mz_ - 24.0, mz_ + 24.0)])        # arm out to the motor

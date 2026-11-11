@@ -79,6 +79,12 @@ FILL_DOWN = ((-20.0, -59.0), (-30.0, -67.0))                 # (x, y) where each
 # and the valve side blocks inside the plates (checked against the pass-2 gun)
 HUB_R, HUB_BOLT_R, HUB_GRIP = 36.0, 28.0, 20.0                # boss radius, bolt circle, printed length under each head
 HUB_BOLTS = tuple((HUB_BOLT_R * math.cos(math.radians(a)), HUB_BOLT_R * math.sin(math.radians(a))) for a in (30, 120, 195, 300))
+# Right side (Micah, 2026-11-10: "the cannon pulley should be a ring and have standoffs so its screwed to and floating on
+# the side"): the 112T ring's 6 standoffs sit on a 78 mm circle at angles whose M4 heads inside the plate clear the
+# valve side blocks and the fill lines
+RING_IN, RING_BOLT_R, RING_CB = 68.0, 78.0, 7.0                # ring bore radius, standoff circle, counterbore depth
+RING_BOLTS = tuple((RING_BOLT_R * math.cos(math.radians(a)), RING_BOLT_R * math.sin(math.radians(a)))
+                   for a in (10, 90, 150, 210, 270, 350))
 SMOKE_DOWN = (-8.0, 63.0)                                    # ... and the smoke line, on the other side
 
 
@@ -195,7 +201,7 @@ def _build(xv):
         pts = [(x0, -zo), (x1 - 20, -zo), (x1, -zo + 20), (x1, zo - 20), (x1 - 20, zo), (x0, zo)]
         pl = cq.Workplane("XZ", origin=(0, y0, 0)).polyline(pts).close().extrude(-P.PLATE_T).val()
         pl = pl.cut(hex_prism(12.9, 20, (0, y0 - 5, 0), (0, 1, 0)))
-        for (hx, hz) in HUB_BOLTS:                           # the hub (left) / pulley hub (right) bolts through here
+        for (hx, hz) in (HUB_BOLTS if sy > 0 else RING_BOLTS):   # the left hub's bolts / the right ring's standoffs
             pl = pl.cut(cyl(2.25, 10, (hx, y0 - 2, hz), (0, 1, 0)))
         for (x, z) in ((x0 + 15, zo - 15), (x0 + 15, -zo + 15), (x1 - 25, zo - 30), (x1 - 25, -zo + 30),
                        (xv - 40, zo - 12), (xv - 40, -zo + 12)):
@@ -293,31 +299,32 @@ def _build(xv):
     # hubs: boss on the plate's outer face out to just short of the inner bearing, a lip on its inner race
     yp = CRADLE_Y0 + P.PLATE_T                                   # plate outer face
     yb = P.BEARING_BLOCK_Y[0]                                    # inner bearing face (flange counterbored flush)
-    for sy, tag in ((1, "left"), (-1, "right")):
-        def seg(r, a, b):                                        # cylinder from |y| = a to |y| = b on this side
-            return cyl(r, b - a, (0, sy * a, 0), (0, sy, 0))
-        if sy > 0:
-            hub = seg(HUB_R, yp, yb - 1.5)
-        else:                                                    # right: boss, then the 112T pulley in the belt plane
-            hub = seg(HUB_R, yp, P.ELEV_PULLEY_Y[0]).fuse(elevation_pulley().translate(V(0, -P.ELEV_PULLEY_Y[1], 0)))
-        hub = hub.fuse(seg(9.5, yb - 2.0, yb - 0.3))               # inner-race lip: locates the gun between the bearings
-        y_end = yb - 1.5 if sy > 0 else P.ELEV_PULLEY_Y[1]       # outer face (the pulley's outer flange on the right)
-        hub = hub.cut(seg(7.85, yp - 1, yb + 1))                 # the hex stub passes through (round bore)
-        if sy > 0:
-            hub = hub.cut(hex_prism(12.9, yb - yp + 2, (0, yp - 1, 0), (0, 1, 0)))   # left: keyed, it carries the pot
-        for (hx, hz) in HUB_BOLTS:
-            hub = hub.cut(cyl(2.25, y_end - yp + 2, (hx, sy * (yp - 1), hz), (0, sy, 0)))
-            hub = hub.cut(cyl(4.6, y_end - yp - HUB_GRIP + 1, (hx, sy * (yp + HUB_GRIP), hz), (0, sy, 0)))   # head pocket
-        if sy > 0:
-            gadd("Axle hub left", hub.clean(), "print_d", bom="Axle hub", kind="print",
-                 note="PETG, 5 walls, 40% gyroid; hex bore on the pivot stub; 4 x M4 x 30 from its outer face (counterbored) "
-                      "through the cradle plate into nylocs; its lip bears on the inner bearing's inner race")
-        else:
-            gadd(f"Elevation pulley {P.ELEV_T[1]}T (pulley hub)", hub.clean(), "print_d",
-                 bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm (pulley hub)", kind="print",
-                 note="PETG, 5 walls, 40% gyroid; bolts to the right cradle plate (4 x M4 x 30, counterbored, nylocs "
-                      "inside), not to the axle: the hex stub passes through a round bore; its lip bears on the inner "
-                      "bearing's inner race")
+    # left: the 72 mm hub (keyed, carries the pot), out to the inner bearing with a lip on its inner race
+    hub = cyl(HUB_R, yb - 1.5 - yp, (0, yp, 0), (0, 1, 0)).fuse(cyl(9.5, 1.7, (0, yb - 2.0, 0), (0, 1, 0)))
+    hub = hub.cut(hex_prism(12.9, yb - yp + 2, (0, yp - 1, 0), (0, 1, 0)))
+    for (hx, hz) in HUB_BOLTS:
+        hub = hub.cut(cyl(2.25, yb - yp + 2, (hx, yp - 1, hz), (0, 1, 0)))
+        hub = hub.cut(cyl(4.6, yb - 1.5 - yp - HUB_GRIP + 1, (hx, yp + HUB_GRIP, hz), (0, 1, 0)))   # head pocket
+    gadd("Axle hub left", hub.clean(), "print_d", bom="Axle hub", kind="print",
+         note="PETG, 5 walls, 40% gyroid; hex bore on the pivot stub; 4 x M4 x 30 from its outer face (counterbored) "
+              "through the cradle plate into nylocs; its lip bears on the inner bearing's inner race")
+    # right (Micah 2026-11-10): the 112T pulley is a ring floating on 6 standoffs off the cradle plate, in a belt plane
+    # centred between the plate and the bearing block; a printed sleeve on the stub does the old hub's locating job
+    y0r, y1r = P.ELEV_PULLEY_Y
+    ring = elevation_pulley().translate(V(0, -y1r, 0)).cut(cyl(RING_IN, 40, (0, -y1r - 5, 0), (0, 1, 0)))
+    for (hx, hz) in RING_BOLTS:
+        ring = ring.cut(cyl(2.25, 20, (hx, -y1r - 1, hz), (0, 1, 0)))
+        ring = ring.cut(cyl(4.6, RING_CB + 0.01, (hx, -y1r - 0.01, hz), (0, 1, 0)))     # counterbore for the M4 x 12 head
+        gadd("Elevation pulley standoff", hex_prism(7.0, P.ELEV_STANDOFF, (hx, -yp, hz), (0, -1, 0)), "alu",
+             bom="M4 x 10 mm hex coupling nut (standoff), 304 stainless", kind="cots",
+             note="M4 x 8 from inside the cradle plate into one end, M4 x 12 through the ring (counterbored) into the other")
+    gadd(f"Elevation pulley {P.ELEV_T[1]}T ring", ring.clean(), "print_d",
+         bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm ring (printed)", kind="print",
+         note=f"PETG, 5 walls, 40% gyroid; a ring ({2 * RING_IN:.0f} mm bore) on 6 standoffs {P.ELEV_STANDOFF:.0f} mm off the "
+              "right cradle plate; the axle passes through its open middle")
+    sl = cyl(9.5, yb - 0.3 - yp, (0, -yp, 0), (0, -1, 0)).cut(hex_prism(12.9, yb - yp + 2, (0, -yp + 1, 0), (0, -1, 0)))
+    gadd("Axle spacer right", sl, "print_d", bom="Axle spacer (printed)", kind="print",
+         note="hex bore on the right stub, from the cradle plate to the inner bearing's inner race: locates the gun sideways")
     # every tube runs inside the core and drops out of its bottom just behind the pivot: each fill line from its
     # chamber's inlet elbow back between the chambers, then out beside the bottom one; the smoke line from the collar
     # back along the barrels' valley, through the mantlet and breech block, between the valves

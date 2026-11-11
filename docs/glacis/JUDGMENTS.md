@@ -1188,6 +1188,22 @@ B16. **Parts list: Kenzo's cheaper list, Amazon or AliExpress only** (Kenzo's "C
     M x F check valve (unrated, wrong gender), the ESP32-P4-WIFI6 (no USB-A, RJ45 or speaker amp), his canvas (no
     white), and his Amazon copies of AliExpress rows. The 1x6 bumper boards stay Home Depot (Amazon lumber is ~5x).
     Pre-tax $1,480.86 (Order 1 $1,039.12, Order 2 $441.74, no shipping rows), from $1,516.05.
+B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "remake it and its pair centered between the
+    tower and the cannon. the cannon pulley should be a ring and have standoffs so its screwed to and floating on the
+    side. the other pulley axle should be a touch shorter but the pulley further out ... I have a pulley design for
+    whatever amount of teeth you want"). The 112T is now a printed ring (136 mm bore, the axle runs through its open
+    middle) on 6 M4 x 10 stainless coupling nuts used as standoffs, 10 mm off the right cradle plate: M4 x 8 from
+    inside the plate, M4 x 12 through the ring (7 mm counterbore). They sit on a 78 mm circle at 10 / 90 / 150 / 210 /
+    270 / 350 deg, where the heads inside the plate clear the valve side blocks and fill lines. Belt plane |y| 87.2 to
+    100.2 (centre 93.7; the gap between the plate and the bearing block is centred at 93.1), was 95 to 108. The
+    16T pinion slid out the same 8 mm on the goBILDA's 8 mm REX shaft (shaft drawn 22.8 mm, ending flush; the motor
+    and its bracket don't move), printed from Micah's own pulley design. 16T/112T kept: the 150T belt still fits
+    exactly (750 mm). The left hub (B15) is unchanged; on the right a printed hex sleeve on the stub, from the plate to
+    the inner bearing's race, takes over locating the gun sideways. BEARING_BLOCK_Y is now its own number (109), no
+    longer tied to the pulley. Checked without a full rebuild (Micah: "just rebuild those parts"): the gun and the
+    tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
+    against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
+    fits the bed; gun 18.8 kg, balanced.
 D14 (Borealis). **Money:** $2,002.43 before the review -> $1,777.71, then $1,600.79 after Micah's Sheet changes
     (welded chambers, the M-style QD kit, M4 hardware, cheaper transducers and boost; Order 1 $1,082.69 + $10 shipping,
     Order 2 $508.10), then $1,584.06 with the GOGO in valves (Order 1 $1,065.96 + $10). The MSI vs Supply Giant coupling

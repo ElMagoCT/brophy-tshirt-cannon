@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-10 - Micah's Windows computer (Claude Code) - Elevation ring pulley on standoffs, belt centred
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B17): the 112T gun pulley is a ring on 6 standoffs (M4 x 10 stainless coupling nuts) 10 mm off the right cradle plate; the belt runs centred between the plate and the bearing block; the 16T pinion moved 8 mm out on the motor's 8 mm REX shaft (printed from Micah's pulley design); a printed sleeve on the right stub locates the gun. Ratio and belt unchanged.
+- Files: `cad/glacis/gun.py`, `params.py`, `misc.py`, `bom/glacis_bom.py` (+ csv/json), `docs/glacis/JUDGMENTS.md`
+- Checks: partial rebuild only (gun + tower/pivot/elevation parts, swapped into the last full build's STEPs): rebuilt chassis parts vs everything and the gun's 0-90 deg swing vs everything fixed, 0 hits over 30 mm3; prints fit the bed; belt 750 mm (150T). robot.py not re-run in full, so `out/check_log.txt` and the renders are from the previous full build.
+- Parts list: + M4 x 10 coupling nuts 10-pack $4.99 (Amazon); M4 x 30 now 14 used, nylocs 4, M4 x 8 and M4 x 12 +6 each. Pre-tax $1,485.85. Sheet matches.
+- Onshape: new Gun and Chassis part studios swapped into their sub-assemblies (53/53 and 229/229 rigid), all 10 top-level features OK, version "Elevation ring pulley on standoffs (2026-11-10)". The replaced ones are kept as "Gun (pivots) (old)" and "Chassis, pivot & drive (old)".
+- Questions for Micah: delete the two "(old)" part studios and their STEPs?
+
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Pivot hubs, origin fastens, Kenzo's parts list
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B14 amended, B15, B16):
