@@ -31,8 +31,8 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Files: `cad/glacis/plates.py` (new), `gun.py`, `params.py`, `out/` (check log, renders, parts csv), `bom/glacis_bom.py` (+ csv/json), `docs/glacis/JUDGMENTS.md`
 - Checks: full robot.py on the first plate version (interference 1 pair, the old 64 mm3 sliver; sweep 0-90 deg 0 clashes; prints fit; 0 multi-piece; well floor re-cut; 50 frame pieces, 58 tenons), then the final gun swapped into those STEPs and checked against everything over the swing: 0 hits; no clashes inside the gun; gun 18.5 kg, balanced. `out/check_log.txt` and the renders are from the full run, so they show the first plate version.
 - Parts list: no price change ($1,485.85 pre-tax): M4 x 8 +12 (saddles), M4 x 12 +4 (hub), M4 inserts +12 (86 of 100), M4 x 30 back to 10. Sheet matches.
-- Onshape: backup version "Before chevron plates (2026-11-10)"; 12 part studios replaced (gun, add-on rails, chassis, pneumatics, power, body panels, body frame 1-6), parts swapped by name into their sub-assemblies, rigid groups rebuilt; version "Chevron gun plates (2026-11-10)". The replaced part studios are kept as "(old)" for now.
-- Questions for Micah: delete the "(old)" part studios and their STEPs?
+- Onshape: backup version "Before chevron plates (2026-11-10)"; 12 part studios replaced (gun, add-on rails, chassis, pneumatics, power, body panels, body frame 1-6), parts swapped by name into their sub-assemblies, rigid groups rebuilt; version "Chevron gun plates (2026-11-10)". Then (Micah: "always delete the old stuff. make sure everything but the main assembly is in folders") the 12 replaced part studios and their 12 old STEPs were deleted (the backup version keeps them), and every tab but the main assembly is in a folder: Body frame parts, Lights & speakers parts, System part studios, Wheels, CAD Imports, Sub-assemblies, and a new "Micah's studios" for Part Studio 1 and Variable Studio 1.
+- Questions for Micah: none.
 
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Elevation ring pulley on standoffs, belt centred
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
