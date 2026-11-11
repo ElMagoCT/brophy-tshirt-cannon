@@ -48,8 +48,8 @@ ROWS = [
     ('DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT, 5-pack (Boeray)', 'Amazon', 1, 17.99, 'https://www.amazon.com/dp/B0D8Q2618F', 'Motion', '4 used: the two tank outlets and the two chamber inlets (in the weld-on bungs, pointing at the pivot); 1 spare', '1/4 tube x 1/4 NPT male, 250 psi, SAE J1131 (2026-11-06, L)'),
     ('Pipe thread sealant, RectorSeal T Plus 2 (B0002YPAFY)', 'Amazon', 1, 8.78, 'https://www.amazon.com/dp/B0002YPAFY', 'Tool', 'Every NPT joint', "Skip it if you have pipe dope or PTFE tape (Home Depot's $4.25 isn't one of your sellers) (2026-11-04, L)"),
     ('1 in cam-buckle strap 1 m, 4-pack', 'Aliexpress', 1, 5.2, 'https://www.aliexpress.us/item/3256813026868231.html', 'Structure', '4 used: two per side tank', 'Free shipping; 12 sold, 5 stars. Was $8.99 on Amazon (2026-11-04, L)'),
-    ("Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG (the old cannon's if it fits)", 'Owned', 1, 0.0, 'https://www.zoro.com/dwyer-instruments-brass-ball-valve-600-psi-full-port-14-dbv-00/i/G907144217/', 'Motion', 'Manual tank shut-off (rev C.3): open for a session, closed for transport and before working on the gun; handle at the rear panel', "Reuse the old cannon's if it's 1/4 NPT and stamped 200 psi or more (600 WOG is typical); else Dwyer DBV-00 $6.55 at Zoro (2026-11-03, S)"),
-    ('1/4 NPT brass nipple 1-1/2 in (you think you have one)', 'Owned', 1, 0.0, 'https://www.amazon.com/dp/B07L5HNKQC', 'Motion', "Through the rear panel: the female plug outside, the female elbow inside. A check valve's 10 mm male end is too short to cross the panel itself", 'If not: Legines 5-pack $10.99, or one loose at a hardware store'),
+    ('Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG, 2-pack (B0FKHG6VVT)', 'Amazon', 1, 15.99, 'https://www.amazon.com/dp/B0FKHG6VVT', 'Motion', 'Manual tank shut-off (rev C.3): open for a session, closed for transport and before working on the gun; handle at the rear panel', "You don't have one (Micah, 2026-11-11), so it's a buy: heavy-duty brass, female both ends, 600 WOG (over 4 x the 190 psi it sees); 4.5 stars. One spare (2026-11-11, L)"),
+    ('1/4 NPT brass nipple 1-1/2 in, male x male, 1200 psi, 2-pack (B0747JC92M)', 'Amazon', 1, 7.49, 'https://www.amazon.com/dp/B0747JC92M', 'Motion', "Through the rear panel: the female plug outside, the female elbow inside. A check valve's 10 mm male end is too short to cross the panel itself", "You don't have one (Micah, 2026-11-11), so it's a buy; 4.7 stars. One spare (2026-11-11, L)"),
 
     ('GUN - welded 3 in pipe chambers (Brophy Borealis): top 1.56 L, bottom 1.32 L, both on HSV04 valves to 190 psi; 36 in barrels', None),
     ('Firing valves: U.S. Solid USS-HSV04, 1 in NPT, 12 V DC, NC, pilot-operated, 1-50 bar (725 psi), PTFE seal (Amazon B0BSNHJ4WQ)', 'Amazon', 2, 106.99, 'https://www.amazon.com/dp/B0BSNHJ4WQ', 'Motion', 'One per cannon (rev D.2: the bottom one too, so both run to full tank pressure, capped at 190 under the 200 psi reliefs)', 'In stock, one version only. Thread is listed as NPT / G (a dual thread, no option to pick), so true NPT is NOT confirmed: test-fit a 1 in NPT nipple before trusting it at 190 psi. Cv 11.67, 25 mm, PTFE seal, junction box. Opening time unpublished: bench-test before cutting barrels (2026-11-06, L)'),
@@ -84,9 +84,10 @@ ROWS = [
     ('Logic supply: 5 V 5 A buck-boost module, 3.6-32 V in (pick "5V")', 'Aliexpress', 1, 2.67, 'https://www.aliexpress.us/item/3256808244937735.html', 'Electrical', 'Always-on 5 V logic rail, tapped ahead of the contactor: main controller (its 5 V header), safety node, every sensor', "The row had no link: this is the 3.6-32 V to 5 V / 9 V / 12 V 5 A module, $2.67, 4.8 stars, 413 sold; pick the 5V option. Short-circuit, over-temperature and TVS protection; holds 5 V down to 3.6 V in, so a drive sag can't reset the controllers. Was the PM02 at $13.30 (2026-11-10 review, L)"),
     ('Latching mushroom E-stop 22 mm, 2 NC (LA38)', 'Aliexpress', 2, 5.25, 'https://www.aliexpress.us/item/3256806731686244.html', 'Electrical', 'Rear panel: one contact in the contactor coil (kills the PDH), the other in the valve arm relay coil; + the handheld remote', 'Pick the 2 NC option; 180 sold, 4.9 stars. Was $13.99 each (2026-11-04, L)'),
     ('Panel-mount USB-C extension, 10 cm, waterproof', 'Aliexpress', 1, 2.06, 'https://www.aliexpress.us/item/3256809075308882.html', 'Electrical', 'USB to the main controller through the rear panel', '600+ sold. Was $9.69 (2026-11-04, L)'),
+    ('Printed board trays (3DP): one under each board on the bellypan, 6 mm standoff posts with heat-staked pegs', 'Owned', 1, 0.0, '', 'Electrical', 'Seven trays (controller, safety node, PCA9685, both ADS1115s, drivers board, logic supply): each board drops onto four printed pegs that a soldering iron mushrooms over (no screws, nothing conductive under the board); each tray takes 2 x M4 x 12 up through the bellypan into M4 inserts', 'Filament is the PETG row (2026-11-11, L)'),
     ('Safety remote: 18650 battery shield V8 (charging, 5 V out) + a stash 18650 cell', 'Aliexpress', 1, 3.29, 'https://www.aliexpress.us/item/3256807394809647.html', 'Electrical', 'Remote power, charged over USB, inside your custom printed remote case', '(2026-11-04, L)'),
     ('FRC 12 V battery + charger (owned)', 'Stash', 2, 0.0, '', 'Electrical', 'One per side on its own slide-out sled, each through its own battery relay (below)', 'Owned'),
-    ('REV PDH + ATO breakers, 120 A main breaker, SB50s, wire and lugs', 'Stash', 1, 0.0, '', 'Electrical', 'Main power', 'Owned / Standard FRC stash part; buy only if the stash is out'),
+    ('REV PDH + ATO breakers, 120 A main breaker, SB50s, wire and lugs', 'Stash', 1, 0.0, '', 'Electrical', "Main power: the 120 A breaker is the robot's on / off switch, on the rear panel beside the E-stop (its trip button and reset lever through a 42 mm hole). The E-stop only drops the contactor; the logic rail stays up until the breaker is off", 'Owned / Standard FRC stash part; buy only if the stash is out'),
     ('ESP32-S3 boards (your two)', 'Owned', 2, 0.0, '', 'Electrical', '1: safety node (ESP-NOW to the remote; holds the PDH contactor in only while the remote and the main controller are alive). 2: spare', 'Owned'),
     ('Inline ATO fuse holder + 5 A fuse', 'Stash', 1, 0.0, '', 'Electrical', 'Logic tap, right after the main breaker', 'Standard FRC stash part; buy only if the stash is out'),
     ('Resistors and caps (kit): ADC dividers, pull-downs, RC filters', 'Stash', 1, 0.0, '', 'Electrical', 'Three transducers (10k/15k), battery A, battery B, bus and PDH volts (39k/10k), 100k pull-downs so a cut sensor wire reads as a fault, the speaker tap', 'Standard FRC stash part; buy only if the stash is out'),
@@ -119,6 +120,7 @@ ROWS = [
     ('Silicone tube 1/2 in ID x 5/8 in OD, 10 ft, food grade, -50 to 200 C (B0CPXTZ1MP)', 'Amazon', 1, 9.99, 'https://www.amazon.com/dp/B0CPXTZ1MP', 'Motion', "The gun's smoke line: splitter, up through the well floor, inside the core, along the barrels to the collar. 1/2 in ID (was 3/8): about a quarter of the pressure loss, so the gun gets its share of the fog against the two trail tubes", 'Fits the valley between the barrels; any food-grade silicone [UNVERIFIED price] (2026-11-02, L)'),
     ('MOSFET switch module 5-36 V 15 A, 6 pcs with heat sinks (MTDELE B0D9VWWLCB)', 'Amazon', 1, 5.49, 'https://www.amazon.com/dp/B0D9VWWLCB', 'Electrical', '5 used: light bar (PWM), fog heater (2), fog pump, blower (moved from Order 1)', "5 used; 6-pack instead of a second 10-pack (2026-11-10, Kenzo's list, re-checked L)"),
     ('12 V 40 A relay with pre-wired socket', 'Aliexpress', 2, 2.02, 'https://www.aliexpress.us/item/3256810529693206.html', 'Electrical', 'One per fog core (the second for a second core later); flyback diode on every coil (moved from Order 1)', '4-pin option; 211 sold. Replaces the Nilight 5-pack ($12.14) and the Gebildet 2-pack ($7.99) (2026-11-04, L)'),
+    ('M5 aluminium standoffs (stash): 4 under the fog heater bracket', 'Stash', 4, 0.0, '', 'Cosmetic', "Hold the fog heater's aluminium bracket off the smoke tray. Metal, not printed: the core runs at 220-240 C", 'Stash (2026-11-11, L)'),
     ('Flexible fog tube (yours, 2)', 'Owned', 2, 0.0, '', 'Cosmetic', 'Splitter to the front and rear vents (both down through the bellypan)', 'Owned'),
     ('Printed smoke parts: tray, 400 mL tank, 1-to-3 splitter, one-piece smoke collar, front and rear vents (PETG/ASA)', 'Owned', 1, 0.0, '', 'Cosmetic', 'Ducts, vents and the barrel collar', 'Filament assumed owned; the cores sit on an aluminum bracket, never on a print'),
 
@@ -130,8 +132,8 @@ ROWS = [
     ('M4 nylon-insert lock nuts, 304 stainless, 100 pcs (B0BHQMBRFX)', 'Amazon', 1, 6.99, 'https://www.amazon.com/dp/B0BHQMBRFX', 'Structure', "The left axle hub's 4 bolts (M4 x 12, through its 3 mm flange and the cradle plate)", "Amazon instead of Zoro (Micah: Amazon or AliExpress only) (2026-11-10, Kenzo's list, re-checked L)"),
     ("M4 x 10 mm hex coupling nuts, 304 stainless, 10 pcs (B0GKZDVTN4): the 112T ring's standoffs", 'Amazon', 1, 4.99, 'https://www.amazon.com/dp/B0GKZDVTN4', 'Structure', '6 used: the 112T ring floats 10 mm off the right cradle plate on them (M4 x 8 from inside the plate, M4 x 12 through the ring)', 'Threaded through, so female both ends; the F-F brass standoffs were down to 1 left. Only 10 left (2026-11-10, L)'),
     ('Foam tape 1/4 in x 1/16 in, white, 2 x 33 ft (Yotache B0CCKJ2ZTV)', 'Amazon', 1, 11.98, 'https://www.amazon.com/dp/B0CCKJ2ZTV', 'Structure', "About 13 m round every panel's acrylic ledge, so the clips clamp the panels instead of letting them rattle (the rebate is 0.7 mm deeper for it). White, so it doesn't read as a dark line through the frosted acrylic", 'Yotache; 4.4 stars (2026-11-04, L)'),
-    ('Rivets: 3/16 in aluminium blind rivets, dome head, 3/16 x 1/4 (6-4, 0.188-0.250 in grip), 100 pcs (B07KPQM2TZ)', 'Amazon', 2, 15.48, 'https://www.amazon.com/dp/B07KPQM2TZ', 'Structure', "About 166 used: every waterjet bracket that isn't countersunk (inboard plates, arm knees, top corner gussets, tower plates) into its tube, and the bellypan seam straps. A 1/8 in plate on a 1/16 in tube wall is 0.188 in, the bottom of this grip; strap + bellypan is 0.250, the top", 'Fastenere 6-4, open end, 5052 body. Checked the listing (2026-11-11, L)'),
-    ('Rivets: 3/16 in aluminium countersunk blind rivets, 120 deg, 3/16 x 1/4 (0.126-0.250 in grip), 50 pcs (B0B33RF991)', 'Amazon', 3, 14.99, 'https://www.amazon.com/dp/B0B33RF991', 'Structure', 'About 118 used: the side plates (the wheels run right beside them), the bottom corner gussets (the underglow bracket runs right under them) and the bellypan (a smooth underside). Countersink those holes 120 deg after the waterjet', 'Metal Magery, 100% aluminium; 16 left when checked (2026-11-11, L)'),
+    ('Rivets: 3/16 in aluminium blind rivets, dome head, 3/16 x 1/4 (6-4, 0.188-0.250 in grip), 100 pcs (B07KPQM2TZ)', 'Amazon', 2, 15.48, 'https://www.amazon.com/dp/B07KPQM2TZ', 'Structure', "About 146 used: every waterjet bracket that isn't countersunk (inboard plates, arm knees, top corner gussets, tower plates) into its tube. A 1/8 in plate on a 1/16 in tube wall is 0.188 in, the bottom of this grip", 'Fastenere 6-4, open end, 5052 body. Checked the listing (2026-11-11, L)'),
+    ('Rivets: 3/16 in aluminium countersunk blind rivets, 120 deg, 3/16 x 1/4 (0.126-0.250 in grip), 50 pcs (B0B33RF991)', 'Amazon', 3, 14.99, 'https://www.amazon.com/dp/B0B33RF991', 'Structure', 'About 116 used: the side plates (the wheels run right beside them), the bottom corner gussets (the underglow bracket runs right under them) and the bellypan (a smooth underside). Countersink those holes 120 deg after the waterjet', 'Metal Magery, 100% aluminium; 16 left when checked (2026-11-11, L)'),
     ('#10-32 heat-set inserts, brass, 3/8 in, 60 pcs (B0DFWTJYHK)', 'Amazon', 1, 9.99, 'https://www.amazon.com/dp/B0DFWTJYHK', 'Structure', "42 used: 13 in the frame (8 in tabs on the side walls' inner faces, 5 in the end walls), 13 in the posts' feet, 16 in the bumper corner brackets", '6.3 mm hole, 10.5 deep; 4.8 stars (2026-11-04, L)'),
     ('#10-32 rivnuts, aluminium, flat head, 50 pcs (B0CGLPT66M)', 'Amazon', 0, 7.99, 'https://www.amazon.com/dp/B0CGLPT66M', 'Structure', 'Still none: every bracket is riveted for good, and nothing that has to come off screws into a tube (the frame posts take #10-32s up into inserts in their printed feet, the rails take T-nuts, the Falcons their own threads)', 'Grip range for 1/16 in wall not listed [UNVERIFIED]; needs a rivnut tool (most FRC shops have one). 4.6 stars (2026-11-04, L)'),
     ('Frosted acrylic 1/8 in (owned): 8 panels (the front is one U-shaped sheet round the light bar hole)', 'Owned', 8, 0.0, '', 'Cosmetic', 'Recessed in the printed frame, held by corner clips; cut 1 mm under the rebate outline all round', 'Owned. You found enough for all 8 panels (Micah, 2026-11-11), so the Lesnlok 2-pack ($86.98) is off the list; the cut plan in docs/glacis/acrylic_cuts is for 24 x 48 in sheets'),
@@ -144,7 +146,7 @@ ROWS = [
     ('M4 drop-in T-nuts for 20-series (6 mm slot), M4 x 10 x 6, 50 pcs', 'Aliexpress', 1, 2.52, 'https://www.aliexpress.us/item/2251832628044342.html', 'Structure', "14 used: 3 per gun rail, 1 under each light bar bracket foot, 2 under each pivot bearing block (in the in-well rail's top slot), 2 for the elevation motor bracket (the right rail's bottom slot). Drop in from the side after the rail is placed", '$2.90 ($1.09 new-shopper price) (2026-11-09, L)'),
     ('M4 x 30 button head screws, ISO 7380, black 10.9 steel, 30 pcs', 'Aliexpress', 1, 3.39, 'https://www.aliexpress.us/item/3256808326585307.html', 'Structure', "10 used: through holes CNC'd across the in-well rails' core (8 mm head access from the gun well) and the tower plates into inserts in the deck's well-edge member", 'Price per length [UNVERIFIED]: $1.09 showed for the default 50 mm option (2026-11-09). Stash M5s work too'),
     ("20x20 T-slot extrusion (your spares): 2 x 470 mm inside the gun well, 2 x 276 mm inside the gun's cradle plates, 2 x 372 mm across the front light bar hole", 'Owned', 6, 0.0, '', 'Structure', "Gun well: one each side, flush with the towers' outboard face and 2 mm under the deck, one piece over the cut-down tower; the pivot's bearing block sits on it and the tower plate between it and the well-edge member. Gun: one inside each cradle plate along its top edge, flush with it. Front: flat on the frame's inner face behind the light bar hole, one along its bottom (the bar stands on it) and one along its top (free for sensors). All mirrored about the centreline and clear of the 0-90 deg swing; the cross holes in the in-well and front rails are a CNC side operation", "Yours (Micah, 2026-11-10: 'I have a lot to spare'). Cut square; the CAD lengths are the cut lengths"),
-    ('Waterjet brackets: 1/8 in aluminium sheet (stash), 41 flat parts on 11 sheets of 12 x 12 in', 'Stash', 1, 0.0, '', 'Structure', 'Nothing bent. Side plates (4: the Falcon and axle plates grown along the inner rail into every post: the rear ones take both sled posts, the tower and the rear tank post), inboard plates (6), arm knees (14), corner gussets (4 top, 4 bottom), tower plates (2) and rail spacer strips (2), the bellypan in 3 pieces and its 2 seam straps', "From your aluminium (Micah, 2026-11-11). DXFs, the 12 x 12 nest and the table in docs/glacis/waterjet/; everything except the cannon's two side plates is waterjet. Every rivet hole has its matching hole in the tube in the CAD, for the CNC program"),
+    ('Waterjet brackets: 1/8 in aluminium sheet (stash), 36 flat parts on the 12 x 12 waterjet', 'Stash', 1, 0.0, '', 'Structure', 'Nothing bent. Side plates (4: the Falcon and axle plates grown along the inner rail into every post: the rear ones take both sled posts, the tower and the rear tank post), inboard plates (6), arm knees (14), corner gussets (4 top, 4 bottom), tower plates (2) and rail spacer strips (2), (the bellypan is one CNC router piece now)', "From your aluminium (Micah, 2026-11-11). DXFs, the 12 x 12 nest and the table in docs/glacis/waterjet/; everything except the cannon's two side plates is waterjet. Every rivet hole has its matching hole in the tube in the CAD, for the CNC program"),
 
     ('LIGHTS - panel loops, glowing frame, underglow, front light bar', None),
     ('WS2812B LED strip 5 mm wide, 2020 LEDs, 100 LED/m, 5 m', 'Aliexpress', 2, 14.16, 'https://www.aliexpress.us/item/3256806570121908.html', 'Electrical', '7.6 m: one piece per frame member (the front and rear bottom members have no tunnel: a jumper wire runs round them), LEDs out, bent the easy way up into the feed slot at each end and soldered to the next at the slot mouth', '$13.61 a reel + $1.09 shipping split over the two; 77 sold, 5 stars. Logged-in price (2026-11-04, L)'),
@@ -186,12 +188,58 @@ COMMENTS = {
 ORDERED = ()   # rows ticked Purchased in the Sheet (keep them ticked when the tabs are rewritten); none as of 2026-11-10
 
 
-# section title prefix -> order (1: pneumatics, important electronics, speakers; 2: materials, LEDs, smoke)
+# section title prefix -> order (1: pneumatics, important electronics; 2: materials, LEDs, smoke, audio (Micah, 2026-11-11))
+# Part codes (Micah, 2026-11-11: "give every single part a number or code that corresponds to something on the list.
+# Acr for white acrylic, ASh for aluminum sheet, ATu for aluminum tubes, AEx for extrusion, and a part and number for
+# everything specific corresponding to what system it's a part of ... for 3D printed parts, put 3DP. a pneumatic valve
+# could be P24"). A bought or owned part is its system letter and its place in that system on the list (P07); the parts
+# we make are coded by material (Acr, ASh, ABr, ATu, AEx, 3DP) and, in Onshape, numbered one by one within it.
+SYSTEM_OF = {"PRESSURE SIDE": "P", "GUN": "P", "DRIVE": "D", "ELEVATION": "E", "CONTROLS": "C", "AUDIO": "S",
+             "SMOKE": "F", "FRAME + BODY": "B", "RAILS": "R", "LIGHTS": "L", "BUMPERS": "B", "OTHER MATERIALS": "B",
+             "FROM THE OLD CANNON": "P"}
+MATERIAL_CODE = (("Frosted acrylic", "Acr"), ("Waterjet brackets", "ASh"), ("Gun cradle plates", "ASh"),
+                 ("Breech adapters", "ABr"), ("20x20 T-slot", "AEx"), ("Printed", "3DP"))
+SYSTEM_NAMES = {"P": "pneumatics + gun", "D": "drive", "E": "elevation", "C": "controls + power", "S": "sound",
+                "F": "fog", "B": "body, bumpers + fasteners", "R": "rails", "L": "lights",
+                "Acr": "white acrylic", "ASh": "aluminium sheet", "ABr": "aluminium bar", "ATu": "aluminium tube",
+                "AEx": "20x20 extrusion", "3DP": "3D printed"}
+
+
+def codes():
+    """{row name: code}. Codes stay put once given (glacis_bom_codes.json keeps them): a new row takes the next free
+    number in its system, so the codes already stamped on Onshape parts and written on parts don't shift."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    try:
+        prev = json.load(open(os.path.join(here, "glacis_bom_codes.json")))
+    except (OSError, ValueError):
+        prev = {}
+    out, n, sysl = {}, {}, None
+    for c in prev.values():
+        if c[:1].isalpha() and c[1:].isdigit():
+            n[c[0]] = max(n.get(c[0], 0), int(c[1:]))
+    for r in ROWS:
+        if r[1] is None:
+            sysl = next((v for k, v in SYSTEM_OF.items() if r[0].startswith(k)), None)
+            continue
+        if r[0] in out:                                     # the same part split over both orders keeps one code
+            continue
+        mat = next((c for k, c in MATERIAL_CODE if r[0].startswith(k)), None)
+        if mat:
+            out[r[0]] = mat
+            continue
+        if prev.get(r[0], "")[:1] == sysl and prev[r[0]][1:].isdigit():
+            out[r[0]] = prev[r[0]]
+            continue
+        n[sysl] = n.get(sysl, 0) + 1
+        out[r[0]] = f"{sysl}{n[sysl]:02d}"
+    return out
+
+
 ORDER_OF = {"FROM THE OLD CANNON": 1, "PRESSURE SIDE": 1, "GUN": 1, "DRIVE": 1, "ELEVATION": 1, "CONTROLS": 1,
-            "AUDIO": 1, "SHIPPING": 1, "SMOKE": 2, "FRAME + BODY": 2, "RAILS": 2, "LIGHTS": 2, "BUMPERS": 2,
+            "AUDIO": 2, "SHIPPING": 1, "SMOKE": 2, "FRAME + BODY": 2, "RAILS": 2, "LIGHTS": 2, "BUMPERS": 2,
             "OTHER MATERIALS": 2, "LATER": 2, "ALREADY HAVE": 2}
-ORDER_TITLES = {1: "Borealis Order 1 - pneumatics, electronics, speakers",
-                2: "Borealis Order 2 - materials, LEDs, smoke"}
+ORDER_TITLES = {1: "Borealis Order 1 - pneumatics, electronics",
+                2: "Borealis Order 2 - materials, LEDs, smoke, audio"}
 
 
 def order_of(section):
@@ -250,17 +298,20 @@ def _sheet(rows):
         kinds.append("item")
         cell_notes[f"B{row}"] = notes
     return dict(rows=out, kinds=kinds, notes=cell_notes, shipping=round(shipping, 2), first_cell="B4",
+                codes=[CODES.get(x[0], "") if k == "item" else "" for x, k in zip(out, kinds)],
                 last=3 + len(out), items=round(sub, 2))
 
 
 def main():
+    global CODES
+    CODES = codes()
     here = os.path.dirname(os.path.abspath(__file__))
     od = orders()
     tot = 0.0
     with open(os.path.join(here, "glacis_bom.csv"), "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["Order", "Name", "Seller", "Amount", "Individual Price", "Price", "Link", "Type", "Purpose",
-                    "Alternative/Notes"])
+                    "Alternative/Notes", "Code"])
         for k in (1, 2):
             sub = 0.0
             w.writerow([k, ORDER_TITLES[k]])
@@ -270,13 +321,14 @@ def main():
                     continue
                 name, seller, q, u, link, typ, purpose, notes = r
                 sub += q * u
-                w.writerow([k, name, seller, q, f"{u:.2f}", f"{q * u:.2f}", link, typ, purpose, notes])
+                w.writerow([k, name, seller, q, f"{u:.2f}", f"{q * u:.2f}", link, typ, purpose, notes, CODES[name]])
             w.writerow([k, f"Order {k} total", "", "", "", f"{sub:.2f}"])
             w.writerow([])
             tot += sub
         w.writerow(["", "Total", "", "", "", f"{tot:.2f}"])
     sheets = {str(k): dict(title=ORDER_TITLES[k], **_sheet(od[k])) for k in (1, 2)}
     json.dump(dict(orders=sheets), open(os.path.join(here, "glacis_bom_sheet.json"), "w"))
+    json.dump(CODES, open(os.path.join(here, "glacis_bom_codes.json"), "w"), indent=0)
     for k in (1, 2):
         sh = sheets[str(k)]
         print(f"order {k}: {sum(1 for x in sh['kinds'] if x == 'item')} rows, items ${sh['items']:,.2f} + shipping "

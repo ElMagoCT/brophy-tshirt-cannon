@@ -213,14 +213,14 @@ SPECS = []
 
 
 def plate(name, key, t, fr, outline, holes, rivets, pockets=(), group="frame", bom=None, note="", mirrors=(),
-          tube="far", flush=False):
+          tube="far", flush=False, marks=()):
     """Queue one flat part (built in realise() once the rivets are checked). `rivets` = [(u, v)] into the tube on the
     plate's `tube` side: "far" = beyond the plate along n (the plate is w 0..t), "near" = behind the origin face.
     `mirrors` = [(name, solid -> solid, frame)] for the other copies of the same flat part. `flush` = countersunk
     rivets (no head stands proud)."""
     SPECS.append(dict(name=name, key=key, t=t, fr=fr, outline=ccw(outline), holes=list(holes), rivets=list(rivets),
                       pockets=[ccw(p) for p in pockets], group=group, note=note, mirrors=list(mirrors), tube=tube,
-                      flush=flush, bom=bom or f"{key} ({'1/8' if t > 2 else '1/16'} Al, waterjet)"))
+                      flush=flush, bom=bom or f"{key} ({'1/8' if t > 2 else '1/16'} Al, waterjet)", marks=list(marks)))
 
 
 def _rivet_at(sp, f_, uv):
@@ -286,7 +286,7 @@ def realise(log=print):
                 p_, d_, _, _ = _rivet_at(sp, f_, uv)
                 RIVETS.append((nm, p_, d_, sp["flush"]))
         FLAT.append(dict(name=sp["name"], key=sp["key"], t=sp["t"], outline=sp["outline"], pockets=sp["pockets"],
-                         holes=holes, qty=len(copies), rivets=len(sp["rivets"]), flush=sp["flush"]))
+                         holes=holes, qty=len(copies), rivets=len(sp["rivets"]), flush=sp["flush"], marks=sp["marks"]))
 
 
 def mirror_y(s):
@@ -481,40 +481,29 @@ def corner_gussets():
               mirrors=mir, tube="near" if tag == "top" else "far", flush=(tag == "bottom"))
 
 
-SEAMS = (-100.0, 140.0)
+SEAMS = ()
 
 
 def bellypan():
-    """Three pieces under 12 in, riveted up into the inner rails, a strap under each seam (1/8 in too, so every
-    bracket comes off one stock thickness)."""
+    """One piece on the CNC router (Micah, 2026-11-11: "the bottom plate which can also be cnc'ed"), 768 x 259 mm,
+    riveted up into both inner rails (countersunk: a smooth underside), the two fog vents cut through, and every
+    electronics part's footprint lightly engraved (layer MARK) so its mounting holes get drilled to the real part."""
+    import misc
     xa, xb = -P.FRAME_X + P.RAIL_W, P.FRAME_X - P.RAIL_W
     yb = P.INNER_RAIL_Y[1]
-    cuts = [(x, 0.0, 35.0) for x in (-300.0, -200.0, 200.0, 300.0)] + [(vx, vy, 13.5) for vx, vy in P.FOG_VENTS]
-    edges = [xa] + list(SEAMS) + [xb]
+    holes = [(vx, vy, 13.5) for vx, vy in P.FOG_VENTS]
+    out = fillet_poly(rect(xa, xb, -yb, yb), 3.0)
+    riv = []
+    x = xa + 12.0
+    while x < xb - 11.0:
+        riv += [(x, IY), (x, -IY)]
+        x += 64.0
+    marks = [(lab, rect(x0, x1, y0, y1)) for lab, x0, x1, y0, y1 in misc.ELEC_MARKS]
     fr = dict(o=(0.0, 0.0, P.BELLY_Z - T8), u=(1, 0, 0), v=(0, 1, 0), n=(0, 0, 1))
-    for k, tag in enumerate(("rear", "middle", "front")):
-        x0, x1 = edges[k], edges[k + 1]
-        out = fillet_poly(rect(x0, x1, -yb, yb), 3.0)
-        holes = [(u, v, r) for u, v, r in cuts if x0 + r < u < x1 - r]
-        riv = []
-        x = x0 + 12.0
-        while x < x1 - 11.0:
-            riv += [(x, IY), (x, -IY)]
-            x += 64.0
-        for s in SEAMS:                                      # the seam strap's rivets
-            if x0 < s - 10.0 < x1:
-                riv_s = [(s - 10.0, y) for y in (-90.0, -45.0, 0.0, 45.0, 90.0)]
-                holes += [(u, v, RIV) for u, v in riv_s]
-            if x0 < s + 10.0 < x1:
-                holes += [(s + 10.0, y, RIV) for y in (-90.0, -45.0, 0.0, 45.0, 90.0)]
-        plate(f"Bellypan {tag}", f"Bellypan {tag}", T8, fr, out, holes, riv, (), group="frame",
-              note="riveted up into both inner rails; the seams sit on a strap", flush=True)
-    frs = dict(o=(0.0, 0.0, P.BELLY_Z - 2 * T8), u=(1, 0, 0), v=(0, 1, 0), n=(0, 0, 1))
-    for s in SEAMS:
-        out = fillet_poly(rect(s - 20.0, s + 20.0, -100.0, 100.0), 3.0)
-        holes = [(s + d, y, RIV) for d in (-10.0, 10.0) for y in (-90.0, -45.0, 0.0, 45.0, 90.0)]
-        plate(f"Bellypan seam strap {s:.0f}", "Bellypan seam strap", T8, frs, out, holes, [], (), group="frame",
-              note="under the seam: 10 rivets through it and both bellypan pieces")
+    plate("Bellypan", "Bellypan", T8, fr, out, holes, riv, (), group="frame",
+          bom="Bellypan (1/8 Al, CNC router, one piece)",
+          note="one piece, CNC router: riveted up into both inner rails, the fog vents through it, every electronics "
+               "part's footprint engraved (drill its holes to the part)", flush=True, marks=marks)
 
 
 def build(log=print):
@@ -584,6 +573,11 @@ def _draw(msp, f, rot=False, dx=0.0, dy=0.0, layer="CUT"):
     for u, v, r in f["holes"]:
         (x, y), = _xf([(u, v)], rot, dx, dy, u0, v0)
         msp.add_circle((x, y), r, dxfattribs={"layer": layer})
+    for lab, poly in f.get("marks", []):                     # engraved footprints (layer MARK, 0.3 mm deep)
+        pts = _xf(poly, rot, dx, dy, u0, v0)
+        msp.add_lwpolyline(pts, close=True, dxfattribs={"layer": "MARK"})
+        cx, cy = sum(q[0] for q in pts) / len(pts), sum(q[1] for q in pts) / len(pts)
+        msp.add_text(lab, height=5.0, dxfattribs={"layer": "MARK", "insert": (cx - 2.5 * len(lab) / 2, cy)})
 
 
 def export_flat(out_dir, log=print, gap=3.0, margin=4.0):
@@ -666,8 +660,10 @@ def export_flat(out_dir, log=print, gap=3.0, margin=4.0):
 
     orders = [lambda f: -(f["w"] * f["h"]), lambda f: -max(f["w"], f["h"]), lambda f: -(f["w"] + f["h"]),
               lambda f: -min(f["w"], f["h"]), lambda f: -f["h"], lambda f: -f["w"]]
+    for f in parts:
+        f["cnc"] = max(f["w"], f["h"]) > usable or min(f["w"], f["h"]) > usable
     for t in sorted({f["t"] for f in parts}, reverse=True):
-        base = [f for f in parts if f["t"] == t for _ in range(f["qty"])]
+        base = [f for f in parts if f["t"] == t and not f["cnc"] for _ in range(f["qty"])]
         best = None
         for key in orders:
           for mode in (0, 1, 2):
@@ -685,8 +681,8 @@ def export_flat(out_dir, log=print, gap=3.0, margin=4.0):
             for f, rot, x, y in S["place"]:
                 _draw(msp, f, rot, x, y)
             doc.saveas(os.path.join(out_dir, f"nest_{'1-8' if t > 2 else '1-16'}_sheet{i + 1}.dxf"))
-    used = {t: sum(abs(area(f["outline"])) - sum(abs(area(p)) for p in f["pockets"]) for f in parts if f["t"] == t
-                   for _ in range(f["qty"])) for t in sheets}
+    used = {t: sum(abs(area(f["outline"])) - sum(abs(area(p)) for p in f["pockets"]) for f in parts
+                   if f["t"] == t and not f["cnc"] for _ in range(f["qty"])) for t in sheets}
     lines = ["# Waterjet parts (frame brackets)", "",
              "Every bracket on the box-tube frame, flat, in millimetres, from `cad/glacis/brackets.py` (the CAD's own "
              "numbers, regenerated by every `robot.py` run). Nothing is bent. Each DXF is one part (layer CUT: outline, "
@@ -699,15 +695,16 @@ def export_flat(out_dir, log=print, gap=3.0, margin=4.0):
              "- 1/8 in = 3.175 mm, 1/16 in = 1.59 mm, 6061 or 5052.", "",
              "| Part | Qty | Thickness | Size (mm) | Rivets each | File |", "|---|---|---|---|---|---|"]
     for f in sorted(parts, key=lambda f: (-f["t"], f["key"])):
-        lines.append(f"| {f['key']} | {f['qty']} | {'1/8' if f['t'] > 2 else '1/16'} in | {f['w']:.0f} x {f['h']:.0f} | "
-                     f"{f['rivets']}{' CSK' if f['flush'] else ''} | `{f['file']}` |")
+        lines.append(f"| {f['key']}{' (CNC router)' if f['cnc'] else ''} | {f['qty']} | {'1/8' if f['t'] > 2 else '1/16'} in | "
+                     f"{f['w']:.0f} x {f['h']:.0f} | {f['rivets']}{' CSK' if f['flush'] else ''} | `{f['file']}` |")
     lines += ["", "## Nest", ""]
     for t, sh in sheets.items():
         lines.append(f"- {'1/8' if t > 2 else '1/16'} in: {len(sh)} sheet(s) of 12 x 12 in, "
                      f"{100 * used[t] / (len(sh) * SHEET * SHEET):.0f}% of the metal used "
                      f"({', '.join(f'`nest_{chr(49) if False else ('1-8' if t > 2 else '1-16')}_sheet{i + 1}.dxf`' for i in range(len(sh)))})")
-    lines += ["", "Not in this nest: the two gun cradle plates (490 x 226 mm, `docs/glacis/gun_plates/`), cut on "
-              "the CNC router because they are bigger than the 12 x 12 bed, and the fog heater bracket.", ""]
+    lines += ["", "Not in this nest (CNC router, bigger than the 12 x 12 bed): the bellypan, one piece with every "
+              "electronics part's footprint engraved on layer MARK (0.3 mm deep: drill each part's holes to the part), and "
+              "the two gun cradle plates (`docs/glacis/gun_plates/`). Also not here: the fog heater bracket.", ""]
     open(os.path.join(out_dir, "README.md"), "w", encoding="utf-8", newline="\n").write("\n".join(lines))
     log(f"waterjet: {len(parts)} different parts, " + ", ".join(
         f"{'1/8' if t > 2 else '1/16'} in {len(sh)} sheet(s) {100 * used[t] / (len(sh) * SHEET * SHEET):.0f}% used"

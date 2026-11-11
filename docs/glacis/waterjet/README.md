@@ -10,10 +10,7 @@ Every bracket on the box-tube frame, flat, in millimetres, from `cad/glacis/brac
 |---|---|---|---|---|---|
 | Arm knee | 12 | 1/8 in | 86 x 95 | 5 | `arm_knee.dxf` |
 | Arm knee short | 2 | 1/8 in | 86 x 65 | 4 | `arm_knee_short.dxf` |
-| Bellypan front | 1 | 1/8 in | 244 x 259 | 8 CSK | `bellypan_front.dxf` |
-| Bellypan middle | 1 | 1/8 in | 240 x 259 | 8 CSK | `bellypan_middle.dxf` |
-| Bellypan rear | 1 | 1/8 in | 284 x 259 | 10 CSK | `bellypan_rear.dxf` |
-| Bellypan seam strap | 2 | 1/8 in | 40 x 200 | 0 | `bellypan_seam_strap.dxf` |
+| Bellypan (CNC router) | 1 | 1/8 in | 768 x 259 | 24 CSK | `bellypan.dxf` |
 | Corner gusset bottom | 4 | 1/8 in | 100 x 179 | 9 CSK | `corner_gusset_bottom.dxf` |
 | Corner gusset top | 4 | 1/8 in | 100 x 179 | 9 | `corner_gusset_top.dxf` |
 | Inboard plate front tank | 2 | 1/8 in | 80 x 147 | 4 | `inboard_plate_front_tank.dxf` |
@@ -26,6 +23,6 @@ Every bracket on the box-tube frame, flat, in millimetres, from `cad/glacis/brac
 
 ## Nest
 
-- 1/8 in: 11 sheet(s) of 12 x 12 in, 50% of the metal used (`nest_1-8_sheet1.dxf`, `nest_1-8_sheet2.dxf`, `nest_1-8_sheet3.dxf`, `nest_1-8_sheet4.dxf`, `nest_1-8_sheet5.dxf`, `nest_1-8_sheet6.dxf`, `nest_1-8_sheet7.dxf`, `nest_1-8_sheet8.dxf`, `nest_1-8_sheet9.dxf`, `nest_1-8_sheet10.dxf`, `nest_1-8_sheet11.dxf`)
+- 1/8 in: 8 sheet(s) of 12 x 12 in, 40% of the metal used (`nest_1-8_sheet1.dxf`, `nest_1-8_sheet2.dxf`, `nest_1-8_sheet3.dxf`, `nest_1-8_sheet4.dxf`, `nest_1-8_sheet5.dxf`, `nest_1-8_sheet6.dxf`, `nest_1-8_sheet7.dxf`, `nest_1-8_sheet8.dxf`)
 
-Not in this nest: the two gun cradle plates (490 x 226 mm, `docs/glacis/gun_plates/`), cut on the CNC router because they are bigger than the 12 x 12 bed, and the fog heater bracket.
+Not in this nest (CNC router, bigger than the 12 x 12 bed): the bellypan, one piece with every electronics part's footprint engraved on layer MARK (0.3 mm deep: drill each part's holes to the part), and the two gun cradle plates (`docs/glacis/gun_plates/`). Also not here: the fog heater bracket.

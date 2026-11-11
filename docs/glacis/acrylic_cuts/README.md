@@ -5,9 +5,9 @@ strips below (the red dashed lines in `acrylic_cut_plan.svg`, measured from one 
 bed with its 24 in side along the bed's 36 in and cut its DXF (millimetres, origin at the strip's corner, panels
 centred on the strip: a strip is 609.6 mm wide).
 
-- Sheet 1 strip 1: 24 x 16.51 in -> rear (22.75 x 15.98)
-- Sheet 1 strip 2: 24 x 14.83 in -> front (U round the light bar hole) (22.79 x 14.31)
-- Sheet 1 strip 3: 24 x 16.41 in -> front side L (18.33 x 15.89)
+- Sheet 1 strip 1: 24 x 16.42 in -> rear (22.75 x 15.98)
+- Sheet 1 strip 2: 24 x 15.00 in -> front (U round the light bar hole) (22.79 x 14.55)
+- Sheet 1 strip 3: 24 x 16.33 in -> front side L (18.33 x 15.89)
 - Sheet 2 strip 1: 24 x 16.89 in -> front side R (18.33 x 15.89)
 - Sheet 2 strip 2: 24 x 15.43 in -> battery door (15.89 x 10.72), deck strip (18.59 x 3.46)
 - Sheet 2 strip 3: 24 x 15.43 in -> battery door (15.89 x 10.72), deck strip (18.59 x 3.46)

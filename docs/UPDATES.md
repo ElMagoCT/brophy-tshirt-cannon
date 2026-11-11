@@ -25,6 +25,16 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-11 - Micah's Windows computer (Claude Code) - Electronics on the bellypan, breaker at the rear, part numbers
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B21): every board and module on a one-piece CNC'd bellypan (footprints engraved, boards on printed trays), the shelf gone; the main breaker (the on / off switch) on the rear panel beside the E-stop; a code for every list row and a Part number on every Onshape part; the main valve and 1-1/2 in nipple are buys; audio is in Order 2; M5 fog-heater standoffs listed.
+- Files: `cad/glacis/misc.py`, `brackets.py`, `partcodes.py` (new), `out/` (check log, renders, parts csv, part_codes.json/.csv, STEPs), `docs/glacis/waterjet/` (bellypan now CNC, not nested), `docs/glacis/acrylic_cuts/` (rear panel's breaker hole), `bom/glacis_bom.py` (+ csv/json, `glacis_bom_codes.json` new), `docs/glacis/JUDGMENTS.md`
+- Checks: full robot.py (only the old 64 mm3 sliver; sweep 0 clashes; prints fit; 0 multi-piece), then the board trays: 0 hits against everything and the swing.
+- Parts list: $1,514.52 -> $1,538.00 pre-tax (+$15.99 main valve, +$7.49 nipple). Sheet: rows moved, column A codes, audio moved, tabs renamed "Borealis Order 1 - pneumatics, electronics" ($1,052.09 with tax) and "Borealis Order 2 - materials, LEDs, smoke, audio" ($625.86).
+- Onshape: backup version "Before electronics on the bellypan + part numbers (2026-11-11)"; chassis (6), power and body panels re-imported and swapped, old tabs deleted, new ones filed; every part's Part number set; version saved.
+- Sidenote: Cannon home (total $1,538.00, Pneumatic $844.20, latest paragraph), Pneumatic (main valve and nipple are buys), Lights/Wiring (breaker / E-stop sticky, PDH box).
+- Questions for Micah: none.
+
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Acrylic and aluminium in hand; CNC only for the cannon
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (Micah: "only cnc for the cannon, everything else waterjet. i have aluminum for this so no need to add it. also remove acrylic from the total, i found enough"): the Lesnlok acrylic 2-pack ($86.98) and the aluminium stock row are off the parts list; the owned-acrylic, breech adapter, waterjet bracket and gun plate rows say the material is his. The gun's two side plates are the only CNC router parts; every other plate is waterjet.

@@ -399,35 +399,62 @@ def batteries_and_electronics():
         add(f"FRC battery {side}", b, "battery", "power", bom="FRC 12 V 18 Ah battery (owned, MK ES17-12)")
         add(f"Anderson SB50 {side}", box(-252.0, -232.0, min(sgn * 113.0, sgn * 137.0), max(sgn * 113.0, sgn * 137.0),
                                           300.0, 325.0), "red", "power", bom="Anderson SB50 pair + 6 AWG contacts (stash)")
-    # back bottom bay: PDH and breaker on the bellypan, controls and the valve cross on a printed shelf
+    # Everything on the bellypan (Micah, 2026-11-11: "try to put all the electronics on the bottom plate which can also
+    # be cnc'ed"): the printed shelf is gone. Each part's spot was found clear of every other part (the pneumatics over
+    # the rear bay, the fog tube, the vents, the inner plates); boards stand on 6 mm M3 nylon standoffs. The CNC'd
+    # bellypan carries each footprint as a light engraving (brackets.bellypan), so the holes are drilled to the real part
     zb = P.BELLY_Z
+    ELEC_MARKS.clear()
     add("Power distribution (REV PDH)", box(-370.0, -267.0, -86.5, 86.5, zb, zb + 36), "black", "power",
         bom="REV PDH (owned) + ATO breakers / fuses (stash)")
-    add("Main breaker 120 A", box(-255.0, -218.0, -20.0, 20.0, zb, zb + 40), "black", "power", bom="120 A main breaker (stash)")
-    shelf = box(-380.0, -180.0, -100.0, 100.0, 150.0, 154.0)          # between the inner rails (|y| 104+)
-    for (x, y) in ((-372, -92), (-372, 92), (-188, -92), (-188, 92)):
-        shelf = shelf.fuse(box(x - 5, x + 5, y - 5, y + 5, zb, 150.0))
-    for r_ in RELIEF_AT:                                   # clear of the chamber reliefs that hang down past it
-        shelf = shelf.cut(cyl(14.0, 400.0, (r_.x, r_.y, -100.0), (0, 0, 1)))
-    add("Electronics shelf", shelf, "print", "power", bom="Electronics shelf", kind="print")
-    z = 154.0
-    # Whole-design review (2026-11-11): the shelf now carries what the parts list buys (rev D.2.1): the Waveshare
-    # ESP32-P4-Module-DEV-KIT (88 x 56 mm with its USB / RJ45 overhang, about 18 tall) instead of the Wireless Tag board,
-    # a PCA9685 where the Bluetooth music ESP32 was (music streams over the WebSocket now), and both ADS1115s
-    boards = [("Main controller ESP32-P4 + C6 (Waveshare)", -380, -292, -98, -42, 18, "pcb",
-               "Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)"),
-              ("ESP32-S3 safety node", -290, -221, -98, -70, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8 (owned)"),
-              ("PWM expander PCA9685", -288, -226, -64, -38, 12, "pcb", "PWM expander: PCA9685 16-channel, I2C (Dorhea B07RMTN4NZ)"),
-              ("ADS1115 ADC 1 (pressures)", -375, -347, -32, -14, 6, "pcb", "ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)"),
-              ("ADS1115 ADC 2 (battery and bus volts)", -343, -315, -32, -14, 6, "pcb", "ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)"),
-              ("Spark MAX (elevation)", -220, -185, -98, -28, 25, "black", "REV Spark MAX (owned)"),
-              ("Valve arm relay 40 A", -220, -192, -20, -2, 36, "black", "12 V 40 A SPDT relay + socket"),
-              ("Valve + fog drivers (MOSFETs, relays, ULN2803A)", -378, -308, -6, 54, 32, "pcb", "MOSFET switch modules + 12 V 40 A relays + ULN2803A"),
-              ("Buck 12-5 V 20 A", -300, -244, 45, 95, 25, "black", "12->5 V 20 A buck (B089M5R3NJ)")]   # under the main valve
-    boards.append(("Logic supply 5 V (buck-boost)", -378, -352, 60, 85, 10, "pcb",
-                   "Logic supply: 5 V 5 A buck-boost module, 3.6-32 V in"))
-    for name, x0, x1, y0, y1, h, col, bom in boards:
-        add(name, box(x0, x1, y0, y1, z, z + h), col, "power", bom=bom)
+    ELEC_MARKS.append(("PDH", -370.0, -267.0, -86.5, 86.5))
+    # the main breaker is the robot's on / off switch: on the rear panel beside the E-stop, its red trip button and
+    # reset lever through a hole in the panel (the E-stop only drops the contactor; the logic rail stays up)
+    by, bz = BREAKER
+    xi = P.rear_x(bz) + P.CLIP_T + 4.0                     # behind the acrylic, its face parallel to the slanted panel
+    lean = math.degrees(math.atan((P.rear_x(bz + 18.0) - P.rear_x(bz - 18.0)) / 36.0))
+    brk_ = box(0.0, 41.0, -26.0, 26.0, -18.0, 18.0).rotate(V(0, 0, 0), V(0, 1, 0), lean).translate(V(xi, by, bz))
+    add("Main breaker 120 A", brk_, "black", "power",
+        bom="120 A main breaker (stash)", note="rear panel, bottom strip beside the E-stop: the on / off switch; its face "
+        "through a 42 mm hole, 2 x #10-32 through its ears and the panel")
+    boards = [
+              ('Main controller ESP32-P4 + C6 (Waveshare)', -259, -203, -43, 45, 6, 18, 'pcb',
+               'Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)'),
+              ('ESP32-S3 safety node', -263, -194, 49, 77, 6, 15, 'pcb',
+               'ESP32-S3-DevKitC-1 N8R8 (owned)'),
+              ('PWM expander PCA9685', -199, -173, -31, 31, 6, 12, 'pcb',
+               'PWM expander: PCA9685 16-channel, I2C (Dorhea B07RMTN4NZ)'),
+              ('ADS1115 ADC 1 (pressures)', -111, -83, -31, -13, 6, 6, 'pcb',
+               'ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)'),
+              ('ADS1115 ADC 2 (battery and bus volts)', -79, -51, -31, -13, 6, 6, 'pcb',
+               'ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)'),
+              ('Spark MAX (elevation)', -263, -193, -83, -48, 0, 25, 'black',
+               'REV Spark MAX (owned)'),
+              ('Valve arm relay 40 A', -15, 13, -35, -17, 0, 36, 'black',
+               '12 V 40 A SPDT relay + socket'),
+              ('Valve + fog drivers (MOSFETs, relays, ULN2803A)', 33, 93, 17, 87, 6, 32, 'pcb',
+               'MOSFET switch modules + 12 V 40 A relays + ULN2803A'),
+              ('Buck 12-5 V 20 A', 97, 147, 17, 73, 0, 25, 'black',
+               '12->5 V 20 A buck (B089M5R3NJ)'),
+              ('Logic supply 5 V (buck-boost)', 125, 150, -43, -17, 6, 10, 'pcb',
+               'Logic supply: 5 V 5 A buck-boost module, 3.6-32 V in'),
+    ]
+    for name, x0, x1, y0, y1, so, h, col, bom in boards:
+        add(name, box(x0, x1, y0, y1, zb + so, zb + so + h), col, "power", bom=bom,
+            note="heat-staked onto its printed board tray" if so else "screwed to the bellypan (M4)")
+        ELEC_MARKS.append((name.split(" (")[0], x0, x1, y0, y1))
+        if so:      # a printed tray (Micah: "things like standoffs we can 3d print"): 2 mm base, four 6 mm posts with
+            # pegs a soldering iron mushrooms over the board's holes; 2 x M4 x 12 up through the bellypan into inserts
+            tr = box(x0, x1, y0, y1, zb, zb + 2.0)
+            for cx, cy in ((x0 + 4.0, y0 + 4.0), (x1 - 4.0, y0 + 4.0), (x0 + 4.0, y1 - 4.0), (x1 - 4.0, y1 - 4.0)):
+                tr = tr.fuse(cyl(3.5, so - 2.0, (cx, cy, zb + 2.0)))
+            long_x = (x1 - x0) >= (y1 - y0)
+            for k in (-1, 1):
+                hx = (x0 + x1) / 2 + (k * (x1 - x0) / 4 if long_x else 0.0)
+                hy = (y0 + y1) / 2 + (0.0 if long_x else k * (y1 - y0) / 4)
+                tr = tr.fuse(cyl(4.5, so - 2.0, (hx, hy, zb + 2.0))).cut(cyl(P.INSERT[0], P.INSERT[1], (hx, hy, zb - 0.1)))
+            add(f"Board tray {name.split(' (')[0]}", tr.clean(), "print", "power", bom="Printed board tray", kind="print",
+                note="PETG; the board heat-staked onto its four pegs; 2 x M4 x 12 up through the bellypan into inserts")
     relay = "Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
     add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power", bom=relay,
         note="main breaker -> contactor -> PDH; coil through the rear E-stop, the safety node and the main controller in series")
@@ -437,6 +464,8 @@ def batteries_and_electronics():
              "until the two are within 0.3 V")
     add("Battery relay B 200 A", box(-97.0, -22.0, -95.0, -35.0, zb, zb + 70.0), "black", "power", bom=relay,
         note="in battery B's + lead, between its SB50 and the bus")
+    ELEC_MARKS.extend([("Contactor", -175.0, -100.0, -95.0, -35.0), ("Battery relay A", -175.0, -100.0, 35.0, 95.0),
+                       ("Battery relay B", -97.0, -22.0, -95.0, -35.0)])
     # bottom of the rear panel: E-stop, standby charge port (fill port and tank relief come out of the manifold)
     ey, ez = ESTOP
     xo = P.rear_x(ez)
@@ -456,6 +485,8 @@ def batteries_and_electronics():
 
 
 ESTOP = (-215.0, 255.0)     # (y, z) on the rear panel, bottom strip under the open middle
+BREAKER = (-156.0, 255.0)   # the main breaker, between the E-stop and the charge port
+ELEC_MARKS = []             # (label, x0, x1, y0, y1) of every part on the bellypan: engraved on the CNC'd bellypan
 CHARGE = (-95.0, 255.0)
 USB = (182.0, 255.0)
 
@@ -497,6 +528,7 @@ def audio_power():
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
     add("Audio amp (TPA3255)", box(-95.0, 27.0, 22.0, 95.0, zb, zb + 30.0), "pcb", "power",       # moved 40 mm forward: battery relay A sits behind it
         bom="TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm", note="one channel per speaker, about 70 W each on 33 V")
+    ELEC_MARKS.extend([("Amp", -95.0, 27.0, 22.0, 95.0), ("Boost", -10.0, 120.0, -95.0, -40.0)])
     add("Audio boost 12-33 V 1200 W", box(-10.0, 120.0, -95.0, -40.0, zb, zb + 55.0), "black", "power",
         bom="1200 W 20 A boost converter, 8-60 V in, 12-80 V out (set to 33 V)", note="feeds the amp from a 40 A PDH channel; "
              "size not on the listing [UNVERIFIED], drawn 130 x 55 x 55 like the same module on Amazon")
@@ -803,7 +835,8 @@ def frame_mounts():
 
 REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 50.0, REAR_MAN[2], 14.0), (ESTOP[0], ESTOP[1], 23.0),
               (MAIN_Y - 39.5, REAR_MAN[2], 6.0),
-              (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0))
+              (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0),
+              (BREAKER[0], BREAKER[1], 21.0))
 
 
 CUP_SCREWS = []                          # (point on the part's face, direction into the frame): set by body_parts

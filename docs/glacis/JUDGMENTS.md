@@ -1204,6 +1204,34 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B21. **Electronics on the bellypan, breaker at the rear panel, part numbers** (Micah, 2026-11-11: "try to put all the
+    electronics on the bottom plate which can also be cnc'ed. make sure the breaker switch thing is accessible or are
+    we just using the E-stop to turn on and off the bot?"; then "give every single part a number or code that
+    corresponds to something on the list ... Acr ... ASh ... ATu ... AEx ... 3DP ... a pneumatic valve could be P24";
+    "things like standoffs we can 3d print"; rows 56 and 57 "i don't think we have either of those"; "move the audio
+    to the second parts order").
+    - **On / off:** the 120 A main breaker is the switch. It moved from the bellypan (behind the bumpers, reachable
+      only with the body open) to the rear panel's bottom strip beside the E-stop, its face parallel to the slanted
+      panel 4 mm behind it, the trip button and reset lever through a 42 mm hole in the acrylic. The E-stop stays a
+      stop, not a switch: it drops the contactor and the logic rail stays up (rev C.3 by design).
+    - **Bellypan:** one piece on the CNC router (768 x 259 mm), the printed shelf gone. Each shelf part's spot was
+      searched for clear of every other solid (the pneumatics over the rear bay, the fog tube and vents, the inboard
+      plates): controller, Spark MAX, safety node and PCA9685 in the rear bay, both ADCs and the valve relay in the
+      middle, the drivers board, LED buck and logic supply ahead of the boost. Every footprint is engraved (layer MARK)
+      so its holes are drilled to the real part; no hole patterns were guessed.
+    - **Board trays (3DP):** one under each board, 6 mm posts with pegs a soldering iron mushrooms over the board's
+      holes, 2 x M4 x 12 up through the bellypan into inserts. Replaces the nylon standoff kit before it was bought.
+    - **Codes:** every list row has one (bom/glacis_bom_codes.json, column A of the Sheet), kept fixed once given. A
+      bought or owned part is its system letter and number (P pneumatics + gun, D drive, E elevation, C controls +
+      power, S sound, F fog, B body + fasteners, R rails, L lights): the firing valves are P23-1 and P23-2. A made part
+      is material + system + number: 3DP-B014, ASh-D02, ATu-D05, AEx-R03, ABr-P01, Acr-B04. `cad/glacis/partcodes.py`
+      writes out/part_codes.json / .csv; every Onshape part's Part number is set from it. W = the deferred printed
+      wheels' belts and rods (not on the list).
+    - **List:** the main ball valve (2-pack, $15.99) and the 1-1/2 in nipple (2-pack, $7.49) are buys now; the M5
+      standoffs under the fog heater stay metal (240 C) and go on the list as stash; audio moved to Order 2.
+    Checks: full robot.py (interference: only the old 64 mm3 fill-elbow sliver; sweep 0-90 deg 0 clashes; prints fit;
+    0 multi-piece), then the trays added and the power tab re-checked against everything and the gun swing: 0 hits.
+
 B20. **Flat waterjet brackets, riveted, tied together** (Micah, 2026-11-11: "add all the brackets, everything can be
     waterjet from 1/8in or 1/16th aluminum. try to avoid bends because they throw off the holes and we plan to cnc the
     extrusions ... be metal efficient and feel free to style stuff. try to keep brackets under 12x12"; then "tie the
