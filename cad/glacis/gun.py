@@ -260,8 +260,8 @@ def _build(xv):
         rz = (zo - P.RAIL20, zo)
         for xs_ in (rx0 + 30.0, (rx0 + rx1) / 2, rx1 - 30.0):
             pl = pl.cut(cyl(2.25, 10, (xs_, y0 - 2, zo - P.RAIL20 / 2), (0, 1, 0)))
-        gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al, waterjet)", kind="stock",
-             note="Chevron + turret wheel: swallowtail back, round boss round the pivot, chevron pockets (waterjet)")
+        gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al, CNC router)", kind="stock",
+             note="Chevron + turret wheel: swallowtail back, round boss round the pivot, chevron pockets (CNC router: too big for the 12 x 12 waterjet)")
         gadd(f"Rail 20x20 gun {tag}", t_slot(rx0, rx1, ry, rz), "alu", bom="20x20 T-slot extrusion (owned spare, cut)",
              kind="stock", mass=0.47 * (rx1 - rx0) / 1000.0,
              note=f"{rx1 - rx0:.0f} mm; 3 x M4 x 8 through the cradle plate into M4 drop-in T-nuts; top flush with the plate")

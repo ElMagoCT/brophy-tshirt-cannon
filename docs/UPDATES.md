@@ -32,7 +32,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Checks: full robot.py (sweep 0-90 deg 0 clashes; interference: the old 64 mm3 sliver, and the tank line through the lowered saddle, fixed and re-checked: 0; prints fit; 0 multi-piece). `out/check_log.txt` predates the saddle fix.
 - Parts list: $1,525.57 -> $1,601.50 pre-tax (+$75.93: 2 packs of dome rivets, 3 of countersunk; brackets are stash sheet). Sheet synced (Order 2 $613.37 with tax).
 - Onshape: backup version "Before waterjet brackets (2026-11-11)"; the chassis part studio replaced by 6 (110 parts) and pneumatics re-imported, swapped into their sub-assemblies, rigid groups rebuilt, all assemblies OK; old studios and STEPs deleted, new ones filed in System part studios; version "Waterjet brackets: flat, riveted, interconnected (2026-11-11)".
-- Questions for Micah: the gun cradle plates (490 x 226 mm) don't fit the 12 x 12 waterjet: CNC router, or split them?
+- Questions for Micah: the gun cradle plates (490 x 226 mm) don't fit the 12 x 12 waterjet. Answered: "ill use a cnc" (the router); the parts list, the plates' README and the CAD label say so.
 
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Review pass: holes, one gun core, electronics shelf, parts list
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)

@@ -1228,8 +1228,8 @@ B20. **Flat waterjet brackets, riveted, tied together** (Micah, 2026-11-11: "add
       different, the biggest 293 mm; they nest on 11 sheets of 12 x 12 in (about 75% of each sheet inside part
       outlines; the bellypan takes 3 sheets on its own). 3/16 blind rivets: 166 dome, 118 countersunk (120 deg).
       No threaded rivets: nothing that has to come off screws into a tube.
-    - Not bracketed: the gun cradle plates (490 x 226 mm) are bigger than the 12 x 12 bed; they need a bigger machine
-      or the CNC router.
+    - Not bracketed: the gun cradle plates (490 x 226 mm) are bigger than the 12 x 12 bed, so they go on the CNC
+      router (Micah: "ill use a cnc").
     Checks: full robot.py (interference 2 pairs: the old 64 mm3 fill-elbow sliver and a 475 mm3 tank line through the
     lowered tank saddle, then fixed and re-checked alone: 0; sweep 0-90 deg 0 clashes; prints fit; 0 multi-piece;
     brackets vs every part 0 hits).

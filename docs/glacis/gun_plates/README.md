@@ -1,4 +1,4 @@
-# Gun cradle plates (waterjet)
+# Gun cradle plates (CNC router)
 
 Two plates, 1/8 in (3.175 mm) 6061 aluminium sheet, one DXF each, in millimetres, cut from the CAD's own STEP export
 by `cad/glacis/plate_dxf.py` (run it again after any change to the plates).
@@ -9,6 +9,8 @@ by `cad/glacis/plate_dxf.py` (run it again after any change to the plates).
 - Every round hole is 4.5 mm for an M4 and has a part behind it (insert, nyloc, T-nut or standoff). The hexagon is the
   1/2 in hex for the pivot stub: cut it on the line and file to a snug fit.
 - The pockets (chevrons and the X round the hub) are lightening cut-outs with 4 mm corner radii.
+- Cut on the CNC router: at 490 x 226 mm they are too big for the 12 x 12 in waterjet. A 1/4 in
+  end mill or smaller reaches the 4 mm inside corners; drill or helix the 4.5 mm holes.
 
 | File | Outline | Mass | Round holes |
 |---|---|---|---|

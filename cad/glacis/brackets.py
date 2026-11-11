@@ -706,8 +706,8 @@ def export_flat(out_dir, log=print, gap=3.0, margin=4.0):
         lines.append(f"- {'1/8' if t > 2 else '1/16'} in: {len(sh)} sheet(s) of 12 x 12 in, "
                      f"{100 * used[t] / (len(sh) * SHEET * SHEET):.0f}% of the metal used "
                      f"({', '.join(f'`nest_{chr(49) if False else ('1-8' if t > 2 else '1-16')}_sheet{i + 1}.dxf`' for i in range(len(sh)))})")
-    lines += ["", "Not in this nest: the two gun cradle plates (490 x 226 mm, `docs/glacis/gun_plates/`), which are "
-              "bigger than the 12 x 12 bed, and the fog heater bracket.", ""]
+    lines += ["", "Not in this nest: the two gun cradle plates (490 x 226 mm, `docs/glacis/gun_plates/`), cut on "
+              "the CNC router because they are bigger than the 12 x 12 bed, and the fog heater bracket.", ""]
     open(os.path.join(out_dir, "README.md"), "w", encoding="utf-8", newline="\n").write("\n".join(lines))
     log(f"waterjet: {len(parts)} different parts, " + ", ".join(
         f"{'1/8' if t > 2 else '1/16'} in {len(sh)} sheet(s) {100 * used[t] / (len(sh) * SHEET * SHEET):.0f}% used"

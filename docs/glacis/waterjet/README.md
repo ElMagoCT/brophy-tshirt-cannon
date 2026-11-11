@@ -28,4 +28,4 @@ Every bracket on the box-tube frame, flat, in millimetres, from `cad/glacis/brac
 
 - 1/8 in: 11 sheet(s) of 12 x 12 in, 50% of the metal used (`nest_1-8_sheet1.dxf`, `nest_1-8_sheet2.dxf`, `nest_1-8_sheet3.dxf`, `nest_1-8_sheet4.dxf`, `nest_1-8_sheet5.dxf`, `nest_1-8_sheet6.dxf`, `nest_1-8_sheet7.dxf`, `nest_1-8_sheet8.dxf`, `nest_1-8_sheet9.dxf`, `nest_1-8_sheet10.dxf`, `nest_1-8_sheet11.dxf`)
 
-Not in this nest: the two gun cradle plates (490 x 226 mm, `docs/glacis/gun_plates/`), which are bigger than the 12 x 12 bed, and the fog heater bracket.
+Not in this nest: the two gun cradle plates (490 x 226 mm, `docs/glacis/gun_plates/`), cut on the CNC router because they are bigger than the 12 x 12 bed, and the fog heater bracket.
