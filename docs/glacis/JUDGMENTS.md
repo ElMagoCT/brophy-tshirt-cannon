@@ -1204,6 +1204,39 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B18. **Gun restyle: chevron + turret-wheel plates, cannons 30% closer, V rear holder, printed end covers** (Micah, same
+    day, after 15 side-plate concepts (claude.ai artifact "Borealis Side Plates"): "combine chevron and turret wheel.
+    make the wheel chevrons", then "just 1 set in the ring", "shorten the back ... leave the chambers where they are",
+    "go 3 and 3", "push the chamber holder thing up ... to align it with the indent on the back ... make it match the
+    profile"; earlier: "the turret hub needs to be cleaned up. fix these holes. lighten the sideplates and make them
+    look cool. also make the chamber caps 3d printed and better. make the back more interesting. make the top and
+    bottom profiles more dynamic. also put the cannons 30% closer together").
+    - **Cannons:** GUN_GAP 35.8 -> 25.1 mm (read as the gap shrinking 30%; a 30% cut to the axis-to-axis spacing would
+      overlap the 3 in chambers). Axes 101 mm apart (was 112), chambers 12 mm apart, the gun 11 mm shorter top to
+      bottom. The old 35.8 came from two 3 x 1 reducing couplings side by side, gone since the chambers are welded.
+    - **Plates** (new `plates.py`): the Chevron concept's swallowtail back and pointed nose, plus the turret wheel's
+      round boss (r = plate half-height + 6) breaking the top and bottom edges round the pivot. Pockets: 3 forward
+      chevrons behind the hub, 3 ahead of it, an X of 4 outward chevrons round the hub between the ring's standoffs;
+      6 mm webs, 4 mm corner rounds, a 10 mm rim, solid at the pivot boss, the ring's standoff pads, the breech block,
+      the top rail, the valve-block pads, the tie bolts and the saddle screws (the chevrons may be broken by those
+      pads). The back is shorter: it ends 4 mm behind the rear saddle line (was 30), the chambers unchanged. 717 g each
+      (was 846).
+    - **Rear chamber holder:** the rear saddle and its two caps are now V-shaped, a 24 mm band 4 mm in from the plates'
+      swallowtail edge, so they line up with the indent. Front saddle stays straight.
+    - **Chamber caps** (both stations): solid blocks that fill out to the plates (stepping in under the add-on rail on
+      top), so there are no open corners round the pipes (the holes in Micah's screenshot); 2 x M4 x 12 down through
+      counterbores into inserts in the saddle. The saddles now also screw to the plates: 2 x M4 x 8 per saddle per side
+      into inserts in their sides (the plates had no saddle screws before).
+    - **End covers:** a printed sleeve over each chamber's welded back end with an octagonal faceted nose and an LED
+      groove, held with RTV; cosmetic, the steel disc is the pressure boundary.
+    - **Left hub:** a slim flanged hub (4 mm flange on the plate, 44 mm barrel to the inner bearing, the inner-race
+      lip, 4 x M4 x 12 into nylocs) instead of the 72 mm block; the plate's turret boss is the visual hub now.
+    - **Gun rails** 300 -> 276 mm (the plate starts later).
+    Checks: full robot.py (on the 7-chevron version: interference 1 pair, the 64 mm3 fill elbow sliver; sweep 0-90 deg
+    0 clashes; all prints on the bed; 0 multi-piece; the gun well floor re-cut, 261 under the axle; 50 frame pieces,
+    58 tenons; all rail and speaker screws found), then the final gun rebuilt and swapped into those STEPs: the gun vs
+    everything over 0-90 deg every 5 and the rebuilt chassis parts vs everything, 0 hits over 30 mm3; no clashes
+    inside the gun; every print fits the bed; gun 18.5 kg, balanced.
 D14 (Borealis). **Money:** $2,002.43 before the review -> $1,777.71, then $1,600.79 after Micah's Sheet changes
     (welded chambers, the M-style QD kit, M4 hardware, cheaper transducers and boost; Order 1 $1,082.69 + $10 shipping,
     Order 2 $508.10), then $1,584.06 with the GOGO in valves (Order 1 $1,065.96 + $10). The MSI vs Supply Giant coupling

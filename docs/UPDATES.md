@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-10 - Micah's Windows computer (Claude Code) - Gun restyle: chevron/turret-wheel plates, cannons closer, V rear holder
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B18): new side plates (swallowtail back, turret boss round the pivot, 3 + 3 side chevrons and an X of 4 round the hub, 717 g each, was 846); cannons 30% closer (gap 25.1 mm, axes 101 mm); V-shaped rear chamber holder lined up with the plates' back; chamber caps that fill out to the plates (no open corners) and saddles screwed to the plates; printed end covers on the chambers' back ends; a slim left hub; gun rails 276 mm.
+- Files: `cad/glacis/plates.py` (new), `gun.py`, `params.py`, `out/` (check log, renders, parts csv), `bom/glacis_bom.py` (+ csv/json), `docs/glacis/JUDGMENTS.md`
+- Checks: full robot.py on the first plate version (interference 1 pair, the old 64 mm3 sliver; sweep 0-90 deg 0 clashes; prints fit; 0 multi-piece; well floor re-cut; 50 frame pieces, 58 tenons), then the final gun swapped into those STEPs and checked against everything over the swing: 0 hits; no clashes inside the gun; gun 18.5 kg, balanced. `out/check_log.txt` and the renders are from the full run, so they show the first plate version.
+- Parts list: no price change ($1,485.85 pre-tax): M4 x 8 +12 (saddles), M4 x 12 +4 (hub), M4 inserts +12 (86 of 100), M4 x 30 back to 10. Sheet matches.
+- Onshape: backup version "Before chevron plates (2026-11-10)"; 12 part studios replaced (gun, add-on rails, chassis, pneumatics, power, body panels, body frame 1-6), parts swapped by name into their sub-assemblies, rigid groups rebuilt; version "Chevron gun plates (2026-11-10)". The replaced part studios are kept as "(old)" for now.
+- Questions for Micah: delete the "(old)" part studios and their STEPs?
+
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Elevation ring pulley on standoffs, belt centred
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B17): the 112T gun pulley is a ring on 6 standoffs (M4 x 10 stainless coupling nuts) 10 mm off the right cradle plate; the belt runs centred between the plate and the bearing block; the 16T pinion moved 8 mm out on the motor's 8 mm REX shaft (printed from Micah's pulley design); a printed sleeve on the right stub locates the gun. Ratio and belt unchanged.

@@ -274,7 +274,9 @@ CH_TOE_L = 2.0 * IN                         # half of the 1 x 4 in nipple: threa
 CH_BUNG_X, CH_BUNG_H = 1.0 * IN, 16.0       # bung centre behind the front disc; its height off the pipe
 SMOKE_R = 0.3125 * IN                       # the gun's smoke line: 1/2 in ID x 5/8 in OD silicone (was 3/8 x 1/2)
 RED = dict(L=80.8, OD_IN=44.0, OD_OUT=108.7, BAND_IN=16.0, BAND_OUT=28.0, MASS=0.9)   # 3 x 1 malleable reducing coupling
-GUN_GAP = 35.8                              # between the barrels: 112 mm between axes, the 3 x 1 couplings side by side + 3
+GUN_GAP = 35.8 * 0.70                       # between the barrels (Micah 2026-11-10: "30% closer"; was 35.8 for the old 3 x 1
+                                            # couplings side by side, gone since the chambers are welded): 101 mm axes,
+                                            # the 3 in chambers 12 mm apart
 PITCH = BARREL_OD + GUN_GAP                 # cannons at z = +/- PITCH / 2 about the axis
 CRADLE_Y0 = 74.0                            # inner faces of the two cradle plates: the 109 mm couplings plus the fill
                                             # and smoke lines that run beside them

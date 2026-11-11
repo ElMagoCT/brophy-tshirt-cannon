@@ -20,6 +20,7 @@ import cadquery as cq
 from cadquery import Vector as V
 import params as P
 import pneu_parts as PP
+import plates
 from lib import add, box, cyl, tube, hex_prism, union, C, t_slot
 from fittings import Chain, OD, ENG, BORE, relief_cap
 
@@ -77,7 +78,7 @@ FILL_DOWN = ((-20.0, -59.0), (-30.0, -67.0))                 # (x, y) where each
 # bearing (a lip bears on its inner race, so the gun can't slide sideways); the right one is the 112T pulley. 4 x M4 x 30
 # from the outer face (counterbored) through the plate into nylocs inside, at angles that clear the fill and smoke lines
 # and the valve side blocks inside the plates (checked against the pass-2 gun)
-HUB_R, HUB_BOLT_R, HUB_GRIP = 36.0, 28.0, 20.0                # boss radius, bolt circle, printed length under each head
+HUB_FL_R, HUB_FL_T, HUB_BOLT_R = 36.0, 4.0, 28.0              # left hub flange radius / thickness, bolt circle
 HUB_BOLTS = tuple((HUB_BOLT_R * math.cos(math.radians(a)), HUB_BOLT_R * math.sin(math.radians(a))) for a in (30, 120, 195, 300))
 # Right side (Micah, 2026-11-10: "the cannon pulley should be a ring and have standoffs so its screwed to and floating on
 # the side"): the 112T ring's 6 standoffs sit on a 78 mm circle at angles whose M4 heads inside the plate clear the
@@ -163,6 +164,22 @@ def _cannon(k, xf):
          bom="Chamber: 3 in Sch 40 steel pipe, plain end (cut)", kind="stock", note=f"{nl / IN:.1f} in")
     gadd(f"Chamber back disc {tag}", cyl(R_PIPE, T, (xpi - nl - T, 0, h), (1, 0, 0)), "steel",
          bom="Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)", kind="machined", note="blank; welded on")
+    # printed end cover over the welded back end (Micah 2026-11-10: "make the back more interesting"): a sleeve that
+    # pushes onto the pipe over the disc and weld, a short chevron-faceted nose and an LED groove; cosmetic only, the
+    # steel disc is the pressure boundary
+    xe = xpi - nl - T                                        # the back disc's outer face
+    ri, ro = R_PIPE + 0.8, R_PIPE + 4.0
+    cov = tube(ro, ri, 30.0, (xe - 4.0, 0, h), (1, 0, 0)).fuse(cyl(ro, 4.0, (xe - 4.0, 0, h), (1, 0, 0)))
+    sides = 8                                               # octagonal faceted nose, 18 mm long
+    ring0 = [V(xe - 4.0, ro * math.cos(2 * math.pi * i / sides + math.pi / 8), h + ro * math.sin(2 * math.pi * i / sides + math.pi / 8))
+             for i in range(sides)]
+    ring1 = [V(xe - 22.0, 0.45 * ro * math.cos(2 * math.pi * i / sides + math.pi / 8), h + 0.45 * ro * math.sin(2 * math.pi * i / sides + math.pi / 8))
+             for i in range(sides)]
+    nose = cq.Solid.makeLoft([cq.Wire.makePolygon(ring0, close=True), cq.Wire.makePolygon(ring1, close=True)], True)
+    cov = cov.fuse(nose).cut(tube(ro + 1, ro - 2.0, 6.0, (xe + 12.0, 0, h), (1, 0, 0)))
+    gadd(f"Chamber end cover {tag}", cov.clean(), "print", bom="Chamber end cover (printed)", kind="print",
+         note="PETG, 4 walls; pushes onto the chamber's welded back end with a bead of RTV; LED groove for a 5 mm strip; "
+              "cosmetic, not on the pressure boundary")
     CH_VOL[k] = math.pi * (BORE_PIPE / 2) ** 2 * nl / 1000.0
     xb_ = xpi - P.CH_BUNG_X                                  # the inlet bung, 1 in behind the front disc
     dn = V(0, -math.sin(math.radians(60)), -s * 0.5)         # toward the tube lane, 30 deg toward the axis (the two
@@ -195,47 +212,101 @@ def _build(xv):
     zo = P.PITCH / 2 + R_CH + 12.0
     xb1 = ax0 + AD_BODY + AD_SHOULDER + AD_SPIGOT            # end of the barrel spigots = front of the breech block
     # cradle: two 1/8 in plates outside everything, from the rear saddle to the breech block
-    x0, x1 = min(xs_list) - 30.0, xb1
+    x0, x1 = min(xs_list) - 4.0, xb1                         # Micah: shorter at the back (was rear saddle - 30)
+    rx0, rx1 = x0 + 22.0, min(xv - 58.0, x0 + 22.0 + 300.0)        # the 20x20 add-on rail inside each top edge
+    ties = ((x0 + 15, zo - 15), (x0 + 15, -zo + 15), (x1 - 25, zo - 30), (x1 - 25, -zo + 30),
+            (xv - 40, zo - 12), (xv - 40, -zo + 12))
+    # M4 x 8 into inserts in each saddle's side, on the web between two side chevrons (plates.layout)
+    xsf, xsr = max(xs_list), min(xs_list)
+    sad_holes = plates.saddle_screws([xsf], plates.layout(x0, zo, xs_list, ax0 + AD_BODY - 2.0))
+    # the rear chamber holder follows the plate's swallowtail (Micah: "align it with the indent on the back ... make it
+    # match the profile"): a V band 24 mm wide, 4 mm in from the plate's back edge
+    vx = lambda z: plates.rear_edge_x(x0, zo, z) + 4.0              # holder's back face at height z
+    sad_holes += [(vx(30.0) + 12.0, 30.0), (vx(30.0) + 12.0, -30.0)]
+    # Brophy Borealis plate (Micah 2026-11-10: "combine chevron and turret wheel. make the wheel chevrons"): see plates.py
+    flat = plates.plate_2d(P.PLATE_T, x0, x1, zo, xs_list, ax0 + AD_BODY - 2.0, (rx0, rx1),
+                           [(x, z, 9.0) for x, z in ties] + [(xs, z, 5.5) for xs, z in sad_holes]
+                           + [(xv - vk["L"] / 2, s * P.PITCH / 2, 10.0) for vk in P.VALVES for s in (1, -1)],
+                           list(RING_BOLTS) + list(HUB_BOLTS))
     for sy, tag in ((1, "left"), (-1, "right")):
         y0 = CRADLE_Y0 if sy > 0 else -CRADLE_Y0 - P.PLATE_T
-        pts = [(x0, -zo), (x1 - 20, -zo), (x1, -zo + 20), (x1, zo - 20), (x1 - 20, zo), (x0, zo)]
-        pl = cq.Workplane("XZ", origin=(0, y0, 0)).polyline(pts).close().extrude(-P.PLATE_T).val()
+        pl = plates.to_side(flat, y0)
         pl = pl.cut(hex_prism(12.9, 20, (0, y0 - 5, 0), (0, 1, 0)))
         for (hx, hz) in (HUB_BOLTS if sy > 0 else RING_BOLTS):   # the left hub's bolts / the right ring's standoffs
             pl = pl.cut(cyl(2.25, 10, (hx, y0 - 2, hz), (0, 1, 0)))
-        for (x, z) in ((x0 + 15, zo - 15), (x0 + 15, -zo + 15), (x1 - 25, zo - 30), (x1 - 25, -zo + 30),
-                       (xv - 40, zo - 12), (xv - 40, -zo + 12)):
+        for (x, z) in ties:
             pl = pl.cut(cyl(3.3, 10, (x, y0 - 2, z), (0, 1, 0)))
+        for (x, z) in sad_holes:
+            pl = pl.cut(cyl(2.25, 10, (x, y0 - 2, z), (0, 1, 0)))
         # Brophy Borealis: a 20x20 T-slot rail inside each plate along its top edge, flush with it, for add-ons;
         # 3 x M4 x 8 through the plate into drop-in T-nuts in the rail's outer slot (clear of the plate's own holes)
-        rx0, rx1 = x0 + 22.0, min(xv - 58.0, x0 + 22.0 + 300.0)
         ry = (CRADLE_Y0 - P.RAIL20, CRADLE_Y0) if sy > 0 else (-CRADLE_Y0, -CRADLE_Y0 + P.RAIL20)
         rz = (zo - P.RAIL20, zo)
         for xs_ in (rx0 + 30.0, (rx0 + rx1) / 2, rx1 - 30.0):
             pl = pl.cut(cyl(2.25, 10, (xs_, y0 - 2, zo - P.RAIL20 / 2), (0, 1, 0)))
-        gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al)", kind="stock")
+        gadd(f"Cradle plate {tag} (1/8 Al)", pl, "alu", bom="Gun cradle plate (1/8 Al, waterjet)", kind="stock",
+             note="Chevron + turret wheel: swallowtail back, round boss round the pivot, chevron pockets (waterjet)")
         gadd(f"Rail 20x20 gun {tag}", t_slot(rx0, rx1, ry, rz), "alu", bom="20x20 T-slot extrusion (owned spare, cut)",
              kind="stock", mass=0.47 * (rx1 - rx0) / 1000.0,
              note=f"{rx1 - rx0:.0f} mm; 3 x M4 x 8 through the cradle plate into M4 drop-in T-nuts; top flush with the plate")
     # chamber saddles: one block between the two nipples at each station, a printed cap bolted over each outer half
     cyls = [cyl(R_PIPE + 0.5, 1200, (xr - 1100, 0, h), (1, 0, 0)) for h in H]
     lanes = union([cyl(3.8, 1200, (xr - 1100, y, 0), (1, 0, 0)) for y in FILL_LANES])   # fill lines pass through
-    for xs in xs_list:
+    for xs in [xsf]:
         sad = box(xs - 14, xs + 14, -CRADLE_Y0, CRADLE_Y0, H[1], H[0]).cut(cyls[0]).cut(cyls[1]).cut(lanes)
         gadd(f"Chamber saddle {xs:.0f}", sad, "print", bom="Chamber saddle", kind="print",
-             note="PETG, 5 walls, 40% gyroid; screws through both cradle plates; caps close the outer halves")
+             note="PETG, 5 walls, 40% gyroid; 2 x M4 x 8 through each cradle plate into inserts in its sides; caps close "
+                  "the outer halves")
+        # caps (Micah 2026-11-10: "fix these holes", "make the chamber caps better"): a solid block over each pipe's
+        # outer half that fills out to the plates (under the add-on rail on top), so there are no open corners
+        # round the pipe; 2 x M4 x 12 down through counterbores into inserts in the saddle
+        yw, yn = CRADLE_Y0 - 0.5, CRADLE_Y0 - P.RAIL20 - 0.5          # full width / beside the rail
         for k, h in enumerate(H):
             s = OUT[k]
-            z0, z1 = (h + 0.5, h + 200) if s > 0 else (h - 200, h - 0.5)
-            cap = tube(R_PIPE + 6.0, R_PIPE + 0.5, 20.0, (xs - 10, 0, h), (1, 0, 0)).intersect(box(xs - 11, xs + 11, -200, 200, z0, z1))
-            fz0, fz1 = (h + 0.5, h + 6.5) if s > 0 else (h - 6.5, h - 0.5)
-            yh = (R_PIPE + 3.0 + CRADLE_Y0 - 0.5) / 2 + 0.5       # M4 head clears the cap's ring
-            for sy in (1, -1):                                  # flanges onto the saddle, one M4 each into an insert
-                fl = box(xs - 10, xs + 10, min(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)),
-                         max(sy * (R_PIPE + 3.0), sy * (CRADLE_Y0 - 0.5)), fz0, fz1)
-                cap = cap.fuse(fl.cut(cyl(2.25, 20, (xs, sy * yh, fz0 - 1), (0, 0, 1))))
+            e = abs(h) + R_PIPE + 6.0                                  # the cap's outer face, |z|
+            if s > 0:
+                zw = min(e, zo - P.RAIL20 - 0.5)
+                prof = [(-yw, h + 0.5), (yw, h + 0.5), (yw, zw), (yn, zw), (yn, e - 6), (yn - 6, e), (-yn + 6, e),
+                        (-yn, e - 6), (-yn, zw), (-yw, zw)]
+            else:
+                prof = [(-yw, h - 0.5), (yw, h - 0.5), (yw, -e + 8), (yw - 8, -e), (-yw + 8, -e), (-yw, -e + 8)]
+            cap = cq.Workplane("YZ", origin=(xs - 10, 0, 0)).polyline(prof).close().extrude(20.0).val()
+            cap = cap.cut(cyl(R_PIPE + 0.5, 30, (xs - 15, 0, h), (1, 0, 0)))
+            for sy in (1, -1):
+                yh = sy * 62.0
+                cap = cap.cut(cyl(2.25, 120, (xs, yh, h - 60 * s), (0, 0, s)))
+                cap = cap.cut(cyl(4.6, 120, (xs, yh, h + 8.5 * s), (0, 0, s)))       # counterbore: 8 mm of print under the head
             gadd(f"Chamber cap {TAGS[k]} {xs:.0f}", cap.clean(), "print", bom="Chamber cap", kind="print",
-                 note="PETG, 5 walls, 40% gyroid; 2 x M4 x 12 into M4 x 4 heat-set inserts in the saddle")
+                 note="PETG, 5 walls, 40% gyroid; fills out to the cradle plates; 2 x M4 x 12 through counterbores into "
+                      "M4 x 4 heat-set inserts in the saddle")
+    # rear chamber holder: saddle + 2 caps, each a V band that follows the plate's swallowtail back
+    def vband(za, zb, ya, yb, w=24.0):
+        zs = sorted({za, zb} | ({0.0} if za < 0 < zb else set()))
+        back = [(vx(z), z) for z in zs]
+        front = [(vx(z) + w, z) for z in reversed(zs)]
+        return cq.Workplane("XZ", origin=(0, yb, 0)).polyline(back + front).close().extrude(yb - ya).val()
+    xc = lambda z: vx(z) + 12.0
+    sad = vband(H[1], H[0], -CRADLE_Y0, CRADLE_Y0).cut(cyls[0]).cut(cyls[1]).cut(lanes)
+    gadd("Chamber saddle rear", sad, "print", bom="Chamber saddle", kind="print",
+         note="PETG, 5 walls, 40% gyroid; V-shaped to follow the plates' swallowtail back; 2 x M4 x 8 through each "
+              "cradle plate into inserts in its sides; caps close the outer halves")
+    yw, yn = CRADLE_Y0 - 0.5, CRADLE_Y0 - P.RAIL20 - 0.5
+    for k, h in enumerate(H):
+        s = OUT[k]
+        e = abs(h) + R_PIPE + 6.0
+        if s > 0:
+            zw = min(e, zo - P.RAIL20 - 0.5)
+            cap = vband(h + 0.5, zw, -yw, yw).fuse(vband(zw, e, -yn, yn))
+        else:
+            cap = vband(-e, h - 0.5, -yw, yw)
+        cap = cap.cut(cyls[k])
+        for sy in (1, -1):
+            yh = sy * 62.0
+            cap = cap.cut(cyl(2.25, 120, (xc(h), yh, h - 60 * s), (0, 0, s)))
+            cap = cap.cut(cyl(4.6, 120, (xc(h), yh, h + 8.5 * s), (0, 0, s)))
+        gadd(f"Chamber cap {TAGS[k]} rear", cap.clean(), "print", bom="Chamber cap", kind="print",
+             note="PETG, 5 walls, 40% gyroid; V-shaped like the plates' back; fills out to the plates; 2 x M4 x 12 through "
+                  "counterbores into M4 x 4 heat-set inserts in the saddle")
     for k, h in enumerate(H):
         vk = P.VALVES[k]
         x0v, x1v = xv - vk["L"], xv
@@ -299,15 +370,17 @@ def _build(xv):
     # hubs: boss on the plate's outer face out to just short of the inner bearing, a lip on its inner race
     yp = CRADLE_Y0 + P.PLATE_T                                   # plate outer face
     yb = P.BEARING_BLOCK_Y[0]                                    # inner bearing face (flange counterbored flush)
-    # left: the 72 mm hub (keyed, carries the pot), out to the inner bearing with a lip on its inner race
-    hub = cyl(HUB_R, yb - 1.5 - yp, (0, yp, 0), (0, 1, 0)).fuse(cyl(9.5, 1.7, (0, yb - 2.0, 0), (0, 1, 0)))
+    # left (Micah 2026-11-10: "the turret hub needs to be cleaned up"): a slim flanged hub, keyed on the stub (it turns
+    # the pot): a 4 mm flange on the plate carries the 4 bolts, a 44 mm barrel runs to the inner bearing with a lip on
+    # its inner race; the plate's turret boss is the visual hub now
+    hub = cyl(HUB_FL_R, HUB_FL_T, (0, yp, 0), (0, 1, 0)).fuse(cyl(22.0, yb - 1.5 - yp, (0, yp, 0), (0, 1, 0)))
+    hub = hub.fuse(cyl(9.5, 1.7, (0, yb - 2.0, 0), (0, 1, 0)))
     hub = hub.cut(hex_prism(12.9, yb - yp + 2, (0, yp - 1, 0), (0, 1, 0)))
     for (hx, hz) in HUB_BOLTS:
-        hub = hub.cut(cyl(2.25, yb - yp + 2, (hx, yp - 1, hz), (0, 1, 0)))
-        hub = hub.cut(cyl(4.6, yb - 1.5 - yp - HUB_GRIP + 1, (hx, yp + HUB_GRIP, hz), (0, 1, 0)))   # head pocket
+        hub = hub.cut(cyl(2.25, HUB_FL_T + 2, (hx, yp - 1, hz), (0, 1, 0)))
     gadd("Axle hub left", hub.clean(), "print_d", bom="Axle hub", kind="print",
-         note="PETG, 5 walls, 40% gyroid; hex bore on the pivot stub; 4 x M4 x 30 from its outer face (counterbored) "
-              "through the cradle plate into nylocs; its lip bears on the inner bearing's inner race")
+         note="PETG, 5 walls, 40% gyroid; hex bore on the pivot stub; 4 x M4 x 12 through its flange and the cradle "
+              "plate into nylocs; its lip bears on the inner bearing's inner race")
     # right (Micah 2026-11-10): the 112T pulley is a ring floating on 6 standoffs off the cradle plate, in a belt plane
     # centred between the plate and the bearing block; a printed sleeve on the stub does the old hub's locating job
     y0r, y1r = P.ELEV_PULLEY_Y
