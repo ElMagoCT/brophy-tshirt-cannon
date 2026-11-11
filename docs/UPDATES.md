@@ -25,6 +25,13 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-11 - Micah's Windows computer (Claude Code) - Acrylic and aluminium in hand; CNC only for the cannon
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (Micah: "only cnc for the cannon, everything else waterjet. i have aluminum for this so no need to add it. also remove acrylic from the total, i found enough"): the Lesnlok acrylic 2-pack ($86.98) and the aluminium stock row are off the parts list; the owned-acrylic, breech adapter, waterjet bracket and gun plate rows say the material is his. The gun's two side plates are the only CNC router parts; every other plate is waterjet.
+- Files: `bom/glacis_bom.py` (+ csv/json), `docs/glacis/air_wiring_artifact.html` (parts data; the "aluminium is unpriced" open item gone)
+- Parts list: $1,601.50 -> $1,514.52 pre-tax. Sheet synced (Order 2 $518.48 with tax). Sidenote: Body (Shell) board (rivets, riveter, waterjet bracket row; acrylic and stock boxes removed; design notes), the gun plate box on Pneumatic, the Cannon home page (total, Body subtotal, latest paragraph). "Glacis air & wiring" artifact republished.
+- Questions for Micah: none.
+
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Flat waterjet brackets, riveted and tied together
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B20): new `cad/glacis/brackets.py`: side plates (the Falcon plates grown into every post), inboard plates, arm knees, drilled corner gussets, flat tower plates + spacer strips, a 3-piece bellypan with seam straps; every rivet hole drilled through the tube under it in the CAD. Bent parts and the old drive plates / top arm gussets gone; tank saddles step down onto the arms.
