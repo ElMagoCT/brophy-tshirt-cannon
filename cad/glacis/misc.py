@@ -76,13 +76,7 @@ def towers_and_pivot():
         # Brophy Borealis (Micah, 2026-11-10): the tower stops under the in-well rail, the rail runs over it and the
         # bearing block sits on the rail; one 1/8 in plate on the outboard side wraps the tower and ties the three
         post(f"Turret tower {side} (1x1)", (x0 + x1) / 2, yc, P.RAIL_Z[1], P.DECK_RAIL["z"][0])
-        for xf, d in ((x0, -1), (x1, 1)):
-            leg_v = box(min(xf, xf + d * P.PLATE_T), max(xf, xf + d * P.PLATE_T), yc - 12.7, yc + 12.7,
-                        P.RAIL_Z[1], P.RAIL_Z[1] + 60)
-            leg_h = box(min(xf, xf + d * 15), max(xf, xf + d * 15), yc - 12.7, yc + 12.7,
-                        P.RAIL_Z[1], P.RAIL_Z[1] + P.PLATE_T)
-            add(f"Tower base gusset {side} {'rear' if d < 0 else 'front'}", leg_v.fuse(leg_h), "alu", "frame",
-                bom="Tower base gusset (1/8 Al, bent)", kind="stock", note="3/16 rivets")
+        # (the tower's base is riveted to the side and inboard plates: brackets.py)
         # bearing block from the tower's front face forward to the axle: two flanged 1/2 hex bearings
         blk = box(x1, px + 25.0, min(sgn * y0, sgn * y1), max(sgn * y0, sgn * y1), pz - 28, pz + 28)
         blk = blk.cut(cyl(9.0, 800, (px, -400, pz), (0, 1, 0)))
@@ -191,11 +185,13 @@ def air():
             post(f"Tank post {side} {xb:.0f} (1x1)", xb, sgn * IY, P.RAIL_Z[1], P.RAIL_Z[1] + 104.0)
             tube_part(f"Tank arm {side} {xb:.0f} (1x1)", "y", sgn * P.INNER_RAIL_Y[0], sgn * 262.0, xb,
                       P.RAIL_Z[1] + 104.0 + 12.7)
-            add(f"Tank arm gusset {side} {xb:.0f}", box(xb - 12.7, xb + 12.7, min(sgn * P.INNER_RAIL_Y[0], sgn * 210.0),
-                max(sgn * P.INNER_RAIL_Y[0], sgn * 210.0), P.RAIL_Z[1] + 129.4, P.RAIL_Z[1] + 129.4 + P.PLATE_T), "alu", "pneu",
-                bom="Arm gusset (1/8 Al)", kind="stock")
-            sad = box(xb - 14, xb + 14, sgn * ty - 68, sgn * ty + 68, P.RAIL_Z[1] + 129.4 + P.PLATE_T, tz).cut(
+            # (the arm knees on both faces of the joint: brackets.py)
+            zt_ = P.RAIL_Z[1] + 129.4                      # the arm's top
+            sad = box(xb - 14, xb + 14, sgn * ty - 68, sgn * ty + 68, zt_ + P.PLATE_T, tz).cut(
                 cyl(R + 1.0, 60, (xb - 30, sgn * ty, tz), (1, 0, 0)))
+            # a foot down onto the arm where the old top gusset was (the knees now hold the arm), clear of the tank line
+            fy = sorted([sgn * max(ty - 68.0, P.INNER_RAIL_Y[0]), sgn * min(ty + 68.0, 210.0)])
+            sad = sad.fuse(box(xb - 12.7, xb + 12.7, fy[0], fy[1], zt_, zt_ + P.PLATE_T + 0.5))
             add(f"Tank saddle {side} {xb:.0f}", sad, "print", "pneu", bom="Tank saddle", kind="print")
         for xs in (tx - 40.0, tx + 40.0):
             add(f"Tank strap {side} {xs:.0f}", tube(R + 2.5, R + 0.5, 25.0, (xs - 12.5, sgn * ty, tz), (1, 0, 0)), "black",
@@ -528,10 +524,7 @@ def deck_rails():
             note=f"{x1 - x0:.0f} mm inside the gun well, over the cut-down tower; {n_} x M4 x 30 through CNC'd cross holes "
                  "(8 mm head access from the well side, the head on the core) and the tower plate into inserts in the deck's well-edge member; the bearing "
                  "block on top, the elevation motor bracket under the right one")
-        add(f"Tower plate {side} (1/8 Al)", tower_plate(sg), "alu", "frame", bom="Tower plate (1/8 Al, bent)", kind="stock",
-            note="waterjet and bend: wraps the tower's outboard, front and back faces, runs the length of the in-well rail "
-                 "between it and the deck's well-edge member, and up over the bearing block; 4 x 3/16 rivets into the "
-                 "tower, the rail's M4s through it, the block's 1/4-20s")
+        # (the tower plate, flat now, and the rail's spacer strip: brackets.py)
 
 
 def front_rails():

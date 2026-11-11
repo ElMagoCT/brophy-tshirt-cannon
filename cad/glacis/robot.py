@@ -26,6 +26,7 @@ from lib import PARTS
 import drive
 import gun
 import misc
+import brackets
 import render
 import pneu_parts
 
@@ -68,6 +69,7 @@ def build(elev=P.ELEV_SHOW):
     misc.deck_rails()
     misc.front_rails()
     misc.speakers()
+    brackets.build(log)                 # flat waterjet brackets, rivets checked, tubes drilled
     for p in PARTS:
         if p["moving"]:
             p["local"] = p["shape"]
@@ -385,6 +387,7 @@ if __name__ == "__main__":
     if "--export" in sys.argv:
         export(parts)
         bom_rollup(parts)
+        brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
         sys.exit(0)
     if not quick:
         t = time.time()
@@ -412,5 +415,6 @@ if __name__ == "__main__":
             sys.exit(0)
         export(parts)
         bom_rollup(parts)
+        brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
         renders(parts)
     open(os.path.join(OUT, "check_log.txt"), "w").write("\n".join(LOG) + "\n")

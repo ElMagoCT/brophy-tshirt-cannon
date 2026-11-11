@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-11 - Micah's Windows computer (Claude Code) - Flat waterjet brackets, riveted and tied together
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B20): new `cad/glacis/brackets.py`: side plates (the Falcon plates grown into every post), inboard plates, arm knees, drilled corner gussets, flat tower plates + spacer strips, a 3-piece bellypan with seam straps; every rivet hole drilled through the tube under it in the CAD. Bent parts and the old drive plates / top arm gussets gone; tank saddles step down onto the arms.
+- Files: `cad/glacis/brackets.py` (new), `drive.py`, `misc.py`, `robot.py`, `out/` (check log, renders, parts csv, STEPs: the chassis tab is now 6 files), `docs/glacis/waterjet/` (new: one DXF per part, the 12 x 12 nest, README), `bom/glacis_bom.py` (+ csv/json), `docs/glacis/JUDGMENTS.md`
+- Checks: full robot.py (sweep 0-90 deg 0 clashes; interference: the old 64 mm3 sliver, and the tank line through the lowered saddle, fixed and re-checked: 0; prints fit; 0 multi-piece). `out/check_log.txt` predates the saddle fix.
+- Parts list: $1,525.57 -> $1,601.50 pre-tax (+$75.93: 2 packs of dome rivets, 3 of countersunk; brackets are stash sheet). Sheet synced (Order 2 $613.37 with tax).
+- Onshape: backup version "Before waterjet brackets (2026-11-11)"; the chassis part studio replaced by 6 (110 parts) and pneumatics re-imported, swapped into their sub-assemblies, rigid groups rebuilt, all assemblies OK; old studios and STEPs deleted, new ones filed in System part studios; version "Waterjet brackets: flat, riveted, interconnected (2026-11-11)".
+- Questions for Micah: the gun cradle plates (490 x 226 mm) don't fit the 12 x 12 waterjet: CNC router, or split them?
+
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Review pass: holes, one gun core, electronics shelf, parts list
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B19): every plate hole has something behind it (tie holes gone, saddles / caps / core screwed from the sides); valve blocks + breech block + mantlet are one printed gun core in left and right halves; hub flange 3 mm, ring standoff screws counterbored, stubs tapped both ends; the electronics shelf matches rev D.2.1 (Waveshare board, PCA9685, two ADS1115s, two battery relays, 1200 W boost); robot.py measures gun prints level.

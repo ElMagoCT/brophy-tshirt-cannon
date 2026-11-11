@@ -1204,6 +1204,36 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B20. **Flat waterjet brackets, riveted, tied together** (Micah, 2026-11-11: "add all the brackets, everything can be
+    waterjet from 1/8in or 1/16th aluminum. try to avoid bends because they throw off the holes and we plan to cnc the
+    extrusions ... be metal efficient and feel free to style stuff. try to keep brackets under 12x12"; then "tie the
+    motor mounts into the tank posts and stuff. make it interconnected. include the threaded rivets if/where you use
+    them please but no need for screws").
+    - **New module** `cad/glacis/brackets.py`: every bracket is 2D data (outline, isogrid pockets, holes) that makes
+      the solid, the DXF and the nest. Each rivet hole is checked for its head (dropped if it would hit a part) and
+      cut through the near wall of the tube under it, so the CNC program for every extrusion comes from the model.
+    - **Side plates** (4, replace the drive plates): the Falcon and axle plate grown along the inner rail's outboard
+      face into every post on its stretch. Rear: both sled posts, the tower and the rear tank post; front: the front
+      tank post. Isogrid pockets, countersunk rivets (the wheel runs right beside them). 290 x 146 and 210 x 146 mm.
+    - **Inboard plates** (6) on the rail's inner face round the same posts, clear of the Falcon bodies; the rear one
+      stays low (the valve cross, line relief and in valve A sit just above the rail on the left).
+    - **Arm knees** (14): an L on both faces of every post-to-arm joint (sled rails, tank arms) in place of the old
+      flat top gussets; the -320 sled joint gets one short knee on its front face only (the rear manifold is right
+      behind the post). The tank saddles step down onto the arms where the old gusset was.
+    - **Tower plates** flat (no bent flanges), 293 mm, plus a flat spacer strip for the rest of the in-well rail; the
+      bent tower base gussets are gone (the side and inboard plates hold the tower's foot).
+    - **Corner gussets** as before, now drilled (the bottom ones countersunk: the underglow bracket runs right under).
+    - **Bellypan** in 3 pieces (284, 240, 244 x 259 mm) with a strap under each seam.
+    - Everything is 1/8 in (the only 1/16 part was a seam strap, which would have wasted a sheet): 41 parts, 15
+      different, the biggest 293 mm; they nest on 11 sheets of 12 x 12 in (about 75% of each sheet inside part
+      outlines; the bellypan takes 3 sheets on its own). 3/16 blind rivets: 166 dome, 118 countersunk (120 deg).
+      No threaded rivets: nothing that has to come off screws into a tube.
+    - Not bracketed: the gun cradle plates (490 x 226 mm) are bigger than the 12 x 12 bed; they need a bigger machine
+      or the CNC router.
+    Checks: full robot.py (interference 2 pairs: the old 64 mm3 fill-elbow sliver and a 475 mm3 tank line through the
+    lowered tank saddle, then fixed and re-checked alone: 0; sweep 0-90 deg 0 clashes; prints fit; 0 multi-piece;
+    brackets vs every part 0 hits).
+
 B19. **Review pass: every plate hole backed, one gun core (left / right), side screws, electronics shelf, parts list**
     (Micah, 2026-11-10: "review the holes in it probably combining the manifold and breech blocks into one piece. review
     all the cannon parts and make sure they all go together well. then review the whole design and make sure its good.
