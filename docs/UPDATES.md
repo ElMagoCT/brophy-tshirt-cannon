@@ -34,8 +34,8 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Files: `cad/glacis/gun.py`, `cad/glacis/out/` (checks, renders, parts csv), `bom/glacis_bom.py` (+ csv/json), `docs/glacis/JUDGMENTS.md`
 - Checks: robot.py (47 min): interference 1 pair over 30 mm3 (the 64 mm3 fill elbow sliver from rev D.2), elevation sweep 0-90 deg 0 clashes, every print fits the bed, 0 multi-piece parts, 49 frame pieces, 57 tenons, speaker cups 8/8, front rail screws 4/4, in-well rail screws 10/10; gun 19.0 kg, CG on the axle.
 - Parts list: pre-tax $1,480.86 (Order 1 $1,039.12, Order 2 $441.74), was $1,505.06 before today's hub nylocs and swaps. Sheet Order tabs match.
-- Not done: the new Gun part studio isn't in the "System part studios" folder yet, and the old one and its STEP are still in the document (deleting needs Micah's OK).
-- Questions for Micah: delete "Gun (pivots) (old)" and its STEP?
+- Cleanup (Micah's OK): "Gun (pivots) (old)" and its STEP deleted (no assembly used them; the earlier versions keep them); the new Gun part studio is in "System part studios".
+- Questions for Micah: none.
 
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Onshape gun mate: variable limits, 0-90 deg
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
