@@ -227,10 +227,12 @@ def print_parts(parts):
     for p in parts:
         if p["kind"] != "print":
             continue
-        b = p["shape"].BoundingBox()                   # a near-square part's principal axes can come out at 45 deg
+        sh = p["local"] if p.get("moving") and p.get("local") is not None else p["shape"]   # a gun part is measured level, as
+        b = sh.BoundingBox()                           # designed, not tilted to the display elevation (2026-11-11: the
+        # gun core halves, 243 x 198 x 74, were reported as 254 x 198 x 83 through the tilted box and the fallback below)
         square = all(d <= m for d, m in zip(sorted((b.xlen, b.ylen, b.zlen), reverse=True), sorted(P.BED, reverse=True)))
-        if not square and not B_.fits_bed(p["shape"]):
-            bad.append((p["name"], [round(x) for x in B_._obb_dims(p["shape"])]))
+        if not square and not B_.fits_bed(sh):         # a near-square part's principal axes can come out at 45 deg
+            bad.append((p["name"], [round(x) for x in B_._obb_dims(sh)]))
     return bad
 
 

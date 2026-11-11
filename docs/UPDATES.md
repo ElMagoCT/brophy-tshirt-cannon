@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-11 - Micah's Windows computer (Claude Code) - Review pass: holes, one gun core, electronics shelf, parts list
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B19): every plate hole has something behind it (tie holes gone, saddles / caps / core screwed from the sides); valve blocks + breech block + mantlet are one printed gun core in left and right halves; hub flange 3 mm, ring standoff screws counterbored, stubs tapped both ends; the electronics shelf matches rev D.2.1 (Waveshare board, PCA9685, two ADS1115s, two battery relays, 1200 W boost); robot.py measures gun prints level.
+- Files: `cad/glacis/gun.py`, `plates.py`, `misc.py`, `robot.py`, `plate_dxf.py` (new), `out/` (check log, renders, parts csv, STEPs), `docs/glacis/gun_plates/` (new: one DXF per plate, mm), `bom/glacis_bom.py` (+ csv/json), `docs/glacis/air_wiring_artifact.html` + `parts_section.py`, `docs/glacis/JUDGMENTS.md`, `CLAUDE.md` (status lines)
+- Checks: full robot.py (interference 1 pair, the old 64 mm3 sliver; sweep 0-90 deg 0 clashes; 0 multi-piece; 50 frame pieces), the shelf rebuilt alone against everything and the gun swing: 0 hits. `out/check_log.txt` predates the shelf fix and the level bed check.
+- Parts list: $1,489.58 -> $1,525.57 pre-tax (+$35.99, the second PETG spool; +$3.56 inserts, -$0.17 logic supply, plus earlier same-day swaps). Sheet synced (Order 1 $1,133.87, Order 2 $530.53 with tax). Sidenote Cannon boards and home page updated. "Glacis air & wiring" artifact republished.
+- Onshape: backup version "Before review pass (2026-11-11)"; new STEPs imported for gun, add-on rails, body frame 1 and 2, lights 1, power; the Gun sub-assembly is swapped (48 parts, rigid group rebuilt). NOT done yet (Onshape signed out mid-swap): the other five swaps, deleting the replaced part studios and blobs, renaming and filing the new tabs, the closing version.
+- Questions for Micah: none (the core is split left / right, not top / bottom: see B19).
+
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Gun restyle: chevron/turret-wheel plates, cannons closer, V rear holder
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B18): new side plates (swallowtail back, turret boss round the pivot, 3 + 3 side chevrons and an X of 4 round the hub, 717 g each, was 846); cannons 30% closer (gap 25.1 mm, axes 101 mm); V-shaped rear chamber holder lined up with the plates' back; chamber caps that fill out to the plates (no open corners) and saddles screwed to the plates; printed end covers on the chambers' back ends; a slim left hub; gun rails 276 mm.

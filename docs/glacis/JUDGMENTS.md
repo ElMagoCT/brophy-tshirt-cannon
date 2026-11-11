@@ -1204,6 +1204,37 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B19. **Review pass: every plate hole backed, one gun core (left / right), side screws, electronics shelf, parts list**
+    (Micah, 2026-11-10: "review the holes in it probably combining the manifold and breech blocks into one piece. review
+    all the cannon parts and make sure they all go together well. then review the whole design and make sure its good.
+    then review the parts list one more time and update the artifact and sidenote"; answers: combine all three, the
+    holes are "the screw holes that don't have anything behind them, they should be moved").
+    - **Holes:** the six 6.6 mm tie holes had nothing behind them and are gone. Every hole in both plates now lands on an
+      insert, nyloc, T-nut or standoff (21 left, 23 right, all 4.5 mm for M4, plus the hex): 8 into the saddles, 4 into
+      the chamber caps and 6 into the gun core per side (M4 x 8 into M4 x 4 inserts), 3 into the rail's T-nuts, the
+      hub's 4 or the ring's 6. The chevrons were re-phased so every screw sits in a solid web. 704 g per plate.
+    - **Gun core:** the valve side blocks, breech block and mantlet are one printed part split LEFT / RIGHT on the plane
+      through both barrel axes. Micah's pick said top / bottom, but a top / bottom split leaves each half a closed ring
+      round its barrel that can only slide on, not clamp; left / right halves close from the sides and 2 x M4 x 12
+      across the split clamp both barrels onto their spigots. 243 x 198 x 74 mm and about 0.5 kg each, printed outer
+      face down.
+    - **Caps and saddles** screw in from the sides through the plates (the old vertical cap screws sat under the add-on
+      rail). Left hub flange 3 mm (4 mm left an M4 x 12 too short for a nyloc); the ring's standoff screws are
+      counterbored so the M4 x 8 and M4 x 12 don't meet inside the 10 mm coupling nut. Pivot stubs tapped 1/4-20 both
+      ends with a bolt and washer each side.
+    - **Electronics shelf** now matches the rev D.2.1 parts: Waveshare ESP32-P4-Module-DEV-KIT (88 x 56 x 18), a PCA9685
+      where the music board was, both ADS1115s, a battery relay each side of the bellypan, the amp 40 mm forward, the
+      1200 W boost (130 x 55 x 55, [UNVERIFIED] size). Stale CAD labels (McMaster relief, Lnrueg plug, FUSCH
+      transducer, Sch 40 nipple) refreshed.
+    - **Parts list:** PETG 1 -> 2 spools (the prints come to about 6.5 kg), M4 inserts 1 -> 2 packs, the logic supply
+      row got its link (3.6-32 V buck-boost, $2.67), new $0 rows for the gun plates, breech-adapter bar, printed gun parts
+      and aluminium stock, the drive rows get their own section, two stale notes corrected. $1,525.57 pre-tax.
+    Checks: full robot.py (interference 1 pair, the old 64 mm3 fill-elbow sliver; sweep 0-90 deg 0 clashes; 0
+    multi-piece; 50 frame pieces; all rail and speaker screws found; gun 18.5 kg, CG 1 mm ahead). The bed check flagged
+    the two core halves at 254 x 198 x 83: it measured them tilted to the 20 deg display pose; robot.py now measures gun
+    parts level (243 x 198 x 74, fits). The new shelf parts, rebuilt alone and swapped into the power STEP: 0 hits over
+    30 mm3 against every other part and the gun over 0-90 deg.
+
 B18. **Gun restyle: chevron + turret-wheel plates, cannons 30% closer, V rear holder, printed end covers** (Micah, same
     day, after 15 side-plate concepts (claude.ai artifact "Borealis Side Plates"): "combine chevron and turret wheel.
     make the wheel chevrons", then "just 1 set in the ring", "shorten the back ... leave the chambers where they are",

@@ -214,7 +214,7 @@ def air():
     blk, ports = PP.manifold(V(mx, my, mz), (0, 1, 0), (0, 0, 1), stations)
     add("Rear manifold", blk, "brass", "pneu", bom="Rear manifold: 1/4 NPT brass crosses + close nipples (built)")
     add("Tank transducer 0-300 psi", PP.transducer(ports[2][0], ports[2][1]), "steel", "pneu",
-        bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH)")
+        bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable")
     tops = {}
     for k, tag in ((0, "right tank"), (1, "left tank")):          # left one clear of its battery sled
         add(f"Rear manifold push-to-connect {tag}", PP.ptc_straight(ports[k][0], ports[k][1]), "brass", "pneu",
@@ -234,13 +234,13 @@ def air():
     add("Main valve push-to-connect", PP.ptc_straight(vc - V(0, 22.5, 0), (0, -1, 0)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     MAIN_OUT[:] = [vc - V(0, 22.5 + 18.0, 0)]
-    # fill (rev D.2; Borealis: the plug is from the Lnrueg M-style kit): a FEMALE M-style plug outside the panel on the 1-1/2 in nipple through it, then
+    # fill (rev D.2; Borealis: the plug is one of the ZKZX female-thread M-style plugs): a FEMALE M-style plug outside the panel on the 1-1/2 in nipple through it, then
     # behind the panel a female x female elbow turns along +y, the male x male check valve, and a street elbow into the
     # manifold's back face
     e14 = 10.2
     xp = xo - e14 - 4.2                                    # the nipple's outer tip: the plug's hex sits clear outside the panel
     add("Fill plug (M-style, female)", PP.m_plug_f(V(xp, yb, mz), (-1, 0, 0)), "steel", "pneu",
-        bom="Fill plug: M-style plug, 1/4 FNPT (female), from the Lnrueg 45-pc kit", note="your universal coupler snaps on")
+        bom="QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)", note="your universal coupler snaps on")
     ce = 17.0                                              # F x F barstock elbow, centre to port face (nominal)
     xn1 = xu - ce + e14                                    # nipple tip inside the elbow's port
     add("Fill nipple", PP.close_nipple(V((xp + xn1) / 2, yb, mz), (1, 0, 0), length=xn1 - xp, hexed=False), "brass", "pneu",
@@ -254,7 +254,7 @@ def air():
     add("Fill elbow manifold", PP.street_elbow(V(xu, y_fill, mz), (0, -1, 0), (1, 0, 0)), "brass", "pneu",
         bom="1/4 NPT brass street elbow")
     add("Tank relief valve 200 psi", PP.relief_valve(ports[5][0], ports[5][1], length=ports[5][0].x - (xo - 4.0)), "brass",
-        "pneu", bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)", note="pull ring at the rear panel: the hand dump")
+        "pneu", bom="Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)", note="pull ring at the rear panel: the hand dump")
     # main valve (the tanks' shut-off, opens only while a chamber fills) into a brass cross; one in valve per chamber
     # off the cross meters its chamber against that chamber's transducer, and its closed seat is what keeps the
     # other cannon's shot from reaching it (no check valves). Main valve to in-valve seats is all brass at tank
@@ -268,7 +268,7 @@ def air():
     add("Valve cross", PP.npt_cross(V(fx, fy, fz), (1, 0, 0), (0, 1, 0), c2e=vc), "brass", "pneu",
         bom="1/4 NPT brass cross (ChillWaves)", note="close nipples to the in valves")
     add("Line relief valve 200 psi", PP.relief_valve(V(fx, fy, fz) + LINE_RELIEF * vc, LINE_RELIEF), "brass", "pneu",
-        bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)")
+        bom="Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)")
     CHECKS.clear()
     RELIEF_AT.clear()
     for d, tag, up, plug in VALVE_RUNS:
@@ -294,7 +294,7 @@ def air():
         add(f"Chamber transducer {tag}", PP.transducer(c + up * ce, up), "steel", "pneu",
             bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)")
         add(f"Chamber relief valve 200 psi {tag}", PP.relief_valve(c - up * ce, -up), "brass", "pneu",
-            bom="Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
+            bom="Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)",
             note="the chamber's own relief and hand bleed (the in valve's closed seat seals it off from the tanks)")
         add(f"Chamber cross {tag} push-to-connect", PP.ptc_straight(c + d * ce, d), "brass", "pneu",
             bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
@@ -415,22 +415,32 @@ def batteries_and_electronics():
         shelf = shelf.cut(cyl(14.0, 400.0, (r_.x, r_.y, -100.0), (0, 0, 1)))
     add("Electronics shelf", shelf, "print", "power", bom="Electronics shelf", kind="print")
     z = 154.0
-    boards = [("Main controller ESP32-P4 + C5 (WTDKP4C5-S1)", -375, -295, -98, -38, 18, "pcb",
-               "Main controller: ESP32-P4 + ESP32-C5 board, Wireless Tag WTDKP4C5-S1 (N16R32)"),
+    # Whole-design review (2026-11-11): the shelf now carries what the parts list buys (rev D.2.1): the Waveshare
+    # ESP32-P4-Module-DEV-KIT (88 x 56 mm with its USB / RJ45 overhang, about 18 tall) instead of the Wireless Tag board,
+    # a PCA9685 where the Bluetooth music ESP32 was (music streams over the WebSocket now), and both ADS1115s
+    boards = [("Main controller ESP32-P4 + C6 (Waveshare)", -380, -292, -98, -42, 18, "pcb",
+               "Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)"),
               ("ESP32-S3 safety node", -290, -221, -98, -70, 15, "pcb", "ESP32-S3-DevKitC-1 N8R8 (owned)"),
-              ("Bluetooth music ESP32 (WROOM-32)", -290, -235, -64, -36, 12, "pcb", "Bluetooth music: ESP32-WROOM-32 dev board, USB-C (AITRIP B0DF2YJSHN)"),
-              ("ADS1115 ADC", -375, -347, -32, -14, 6, "pcb", "ADS1115 16-bit 4-channel ADC module, I2C (B0FLPZMQJY)"),
+              ("PWM expander PCA9685", -288, -226, -64, -38, 12, "pcb", "PWM expander: PCA9685 16-channel, I2C (Dorhea B07RMTN4NZ)"),
+              ("ADS1115 ADC 1 (pressures)", -375, -347, -32, -14, 6, "pcb", "ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)"),
+              ("ADS1115 ADC 2 (battery and bus volts)", -343, -315, -32, -14, 6, "pcb", "ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)"),
               ("Spark MAX (elevation)", -220, -185, -98, -28, 25, "black", "REV Spark MAX (owned)"),
               ("Valve arm relay 40 A", -220, -192, -20, -2, 36, "black", "12 V 40 A SPDT relay + socket"),
               ("Valve + fog drivers (MOSFETs, relays, ULN2803A)", -378, -308, -6, 54, 32, "pcb", "MOSFET switch modules + 12 V 40 A relays + ULN2803A"),
               ("Buck 12-5 V 20 A", -300, -244, 45, 95, 25, "black", "12->5 V 20 A buck (B089M5R3NJ)")]   # under the main valve
     boards.append(("Logic supply 5 V (buck-boost)", -378, -352, 60, 85, 10, "pcb",
-                   "Logic supply: 5 V 5 A buck-boost, 3.6-32 V in (diymore)"))
+                   "Logic supply: 5 V 5 A buck-boost module, 3.6-32 V in"))
     for name, x0, x1, y0, y1, h, col, bom in boards:
         add(name, box(x0, x1, y0, y1, z, z + h), col, "power", bom=bom)
-    add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power",
-        bom="Contactor 12 V 200 A continuous duty, isolated coil, 4-pin (B07T48QKQB)",
+    relay = "Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
+    add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power", bom=relay,
         note="main breaker -> contactor -> PDH; coil through the rear E-stop, the safety node and the main controller in series")
+    # rev D.2.1: one 200 A relay in each battery's + lead (same part as the contactor), a 4.7 ohm 5 W resistor across each
+    add("Battery relay A 200 A", box(-175.0, -100.0, 35.0, 95.0, zb, zb + 70.0), "black", "power", bom=relay,
+        note="in battery A's + lead, between its SB50 and the bus; the controller keeps only the fuller pack connected "
+             "until the two are within 0.3 V")
+    add("Battery relay B 200 A", box(-97.0, -22.0, -95.0, -35.0, zb, zb + 70.0), "black", "power", bom=relay,
+        note="in battery B's + lead, between its SB50 and the bus")
     # bottom of the rear panel: E-stop, standby charge port (fill port and tank relief come out of the manifold)
     ey, ez = ESTOP
     xo = P.rear_x(ez)
@@ -482,12 +492,18 @@ def speakers():
     for br, side in zip(LB.brackets(), ("left", "right")):
         add(f"Light bar bracket {side}", br, "steel", "power", bom="Light bar end bracket (comes with the bar)",
             kind="cots", note="its foot on the lower front rail (M4 x 8 into a drop-in T-nut), the bar's side bolt through its ear")
+    audio_power()
+
+
+def audio_power():
+    """The siren amp and its boost converter on the middle of the bellypan (their own function so the electronics
+    can be rebuilt without the body)."""
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
-    add("Audio amp (TPA3255)", box(-135.0, -13.0, 22.0, 95.0, zb, zb + 30.0), "pcb", "power",
-        bom="TPA3255 2 x 300 W amp board", note="one channel per speaker, about 100 W each on 48 V")
-    add("Audio boost 12-48 V 1500 W", box(-10.0, 120.0, -100.0, -24.0, zb, zb + 60.0), "black", "power",
-        bom="1500 W 30 A boost converter, set to 48 V", note="feeds the amp from a 40 A PDH channel; size not listed, "
-             "drawn 130 x 76 x 60")
+    add("Audio amp (TPA3255)", box(-95.0, 27.0, 22.0, 95.0, zb, zb + 30.0), "pcb", "power",       # moved 40 mm forward: battery relay A sits behind it
+        bom="TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm", note="one channel per speaker, about 70 W each on 33 V")
+    add("Audio boost 12-33 V 1200 W", box(-10.0, 120.0, -95.0, -40.0, zb, zb + 55.0), "black", "power",
+        bom="1200 W 20 A boost converter, 8-60 V in, 12-80 V out (set to 33 V)", note="feeds the amp from a 40 A PDH channel; "
+             "size not on the listing [UNVERIFIED], drawn 130 x 55 x 55 like the same module on Amazon")
 
 
 # ------------------------------------------------------------------ deck rails (Brophy Borealis)

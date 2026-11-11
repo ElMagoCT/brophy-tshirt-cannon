@@ -1,10 +1,10 @@
 drive: built
-gun: valves at x 138.9 from the axis, centre of mass (0.0, 2.9) mm, 18.7 kg; chambers 1.56 L (top) and 1.32 L (bottom), barrels 25.1 mm apart
-gun well: floor at z 549 where it meets the front, 377 at the back, 261 under the axle
+gun: valves at x 137.7 from the axis, centre of mass (0.7, 2.8) mm, 18.5 kg; chambers 1.56 L (top) and 1.32 L (bottom), barrels 25.1 mm apart
+gun well: floor at z 548 where it meets the front, 375 at the back, 260 under the axle
 elevation belt pitch length 750 mm (150.0 teeth)
 underglow: 2.5 m of strip under the bumpers
-body: 47 faces, volume 109.8 L
-shell volume 21.95 L, 1 solid
+body: 47 faces, volume 109.7 L
+shell volume 21.94 L, 1 solid
 8 panels
 shared edges, interior angle -> window/LED inset (mm): 91 deg -> 36.2, 94 deg -> 34.7, 98 deg -> 32.5, 100 deg -> 31.4
   round 1: front@x313 edge 1 (open) -> 23; front@x313 edge 5 (open) -> 23
@@ -23,23 +23,23 @@ joints: 58 tapered tenons (0 small), 40 with M4 cross screws and 18 glued (fille
 frame mounts: 13 #10-32 inserts in the frame
 speaker cup screws: 8 of 8, front rail screws: 4 of 4, in-well rail screws: 10 of 10
 body: 50 frame pieces (loose chunks: ['E12S0 87 mm3 -> E00S0', 'E33S0 87 mm3 -> E06S0']), 8 panels, 40 clips, LED strip 11.4 m in panel loops + 7.7 m in the frame
-built 576 parts in 4037 s
+built 571 parts in 4155 s
 envelope at  0 deg: 60.5 L x 27.9 W x 31.1 H in
 envelope at 90 deg: 37.9 L x 27.9 W x 69.0 H in
 body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
-mass estimate 84.2 kg (186 lb): body 7.1, bumper 5.2, drive 15.0, frame 5.3, gun 18.7, pneu 10.8, power 22.2
-gun 18.7 kg, CG 0 mm ahead / 3 mm above the pivot -> 0.0 N*m at 0 deg
-interference: 1 pairs over 30 mm^3 (587 s)
+mass estimate 84.1 kg (185 lb): body 7.1, bumper 5.2, drive 15.0, frame 5.3, gun 18.5, pneu 10.8, power 22.2
+gun 18.5 kg, CG 1 mm ahead / 3 mm above the pivot -> 0.1 N*m at 0 deg
+interference: 1 pairs over 30 mm^3 (518 s)
     (64, 'Fill elbow manifold', 'Rear manifold')
-elevation sweep 0-90 deg: 0 clashes (23 s)
-printed parts that don't fit a 250 mm cube (CC1/CC2): 0 []
+elevation sweep 0-90 deg: 0 clashes (25 s)
+printed parts that don't fit a 250 mm cube (CC1/CC2): 2 [('Gun core left', [254, 198, 83]), ('Gun core right', [255, 198, 83])]
 parts in more than one piece: 0 []
 exported Chassis, pivot & drive: 89 parts, 6.9 MB
 exported Wheel FL: 35 parts, 6.9 MB
 exported Wheel FR: 35 parts, 7.6 MB
 exported Wheel RL: 35 parts, 6.9 MB
 exported Wheel RR: 35 parts, 7.6 MB
-exported Gun (pivots): 53 parts, 3.5 MB
+exported Gun (pivots): 48 parts, 4.3 MB
 exported Add-on rails: 6 parts, 1.7 MB
 exported Pneumatics: 56 parts, 3.8 MB
 exported Power, electronics & smoke: 40 parts, 1.1 MB
@@ -54,5 +54,5 @@ exported Body frame 4 of 6: 8 parts, 7.9 MB
 exported Body frame 5 of 6: 8 parts, 8.3 MB
 exported Body frame 6 of 6: 9 parts, 7.4 MB
 exported Body panels & clips: 48 parts, 1.8 MB
-BOM rollup: 174 distinct items -> C:\Users\micah\brophy-tshirt-cannon\cad\glacis\out\parts_from_cad.csv
+BOM rollup: 172 distinct items -> C:\Users\micah\brophy-tshirt-cannon\cad\glacis\out\parts_from_cad.csv
 renders written

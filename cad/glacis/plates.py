@@ -61,8 +61,14 @@ def radial_chevron(ang, r0, r1, half, th, t):
 
 SIDE_W, SIDE_TH = 22.0, 16.0                  # side chevrons: depth (arm sweep), slot width before the webs
 N_REAR, N_FRONT = 3, 3                         # Micah: "go 3 and 3" (they can be broken up by the pads)
-WHEEL_REAR, FRONT0 = -72.0, 70.0               # rear row stops short of the wheel; the front row starts here
-REAR0 = 44.0                                   # rear row start behind x0 (clear of the V-shaped rear chamber holder)
+FRONT0 = 70.0                                  # the front row starts here (ahead of the wheel)
+P_REAR = 32.0                                  # rear row pitch: 16 mm of solid web between chevrons for the screws
+SAD_Z, CAP_DZ = 40.0, 18.0                     # saddle screws at z = +-40; cap screws 18 above / below each cannon axis
+
+
+def web_x(xk, w, zt, pitch, z):
+    """x of the centre of the solid web just ahead of the chevron that starts at xk, at height z."""
+    return xk + SIDE_TH + (pitch - SIDE_TH) / 2 + w * (1 - abs(z) / zt)
 
 
 def _row(xa, xb, n, w):
@@ -73,27 +79,29 @@ def _row(xa, xb, n, w):
     return [xa + k * p for k in range(n)]
 
 
-def layout(x0, zo, saddles, breech_x0):
-    rear = _row(x0 + REAR0, WHEEL_REAR, N_REAR, SIDE_W)            # starts ahead of the rear chamber holder
+def layout(x0, zo, saddles, breech_x0, cap_z=None):
+    """Rear row: phased so the front saddle's line (its saddle and cap screws) lies in the solid web just ahead of the last
+    chevron (and clear of the ring standoff pads), so no chevron is cut by a screw pad. Front row: spread from FRONT0 to the breech block; the gun
+    core's screws go in its webs (see core_web_x)."""
+    zt_r, zt_f = zo - 28, zo - 16
+    xsf = max(saddles)
+    zs = [SAD_Z] + ([cap_z] if cap_z else [])
+    off = sum(web_x(0.0, SIDE_W, zt_r, P_REAR, z) for z in zs) / len(zs)
+    x2 = xsf - off
+    rear = [x2 + (k - (N_REAR - 1)) * P_REAR for k in range(N_REAR)]
     front = _row(FRONT0, breech_x0 - 6, N_FRONT, 18.0)
-    return dict(rear=rear, front=front, w_front=18.0, zt_rear=zo - 28, zt_front=zo - 16,
-                pitch=rear[1] - rear[0] if len(rear) > 1 else 0.0)
+    return dict(rear=rear, front=front, w_front=18.0, zt_rear=zt_r, zt_front=zt_f,
+                pitch=P_REAR, pitch_front=front[1] - front[0])
+
+
+def core_web_x(lay, k, z):
+    """x of the web ahead of front chevron k at height z (a gun-core screw point)."""
+    return web_x(lay["front"][k], lay["w_front"], lay["zt_front"], lay["pitch_front"], z)
 
 
 def saddle_screws(saddles, lay):
-    """Two screw points per saddle on the web centre line between rear chevrons (+-z)."""
-    zt, g = lay["zt_rear"], lay["pitch"] - SIDE_TH
-    out = []
-    for xs in saddles:
-        best = None
-        for xk in lay["rear"]:
-            u = xs - xk - SIDE_TH - g / 2                       # how far the web centre must sweep back at this z
-            z = zt * (1 - u / SIDE_W)
-            if 12 <= z <= zt - 10 and (best is None or abs(z - 0.5 * zt) < abs(best - 0.5 * zt)):
-                best = z
-        z = best if best is not None else 0.5 * zt
-        out += [(xs, z), (xs, -z)]
-    return out
+    """Two screw points per saddle (+-SAD_Z)."""
+    return [(xs, sg * SAD_Z) for xs in saddles for sg in (1, -1)]
 
 
 def rear_edge_x(x0, zo, z):
@@ -101,7 +109,7 @@ def rear_edge_x(x0, zo, z):
     return x0 + 10 - 50 * abs(z) / (zo - 6)
 
 
-def plate_2d(t, x0, x1, zo, saddles, breech_x0, rail, keep_pts, standoffs, r_boss_keep=46.0):
+def plate_2d(t, x0, x1, zo, saddles, breech_x0, rail, keep_pts, standoffs, r_boss_keep=46.0, cap_z=None):
     """The plate as a thin solid in XY. keep_pts: [(x, z, r)] extra solid pads; standoffs: [(x, z)] ring pads."""
     zb = zo + 6.0                                                   # turret boss radius
     outline = _union([
@@ -109,7 +117,7 @@ def plate_2d(t, x0, x1, zo, saddles, breech_x0, rail, keep_pts, standoffs, r_bos
                (x1 + 10, zo - 40), (x1 - 40, zo)], t),
         _circle(0, 0, zb, t)])
     # pockets (Micah: "just 1 set in the ring. increase the ones on the sides")
-    lay = layout(x0, zo, saddles, breech_x0)
+    lay = layout(x0, zo, saddles, breech_x0, cap_z=cap_z)
     pk = [chevron(x, SIDE_W, lay["zt_rear"], SIDE_TH, t) for x in lay["rear"]]
     pk += [chevron(x, lay["w_front"], lay["zt_front"], SIDE_TH, t) for x in lay["front"]]
     for a in (50, 120, 240, 310):                                  # the wheel: an X of chevrons between the ring standoffs
