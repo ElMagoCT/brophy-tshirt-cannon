@@ -72,6 +72,13 @@ ACCENT_T = 8.5                                               # wall of the smoke
 SMOKE_Y = 22.0                                               # smoke line: in the valley between the barrels, z = 0
 FILL_LANES = (-59.0, -67.0)                                  # fill lines (top, bottom cannon): y beside the couplings
 FILL_DOWN = ((-20.0, -59.0), (-30.0, -67.0))                 # (x, y) where each fill line drops out of the core
+# Pivot hubs (Micah, 2026-11-10: "clean up the cannon hub"; "the pulley should screw to the aluminum side plate instead
+# of going through the axle"): a 72 mm boss on each cradle plate's outer face that fills the gap to the inner pivot
+# bearing (a lip bears on its inner race, so the gun can't slide sideways); the right one is the 112T pulley. 4 x M4 x 30
+# from the outer face (counterbored) through the plate into nylocs inside, at angles that clear the fill and smoke lines
+# and the valve side blocks inside the plates (checked against the pass-2 gun)
+HUB_R, HUB_BOLT_R, HUB_GRIP = 36.0, 28.0, 20.0                # boss radius, bolt circle, printed length under each head
+HUB_BOLTS = tuple((HUB_BOLT_R * math.cos(math.radians(a)), HUB_BOLT_R * math.sin(math.radians(a))) for a in (30, 120, 195, 300))
 SMOKE_DOWN = (-8.0, 63.0)                                    # ... and the smoke line, on the other side
 
 
@@ -188,8 +195,8 @@ def _build(xv):
         pts = [(x0, -zo), (x1 - 20, -zo), (x1, -zo + 20), (x1, zo - 20), (x1 - 20, zo), (x0, zo)]
         pl = cq.Workplane("XZ", origin=(0, y0, 0)).polyline(pts).close().extrude(-P.PLATE_T).val()
         pl = pl.cut(hex_prism(12.9, 20, (0, y0 - 5, 0), (0, 1, 0)))
-        for a in range(6):
-            pl = pl.cut(cyl(1.7, 10, (11.5 * math.cos(a * math.pi / 3), y0 - 2, 11.5 * math.sin(a * math.pi / 3)), (0, 1, 0)))
+        for (hx, hz) in HUB_BOLTS:                           # the hub (left) / pulley hub (right) bolts through here
+            pl = pl.cut(cyl(2.25, 10, (hx, y0 - 2, hz), (0, 1, 0)))
         for (x, z) in ((x0 + 15, zo - 15), (x0 + 15, -zo + 15), (x1 - 25, zo - 30), (x1 - 25, -zo + 30),
                        (xv - 40, zo - 12), (xv - 40, -zo + 12)):
             pl = pl.cut(cyl(3.3, 10, (x, y0 - 2, z), (0, 1, 0)))
@@ -283,12 +290,34 @@ def _build(xv):
     for sy, tag, y_lo, y_hi in ((1, "left", CRADLE_Y0, ya + 12.0), (-1, "right", -ya, -CRADLE_Y0)):
         gadd(f"Pivot axle stub {tag} (1/2 hex)", hex_prism(12.7, y_hi - y_lo, (0, y_lo, 0), (0, 1, 0)), "steel",
              bom="1/2 in hex shaft, steel (pivot stub)", kind="stock", note=f"{(y_hi - y_lo) / IN:.1f} in, 1/4-20 tapped end")
-        y_h = sy * (CRADLE_Y0 + P.PLATE_T)
-        hub = cyl(16.0, 10.0, (0, y_h, 0), (0, sy, 0)).cut(hex_prism(12.9, 14.0, (0, y_h - sy, 0), (0, sy, 0)))
-        gadd(f"Axle hub {tag}", hub, "print_d", bom="Axle hub", kind="print", note="PETG, 5 walls, 40% gyroid; 6 x M3 to the cradle plate")
-    pul = elevation_pulley().translate(V(0, -P.ELEV_PULLEY_Y[1], 0))
-    gadd(f"Elevation pulley {P.ELEV_T[1]}T", pul, "print_d", bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm", kind="print",
-         note="hex bore")
+    # hubs: boss on the plate's outer face out to just short of the inner bearing, a lip on its inner race
+    yp = CRADLE_Y0 + P.PLATE_T                                   # plate outer face
+    yb = P.BEARING_BLOCK_Y[0]                                    # inner bearing face (flange counterbored flush)
+    for sy, tag in ((1, "left"), (-1, "right")):
+        def seg(r, a, b):                                        # cylinder from |y| = a to |y| = b on this side
+            return cyl(r, b - a, (0, sy * a, 0), (0, sy, 0))
+        if sy > 0:
+            hub = seg(HUB_R, yp, yb - 1.5)
+        else:                                                    # right: boss, then the 112T pulley in the belt plane
+            hub = seg(HUB_R, yp, P.ELEV_PULLEY_Y[0]).fuse(elevation_pulley().translate(V(0, -P.ELEV_PULLEY_Y[1], 0)))
+        hub = hub.fuse(seg(9.5, yb - 2.0, yb - 0.3))               # inner-race lip: locates the gun between the bearings
+        y_end = yb - 1.5 if sy > 0 else P.ELEV_PULLEY_Y[1]       # outer face (the pulley's outer flange on the right)
+        hub = hub.cut(seg(7.85, yp - 1, yb + 1))                 # the hex stub passes through (round bore)
+        if sy > 0:
+            hub = hub.cut(hex_prism(12.9, yb - yp + 2, (0, yp - 1, 0), (0, 1, 0)))   # left: keyed, it carries the pot
+        for (hx, hz) in HUB_BOLTS:
+            hub = hub.cut(cyl(2.25, y_end - yp + 2, (hx, sy * (yp - 1), hz), (0, sy, 0)))
+            hub = hub.cut(cyl(4.6, y_end - yp - HUB_GRIP + 1, (hx, sy * (yp + HUB_GRIP), hz), (0, sy, 0)))   # head pocket
+        if sy > 0:
+            gadd("Axle hub left", hub.clean(), "print_d", bom="Axle hub", kind="print",
+                 note="PETG, 5 walls, 40% gyroid; hex bore on the pivot stub; 4 x M4 x 30 from its outer face (counterbored) "
+                      "through the cradle plate into nylocs; its lip bears on the inner bearing's inner race")
+        else:
+            gadd(f"Elevation pulley {P.ELEV_T[1]}T (pulley hub)", hub.clean(), "print_d",
+                 bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm (pulley hub)", kind="print",
+                 note="PETG, 5 walls, 40% gyroid; bolts to the right cradle plate (4 x M4 x 30, counterbored, nylocs "
+                      "inside), not to the axle: the hex stub passes through a round bore; its lip bears on the inner "
+                      "bearing's inner race")
     # every tube runs inside the core and drops out of its bottom just behind the pivot: each fill line from its
     # chamber's inlet elbow back between the chambers, then out beside the bottom one; the smoke line from the collar
     # back along the barrels' valley, through the mantlet and breech block, between the valves
@@ -379,5 +408,4 @@ def elevation_pulley():
     t, w, fl = P.ELEV_T[1], 9.0, 2.0
     pd = P.pd(t)
     s = cyl(pd / 2 - 0.57, w, (0, fl, 0), (0, 1, 0))
-    s = s.fuse(cyl(pd / 2 + 2.5, fl, (0, 0, 0), (0, 1, 0))).fuse(cyl(pd / 2 + 2.5, fl, (0, fl + w, 0), (0, 1, 0)))
-    return s.cut(hex_prism(12.8, w + 2 * fl + 2, (0, -1, 0), (0, 1, 0)))
+    return s.fuse(cyl(pd / 2 + 2.5, fl, (0, 0, 0), (0, 1, 0))).fuse(cyl(pd / 2 + 2.5, fl, (0, fl + w, 0), (0, 1, 0)))

@@ -25,6 +25,18 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-10 - Micah's Windows computer (Claude Code) - Pivot hubs, origin fastens, Kenzo's parts list
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B14 amended, B15, B16):
+  - **Pivot hubs:** a 72 mm printed boss on each cradle plate out to the inner pivot bearing, with a lip on its inner race (locates the gun sideways). The right one is the 112T pulley, bolted to the plate (4 x M4 x 30 + nylocs) with a round bore, so the pulley no longer drives through the axle. The plates' M3 hub holes became the 4 M4 holes.
+  - **Onshape:** the 8 static sub-assemblies are fastened to the origin again (a lock alone let the chassis rotate when the pivot solved); the gun stays on its one revolute with the Gun min / max angle limits. Gun part studio replaced from the new STEP (old one kept as "Gun (pivots) (old)"), Gun sub-assembly 44 parts + its 2 rails, rigid group 46/46, all 10 top-level features OK. Version "Pivot hubs: pulley bolted to the plate (2026-11-10)".
+  - **Parts list:** Kenzo's "Cheaper Parts" tab reviewed (notes on each row of his tab); the good swaps applied, everything on Amazon or AliExpress except the Home Depot 1x6s; M4 nylocs added for the hubs.
+- Files: `cad/glacis/gun.py`, `cad/glacis/out/` (checks, renders, parts csv), `bom/glacis_bom.py` (+ csv/json), `docs/glacis/JUDGMENTS.md`
+- Checks: robot.py (47 min): interference 1 pair over 30 mm3 (the 64 mm3 fill elbow sliver from rev D.2), elevation sweep 0-90 deg 0 clashes, every print fits the bed, 0 multi-piece parts, 49 frame pieces, 57 tenons, speaker cups 8/8, front rail screws 4/4, in-well rail screws 10/10; gun 19.0 kg, CG on the axle.
+- Parts list: pre-tax $1,480.86 (Order 1 $1,039.12, Order 2 $441.74), was $1,505.06 before today's hub nylocs and swaps. Sheet Order tabs match.
+- Not done: the new Gun part studio isn't in the "System part studios" folder yet, and the old one and its STEP are still in the document (deleting needs Micah's OK).
+- Questions for Micah: delete "Gun (pivots) (old)" and its STEP?
+
 ## 2026-11-10 - Micah's Windows computer (Claude Code) - Onshape gun mate: variable limits, 0-90 deg
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B14): elevation range 0-90 deg (was 0-85; the pass-2 build clears to 95). Onshape top assembly: one "Gun pivot" revolute whose limits are the configuration variables "Gun min angle" / "Gun max angle" (0-90, + = barrels up); the 8 fastens and the angle-lock mate are deleted and the 8 non-gun sub-assemblies are locked; the gun's 20x20 rails now live in the Gun sub-assembly; the Gun instance was replaced (the old one was stuck off its pivot).

@@ -1154,12 +1154,40 @@ B14. **Elevation 0-90 deg; Onshape gun mate = one revolute with variable limits*
     or flex with it (service and fog loops). Next build re-cuts the well floor for 90 and its sweep checks 0-90.
     Onshape: configuration = two variables, "Gun min angle" (default 0) and "Gun max angle" (default 90), 0-90 deg;
     the "Gun pivot" revolute's limits are #Gun_min / #Gun_max (+ = barrels up: both Pivot connectors were turned 180
-    deg about X, which flips the sense without moving anything). The 8 fasten-to-origin mates and the angle-lock mate
-    are gone; the 8 non-gun sub-assemblies are locked in place instead. The gun's two 20x20 rails moved from the
+    deg about X, which flips the sense without moving anything). The angle-lock mate is gone. (The 8 fasten-to-origin
+    mates went too at first, with the sub-assemblies only locked, but a lock didn't hold the chassis against the pivot
+    solve, so Micah asked for the static parts to be fixed to the origin: the 8 fastens are back.) The gun's two
+    20x20 rails moved from the
     Add-on rails sub-assembly into the Gun sub-assembly so they swing with it. The old Gun instance carried a stale
     stored pose (60 deg and 487 mm sideways, off its pivot) that no solve cleared, so it was replaced with a fresh
     instance. Onshape doesn't re-pose the gun when the variables change; drag it, or set both to one angle and
     use the mate's "Apply limit position".
+B15. **Pivot hubs; the pulley bolts to the plate** (Micah, same day: "try to clean up the cannon hub, it needs some work.
+    also the pulley should screw to the aluminum side plate instead of going through the axle"). Before: a 10 mm
+    printed puck on each cradle plate keyed the 1/2 hex stub, the 112T pulley hung on the right stub's hex 18 mm out
+    from the plate, and about 32 mm of bare hex crossed to each bearing block, with nothing locating the gun between
+    the bearings. Now each side has a 72 mm printed boss on the plate's outer face that runs out to 1.5 mm short of the
+    inner pivot bearing, with a 19 mm lip that bears on that bearing's inner race (0.3 mm float), so the hubs also
+    locate the gun sideways. Right: the boss and the 112T HTD pulley are one print ("Elevation pulley 112T (pulley
+    hub)"), with the belt plane unchanged (y -97 to -106) and a round 15.7 mm bore, so the stub only passes through;
+    torque goes pulley -> plate. Left: "Axle hub left", hex bore (it keys the stub that turns the pot). Each takes 4 x
+    M4 x 30 from its outer face (counterbored so 20 mm of print is under the head) through the plate into nylocs
+    inside; the 4 bolts sit on a 28 mm circle at 30 / 120 / 195 / 300 deg, the angles that clear the fill and smoke
+    lines and the valve side blocks inside both plates (checked against the gun). The plates' 6 x M3 hub holes became
+    the 4 x 4.5 mm bolt holes. Checks (full build): interference 1 pair (the old 64 mm3 fill elbow sliver), sweep 0-90
+    deg 0 clashes, every print fits the bed (the pulley hub is 183 mm across), gun 19.0 kg balanced on the axle.
+B16. **Parts list: Kenzo's cheaper list, Amazon or AliExpress only** (Kenzo's "Cheaper Parts" tab, reviewed with every
+    Amazon page re-read; Micah: "do the good ones ... amazon or ali are the ideal for everything. try hard not to have
+    anything else"). Taken: brass close nipples (250 psi), the F x F elbow at $6.39, 2-pc street elbows, a stainless
+    plug 10-pack, Litoexpe bushings (1200 psi), Boeray 35 ft DOT tube (500 psi), step bungs (24.8 mm collar; drill to
+    it), cheaper continuous-duty contactors, a Diann blower 2-pack, $20.99 fog fluid (FogUp rose to $23.95), a MOSFET
+    6-pack, iSANMATE PETG. His QD split is in with the plugs corrected to FEMALE thread (his were male, which don't go
+    on the nipples). Off McMaster/Zoro: Loner ST25-1A ASME 200 psi relief 2-packs (pull ring), Grainger-approved 1 in
+    Sch 80 close nipples (seamless A106, 300 psi; bore 24.3 vs 26.6 mm, about the HSV04's own orifice; the only Sch 40
+    ones on Amazon are 150 psi decorative pipe), Amazon M4 nylocs; the McMaster shipping row is gone. Not taken: his
+    M x F check valve (unrated, wrong gender), the ESP32-P4-WIFI6 (no USB-A, RJ45 or speaker amp), his canvas (no
+    white), and his Amazon copies of AliExpress rows. The 1x6 bumper boards stay Home Depot (Amazon lumber is ~5x).
+    Pre-tax $1,480.86 (Order 1 $1,039.12, Order 2 $441.74, no shipping rows), from $1,516.05.
 D14 (Borealis). **Money:** $2,002.43 before the review -> $1,777.71, then $1,600.79 after Micah's Sheet changes
     (welded chambers, the M-style QD kit, M4 hardware, cheaper transducers and boost; Order 1 $1,082.69 + $10 shipping,
     Order 2 $508.10), then $1,584.06 with the GOGO in valves (Order 1 $1,065.96 + $10). The MSI vs Supply Giant coupling
