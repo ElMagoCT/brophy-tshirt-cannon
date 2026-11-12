@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-12 - Micah's Windows computer (Claude Code) - Bigger angled smoke holes, baffles in the smoke collar
+- Branch / commit: micah-windows/borealis (PR #2)
+- Changed: barrel smoke holes are 3/8 in (were 5 mm), still 3 per barrel facing the other barrel, now leaning 40 deg toward the muzzle so the shot's air streams past them; the smoke collar is 42 mm long with the line's socket, then a chamber with two cone baffles (forward-pointing lips: smoke passes, blast air coming back is caught in the pockets), then one 7 mm channel per hole.
+- Files: cad/glacis/gun.py
+- Checks: gun-only rebuild (smoke_test): 0 clashes over 30 mm3, 0 sweep clashes 0-90, no multi-piece parts, collar 42 x 94 x 196 mm; gun 18.9 kg, balanced. Full robot.py not re-run.
+- Parts list: no change
+- Not done: Onshape re-import of the gun tab
+- Questions for Micah: breech adapter (he has no aluminium stock, 2.5D only)
+
 ## 2026-11-12 - Micah's Windows computer (Claude Code) - CAD matches the list, Sheet notes, LED wiring, centred 3/4 in smoke line, visuals
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B23, B24):

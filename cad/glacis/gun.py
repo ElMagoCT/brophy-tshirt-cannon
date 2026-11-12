@@ -75,6 +75,10 @@ SMOKE_SQ = (15.0, 10.0)                                      # the 1 in OD line 
                                                              # the barrels (25 mm apart): half-axes, same perimeter
 SMOKE_HOLE_DEG = (0.0, 35.0, -35.0)                          # each barrel's 3 smoke holes, from the side facing the other
                                                              # barrel (the collar's channels line up with them)
+SMOKE_HOLE_D = 9.5                                           # 3/8 in (Micah 2026-11-12: "bigger"); 6 of them ~ the line's bore
+SMOKE_TILT = 40.0                                            # holes lean this far from radial toward the muzzle, so the shot's
+                                                             # air streams past them instead of ramming into them
+SMOKE_HOLE_LEAD = 10.5                                       # hole centres sit this far ahead of the collar's centre
 FILL_LANES = (-59.0, -67.0)                                  # fill lines (top, bottom cannon): y beside the couplings
 FILL_DOWN = ((-20.0, -59.0), (-30.0, -67.0))                 # (x, y) where each fill line drops out of the core
 # Pivot hubs (Micah, 2026-11-10: "clean up the cannon hub"; "the pulley should screw to the aluminum side plate instead
@@ -146,11 +150,12 @@ def _cannon(k, xf):
     b0 = ax0 + AD_BODY + AD_SHOULDER
     bar = tube(P.BARREL_OD / 2, P.BARREL_OD / 2 - P.BARREL_WALL, P.BARREL_LEN, (b0, 0, h), (1, 0, 0))
     xh = b0 + SMOKE_HOLE_X
-    for u in _smoke_dirs(h):                                 # 3 smoke holes facing the other barrel, just ahead of the shirt
-        bar = bar.cut(cyl(2.5, P.BARREL_OD, (xh, 0, h), u))
+    for pb, d in _smoke_holes(xh, h):                        # 3 smoke holes facing the other barrel, just ahead of the shirt
+        bar = bar.cut(cyl(SMOKE_HOLE_D / 2, P.BARREL_WALL + 8.0, (pb - d * 3.0).toTuple(), d.toTuple()))
     gadd(f"Barrel {tag}", bar, "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock",
-         note=f"{P.BARREL_LEN / IN:.1f} in; 3 x 5 mm smoke holes {SMOKE_HOLE_X:.0f} mm from the breech end, on the side "
-              "facing the other barrel (straight at it and 35 deg either side), drilled through the collar's channels")
+         note=f"{P.BARREL_LEN / IN:.1f} in; 3 x 3/8 in smoke holes {SMOKE_HOLE_X + SMOKE_HOLE_LEAD:.0f} mm from the breech "
+              f"end, on the side facing the other barrel (straight at it and 35 deg either side), each leaning "
+              f"{SMOKE_TILT:.0f} deg toward the muzzle (start square with a step bit, then tilt it)")
     # Brophy Borealis welded chamber (Micah, 2026-11-10): half of a 1 x 4 in nipple (its threaded end into the valve)
     # welded through a 3/8 in A36 front disc (1.33 in hole), flush with the disc's inner face; 3 in Sch 40 plain-end
     # pipe between the two 3.5 in discs; the back disc is blank. The 1/4 NPT weld bung sits 1 in behind the front disc
@@ -333,7 +338,7 @@ def _build(xv):
     # between the barrels, across in front of the valves, along the side and out the bottom behind the pivot
     xc = b0s[0] + SMOKE_HOLE_X
     xd_, yd_ = SMOKE_DOWN
-    smoke_pts = [V(xc - 7.5, SMOKE_Y, 0), V(xv - 40.0, SMOKE_Y, 0), V(xv - 40.0, yd_, 0), V(xd_, yd_, 0),
+    smoke_pts = [V(xc - 10.5, SMOKE_Y, 0), V(xv - 40.0, SMOKE_Y, 0), V(xv - 40.0, yd_, 0), V(xd_, yd_, 0),
                  V(xd_, yd_, -(zo + 4.0))]
     smoke_cut = _smoke_line(smoke_pts, grow=0.6, hollow=False)
     bz = P.PITCH / 2 + P.BARREL_OD / 2 + 14.0               # +14: room for the clamp screws over / under the barrels
@@ -376,19 +381,31 @@ def _build(xv):
                   "strip in the mantlet groove")
     # smoke collar (Micah 2026-11-11: "cleaned up ... specific holes that match the ones in the polycarb"): the
     # squished line plugs into an oblong socket at the back, between the barrels, into a small plenum; from it one
-    # 5 mm channel runs to each of the 3 holes in each barrel (no ring grooves)
+    # channel runs to each of the 3 holes in each barrel (no ring grooves)
+    # 2026-11-12 (Micah: bigger holes angled to the muzzle, "silencer type air barbs on the inside"): socket -> a
+    # chamber with two cone baffles (smoke goes through their forward-pointing lips easily; blast air coming back hits
+    # the plates and swirls in the pockets round the lips) -> one 7 mm channel per hole, leaning to the muzzle
+    X_, Y_ = V(1, 0, 0), V(0, 1, 0)
     Wa, Ha = 2 * (rb + ACCENT_T), P.PITCH + 2 * (rb + ACCENT_T)
-    col = _rounded_prism(xc - 16, 32.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
-    col = col.cut(_oval(V(xc - 17.0, 0, 0), V(1, 0, 0), V(0, 1, 0), SMOKE_SQ[0] + 0.6, SMOKE_SQ[1] + 0.6, 11.0))
-    col = col.cut(_oval(V(xc - 6.5, 0, 0), V(1, 0, 0), V(0, 1, 0), SMOKE_SQ[0] - 3.0, SMOKE_SQ[1] - 2.5, 12.5))
+    col = _rounded_prism(xc - 20.0, 42.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
+    col = col.cut(_oval(V(xc - 21.0, 0, 0), X_, Y_, SMOKE_SQ[0] + 0.6, SMOKE_SQ[1] + 0.6, 11.0))   # line's socket
+    col = col.cut(_oval(V(xc - 10.5, 0, 0), X_, Y_, 16.0, 10.0, 16.5))                            # baffle chamber
+    for xb in (xc - 7.5, xc - 2.0):                                                                 # the two baffles
+        plate = _oval(V(xb, 0, 0), X_, Y_, 16.5, 10.5, 1.6).cut(_oval(V(xb - 1, 0, 0), X_, Y_, 10.0, 6.0, 4.0))
+        lip = _oval(V(xb + 1.6, 0, 0), X_, Y_, 11.6, 7.6, 2.5).cut(_oval(V(xb, 0, 0), X_, Y_, 10.0, 6.0, 5.0))
+        col = col.fuse(plate, lip).clean()
+    F = V(xc + 4.5, 0, 0)                                    # channels leave the chamber's front pocket
     for h in H:
-        for u in _smoke_dirs(h):
-            hp = V(0, rb * u[1], h + rb * u[2])
-            col = col.cut(cyl(2.5, hp.Length + 1.0, (xc, 0, 0), hp.normalized().toTuple()))
-        col = col.cut(cyl(rb + 0.3, 40, (xc - 20, 0, h), (1, 0, 0)))
+        for pb, d in _smoke_holes(xc, h):
+            E = pb + d * (P.BARREL_WALL + 3.0)
+            col = col.cut(cyl(SMOKE_HOLE_D / 2, P.BARREL_WALL + 6.0, (pb - d * 3.0).toTuple(), d.toTuple()))
+            col = col.cut(cyl(3.5, (F - E).Length, E.toTuple(), (F - E).normalized().toTuple()))
+            col = col.cut(cq.Solid.makeSphere(3.5, E)).cut(cq.Solid.makeSphere(3.5, F))
+        col = col.cut(cyl(rb + 0.3, 50, (xc - 25, 0, h), (1, 0, 0)))
     gadd("Smoke collar", col.clean(), "print", bom="Smoke collar (printed, one piece)", kind="print",
-         note="slides on from the muzzle until its 6 channels line up with the barrels' smoke holes; a bead of RTV round "
-              "each barrel seals it; the squished 3/4 in line pushes into the oblong socket at the back")
+         note="slides on from the muzzle until its 6 angled holes line up with the barrels' smoke holes; a bead of RTV round each barrel at both ends seals it; "
+              "the squished 3/4 in line pushes into the oblong socket at the back; two cone baffles inside stop "
+              "blast air running back up the line")
     xe = b0s[0] + P.BARREL_LEN
     mz = _rounded_prism(xe - 25.0, 25.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
     for h in H:
@@ -509,6 +526,17 @@ def _smoke_dirs(h):
     """Unit (0, y, z) directions of one barrel's smoke holes: toward the other barrel and 35 deg either side."""
     sz = -1.0 if h > 0 else 1.0
     return [(0.0, math.sin(math.radians(a)), sz * math.cos(math.radians(a))) for a in SMOKE_HOLE_DEG]
+
+
+def _smoke_holes(x, h):
+    """One barrel's smoke holes for a collar centred at x: (point on the bore, unit axis pointing out of the barrel).
+    The axis leans SMOKE_TILT back from radial, so the hole runs inward toward the muzzle."""
+    r_in, t = P.BARREL_OD / 2 - P.BARREL_WALL, math.radians(SMOKE_TILT)
+    out = []
+    for u in _smoke_dirs(h):
+        rad = V(0, u[1], u[2])
+        out.append((V(x + SMOKE_HOLE_LEAD, 0, h) + rad * r_in, (rad * math.cos(t) - V(1, 0, 0) * math.sin(t)).normalized()))
+    return out
 
 
 def _oval(p0, d, wide, a, b, L):
