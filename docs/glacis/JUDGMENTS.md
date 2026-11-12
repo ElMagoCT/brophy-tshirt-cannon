@@ -1204,6 +1204,17 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B26. **Smooth smoke channels, LED bands open all round** (Micah, 2026-11-12: "the tube geometry is not very smooth
+    ... scrap the air barb system and just try to make the angle smoother and a little longer. the part is thick
+    enough"; the mantlet's LED groove "is some weird artifact ... make it exposed all the way around"; "add a spot
+    for a strip like it on the fog and end pieces"; "a 5.5mm groove so i can put COB strips we already have").
+    - **Smoke collar:** baffles gone. 60 mm long: the line's socket, a short plenum (the line's bore), then six
+      swept 3/8 in channels, each leaving the plenum heading forward and curving out, tangent all the way, into
+      its hole. The holes now lean 45 deg toward the muzzle and sit 22 mm ahead of the collar's centre. Checked:
+      no channel breaks out of the collar; each only grazes its barrel's outside beside its hole (~8 mm3, air).
+    - **LED bands:** one helper cuts a 5.5 x 2.5 mm groove from the part's own section, so it is open all the way
+      round: the mantlet (was a fixed rounded rectangle that missed the loft, leaving a partial slot), the smoke
+      collar (new) and the muzzle ring. COB strips Micah already has; no parts-list change.
 B25. **Angled smoke holes, collar baffles, breech pucks** (Micah, 2026-11-12: "make them bigger and angle them
     towards the open end ... put silencer type air barbs on the inside"; "i don't have any aluminum stock. i can only
     machine in 2.5D ... an aluminum plug with a flange that's jbwelded in"; "the whole tube assembly should be able to

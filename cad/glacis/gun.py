@@ -79,9 +79,10 @@ SMOKE_SQ = (15.0, 10.0)                                      # the 1 in OD line 
 SMOKE_HOLE_DEG = (0.0, 35.0, -35.0)                          # each barrel's 3 smoke holes, from the side facing the other
                                                              # barrel (the collar's channels line up with them)
 SMOKE_HOLE_D = 9.5                                           # 3/8 in (Micah 2026-11-12: "bigger"); 6 of them ~ the line's bore
-SMOKE_TILT = 40.0                                            # holes lean this far from radial toward the muzzle, so the shot's
+COLLAR_L = 60.0                                              # smoke collar length (long, gentle channels)
+SMOKE_TILT = 45.0                                          # holes lean this far from radial toward the muzzle, so the shot's
                                                              # air streams past them instead of ramming into them
-SMOKE_HOLE_LEAD = 10.5                                       # hole centres sit this far ahead of the collar's centre
+SMOKE_HOLE_LEAD = 22.0                                      # hole centres sit this far ahead of the collar's centre
 FILL_LANES = (-59.0, -67.0)                                  # fill lines (top, bottom cannon): y beside the couplings
 FILL_DOWN = ((-20.0, -59.0), (-30.0, -67.0))                 # (x, y) where each fill line drops out of the core
 # Pivot hubs (Micah, 2026-11-10: "clean up the cannon hub"; "the pulley should screw to the aluminum side plate instead
@@ -119,6 +120,23 @@ def _groove(xg, W, H, r, w=6.0, d=2.5):
     """Band round a rounded-rectangle part's outside: a 5 mm LED strip groove w wide and d deep at x = xg."""
     return _rounded_prism(xg - w / 2, w, W + 4, H + 4, r + 2).cut(
         _rounded_prism(xg - w / 2 - 1, w + 2, W - 2 * d, H - 2 * d, r - d))
+
+
+LED_GROOVE = (5.5, 2.5)                                      # COB strips Micah has (2026-11-12): width, depth
+
+
+def _band_groove(part, xg, w=LED_GROOVE[0], d=LED_GROOVE[1]):
+    """Cutter for an LED strip band round `part` at x = xg: everything outside the part's own section there, offset
+    in by d, over width w (so it is open all the way round whatever the part's shape)."""
+    sl = part.intersect(box(xg - w / 2, xg + w / 2, -1e3, 1e3, -1e3, 1e3))
+    f0 = min((f for f in sl.Faces() if abs(f.normalAt().x) > 0.99), key=lambda f: f.Center().x)
+    fo = cq.Face.makeFromWires(f0.outerWire())
+    b = fo.BoundingBox()
+    sy, sz = (b.ylen - 2 * d) / b.ylen, (b.zlen - 2 * d) / b.zlen     # shrink the section by d each side
+    cy, cz = b.center.y, b.center.z
+    fi = fo.transformGeometry(cq.Matrix([[1, 0, 0, 0], [0, sy, 0, cy * (1 - sy)], [0, 0, sz, cz * (1 - sz)]]))
+    inner = cq.Solid.extrudeLinear(fi, cq.Vector(w + 2, 0, 0))
+    return box(xg - w / 2, xg + w / 2, -1e3, 1e3, -1e3, 1e3).cut(inner.translate(V(-1, 0, 0)))
 
 
 def adapter():
@@ -366,7 +384,7 @@ def _build(xv):
     for h in H:
         man = man.cut(cyl(rb + 1.0, 80, (mz0 - 5, 0, h), (1, 0, 0)))
     man = man.cut(smoke_cut)
-    man = man.cut(_groove(mz0 + 14.0, (W0 + secs[1][1]) / 2, (H0 + secs[1][2]) / 2, 23.0))
+    man = man.cut(_band_groove(man, mz0 + 14.0))             # from the loft's real section: exposed all round
     core = inserts(core.fuse(man), core_holes)
     zcl = P.PITCH / 2 + rb + 7.0                              # clamp screws over the top barrel and under the bottom one
     for xcl in (bx0 + 12.0, bx0 + 40.0):                      # (the smoke line has the middle), heads in the right half
@@ -381,42 +399,47 @@ def _build(xv):
              note="PETG, 5 walls, 40% gyroid, printed outer face down; the two halves close round both valves and both "
                   "barrels: each barrel (puck JB Welded in) slides in from the front and screws onto its valve nipple; "
                   "4 x M4 x 12 across the split, over and under the barrels (heads in the right half, inserts in the left) "
-                  "close the halves round them, then 6 x M4 x 8 through each cradle plate into M4 inserts; a 5 mm LED "
+                  "close the halves round them, then 6 x M4 x 8 through each cradle plate into M4 inserts; a 5.5 mm COB LED "
                   "strip in the mantlet groove")
     # smoke collar (Micah 2026-11-11: "cleaned up ... specific holes that match the ones in the polycarb"): the
     # squished line plugs into an oblong socket at the back, between the barrels, into a small plenum; from it one
     # channel runs to each of the 3 holes in each barrel (no ring grooves)
-    # 2026-11-12 (Micah: bigger holes angled to the muzzle, "silencer type air barbs on the inside"): socket -> a
-    # chamber with two cone baffles (smoke goes through their forward-pointing lips easily; blast air coming back hits
-    # the plates and swirls in the pockets round the lips) -> one 7 mm channel per hole, leaning to the muzzle
+    # 2026-11-12 v2 (Micah: "scrap the air barb system and just try to make the angle smoother and a little longer";
+    # no random geometry in the outlets): socket -> a short plenum -> one smooth swept 3/8 in channel per hole that
+    # leaves the plenum heading forward and curves out into the hole's own 45 deg lean (tangent all the way)
     X_, Y_ = V(1, 0, 0), V(0, 1, 0)
     Wa, Ha = 2 * (rb + ACCENT_T), P.PITCH + 2 * (rb + ACCENT_T)
-    col = _rounded_prism(xc - 20.0, 42.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
+    col = _rounded_prism(xc - 20.0, COLLAR_L, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
     col = col.cut(_oval(V(xc - 21.0, 0, 0), X_, Y_, SMOKE_SQ[0] + 0.6, SMOKE_SQ[1] + 0.6, 11.0))   # line's socket
-    col = col.cut(_oval(V(xc - 10.5, 0, 0), X_, Y_, 16.0, 10.0, 16.5))                            # baffle chamber
-    for xb in (xc - 7.5, xc - 2.0):                                                                 # the two baffles
-        plate = _oval(V(xb, 0, 0), X_, Y_, 16.5, 10.5, 1.6).cut(_oval(V(xb - 1, 0, 0), X_, Y_, 10.0, 6.0, 4.0))
-        lip = _oval(V(xb + 1.6, 0, 0), X_, Y_, 11.6, 7.6, 2.5).cut(_oval(V(xb, 0, 0), X_, Y_, 10.0, 6.0, 5.0))
-        col = col.fuse(plate, lip).clean()
-    F = V(xc + 4.5, 0, 0)                                    # channels leave the chamber's front pocket
+    col = col.cut(_oval(V(xc - 10.5, 0, 0), X_, Y_, SMOKE_SQ[0] - 3.0, SMOKE_SQ[1] - 3.0, 9.0))   # plenum (the line's bore)
+    global SMOKE_CHANNELS
+    SMOKE_CHANNELS = []
     for h in H:
         for pb, d in _smoke_holes(xc, h):
-            E = pb + d * (P.BARREL_WALL + 3.0)
-            col = col.cut(cyl(SMOKE_HOLE_D / 2, P.BARREL_WALL + 6.0, (pb - d * 3.0).toTuple(), d.toTuple()))
-            col = col.cut(cyl(3.5, (F - E).Length, E.toTuple(), (F - E).normalized().toTuple()))
-            col = col.cut(cq.Solid.makeSphere(3.5, E)).cut(cq.Solid.makeSphere(3.5, F))
-        col = col.cut(cyl(rb + 0.3, 50, (xc - 25, 0, h), (1, 0, 0)))
+            r_ = SMOKE_HOLE_D / 2
+            S = V(xc - 4.0, max(-6.0, min(6.0, 0.35 * pb.y)), math.copysign(3.0, h))
+            E = pb + d * (P.BARREL_WALL + 4.0)
+            path = cq.Workplane("XY").spline([S.toTuple(), E.toTuple()], tangents=[(1, 0, 0), (-d).toTuple()],
+                                             includeCurrent=False)
+            ch = cq.Workplane(cq.Plane(origin=S.toTuple(), xDir=(0, 1, 0), normal=(1, 0, 0))).circle(r_) \
+                .sweep(path, isFrenet=True).val()
+            ch = ch.fuse(cyl(r_, P.BARREL_WALL + 8.0, (pb - d * 4.0).toTuple(), d.toTuple()),
+                         cyl(r_, 4.0, (S - X_ * 4.0).toTuple(), (1, 0, 0)))
+            SMOKE_CHANNELS.append(ch)
+            col = col.cut(ch)
+        col = col.cut(cyl(rb + 0.3, COLLAR_L + 10, (xc - 25, 0, h), (1, 0, 0)))
+    col = col.cut(_band_groove(col, xc + 6.0))
     gadd("Smoke collar", col.clean(), "print", bom="Smoke collar (printed, one piece)", kind="print",
-         note="slides on from the muzzle until its 6 angled holes line up with the barrels' smoke holes; a bead of RTV round each barrel at both ends seals it; "
-              "the squished 3/4 in line pushes into the oblong socket at the back; two cone baffles inside stop "
-              "blast air running back up the line")
+         note="slides on from the muzzle until its 6 angled holes line up with the barrels' smoke holes; a bead of RTV "
+              "round each barrel at both ends seals it; the squished 3/4 in line pushes into the oblong socket at the "
+              "back; a 5.5 mm COB strip in its groove")
     xe = b0s[0] + P.BARREL_LEN
     mz = _rounded_prism(xe - 25.0, 25.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
     for h in H:
         mz = mz.cut(cyl(rb + 0.2, 30, (xe - 27.0, 0, h), (1, 0, 0)))
-    mz = mz.cut(_groove(xe - 12.5, Wa, Ha, rb + ACCENT_T - 0.5))
+    mz = mz.cut(_band_groove(mz, xe - 12.5))
     gadd("Muzzle ring", mz, "print", bom="Muzzle ring (printed, one piece, LED groove)", kind="print",
-         note="slides on last, flush with the barrel ends; a 5 mm strip in its groove")
+         note="slides on last, flush with the barrel ends; a 5.5 mm COB strip in its groove")
     # pivot: a 1/2 hex stub per side, through a hub on the plate's outer face, flush with its inner face
     ya = P.BEARING_BLOCK_Y[1] + 1.0
     for sy, tag, y_lo, y_hi in ((1, "left", CRADLE_Y0, ya + 12.0), (-1, "right", -ya, -CRADLE_Y0)):

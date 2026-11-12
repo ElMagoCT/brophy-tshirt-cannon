@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-12 - Micah's Windows computer (Claude Code) - Smooth smoke channels (baffles scrapped), 5.5 mm LED bands all round
+- Branch / commit: micah-windows/borealis (PR #2)
+- Changed: smoke collar 60 mm long with six swept 3/8 in channels curving smoothly into holes that now lean 45 deg (baffles removed); LED groove 5.5 x 2.5 mm (his COB strips) cut from each part's real section so it is open all round, on the mantlet (fixes the partial slot), the smoke collar (new) and the muzzle ring. JUDGMENTS B26.
+- Files: cad/glacis/gun.py, bom/glacis_bom.py (barrel note), docs
+- Checks: gun rebuild: 0 clashes, 0 sweep, no multi-piece parts; no channel breaks out of the collar; gun 18.7 kg balanced. Full robot.py not re-run.
+- Parts list: no change ($1,562.42); Sheet barrel note updated
+- Not done: see the Onshape note below once re-imported
+- Questions for Micah: none
+
 ## 2026-11-12 - Micah's Windows computer (Claude Code) - Bigger angled smoke holes, baffles in the smoke collar
 - Branch / commit: micah-windows/borealis (PR #2)
 - Changed: barrel smoke holes are 3/8 in (were 5 mm), still 3 per barrel facing the other barrel, now leaning 40 deg toward the muzzle so the shot's air streams past them; the smoke collar is 42 mm long with the line's socket, then a chamber with two cone baffles (forward-pointing lips: smoke passes, blast air coming back is caught in the pockets), then one 7 mm channel per hole.
