@@ -31,7 +31,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Files: cad/glacis/gun.py, bom/glacis_bom.py (barrel note), docs
 - Checks: gun rebuild: 0 clashes, 0 sweep, no multi-piece parts; no channel breaks out of the collar; gun 18.7 kg balanced. Full robot.py not re-run.
 - Parts list: no change ($1,562.42); Sheet barrel note updated
-- Not done: see the Onshape note below once re-imported
+- Onshape: re-imported (Gun (pivots) 1-3 of 3 in "Gun part studios", 42 parts coded, old tabs + STEPs deleted, all assembly features OK), version "Smooth smoke channels + 5.5 mm LED bands (2026-11-12)"
 - Questions for Micah: none
 
 ## 2026-11-12 - Micah's Windows computer (Claude Code) - Bigger angled smoke holes, baffles in the smoke collar
