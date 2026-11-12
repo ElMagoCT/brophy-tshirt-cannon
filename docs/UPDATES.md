@@ -37,7 +37,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Checks: full robot.py: interference only the old 64 mm3 fill elbow sliver; sweep 0-90 deg 0 clashes; every print on the bed; 0 multi-piece; gun 18.8 kg, balanced.
 - Parts list: $1,566.22 -> $1,532.42 pre-tax (Order 1 $1,058.28 / $1,154.58 with tax, Order 2 $474.14 / $517.29). Sheet rewritten to match.
 - McMaster: nothing needs to be McMaster; switching away saved about $235 overall (the one dearer swap, rated Sch 80 nipples, is about +$7 net, under the $20 line), so it stays switched.
-- Not done: Onshape re-import of the changed tabs and the Visuals tab with its on/off configuration (next).
+- Onshape: backup version "Before modules, QDs, centred smoke line, visuals (2026-11-12)"; gun (now 2 studios), chassis (6), power, pneumatics and bumpers re-imported and swapped (old tabs and their STEPs deleted, new ones in "System part studios"); 343 parts given their Part number and "<code> <name>". New "Visuals" part studio and a "Visuals" sub-assembly (in "Sub-assemblies", grouped to the chassis in the main assembly), each with five configuration checkboxes: Hide floor / smoke / t-shirts / window glow / headlight beam (all off = everything shown). Version "Modules, QDs, pulley teeth, centred 3/4 in smoke line, visuals with hide switches (2026-11-12)".
 - Questions for Micah: none.
 
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Onshape part names carry their parts-list code
