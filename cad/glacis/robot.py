@@ -50,6 +50,7 @@ def pose(shape, elev):
 
 def build(elev=P.ELEV_SHOW):
     PARTS.clear()
+    lib.TUBE_HOLES.clear()
     t = time.time()
     drive.build(log)
     gun.build(log)
@@ -62,6 +63,7 @@ def build(elev=P.ELEV_SHOW):
     misc.fog()
     misc.batteries_and_electronics()
     misc.bumpers()
+    misc.bumper_spacers()
     glow = misc.underglow()
     log(f"underglow: {glow / 1000:.1f} m of strip under the bumpers")
     misc.frame_mounts()
@@ -388,6 +390,7 @@ if __name__ == "__main__":
         export(parts)
         bom_rollup(parts)
         brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
+        brackets.export_tube_table(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'tube_drilling.csv'))
         sys.exit(0)
     if not quick:
         t = time.time()
@@ -416,5 +419,6 @@ if __name__ == "__main__":
         export(parts)
         bom_rollup(parts)
         brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
+        brackets.export_tube_table(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'tube_drilling.csv'))
         renders(parts)
     open(os.path.join(OUT, "check_log.txt"), "w").write("\n".join(LOG) + "\n")

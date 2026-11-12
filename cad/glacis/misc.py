@@ -579,7 +579,7 @@ def bumpers():
     zb0, zb1 = P.BUMP_Z
     fd = P.FOAM_D
     t = P.BUMP_BACK_T
-    xf, yo = P.FRAME_X, P.OUTER_RAIL_Y[1]
+    xf, yo = P.FRAME_X + P.BUMP_GAP, P.OUTER_RAIL_Y[1] + P.BUMP_GAP      # 3/16 in clear of the chassis all round
     reach = t + fd
     segs = {
         "front": dict(axis="y", pos=xf, out=(1, 0), span=(-(yo + reach), yo + reach)),
@@ -626,13 +626,15 @@ def bumpers():
             backing = box(-xf, xf, by0, by1, zb0, zb1)
         piece = backing
         zr = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
-        if sgm["axis"] == "x":                        # side strips: open-bottom slots past the axle end screws (a
-            for sx in (-1, 1):                        # closed hole would catch the washer as the ring slides down)
-                piece = piece.cut(cyl(14.0, 40, (sx * P.AX_X, sgm["pos"] - 20 * oy, P.AXLE_Z), (0, oy, 0)))
-                piece = piece.cut(box(sx * P.AX_X - 8.0, sx * P.AX_X + 8.0, *sorted([sgm["pos"] - 5 * oy, sgm["pos"] + 12 * oy]),
-                                      zb0 - 1.0, P.AXLE_Z))
+        if sgm["axis"] == "x":                        # side strips (no axle slots: the axles end inside the rail)
             for x in P.BUMP_SIDE_X:
                 piece = piece.cut(cyl(P.TNUT, t + 2, (x, sgm["pos"] - oy, zr), (0, oy, 0)))
+                import lib
+                sg_ = 1 if oy > 0 else -1
+                lib.TUBE_HOLES.append(("bumper #10-32", (x, sg_ * (P.OUTER_RAIL_Y[1] + 1.0), zr), (0, -sg_, 0), 2.6,
+                                       P.TUBE_WALL + 2.0))
+                lib.TUBE_HOLES.append(("bumper screw access", (x, sg_ * (P.OUTER_RAIL_Y[0] - 1.0), zr), (0, sg_, 0), 6.0,
+                                       P.TUBE_WALL + 2.0))
             for kind, sg_, h_ in ring_holes:
                 if kind == "side" and sg_ == oy:
                     piece = piece.cut(h_)
@@ -665,14 +667,32 @@ def bumpers():
             bom="Bumper fabric cover (white canvas, owner's pick)", kind="stock")
 
 
+def bumper_spacers():
+    """A printed 3/16 in spacer on each of the 6 bumper screws, between the outer rail and the ring's backing, so the
+    screws clamp the ring 3/16 in off the chassis."""
+    zr = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
+    for sgn, side in ((1, "left"), (-1, "right")):
+        for x in P.BUMP_SIDE_X:
+            sp = cyl(9.0, P.BUMP_GAP, (x, sgn * P.OUTER_RAIL_Y[1], zr), (0, sgn, 0)).cut(
+                cyl(2.7, 20.0, (x, sgn * (P.OUTER_RAIL_Y[1] - 5.0), zr), (0, sgn, 0)))
+            add(f"Bumper spacer {side} {x:.0f}", sp, "print", "bumper", bom="Bumper spacer (printed, 3/16 in)", kind="print",
+                note="on the bumper's #10-32 between the outer rail and the 1x6")
+
+
+UG_SCREWS = []                                # (x, y) of every underglow bracket screw (corner gussets get holes)
+
+
 def underglow():
     """Underglow: a printed 45 deg strip bracket under the outer and end rails, just inside the bumper backing, each
     carrying a 60/m strip aimed down and out. The light passes under the bumper (its bottom is 3 in up) and pools on
     the floor round the robot; a strip inside the bumper would mostly light the foam."""
     dz = 0.0                                              # flat on the rail; relieved under the corner gussets
-    sec = [(u, z + dz) for u, z in ((-19.0, 84.6), (-5.0, 98.6), (-5.0, 101.6), (-25.0, 101.6), (-25.0, 98.6), (-9.2, 98.6),
-                                    (-21.1, 86.7))]
-    c, d, nn = (-12.0, 91.6 + dz), (0.7071, 0.7071), (0.7071, -0.7071)
+    UG_SCREWS.clear()
+    # 2026-11-11 (Micah: "the underglow LEDs need to go lower down and be at least level with the bottom of the bumper"):
+    # the 45 deg face drops 16 mm on a web from the rail, so the strip's centre is 2.6 mm under the bumper's bottom edge
+    sec = [(u, z + dz) for u, z in ((-19.0, 68.6), (-5.0, 82.6), (-5.0, 101.6), (-25.0, 101.6), (-25.0, 98.6), (-8.0, 98.6),
+                                    (-8.0, 86.0), (-21.1, 72.9))]
+    c, d, nn = (-14.0, 73.6 + dz), (0.7071, 0.7071), (0.7071, -0.7071)
     strip = [(c[0] - 5 * d[0], c[1] - 5 * d[1]), (c[0] + 5 * d[0], c[1] + 5 * d[1]),
              (c[0] + 5 * d[0] + 1.6 * nn[0], c[1] + 5 * d[1] + 1.6 * nn[1]),
              (c[0] - 5 * d[0] + 1.6 * nn[0], c[1] - 5 * d[1] + 1.6 * nn[1])]
@@ -711,15 +731,20 @@ def underglow():
                 xy = (at_, oy * (pos - 15.0)) if ox == 0 else (ox * (pos - 15.0), at_)
                 if clear_.intersect(cyl(6.0, 12.0, (xy[0], xy[1], 90.0), (0, 0, 1))).Volume() < 0.5 and \
                         all(abs(at_ - o_) > 30.0 for o_ in screws_):
-                    seg_ = seg_.cut(cyl(2.25, 14.0, (xy[0], xy[1], 90.0), (0, 0, 1)))
+                    seg_ = seg_.cut(cyl(2.25, 20.0, (xy[0], xy[1], 86.0), (0, 0, 1)))
+                    seg_ = seg_.cut(cyl(4.5, 25.0, (xy[0], xy[1], 60.0), (0, 0, 1)))       # driver access through the face
+                    import lib
+                    lib.TUBE_HOLES.append(("underglow M4 rivnut", (xy[0], xy[1], P.RAIL_Z[0] - 1.0), (0, 0, 1), 3.05,
+                                           P.TUBE_WALL + 2.0))
+                    UG_SCREWS.append((xy[0], xy[1]))
                     screws_.append(at_)
                 if len(screws_) == 2:
                     break
             add(f"Underglow bracket {tag} {k + 1}", seg_, "print", "bumper",
                 bom="Underglow bracket (printed, 45 deg)", kind="print",
-                note=f"{len(screws_)} x M4 up into the rail (into the corner gusset where it steps down); strip on its outer face")
+                note=f"{len(screws_)} x M4 x 8 up into M4 rivnuts in the rail's bottom wall (through the corner gusset where it steps down); the strip on its 45 deg face with 3M tape")
         add(f"LED strip underglow {tag}", prism(strip, -half + 5.0, half - 5.0), "led", "bumper",
-            bom="WS2812B strip 10 mm, 60/m (m)", kind="stock", note="aimed 45 deg down and out, under the bumper")
+            bom="WS2812B strip 10 mm, 60/m (m)", kind="stock", note="aimed 45 deg down and out, its centre just under the bumper's bottom edge; 3M tape")
         total += 2 * half - 10.0
     return total
 
@@ -796,6 +821,9 @@ def frame_mounts():
             ya, yb_ = sorted([q.y - sgn * 6.0, sgn * (y_out + 3.0)])
             pocket = box(q.x - 7, q.x + 7, ya, yb_, zr1 + 16.0, zb - 0.5 - top_t)
             post = post.cut(pocket).cut(clear(q)).cut(foot(q.x, yc, zr1))
+            import lib
+            lib.TUBE_HOLES.append(("frame mount #10-32", (q.x, yc, P.RAIL_Z[0] - 1.0), (0, 0, 1), 2.6,
+                                   P.RAIL_Z[1] - P.RAIL_Z[0] + 2.0))
             add(f"Frame mount {name}", post, "print", "body", bom="Frame mount post (printed)", kind="print",
                 note="2-1/2 in #10-32 up through the rail into its insert; the frame's 1/2 in #10-32 up from the outer "
                      "pocket into the frame tab (bumper ring off first)")
@@ -828,6 +856,9 @@ def frame_mounts():
             pocket = box(min(inner, xo + sx * 3.0), max(inner, xo + sx * 3.0), q.y - 7, q.y + 7, z0 + 16.0,
                          zb - 0.5 - top_t)
             post = post.cut(pocket).cut(clear(q)).cut(foot(sx * (P.FRAME_X - 7.0), q.y, z0))
+            import lib
+            lib.TUBE_HOLES.append(("frame mount #10-32", (sx * (P.FRAME_X - 7.0), q.y, P.RAIL_Z[0] - 1.0), (0, 0, 1), 2.6,
+                                   P.RAIL_Z[1] - P.RAIL_Z[0] + 2.0))
             add(f"Frame mount {name}", post, "print", "body", bom="Frame mount post (printed)", kind="print",
                 note="2-1/2 in #10-32 up through the end rail" + (" and gusset" if z0 > zr1 else "") + " into its "
                      "insert; the frame's 1/2 in #10-32 from the outer pocket (bumper ring off first)")

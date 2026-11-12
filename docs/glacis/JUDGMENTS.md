@@ -1204,6 +1204,28 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B22. **Tube drilling table, lower underglow on tape, axles inside the rail, 3/16 in bumper gap** (Micah, 2026-11-11:
+    ".4in 2x [the 3M tape listing], add it to the list for the bottom leds. also add a bracket / also add the holes in
+    the extrusions for CNCing it"; "the underglow LEDs need to go lower down and be at least level with the bottom of
+    the bumper. also the bumper wood shouldn't need the holes for the bearings, the bearing should just be on the
+    inside face of the extrusion"; "add tolerance between the bumper and chassis? i think 3/16ths on each side").
+    - **Every tube hole is in the CAD and in one table:** each bracket rivet (dome and countersunk), the bearing bores,
+      the axle end-screw access holes, the bumper #10-32s and their access holes, the underglow rivnuts and the
+      frame-mount #10-32s are cut through the box tubes, and `docs/glacis/tube_drilling.csv` lists each hole by tube,
+      face, distance along the tube from its -x/-y/-z end, offset from the face's centre line and diameter, for the
+      CNC program (about 300 holes in 24 tubes).
+    - **Axles:** the axle ends in the outer rail's bearing (bearing in the rail's inner wall). Its end screw and washer go
+      in through a 14 mm hole in the rail's outer wall, which the bumper covers, so the bumper has no axle slots.
+      Axles are 6-3/8 in.
+    - **Underglow:** new printed bracket, the 45 deg face dropped 16 mm on a web from the rail so the strip's centre is
+      2.6 mm under the bumper's bottom edge. The strip sticks on with the 3M tape (0.39 in, 2-pack). Each bracket screws
+      up with M4 x 8s into M4 rivnuts in the rail's bottom wall (28; 1/16 in is too thin to tap), through the corner
+      gussets where it steps down; the gussets have the matching holes (and lost a few rivets, 7 top and 5 bottom,
+      to clear them).
+    - **Bumper gap:** the ring sits 3/16 in off the outer rails and the end rails all round, on six printed 3/16 in
+      spacers at the side screws. To stay 27.75 in wide (the 28 in door), the foam is cut 1-13/16 in deep instead of 2 in.
+    - **Parts list:** + 3M tape $15.99 (L05), + M4 rivnuts 50 pcs $5.49 (B20, grip range for 1/16 in unverified),
+      M4 x 8 button heads 1 -> 2 packs (+$6.74). $1,538.00 -> $1,566.22 pre-tax.
 B21. **Electronics on the bellypan, breaker at the rear panel, part numbers** (Micah, 2026-11-11: "try to put all the
     electronics on the bottom plate which can also be cnc'ed. make sure the breaker switch thing is accessible or are
     we just using the E-stop to turn on and off the bot?"; then "give every single part a number or code that

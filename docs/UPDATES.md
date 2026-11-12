@@ -25,6 +25,19 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-11 - Micah's Windows computer (Claude Code) - Tube holes for the CNC, lower underglow on tape, axles inside the rail, 3/16 in bumper gap
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B22):
+  - Every hole in the box tubes is cut in the CAD and listed in `docs/glacis/tube_drilling.csv` for the CNC program: 303 holes in 24 tubes (138 dome rivets, 100 countersunk, bearings, axle access, bumper screws, underglow rivnuts, frame mounts).
+  - The underglow bracket is new and lower: the strip's centre is just under the bumper's bottom edge. The strip is held on with 3M tape, and the brackets screw into M4 rivnuts in the rails. The corner gussets have the matching holes.
+  - Axles end in the outer rail's bearing (the bearing sits in the rail's inner wall), so the bumper has no axle holes.
+  - The bumper ring sits 3/16 in off the chassis on printed spacers; the foam is cut 1-13/16 in deep so the robot stays 27.75 in wide.
+- Files: `cad/glacis/lib.py`, `drive.py`, `misc.py`, `brackets.py`, `params.py`, `robot.py`, `out/` (check log, renders, parts csv, part codes), `docs/glacis/tube_drilling.csv` (new), `docs/glacis/waterjet/`, `bom/glacis_bom.py` (+ csv/json/codes), `docs/glacis/JUDGMENTS.md`
+- Checks: full robot.py: interference only the old 64 mm3 fill elbow sliver; sweep 0-90 deg 0 clashes; every print on the bed; 37 waterjet parts, 238 rivets.
+- Parts list: $1,538.00 -> $1,566.22 pre-tax (+ L05 3M tape $15.99, + B20 M4 rivnuts $5.49, M4 x 8s 1 -> 2 packs). Sheet: both rows added, text updated; Order 2 $656.65 with tax. `_sheet()` now starts items at row 5 (the Mac chat's per-seller row 3).
+- Onshape: backup version "Before tube holes, lower underglow, bumper gap (2026-11-11)"; chassis (6), bumpers and lights (3) re-imported and swapped (old tabs and STEPs deleted, new ones filed in their folders); every part's Part number re-set (599); version saved.
+- Questions for Micah: the rivnut listing doesn't give a grip range; check it covers a 1/16 in wall (plus the 1/8 in gusset at the corners).
+
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Electronics on the bellypan, breaker at the rear, part numbers
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B21): every board and module on a one-piece CNC'd bellypan (footprints engraved, boards on printed trays), the shelf gone; the main breaker (the on / off switch) on the rear panel beside the E-stop; a code for every list row and a Part number on every Onshape part; the main valve and 1-1/2 in nipple are buys; audio is in Order 2; M5 fog-heater standoffs listed.

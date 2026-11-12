@@ -46,6 +46,7 @@ C = {
 }
 
 PARTS = []
+TUBE_HOLES = []          # (what, point, direction, radius, length): cut through the tubes by brackets.drill_tubes
 
 
 def add(name, shape, color, group, bom=None, kind="cots", moving=False, note="", mass=None):

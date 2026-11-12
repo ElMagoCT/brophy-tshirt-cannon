@@ -1,8 +1,8 @@
 Part number,Part,Tab,CAD label
 3DP-B001,Bumper corner bracket rear R,bumpers_wall_standoffs,Bumper corner bracket (printed)
 3DP-B002,Bumper corner bracket rear L,bumpers_wall_standoffs,Bumper corner bracket (printed)
-3DP-B003,Underglow bracket rear 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B004,Underglow bracket rear 2,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B003,Underglow bracket rear 2,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B004,Underglow bracket rear 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
 3DP-B005,Underglow bracket rear 1,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
 3DP-B006,Frame mount rear -170,bumpers_wall_standoffs,Frame mount post (printed)
 3DP-B007,Frame mount rear 0,bumpers_wall_standoffs,Frame mount post (printed)
@@ -15,115 +15,121 @@ Part number,Part,Tab,CAD label
 3DP-B014,Frame mount R -205,bumpers_wall_standoffs,Frame mount post (printed)
 3DP-B015,Underglow bracket left 2,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
 3DP-B016,Underglow bracket right 2,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B017,Underglow bracket left 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B018,Underglow bracket right 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B019,Frame mount L 100,bumpers_wall_standoffs,Frame mount post (printed)
-3DP-B020,Frame mount R 100,bumpers_wall_standoffs,Frame mount post (printed)
-3DP-B021,Frame mount L 280,bumpers_wall_standoffs,Frame mount post (printed)
-3DP-B022,Frame mount R 280,bumpers_wall_standoffs,Frame mount post (printed)
-3DP-B023,Underglow bracket left 4,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B024,Underglow bracket right 4,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B025,Frame mount front -205,bumpers_wall_standoffs,Frame mount post (printed)
-3DP-B026,Frame mount front 205,bumpers_wall_standoffs,Frame mount post (printed)
-3DP-B027,Underglow bracket front 2,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B028,Underglow bracket front 1,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B029,Underglow bracket front 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
-3DP-B030,Bumper corner bracket front R,bumpers_wall_standoffs,Bumper corner bracket (printed)
-3DP-B031,Bumper corner bracket front L,bumpers_wall_standoffs,Bumper corner bracket (printed)
-3DP-B032,Body frame E41S1,body_frame_1_of_6,Body frame piece E41S1
-3DP-B033,Body frame E41S0+N18,body_frame_1_of_6,Body frame piece E41S0+N18
-3DP-B034,Body frame E41S2+N17,body_frame_1_of_6,Body frame piece E41S2+N17
-3DP-B035,Body frame E39S0,body_frame_1_of_6,Body frame piece E39S0
-3DP-B036,Body frame E20S0,body_frame_1_of_6,Body frame piece E20S0
-3DP-B037,Body frame E37S0,body_frame_1_of_6,Body frame piece E37S0
-3DP-B038,Body frame N01,body_frame_1_of_6,Body frame piece N01
-3DP-B039,Body frame N02,body_frame_1_of_6,Body frame piece N02
-3DP-B040,Body frame E40S0,body_frame_2_of_6,Body frame piece E40S0
-3DP-B041,Body frame E38S0,body_frame_2_of_6,Body frame piece E38S0
-3DP-B042,Body frame E20S1,body_frame_2_of_6,Body frame piece E20S1
-3DP-B043,Body frame E37S1,body_frame_2_of_6,Body frame piece E37S1
-3DP-B044,Body frame E24S0+N03+N09,body_frame_2_of_6,Body frame piece E24S0+N03+N09
-3DP-B045,Body frame E29S0+N04+N10,body_frame_2_of_6,Body frame piece E29S0+N04+N10
-3DP-B046,Body frame E21S0,body_frame_2_of_6,Body frame piece E21S0
-3DP-B047,Body frame E36S0,body_frame_2_of_6,Body frame piece E36S0
-3DP-B048,Body frame E23S0,body_frame_3_of_6,Body frame piece E23S0
-3DP-B049,Body frame E25S0,body_frame_3_of_6,Body frame piece E25S0
-3DP-B050,Body frame E28S0+N12,body_frame_3_of_6,Body frame piece E28S0+N12
-3DP-B051,Body frame E19S0+N11,body_frame_3_of_6,Body frame piece E19S0+N11
-3DP-B052,Body frame E35S1+N22,body_frame_3_of_6,Body frame piece E35S1+N22
-3DP-B053,Body frame E17S1+N21,body_frame_3_of_6,Body frame piece E17S1+N21
-3DP-B054,Body frame E17S0,body_frame_3_of_6,Body frame piece E17S0
-3DP-B055,Body frame E35S0,body_frame_3_of_6,Body frame piece E35S0
-3DP-B056,Body frame E23S1,body_frame_3_of_6,Body frame piece E23S1
-3DP-B057,Body frame E25S1,body_frame_4_of_6,Body frame piece E25S1
-3DP-B058,Body frame E16S0,body_frame_4_of_6,Body frame piece E16S0
-3DP-B059,Body frame E27S0,body_frame_4_of_6,Body frame piece E27S0
-3DP-B060,Body frame E34S0,body_frame_4_of_6,Body frame piece E34S0
-3DP-B061,Body frame E18S0,body_frame_4_of_6,Body frame piece E18S0
-3DP-B062,Body frame E32S0+N14,body_frame_4_of_6,Body frame piece E32S0+N14
-3DP-B063,Body frame E13S0+N13,body_frame_4_of_6,Body frame piece E13S0+N13
-3DP-B064,Body frame E10S0+cheek R+N00a,body_frame_4_of_6,Body frame piece E10S0+cheek R+N00a
-3DP-B065,Body frame E08S0+cheek L+N00b,body_frame_5_of_6,Body frame piece E08S0+cheek L+N00b
-3DP-B066,Body frame E09S0,body_frame_5_of_6,Body frame piece E09S0
-3DP-B067,Body frame E33S0,body_frame_5_of_6,Body frame piece E33S0
-3DP-B068,Body frame E12S0,body_frame_5_of_6,Body frame piece E12S0
-3DP-B069,Body frame E07S0+N16,body_frame_5_of_6,Body frame piece E07S0+N16
-3DP-B070,Body frame E11S0+N15,body_frame_5_of_6,Body frame piece E11S0+N15
-3DP-B071,Body frame E18S1,body_frame_5_of_6,Body frame piece E18S1
-3DP-B072,Body frame E34S1,body_frame_5_of_6,Body frame piece E34S1
-3DP-B073,Body frame E06S0,body_frame_6_of_6,Body frame piece E06S0
-3DP-B074,Body frame E00S0,body_frame_6_of_6,Body frame piece E00S0
-3DP-B075,Body frame E03S1,body_frame_6_of_6,Body frame piece E03S1
-3DP-B076,Body frame E06S1,body_frame_6_of_6,Body frame piece E06S1
-3DP-B077,Body frame E00S1,body_frame_6_of_6,Body frame piece E00S1
-3DP-B078,Body frame E02S0+N05+E03S0,body_frame_6_of_6,Body frame piece E02S0+N05+E03S0
-3DP-B079,Body frame E04S0+N06,body_frame_6_of_6,Body frame piece E04S0+N06
-3DP-B080,Body frame E05S0+N08+N20,body_frame_6_of_6,Body frame piece E05S0+N08+N20
-3DP-B081,Body frame E01S0+N07+N19,body_frame_6_of_6,Body frame piece E01S0+N07+N19
-3DP-B082,Panel clip 07-5,body_panels_clips,Panel corner clip
-3DP-B083,Panel clip 07-0,body_panels_clips,Panel corner clip
-3DP-B084,Panel clip 02-2,body_panels_clips,Panel corner clip
-3DP-B085,Panel clip 06-1,body_panels_clips,Panel corner clip
-3DP-B086,Panel clip 07-2,body_panels_clips,Panel corner clip
-3DP-B087,Panel clip 07-3,body_panels_clips,Panel corner clip
-3DP-B088,Panel clip 07-1,body_panels_clips,Panel corner clip
-3DP-B089,Panel clip 07-4,body_panels_clips,Panel corner clip
-3DP-B090,Panel clip 02-1,body_panels_clips,Panel corner clip
-3DP-B091,Panel clip 06-2,body_panels_clips,Panel corner clip
-3DP-B092,Panel clip 03-0,body_panels_clips,Panel corner clip
-3DP-B093,Panel clip 03-3,body_panels_clips,Panel corner clip
-3DP-B094,Panel clip 04-0,body_panels_clips,Panel corner clip
-3DP-B095,Panel clip 04-3,body_panels_clips,Panel corner clip
-3DP-B096,Panel clip 06-0,body_panels_clips,Panel corner clip
-3DP-B097,Panel clip 02-3,body_panels_clips,Panel corner clip
-3DP-B098,Panel clip 06-3,body_panels_clips,Panel corner clip
-3DP-B099,Panel clip 02-0,body_panels_clips,Panel corner clip
-3DP-B100,Panel clip 01-3,body_panels_clips,Panel corner clip
-3DP-B101,Panel clip 01-4,body_panels_clips,Panel corner clip
-3DP-B102,Panel clip 05-4,body_panels_clips,Panel corner clip
-3DP-B103,Panel clip 05-3,body_panels_clips,Panel corner clip
-3DP-B104,Panel clip 01-2,body_panels_clips,Panel corner clip
-3DP-B105,Panel clip 05-0,body_panels_clips,Panel corner clip
-3DP-B106,Panel clip 03-1,body_panels_clips,Panel corner clip
-3DP-B107,Panel clip 03-2,body_panels_clips,Panel corner clip
-3DP-B108,Panel clip 04-1,body_panels_clips,Panel corner clip
-3DP-B109,Panel clip 04-2,body_panels_clips,Panel corner clip
-3DP-B110,Panel clip 00-7,body_panels_clips,Panel corner clip
-3DP-B111,Panel clip 00-6,body_panels_clips,Panel corner clip
-3DP-B112,Panel clip 01-1,body_panels_clips,Panel corner clip
-3DP-B113,Panel clip 05-1,body_panels_clips,Panel corner clip
-3DP-B114,Panel clip 00-5,body_panels_clips,Panel corner clip
-3DP-B115,Panel clip 00-0,body_panels_clips,Panel corner clip
-3DP-B116,Panel clip 05-2,body_panels_clips,Panel corner clip
-3DP-B117,Panel clip 01-0,body_panels_clips,Panel corner clip
-3DP-B118,Panel clip 00-1,body_panels_clips,Panel corner clip
-3DP-B119,Panel clip 00-4,body_panels_clips,Panel corner clip
-3DP-B120,Panel clip 00-2,body_panels_clips,Panel corner clip
-3DP-B121,Panel clip 00-3,body_panels_clips,Panel corner clip
-3DP-C001,Battery sled left,power_electronics_smoke,Battery sled (pulls out its side's battery door)
-3DP-C002,Battery sled right,power_electronics_smoke,Battery sled (pulls out its side's battery door)
-3DP-C003,Board tray Main controller ESP32-P4 + C6,power_electronics_smoke,Printed board tray
-3DP-C004,Board tray ESP32-S3 safety node,power_electronics_smoke,Printed board tray
+3DP-B017,Bumper spacer left -80,bumpers_wall_standoffs,"Bumper spacer (printed, 3/16 in)"
+3DP-B018,Bumper spacer right -80,bumpers_wall_standoffs,"Bumper spacer (printed, 3/16 in)"
+3DP-B019,Bumper spacer left 0,bumpers_wall_standoffs,"Bumper spacer (printed, 3/16 in)"
+3DP-B020,Bumper spacer right 0,bumpers_wall_standoffs,"Bumper spacer (printed, 3/16 in)"
+3DP-B021,Bumper spacer left 80,bumpers_wall_standoffs,"Bumper spacer (printed, 3/16 in)"
+3DP-B022,Bumper spacer right 80,bumpers_wall_standoffs,"Bumper spacer (printed, 3/16 in)"
+3DP-B023,Underglow bracket left 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B024,Underglow bracket right 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B025,Frame mount L 100,bumpers_wall_standoffs,Frame mount post (printed)
+3DP-B026,Frame mount R 100,bumpers_wall_standoffs,Frame mount post (printed)
+3DP-B027,Frame mount L 280,bumpers_wall_standoffs,Frame mount post (printed)
+3DP-B028,Frame mount R 280,bumpers_wall_standoffs,Frame mount post (printed)
+3DP-B029,Underglow bracket left 4,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B030,Underglow bracket right 4,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B031,Frame mount front -205,bumpers_wall_standoffs,Frame mount post (printed)
+3DP-B032,Frame mount front 205,bumpers_wall_standoffs,Frame mount post (printed)
+3DP-B033,Underglow bracket front 2,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B034,Underglow bracket front 1,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B035,Underglow bracket front 3,bumpers_wall_standoffs,"Underglow bracket (printed, 45 deg)"
+3DP-B036,Bumper corner bracket front R,bumpers_wall_standoffs,Bumper corner bracket (printed)
+3DP-B037,Bumper corner bracket front L,bumpers_wall_standoffs,Bumper corner bracket (printed)
+3DP-B038,Body frame E41S1,body_frame_1_of_6,Body frame piece E41S1
+3DP-B039,Body frame E41S0+N18,body_frame_1_of_6,Body frame piece E41S0+N18
+3DP-B040,Body frame E41S2+N17,body_frame_1_of_6,Body frame piece E41S2+N17
+3DP-B041,Body frame E39S0,body_frame_1_of_6,Body frame piece E39S0
+3DP-B042,Body frame E20S0,body_frame_1_of_6,Body frame piece E20S0
+3DP-B043,Body frame E37S0,body_frame_1_of_6,Body frame piece E37S0
+3DP-B044,Body frame N01,body_frame_1_of_6,Body frame piece N01
+3DP-B045,Body frame N02,body_frame_1_of_6,Body frame piece N02
+3DP-B046,Body frame E40S0,body_frame_2_of_6,Body frame piece E40S0
+3DP-B047,Body frame E38S0,body_frame_2_of_6,Body frame piece E38S0
+3DP-B048,Body frame E20S1,body_frame_2_of_6,Body frame piece E20S1
+3DP-B049,Body frame E37S1,body_frame_2_of_6,Body frame piece E37S1
+3DP-B050,Body frame E24S0+N03+N09,body_frame_2_of_6,Body frame piece E24S0+N03+N09
+3DP-B051,Body frame E29S0+N04+N10,body_frame_2_of_6,Body frame piece E29S0+N04+N10
+3DP-B052,Body frame E21S0,body_frame_2_of_6,Body frame piece E21S0
+3DP-B053,Body frame E36S0,body_frame_2_of_6,Body frame piece E36S0
+3DP-B054,Body frame E23S0,body_frame_3_of_6,Body frame piece E23S0
+3DP-B055,Body frame E25S0,body_frame_3_of_6,Body frame piece E25S0
+3DP-B056,Body frame E28S0+N12,body_frame_3_of_6,Body frame piece E28S0+N12
+3DP-B057,Body frame E19S0+N11,body_frame_3_of_6,Body frame piece E19S0+N11
+3DP-B058,Body frame E35S1+N22,body_frame_3_of_6,Body frame piece E35S1+N22
+3DP-B059,Body frame E17S1+N21,body_frame_3_of_6,Body frame piece E17S1+N21
+3DP-B060,Body frame E17S0,body_frame_3_of_6,Body frame piece E17S0
+3DP-B061,Body frame E35S0,body_frame_3_of_6,Body frame piece E35S0
+3DP-B062,Body frame E23S1,body_frame_3_of_6,Body frame piece E23S1
+3DP-B063,Body frame E25S1,body_frame_4_of_6,Body frame piece E25S1
+3DP-B064,Body frame E16S0,body_frame_4_of_6,Body frame piece E16S0
+3DP-B065,Body frame E27S0,body_frame_4_of_6,Body frame piece E27S0
+3DP-B066,Body frame E34S0,body_frame_4_of_6,Body frame piece E34S0
+3DP-B067,Body frame E18S0,body_frame_4_of_6,Body frame piece E18S0
+3DP-B068,Body frame E32S0+N14,body_frame_4_of_6,Body frame piece E32S0+N14
+3DP-B069,Body frame E13S0+N13,body_frame_4_of_6,Body frame piece E13S0+N13
+3DP-B070,Body frame E10S0+cheek R+N00a,body_frame_4_of_6,Body frame piece E10S0+cheek R+N00a
+3DP-B071,Body frame E08S0+cheek L+N00b,body_frame_5_of_6,Body frame piece E08S0+cheek L+N00b
+3DP-B072,Body frame E09S0,body_frame_5_of_6,Body frame piece E09S0
+3DP-B073,Body frame E33S0,body_frame_5_of_6,Body frame piece E33S0
+3DP-B074,Body frame E12S0,body_frame_5_of_6,Body frame piece E12S0
+3DP-B075,Body frame E07S0+N16,body_frame_5_of_6,Body frame piece E07S0+N16
+3DP-B076,Body frame E11S0+N15,body_frame_5_of_6,Body frame piece E11S0+N15
+3DP-B077,Body frame E18S1,body_frame_5_of_6,Body frame piece E18S1
+3DP-B078,Body frame E34S1,body_frame_5_of_6,Body frame piece E34S1
+3DP-B079,Body frame E06S0,body_frame_6_of_6,Body frame piece E06S0
+3DP-B080,Body frame E00S0,body_frame_6_of_6,Body frame piece E00S0
+3DP-B081,Body frame E03S1,body_frame_6_of_6,Body frame piece E03S1
+3DP-B082,Body frame E06S1,body_frame_6_of_6,Body frame piece E06S1
+3DP-B083,Body frame E00S1,body_frame_6_of_6,Body frame piece E00S1
+3DP-B084,Body frame E02S0+N05+E03S0,body_frame_6_of_6,Body frame piece E02S0+N05+E03S0
+3DP-B085,Body frame E04S0+N06,body_frame_6_of_6,Body frame piece E04S0+N06
+3DP-B086,Body frame E05S0+N08+N20,body_frame_6_of_6,Body frame piece E05S0+N08+N20
+3DP-B087,Body frame E01S0+N07+N19,body_frame_6_of_6,Body frame piece E01S0+N07+N19
+3DP-B088,Panel clip 07-5,body_panels_clips,Panel corner clip
+3DP-B089,Panel clip 07-0,body_panels_clips,Panel corner clip
+3DP-B090,Panel clip 02-2,body_panels_clips,Panel corner clip
+3DP-B091,Panel clip 06-1,body_panels_clips,Panel corner clip
+3DP-B092,Panel clip 07-2,body_panels_clips,Panel corner clip
+3DP-B093,Panel clip 07-3,body_panels_clips,Panel corner clip
+3DP-B094,Panel clip 07-1,body_panels_clips,Panel corner clip
+3DP-B095,Panel clip 07-4,body_panels_clips,Panel corner clip
+3DP-B096,Panel clip 02-1,body_panels_clips,Panel corner clip
+3DP-B097,Panel clip 06-2,body_panels_clips,Panel corner clip
+3DP-B098,Panel clip 03-0,body_panels_clips,Panel corner clip
+3DP-B099,Panel clip 03-3,body_panels_clips,Panel corner clip
+3DP-B100,Panel clip 04-0,body_panels_clips,Panel corner clip
+3DP-B101,Panel clip 04-3,body_panels_clips,Panel corner clip
+3DP-B102,Panel clip 06-0,body_panels_clips,Panel corner clip
+3DP-B103,Panel clip 02-3,body_panels_clips,Panel corner clip
+3DP-B104,Panel clip 06-3,body_panels_clips,Panel corner clip
+3DP-B105,Panel clip 02-0,body_panels_clips,Panel corner clip
+3DP-B106,Panel clip 01-3,body_panels_clips,Panel corner clip
+3DP-B107,Panel clip 01-4,body_panels_clips,Panel corner clip
+3DP-B108,Panel clip 05-4,body_panels_clips,Panel corner clip
+3DP-B109,Panel clip 05-3,body_panels_clips,Panel corner clip
+3DP-B110,Panel clip 01-2,body_panels_clips,Panel corner clip
+3DP-B111,Panel clip 05-0,body_panels_clips,Panel corner clip
+3DP-B112,Panel clip 03-1,body_panels_clips,Panel corner clip
+3DP-B113,Panel clip 03-2,body_panels_clips,Panel corner clip
+3DP-B114,Panel clip 04-1,body_panels_clips,Panel corner clip
+3DP-B115,Panel clip 04-2,body_panels_clips,Panel corner clip
+3DP-B116,Panel clip 00-7,body_panels_clips,Panel corner clip
+3DP-B117,Panel clip 00-6,body_panels_clips,Panel corner clip
+3DP-B118,Panel clip 01-1,body_panels_clips,Panel corner clip
+3DP-B119,Panel clip 05-1,body_panels_clips,Panel corner clip
+3DP-B120,Panel clip 00-5,body_panels_clips,Panel corner clip
+3DP-B121,Panel clip 00-0,body_panels_clips,Panel corner clip
+3DP-B122,Panel clip 05-2,body_panels_clips,Panel corner clip
+3DP-B123,Panel clip 01-0,body_panels_clips,Panel corner clip
+3DP-B124,Panel clip 00-1,body_panels_clips,Panel corner clip
+3DP-B125,Panel clip 00-4,body_panels_clips,Panel corner clip
+3DP-B126,Panel clip 00-2,body_panels_clips,Panel corner clip
+3DP-B127,Panel clip 00-3,body_panels_clips,Panel corner clip
+3DP-C001,Board tray Main controller ESP32-P4 + C6,power_electronics_smoke,Printed board tray
+3DP-C002,Board tray ESP32-S3 safety node,power_electronics_smoke,Printed board tray
+3DP-C003,Battery sled left,power_electronics_smoke,Battery sled (pulls out its side's battery door)
+3DP-C004,Battery sled right,power_electronics_smoke,Battery sled (pulls out its side's battery door)
 3DP-C005,Board tray PWM expander PCA9685,power_electronics_smoke,Printed board tray
 3DP-C006,Board tray ADS1115 ADC 1,power_electronics_smoke,Printed board tray
 3DP-C007,Board tray ADS1115 ADC 2,power_electronics_smoke,Printed board tray
@@ -233,11 +239,11 @@ Part number,Part,Tab,CAD label
 3DP-E005,Elevation pulley 112T ring,gun_pivots,Elevation pulley 112T HTD 9 mm ring (printed)
 3DP-F001,Smoke collar,gun_pivots,"Smoke collar (printed, one piece)"
 3DP-F002,Fog vent rear,power_electronics_smoke,Fog vent nozzle (under the belly)
-3DP-F003,Fog fluid tank,power_electronics_smoke,"Fog fluid tank (printed, about 400 mL)"
-3DP-F004,Smoke machine tray,power_electronics_smoke,Smoke machine tray
-3DP-F005,Fog splitter 1-3,power_electronics_smoke,Fog splitter 1 -> 3 (printed)
-3DP-F006,Fog vent front,power_electronics_smoke,Fog vent nozzle (under bumper)
-3DP-F007,Board tray Valve + fog drivers,power_electronics_smoke,Printed board tray
+3DP-F003,Board tray Valve + fog drivers,power_electronics_smoke,Printed board tray
+3DP-F004,Fog fluid tank,power_electronics_smoke,"Fog fluid tank (printed, about 400 mL)"
+3DP-F005,Smoke machine tray,power_electronics_smoke,Smoke machine tray
+3DP-F006,Fog splitter 1-3,power_electronics_smoke,Fog splitter 1 -> 3 (printed)
+3DP-F007,Fog vent front,power_electronics_smoke,Fog vent nozzle (under bumper)
 3DP-P001,Chamber end cover top,gun_pivots,Chamber end cover (printed)
 3DP-P002,Chamber end cover bottom,gun_pivots,Chamber end cover (printed)
 3DP-P003,Chamber cap top rear,gun_pivots,Chamber cap
@@ -366,8 +372,8 @@ B17-2,Bumper foam left,bumpers_wall_standoffs,Bumper foam strip 2 x 5 in (GoTo F
 B17-3,Bumper foam right,bumpers_wall_standoffs,Bumper foam strip 2 x 5 in (GoTo Foam 43 ILD)
 B17-4,Bumper foam front,bumpers_wall_standoffs,Bumper foam strip 2 x 5 in (GoTo Foam 43 ILD)
 B18-1,Bumper cover rear,bumpers_wall_standoffs,"Bumper fabric cover (white canvas, owner's pick)"
-B18-2,Bumper cover right,bumpers_wall_standoffs,"Bumper fabric cover (white canvas, owner's pick)"
-B18-3,Bumper cover left,bumpers_wall_standoffs,"Bumper fabric cover (white canvas, owner's pick)"
+B18-2,Bumper cover left,bumpers_wall_standoffs,"Bumper fabric cover (white canvas, owner's pick)"
+B18-3,Bumper cover right,bumpers_wall_standoffs,"Bumper fabric cover (white canvas, owner's pick)"
 B18-4,Bumper cover front,bumpers_wall_standoffs,"Bumper fabric cover (white canvas, owner's pick)"
 C01-1,Charge port (SB50 panel mount),power_electronics_smoke,Anderson SB50 panel-mount charge port
 C02-1,Main controller ESP32-P4 + C6 (Waveshare),power_electronics_smoke,"Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)"

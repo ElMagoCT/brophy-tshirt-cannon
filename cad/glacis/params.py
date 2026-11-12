@@ -104,10 +104,12 @@ WHEEL_FREE_FPS = FALCON_FREE_RPM / RATIO * math.pi * 10 / 60 / 12
 FRAME_X = AX_X + WHEEL_R + 3.0 + RAIL_W     # outside face of the end rails
 
 # ------------------------------------------------------------------ bumpers (FRC style)
-FOAM_D, FOAM_H = 2.0 * IN, 5.0 * IN          # rev D.2: GoTo Foam 43 ILD strips, 2 in deep x 5 in tall (was 2 stacked 2.5 in noodles)
+BUMP_GAP = 0.1875 * IN                      # Micah 2026-11-11: 3/16 in between the chassis and the bumper ring, all round
+FOAM_D, FOAM_H = 2.0 * IN - BUMP_GAP, 5.0 * IN   # foam 1-13/16 in deep so the gap keeps 27.75 in over the bumpers (door 28)
+# (rev D.2: GoTo Foam 43 ILD strips, 2 in deep x 5 in tall (was 2 stacked 2.5 in noodles)
 BUMP_BACK_T = 0.75 * IN                      # rev D.2 (Micah): a 1x6 ripped to 5 in. 1/2 in thicker than the old 1/4 ply, so
                                             # the foam is 2 in deep: still 27.75 in over the bumpers (door limit 28)
-BUMP_DEPTH = BUMP_BACK_T + FOAM_D
+BUMP_DEPTH = BUMP_GAP + BUMP_BACK_T + FOAM_D
 BUMP_Z = (GROUND_CLEAR, GROUND_CLEAR + FOAM_H)
 
 # ------------------------------------------------------------------ body (printed frame + recessed acrylic)

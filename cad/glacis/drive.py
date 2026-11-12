@@ -336,13 +336,25 @@ def rod():
 # ------------------------------------------------------------------ build
 def build(log=print):
     rz = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
-    brg_holes = union([cyl(0.5625 * IN + 0.1, 1000, (sx * P.AX_X, -500, P.AXLE_Z), (0, 1, 0)) for sx in (-1, 1)])
+    import lib
+    W_ = P.TUBE_WALL
+    for sx in (-1, 1):
+        for sgn in (1, -1):
+            x = sx * P.AX_X
+            # inner rail: the axle through both walls (flanged bearing on its outboard face, the end screw on its inner face)
+            lib.TUBE_HOLES.append(("wheel axle bearing", (x, sgn * (P.INNER_RAIL_Y[0] - 1.0), P.AXLE_Z), (0, sgn, 0),
+                                   0.5625 * IN + 0.1, P.INNER_RAIL_Y[1] - P.INNER_RAIL_Y[0] + 2.0))
+            # outer rail: the bearing in its inner wall only; a 14 mm hole in the outer wall to put the axle's end
+            # screw and washer in (the bumper covers it: no hole in the bumper)
+            lib.TUBE_HOLES.append(("wheel axle bearing", (x, sgn * (P.OUTER_RAIL_Y[0] - 1.0), P.AXLE_Z), (0, sgn, 0),
+                                   0.5625 * IN + 0.1, W_ + 2.0))
+            lib.TUBE_HOLES.append(("axle end-screw access", (x, sgn * (P.OUTER_RAIL_Y[1] + 1.0), P.AXLE_Z), (0, -sgn, 0),
+                                   7.0, W_ + 2.0))
     for sgn, side in ((1, "L"), (-1, "R")):
         oy = sgn * (P.OUTER_RAIL_Y[0] + P.OUTER_RAIL_Y[1]) / 2
         iy = sgn * (P.INNER_RAIL_Y[0] + P.INNER_RAIL_Y[1]) / 2
-        tube_part(f"Outer rail {side} (1x2)", "x", -P.FRAME_X, P.FRAME_X, oy, rz, (1, 2), cuts=brg_holes)
-        tube_part(f"Inner rail {side} (1x2)", "x", -(P.FRAME_X - P.RAIL_W), P.FRAME_X - P.RAIL_W, iy, rz, (1, 2),
-                  cuts=brg_holes)
+        tube_part(f"Outer rail {side} (1x2)", "x", -P.FRAME_X, P.FRAME_X, oy, rz, (1, 2))
+        tube_part(f"Inner rail {side} (1x2)", "x", -(P.FRAME_X - P.RAIL_W), P.FRAME_X - P.RAIL_W, iy, rz, (1, 2))
     for sx, end in ((1, "front"), (-1, "rear")):
         cx = sx * (P.FRAME_X - P.RAIL_W / 2)
         tube_part(f"End rail {end} (1x2)", "y", -P.OUTER_RAIL_Y[0], P.OUTER_RAIL_Y[0], cx, rz, (1, 2))
@@ -386,10 +398,10 @@ def build(log=print):
                 "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
             add(f"Bearing hex wheel {corner} inner", rail_bearing(ax, sgn * P.INNER_RAIL_Y[1], P.AXLE_Z, -sgn), "steel",
                 "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
-            y_a, y_b = sgn * (P.INNER_RAIL_Y[0] + 0.0), sgn * P.OUTER_RAIL_Y[1]
+            y_a, y_b = sgn * (P.INNER_RAIL_Y[0] + 0.0), sgn * (P.OUTER_RAIL_Y[0] + 0.3125 * IN)   # ends in the outer bearing
             shaft = hex_prism(12.7, abs(y_b - y_a), (ax, y_a, P.AXLE_Z), (0, sgn, 0))
             add(f"Wheel axle {corner} (1/2 hex)", shaft, "steel", "drive", bom="1/2 in hex shaft, wheel axle (6 in)",
-                kind="stock", note="tapped 10-32 both ends, button head + washer")
+                kind="stock", note="tapped 10-32 both ends, button head + washer; the outer one inside the outer rail, put in through the 14 mm hole in its outer wall")
             for y0, y1, tag in ((P.INNER_RAIL_Y[1] + 1.6, P.WHEEL_Y[0], "inner"),
                                 (P.YMID + P.W_OUTER_PLATE[1], P.OUTER_RAIL_Y[0] - 1.6, "outer")):
                 if y1 - y0 > 0.3:

@@ -439,6 +439,35 @@ def tower_plates():
           mirrors=[("Rail spacer strip R", mirror_y, mirror_fr_y(fr))])
 
 
+def _mount_screws():
+    """(x, y) of each frame-mount post's #10-32 up through the outer / end rail (as misc.frame_mounts places them)."""
+    import misc
+    out = []
+    for name, q in misc.mount_points():
+        if name.startswith(("L ", "R ")):
+            sgn = 1 if name[0] == "L" else -1
+            out.append((q.x, sgn * sum(P.OUTER_RAIL_Y) / 2))
+        else:
+            sx = 1 if name.startswith("front") else -1
+            out.append((sx * (P.FRAME_X - 7.0), q.y))
+    return out
+
+
+def _inside(poly, u, v, margin=0.0):
+    """Point in polygon (ray cast), at least `margin` from every edge."""
+    n, c = len(poly), False
+    for i in range(n):
+        (x1, y1), (x2, y2) = poly[i - 1], poly[i]
+        if (y1 > v) != (y2 > v) and u < (x2 - x1) * (v - y1) / (y2 - y1) + x1:
+            c = not c
+        ex, ey = x2 - x1, y2 - y1
+        L2 = ex * ex + ey * ey or 1e-9
+        t = max(0.0, min(1.0, ((u - x1) * ex + (v - y1) * ey) / L2))
+        if math.hypot(u - x1 - t * ex, v - y1 - t * ey) < margin:
+            return False
+    return c
+
+
 def corner_gussets():
     """The top C and bottom L round each wheel end (as before), now drilled for rivets."""
     xe0 = P.AX_X + P.WHEEL_R + 3.0
@@ -449,21 +478,27 @@ def corner_gussets():
     bot = [(xe0, yi0), (xb, yi0), (xb, yo1), (xa, yo1), (xa, yo0), (xe0, yo0)]
     xm = (xe0 + xb) / 2
     ym_o = (yo0 + yo1) / 2
+    import misc
     mounts = []
     try:
         import misc
         mounts = [(q.x, q.y) for _, q in misc.mount_points()]
     except Exception:
         pass
+    mount_xy = [(abs(x), abs(y)) for x, y in _mount_screws()]
+    ug_xy = [(abs(x), abs(y)) for x, y in misc.UG_SCREWS]
+
     def ok(u, v):
-        return all(math.hypot(u - a, v - b) > 13.0 and math.hypot(-u - a, v - b) > 13.0 and
-                   math.hypot(u - a, -v - b) > 13.0 and math.hypot(-u - a, -v - b) > 13.0 for a, b in mounts)
+        return all(math.hypot(u - a, v - b) > 13.0 for a, b in mount_xy + ug_xy)
     end = [(xm, y) for y in (IY, 150.0, 185.0, 220.0, 245.0)]
     outer = [(x, ym_o) for x in (xa + 12.0, xa + 40.0, xa + 68.0, xb - 10.0)]
     inner = [(x, IY) for x in (xa + 40.0, xa + 64.0)]                 # (xa + 12 is under the sled post's foot)
     for tag, poly, riv in (("top", top, end + outer + inner), ("bottom", bot, end + outer)):
         riv = [(u, v) for u, v in riv if ok(u, v)]
         poly = fillet_poly(poly, 6.0)
+        gh = [(u, v, 2.6) for u, v in mount_xy if _inside(poly, u, v, 4.0)]
+        if tag == "bottom":
+            gh += [(u, v, 3.05) for u, v in ug_xy if _inside(poly, u, v, 4.0)]
         z = ZR1 if tag == "top" else ZR0 - T8
         fr = dict(o=(0.0, 0.0, z), u=(1, 0, 0), v=(0, 1, 0), n=(0, 0, 1))     # z .. z + T
         mir = []
@@ -475,7 +510,7 @@ def corner_gussets():
             if "rear" in nm:
                 frm = mirror_fr_x(frm, 0.0)
             mir.append((f"Corner gusset {nm} {tag}", f, frm))
-        plate(f"Corner gusset front L {tag}", f"Corner gusset {tag}", T8, fr, poly, [], riv, (), group="frame",
+        plate(f"Corner gusset front L {tag}", f"Corner gusset {tag}", T8, fr, poly, gh, riv, (), group="frame",
               note="rivets into the end rail, the outer rail" + (" and the inner rail" if tag == "top" else "") +
                    ("; countersunk (the underglow bracket runs right under it)" if tag == "bottom" else ""),
               mirrors=mir, tube="near" if tag == "top" else "far", flush=(tag == "bottom"))
@@ -525,29 +560,66 @@ def build(log=print):
         f"biggest {max(span(f) for f in FLAT):.0f} mm")
 
 
+TUBE_TABLE = []                             # (tube, what, face, along, across, dia) for the CNC program
+
+
 def drill_tubes(log=print):
-    """Cut every rivet hole through the near wall of the tube under it (the CNC'd holes)."""
+    """Cut every hole in the box tubes, the CNC'd holes: each bracket rivet through the wall under it, and every
+    fastener and bearing hole in lib.TUBE_HOLES (frame mounts, bumper screws, underglow rivnuts, axles). Fills
+    TUBE_TABLE with where each hole is on its tube."""
+    import lib
+    TUBE_TABLE.clear()
     tubes = [p for p in PARTS if p["name"].endswith("(1x2)") or p["name"].endswith("(1x1)")]
     bbs = []
     for p in tubes:
         b = p["shape"].BoundingBox()
         bbs.append((b.xmin, b.ymin, b.zmin, b.xmax, b.ymax, b.zmax))
-    per = {}
-    missed = []
-    for nm, pt, d, _ in RIVETS:
-        q = tuple(pt[i] + d[i] * (WALL * 0.5) for i in range(3))
-        hit = [i for i, b in enumerate(bbs) if all(b[k] - 1e-3 <= q[k] <= b[k + 3] + 1e-3 for k in range(3))]
+    holes = [("rivet 3/16" + (" (countersunk plate)" if fl else ""), pt, d, RIV, WALL + 1.0, -0.5)
+             for nm, pt, d, fl in RIVETS] + [(w, pt, d, r, L, 0.0) for w, pt, d, r, L in lib.TUBE_HOLES]
+    per, missed = {}, []
+    for what, pt, d, r, L, back in holes:
+        a = tuple(pt[k] + d[k] * back for k in range(3))
+        b_ = tuple(a[k] + d[k] * L for k in range(3))
+        lo = [min(a[k], b_[k]) - r for k in range(3)]
+        hi = [max(a[k], b_[k]) + r for k in range(3)]
+        hit = [i for i, bb in enumerate(bbs) if all(lo[k] < bb[k + 3] and bb[k] < hi[k] for k in range(3))]
+        cy = cyl(r, L, a, d)
+        hit = [i for i in hit if tubes[i]["shape"].intersect(cy).Volume() > 0.05]
         if not hit:
-            missed.append(nm)
+            missed.append(what)
             continue
-        per.setdefault(hit[0], []).append(cyl(RIV, WALL + 1.0, tuple(pt[i] - d[i] * 0.5 for i in range(3)), d))
+        for i in hit:
+            per.setdefault(i, []).append(cy)
+            bb = bbs[i]
+            dims = [bb[k + 3] - bb[k] for k in range(3)]
+            ax = dims.index(max(dims))
+            n = tuple(-c for c in d)                      # the face the hole is drilled from
+            nk = max(range(3), key=lambda k: abs(n[k]))
+            face = {(0, 1): "front (+x)", (0, -1): "rear (-x)", (1, 1): "left (+y)", (1, -1): "right (-y)",
+                    (2, 1): "top", (2, -1): "bottom"}[(nk, 1 if n[nk] > 0 else -1)]
+            through = L > 3 * WALL + 2.0
+            ck = [k for k in range(3) if k not in (ax, nk)][0]
+            centre = (bb[ck] + bb[ck + 3]) / 2
+            TUBE_TABLE.append((tubes[i]["name"], what, face + (" through both walls" if through else ""),
+                               round(pt[ax] - bb[ax], 1), round(pt[ck] - centre, 1), round(2 * r, 1)))
     for i, cs in per.items():
         tubes[i]["shape"] = tubes[i]["shape"].cut(union(cs) if len(cs) > 1 else cs[0])
-        tubes[i]["note"] = (tubes[i].get("note") or "") + f"; {len(cs)} x 4.9 mm rivet holes (CNC)"
+        tubes[i]["note"] = (tubes[i].get("note") or "") + f"; {len(cs)} CNC'd holes (docs/glacis/tube_drilling.csv)"
     if missed:
         from collections import Counter
-        log("rivets with no tube under them:", dict(Counter(n.rsplit(" ", 1)[0] for n in missed)))
+        log("holes with no tube under them:", dict(Counter(missed)))
+    log(f"tube holes: {len(TUBE_TABLE)} in {len(per)} tubes")
     return missed
+
+
+def export_tube_table(path):
+    import csv
+    rows = sorted(TUBE_TABLE, key=lambda r: (r[0], r[2], r[3], r[4]))
+    with open(path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["Tube", "Hole", "Face (drilled from)", "Along the tube from its -x/-y/-z end (mm)",
+                    "Across the face from its centre line (mm)", "Diameter (mm)"])
+        w.writerows(rows)
 
 
 # ------------------------------------------------------------------ DXFs and the 12 x 12 nest
