@@ -1204,6 +1204,23 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B25. **Angled smoke holes, collar baffles, breech pucks** (Micah, 2026-11-12: "make them bigger and angle them
+    towards the open end ... put silencer type air barbs on the inside"; "i don't have any aluminum stock. i can only
+    machine in 2.5D ... an aluminum plug with a flange that's jbwelded in"; "the whole tube assembly should be able to
+    slide in the gun core and screw into the solenoid").
+    - **Smoke holes:** 3/8 in, 3 per barrel facing the other barrel, each leaning 40 deg from radial toward the
+      muzzle, so the shot's air streams past them instead of ramming into them. Drill them after the barrel is
+      screwed home (NPT stops wherever it's tight), so they face the other barrel.
+    - **Smoke collar:** 42 mm long: the line's socket, a chamber with two cone baffles (plate + forward-pointing lip:
+      smoke passes the lips, blast air coming back is caught in the pockets round them), then one 7 mm channel per
+      hole. Simple check-valve-by-shape, nothing moving.
+    - **Breech puck** (replaces the turned adapter): 2.5D from 1 in 6061 flat bar (1 x 4 x 8 in, Amazon, ~$30
+      [UNVERIFIED]): a 3 in x 1/4 in flange and a 2.74 in x 3/4 in spigot JB Welded in the barrel, 1 in NPT tapped
+      through. Barrel + puck slide into the core from the front (clear 3 in bore, +0.4 mm) and screw onto the valve
+      nipple; the core halves just close round them. The core and plates did not move; the barrels sit 34 mm further
+      back (muzzle too). It is downstream of the firing valve: it sees the shot's pulse like the barrel, never held
+      pressure. Gun 18.7 kg, balanced; gun rebuild clean.
+    - **Parts list:** $1,562.42 pre-tax (Order 1 $1,088.28 / $1,187.31 with tax, Order 2 $474.14).
 B24. **Micah's Sheet notes, LED wiring, a bigger centred smoke line** (Micah, 2026-11-11/12: his notes on both order
     tabs; "add 3p wire for leds, and servo connectors"; "every led should be individually addressable, nothing in
     parallel"; "have it be all controlled from the one board, just group the panels"; "thermal just complicates

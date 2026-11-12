@@ -32,7 +32,8 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Checks: gun-only rebuild (smoke_test): 0 clashes over 30 mm3, 0 sweep clashes 0-90, no multi-piece parts, collar 42 x 94 x 196 mm; gun 18.9 kg, balanced. Full robot.py not re-run.
 - Parts list: no change
 - Not done: Onshape re-import of the gun tab
-- Questions for Micah: breech adapter (he has no aluminium stock, 2.5D only)
+- Then (same day): breech puck replaces the turned adapter (JUDGMENTS B25): 2.5D from 1 in 6061 bar, JB Welded in the barrel; barrel + puck slide into the core and screw onto the valve nipple. Files also bom/glacis_bom.py, glacis_bom_codes.json, partcodes.py, pneu_parts.py. Gun rebuild clean (0 clashes, 0 sweep, 18.7 kg). Parts list $1,562.42 pre-tax (Order 1 $1,187.31 with tax); Sheet row P32 added, P29/P31 notes updated. Puck bar price [UNVERIFIED].
+- Questions for Micah: none
 
 ## 2026-11-12 - Micah's Windows computer (Claude Code) - CAD matches the list, Sheet notes, LED wiring, centred 3/4 in smoke line, visuals
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)

@@ -91,7 +91,7 @@ def material(p):
         return "ATu"
     if "20x20 T-slot" in b:
         return "AEx"
-    if "Breech adapter" in b:
+    if "Breech puck" in b or "Breech adapter" in b:
         return "ABr"
     if "1/8 Al" in b or "(1/8 Al" in n:
         return "ASh"

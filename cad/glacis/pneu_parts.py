@@ -336,7 +336,7 @@ PURPOSE = [   # (substring of the part name, purpose); first match wins, so spec
     ("chamber nipple", "Pipe: part of the chamber or its connection to the firing valve."),
     ("Firing valve", "Fires the cannon: opens to dump the chamber into the barrel."),
     ("nipple", "Close nipple joining the firing valve to the breech adapter."),
-    ("Breech adapter", "Machined adapter: 1 in NPT from the valve to the barrel's spigot."),
+    ("Breech adapter", "Breech puck: 2.5D from 1 in 6061 plate, JB Welded in the barrel, 1 in NPT onto the valve nipple."),
     ("Barrel", "Polycarbonate barrel; smoke enters through six holes just ahead of the shirt."),
     ("Chamber cap", "Printed cap holding the chamber pipe down on its saddle."),
     ("Chamber saddle", "Printed block carrying both chambers between the cradle plates."),

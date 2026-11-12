@@ -67,8 +67,11 @@ def valve(xv, h, s, v=P.VALVE):
     return union([body, coil, nut])
 
 
-AD_BODY, AD_SHOULDER, AD_SPIGOT = 30.0, 10.0, 40.0              # breech adapter lengths along the axis
-SMOKE_HOLE_X = AD_SPIGOT + 165.0                             # from the barrel's breech end: just past a 6 in rolled shirt
+AD_FLANGE, AD_SPIGOT = 6.35, 19.05                           # breech puck (Micah 2026-11-12: 2.5D from 1 in 6061 plate, JB
+                                                             # Welded into the barrel): flange the barrel butts on + spigot in it
+CORE_X0, CORE_X1 = 28.0, 80.0                                # breech block's rear / front face from the puck's back face (kept
+                                                             # from the old turned adapter, so the core and plates don't move)
+SMOKE_HOLE_X = AD_SPIGOT + 165.0                            # from the barrel's breech end: just past a 6 in rolled shirt
 ACCENT_T = 8.5                                               # wall of the smoke collar and muzzle ring round the barrels
 SMOKE_Y = 0.0                                                # smoke line: dead centre between the barrels (Micah 2026-11-11)
 SMOKE_SQ = (15.0, 10.0)                                      # the 1 in OD line squished to an oval where it runs between
@@ -119,15 +122,12 @@ def _groove(xg, W, H, r, w=6.0, d=2.5):
 
 
 def adapter():
-    """CNC breech adapter: 1 in NPT female at the back, a shoulder the barrel butts against and a spigot the
-    barrel slips over (no wider than the barrel, so the barrels can sit close; the breech block clamps the
-    polycarbonate over the spigot, never drilled)."""
-    x1, x2 = AD_BODY, AD_BODY + AD_SHOULDER
-    s = cyl(25.0, x1, (0, 0, 0), (1, 0, 0)).fuse(cyl(P.BARREL_OD / 2, AD_SHOULDER, (x1, 0, 0), (1, 0, 0)))
-    s = s.fuse(cyl(P.BARREL_OD / 2 - P.BARREL_WALL - 0.15, AD_SPIGOT, (x2, 0, 0), (1, 0, 0)))
-    s = s.cut(cyl(OD["1"] / 2, ENG["1"] + 1, (-0.5, 0, 0), (1, 0, 0)))
-    s = s.cut(cyl(13.3, x2, (0, 0, 0), (1, 0, 0)))
-    return s.cut(cyl(P.BARREL_OD / 2 - P.BARREL_WALL - 4.0, AD_SPIGOT + 1, (x2, 0, 0), (1, 0, 0)))
+    """Breech puck, 2.5D from 1 in 6061 plate: a 3 in flange (no wider than the barrel) and a spigot JB Welded inside
+    the barrel; 1 in NPT tapped straight through. Barrel + puck is one assembly that slides into the gun core from
+    the front and screws onto the firing valve's nipple."""
+    s = cyl(P.BARREL_OD / 2, AD_FLANGE, (0, 0, 0), (1, 0, 0))
+    s = s.fuse(cyl(P.BARREL_OD / 2 - P.BARREL_WALL - 0.15, AD_SPIGOT, (AD_FLANGE, 0, 0), (1, 0, 0)))
+    return s.cut(cyl(OD["1"] / 2, AD_FLANGE + AD_SPIGOT + 2, (-1, 0, 0), (1, 0, 0)))
 
 
 VALVE_INFO = (("U.S. Solid USS-HSV04", "Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi", 1.75),
@@ -146,8 +146,9 @@ def _cannon(k, xf):
     ch.nipple("1", bom="1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80")
     ax0 = ch.at(ch.s).x - ENG["1"]
     gadd(f"Breech adapter {tag}", adapter().translate(V(ax0, 0, h)), "alu",
-         bom="Breech adapter (CNC 6061, stash bar, 1 in NPT tap)", kind="machined")
-    b0 = ax0 + AD_BODY + AD_SHOULDER
+         bom="Breech puck (2.5D CNC from 1 in 6061 plate, 1 in NPT tap)", kind="machined",
+         note="3 in x 1/4 in flange + 2.74 in x 3/4 in spigot, 1 in NPT tapped through; JB Weld in the barrel")
+    b0 = ax0 + AD_FLANGE
     bar = tube(P.BARREL_OD / 2, P.BARREL_OD / 2 - P.BARREL_WALL, P.BARREL_LEN, (b0, 0, h), (1, 0, 0))
     xh = b0 + SMOKE_HOLE_X
     for pb, d in _smoke_holes(xh, h):                        # 3 smoke holes facing the other barrel, just ahead of the shirt
@@ -216,12 +217,12 @@ def _build(xv):
         t, ax0 = _cannon(k, xv)                              # xv: the valves' front faces (they line up)
         fills.append(t)
         ax0s.append(ax0)
-    b0s = [a + AD_BODY + AD_SHOULDER for a in ax0s]
+    b0s = [a + AD_FLANGE for a in ax0s]
     ax0 = ax0s[0]
     xr = xv - max(v["L"] for v in P.VALVES)                  # rear face of the longer valve
     xs_list = [xv - sv for sv in P.CH_SADDLE_S]              # chamber saddles, where both 3 in pipes run
     zo = P.PITCH / 2 + R_CH + 12.0
-    xb1 = ax0 + AD_BODY + AD_SHOULDER + AD_SPIGOT            # end of the barrel spigots = front of the breech block
+    xb1 = ax0 + CORE_X1                                      # front of the breech block
     # cradle: two 1/8 in plates outside everything, from the rear saddle to the breech block
     x0, x1 = min(xs_list) - 4.0, xb1                         # Micah: shorter at the back (was rear saddle - 30)
     rx0, rx1 = x0 + 22.0, min(xv - 58.0, x0 + 22.0 + 300.0)        # the 20x20 add-on rail inside each top edge
@@ -229,7 +230,7 @@ def _build(xv):
     # 6.6 mm tie holes had nothing behind them and are gone. Every hole in a plate now has an insert, nut, T-nut or
     # standoff behind it: saddles (sad_holes), chamber caps (cap_holes), the gun core halves (core_holes), the hub /
     # ring, the rail's T-nuts and the hex stub
-    bx0 = ax0 + AD_BODY - 2.0                                 # the breech block's rear face
+    bx0 = ax0 + CORE_X0                                       # the breech block's rear face
     zc_ = P.PITCH / 2 + 18.0
     lay = plates.layout(min(xs_list) - 4.0, zo, xs_list, bx0, cap_z=zc_)
     core_holes = [(x, sg * z) for sg in (1, -1) for x, z in
@@ -252,7 +253,7 @@ def _build(xv):
                 shape = shape.cut(cyl(P.INSERT[0], P.INSERT[1], (x, sy * CRADLE_Y0, z), (0, -sy, 0)))
         return shape
     # Brophy Borealis plate (Micah 2026-11-10: "combine chevron and turret wheel. make the wheel chevrons"): see plates.py
-    flat = plates.plate_2d(P.PLATE_T, x0, x1, zo, xs_list, ax0 + AD_BODY - 2.0, (rx0, rx1),
+    flat = plates.plate_2d(P.PLATE_T, x0, x1, zo, xs_list, ax0 + CORE_X0, (rx0, rx1),
                            [(x, z, 5.5) for x, z in side_holes],
                            list(RING_BOLTS) + list(HUB_BOLTS), cap_z=zc_)
     for sy, tag in ((1, "left"), (-1, "right")):
@@ -351,6 +352,8 @@ def _build(xv):
         x0v = xv - vk["L"]
         vb = box(x0v + 22, bx0 + 1, -CRADLE_Y0, CRADLE_Y0, h - 18, h + 18)                # +22: the half stays on a 250 mm bed
         core = core.fuse(vb.cut(box(x0v - 1, bx0 + 2, -vk["W"] / 2 - 0.4, vk["W"] / 2 + 0.4, h - 40, h + 40)))
+    for h in H:                                              # a clear 3 in bore from the puck forward: barrel + puck slide in
+        core = core.cut(cyl(P.BARREL_OD / 2 + 0.4, 200, (ax0 - 1.0, 0, h), (1, 0, 0)))
     # mantlet: flows (smooth loft) from the breech block's face to a stadium hugging the barrels; LED groove
     rb = P.BARREL_OD / 2
     mz0, mz1 = xb1 - 0.5, xb1 + 50.0
@@ -376,8 +379,9 @@ def _build(xv):
         gadd(f"Gun core {tag}", half.clean(), "print", bom="Gun core half (valve blocks + breech block + mantlet, printed)",
              kind="print",
              note="PETG, 5 walls, 40% gyroid, printed outer face down; the two halves close round both valves and both "
-                  "barrels: 4 x M4 x 12 across the split, over and under the barrels (heads in the right half, inserts in the left) clamp the "
-                  "barrels onto their spigots, then 6 x M4 x 8 through each cradle plate into M4 inserts; a 5 mm LED "
+                  "barrels: each barrel (puck JB Welded in) slides in from the front and screws onto its valve nipple; "
+                  "4 x M4 x 12 across the split, over and under the barrels (heads in the right half, inserts in the left) "
+                  "close the halves round them, then 6 x M4 x 8 through each cradle plate into M4 inserts; a 5 mm LED "
                   "strip in the mantlet groove")
     # smoke collar (Micah 2026-11-11: "cleaned up ... specific holes that match the ones in the polycarb"): the
     # squished line plugs into an oblong socket at the back, between the barrels, into a small plenum; from it one
