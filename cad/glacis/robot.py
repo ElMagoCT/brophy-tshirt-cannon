@@ -59,9 +59,9 @@ def build(elev=P.ELEV_SHOW):
         f"{min(z for _, z in misc.B.SLOT_PTS):.0f} under the axle")
     belt_len = misc.towers_and_pivot()
     log(f"elevation belt pitch length {belt_len:.0f} mm ({belt_len / 5:.1f} teeth)")
-    misc.air()
     misc.fog()
     misc.batteries_and_electronics()
+    misc.air()                          # after the sleds and boards, so each quick disconnect finds a clear spot
     misc.bumpers()
     misc.bumper_spacers()
     glow = misc.underglow()
@@ -83,14 +83,20 @@ def build(elev=P.ELEV_SHOW):
     a, b = misc.CHECKS
     routes = {}
     for tag, c, e, dy in (("A (top cannon)", a, ex[0], 9.0), ("B (bottom cannon)", b, ex[1], -9.0)):
-        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 260.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e]
+        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 310.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e]
     fx = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.FOG_EXITS]
     for f0, f1 in zip(misc.FOG_OUT, fx):
         routes["Fog loop (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(f1.x + 60.0, f1.y, f1.z - 120.0), V(f1.x, f1.y, f1.z - 50.0), f1]
+    swing = [pose(p["local"], a) for p in PARTS if p["moving"] and p["name"].startswith("Chamber")
+             for a in range(int(P.ELEV_RANGE[0]), int(P.ELEV_RANGE[1]) + 1, 15)]    # QDs stay out of the gun's swing
     for tag, pts in routes.items():
         r = P.SMOKE_R if tag.startswith("Fog") else 3.175
-        lib.add(tag, misc.tube_path([p.toTuple() for p in pts], r=r), "tube", "pneu" if r < 5 else "power",
-                bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 1/2 ID x 5/8 OD (ft)", kind="stock")
+        sh = misc.tube_path([p.toTuple() for p in pts], r=r)
+        if tag.startswith("Service loop"):
+            sh = sh.cut(misc.qd_inline(tag.split(" (")[0].replace("Service loop", "service loop"),
+                                       [p.toTuple() for p in pts[:3]], avoid=swing))
+        misc.add_split(tag, sh, "tube", "pneu" if r < 5 else "power", start=pts[0].toTuple(),
+                       bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 3/4 ID x 1 OD (ft)", kind="stock")
     log(f"built {len(PARTS)} parts in {time.time() - t:.0f} s")
     return PARTS
 
@@ -339,6 +345,15 @@ def export(parts):
             json.dump(names, open(path[:-5] + ".names.json", "w"), indent=0)
             manifest.append(dict(tab=label, file=os.path.basename(path), parts=n, bytes=os.path.getsize(path)))
             log(f"exported {label}: {n} parts, {os.path.getsize(path) / 1e6:.1f} MB")
+    # show-off visuals (smoke, t-shirts, window glow, headlight beam, floor): their own tab, never in PARTS or checks
+    import visuals
+    vis = [dict(name=n, shape=s, local=s, color=c, bom=None, kind="visual", moving=False, group="visual")
+           for n, s, c in visuals.build(parts)]
+    path = os.path.join(d, "visuals.step")
+    names = _save_step(vis, "Visuals", path)
+    json.dump(names, open(path[:-5] + ".names.json", "w"), indent=0)
+    manifest.append(dict(tab="Visuals", file="visuals.step", parts=len(vis), bytes=os.path.getsize(path)))
+    log(f"exported Visuals: {len(vis)} parts, {os.path.getsize(path) / 1e6:.1f} MB")
     json.dump(manifest, open(os.path.join(d, "manifest.json"), "w"), indent=1)
 
 

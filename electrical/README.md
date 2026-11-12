@@ -45,7 +45,7 @@ rev C.3/D and still describe the power tree and sensors, except where this box s
   controller, so the valve rail dies with the contactor and a stuck MOSFET can't fire a disarmed gun.
 - **Audio:** the P4 mixes horn, effects and phone music to the PCM5102A. Phone music comes from a classic ESP32
   (Bluetooth A2DP sink) over I2S; volume/pause go back over a UART.
-- MOSFET modules trigger from 3.3 V (no buffer); 74AHCT125s only level-shift LED data. One contactor, a diymore
+- MOSFET modules trigger from 3.3 V (no buffer). LED data goes straight from the controller's 3.3 V pins through a 330 ohm series resistor (no level shifter, Micah 2026-11-11): five data lines, one per chain (left panels, right panels, left frame, right frame, underglow), each on a 3-pin header (5 V, data, GND) on a hand-soldered LED board, the strips on servo plugs. If a chain's first pixel flickers, a 74AHCT125 on that line is the fix. One contactor, a diymore
   3.6-32 V buck-boost for the logic rail.
 - Details and alternatives: `docs/glacis/JUDGMENTS.md`, "Rev D.2 proposal"; the "Glacis air & wiring" artifact has a
   power sim of all of this.
@@ -105,12 +105,12 @@ FRC battery x2 (parallel, SB50) + charge port
 | PDH volts (switched) | 39k/10k divider | ADC | Confirms the contactor closed; catches an E-stop and a welded contactor |
 | Gun angle | 10k pot | ADC | Power it from 3.3 V, not 5 V, so it can't overdrive the ADC |
 | Fog core temperature | MAX6675 + K probe | SPI | Open-thermocouple bit = heater off |
-| Fog fluid level | XKC-Y25-NPN capacitive switch | GPIO (pull-up to 3.3 V) | Taped to the outside of the printed tank at ~20%. No hole in the tank |
 | Fogger box, electronics shelf, battery bay | 3 x DS18B20 | 1-Wire, one pin | Heater off at 70 C in the fogger box (PETG softens near 80 C) |
 
 **Fog fluid gauge for free:** the peristaltic pump is volumetric (70 mL/min, calibrate once), so
-pump-seconds since the last refill = mL used. The UI shows a % gauge; the level switch re-syncs it and
-stops the pump about a minute after it reads dry.
+pump-seconds since the last refill = mL used. The UI shows a % gauge and stops the pump when it reaches
+empty; a refill button resets it (no level switch, Micah 2026-11-11). The heater's only limit is the firmware
+cut at 245 C on the K probe (the KSD301 cutout is dropped).
 
 ## Main valve is manual (rev C.3)
 

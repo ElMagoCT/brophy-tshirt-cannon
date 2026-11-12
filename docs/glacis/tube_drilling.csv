@@ -1,35 +1,39 @@
 Tube,Hole,Face (drilled from),Along the tube from its -x/-y/-z end (mm),Across the face from its centre line (mm),Diameter (mm)
 End rail front (1x2),rivet 3/16 (countersunk plate),bottom,12.2,0.0,4.9
-End rail front (1x2),underglow M4 rivnut,bottom,72.3,-2.3,6.1
+End rail front (1x2),rivet 3/16 (countersunk plate),bottom,37.2,0.0,4.9
+End rail front (1x2),rivet 3/16 (countersunk plate),bottom,72.2,0.0,4.9
 End rail front (1x2),rivet 3/16 (countersunk plate),bottom,107.2,0.0,4.9
-End rail front (1x2),underglow M4 rivnut,bottom,130.8,-2.3,6.1
-End rail front (1x2),underglow M4 rivnut,bottom,215.4,-2.3,6.1
-End rail front (1x2),underglow M4 rivnut,bottom,299.0,-2.3,6.1
-End rail front (1x2),underglow M4 rivnut,bottom,383.5,-2.3,6.1
+End rail front (1x2),rivet 3/16 (countersunk plate),bottom,140.5,0.0,4.9
+End rail front (1x2),rivet 3/16 (countersunk plate),bottom,373.8,0.0,4.9
 End rail front (1x2),rivet 3/16 (countersunk plate),bottom,407.2,0.0,4.9
-End rail front (1x2),underglow M4 rivnut,bottom,442.0,-2.3,6.1
+End rail front (1x2),rivet 3/16 (countersunk plate),bottom,442.2,0.0,4.9
+End rail front (1x2),rivet 3/16 (countersunk plate),bottom,477.2,0.0,4.9
 End rail front (1x2),rivet 3/16 (countersunk plate),bottom,502.2,0.0,4.9
 End rail front (1x2),frame mount #10-32,bottom through both walls,52.2,5.7,5.2
 End rail front (1x2),frame mount #10-32,bottom through both walls,462.2,5.7,5.2
 End rail front (1x2),rivet 3/16,top,12.2,0.0,4.9
 End rail front (1x2),rivet 3/16,top,107.2,0.0,4.9
+End rail front (1x2),rivet 3/16,top,140.5,0.0,4.9
+End rail front (1x2),rivet 3/16,top,373.8,0.0,4.9
 End rail front (1x2),rivet 3/16,top,407.2,0.0,4.9
 End rail front (1x2),rivet 3/16,top,502.2,0.0,4.9
 End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,12.2,0.0,4.9
-End rail rear (1x2),underglow M4 rivnut,bottom,47.3,2.3,6.1
+End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,37.2,0.0,4.9
+End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,72.2,0.0,4.9
 End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,107.2,0.0,4.9
-End rail rear (1x2),underglow M4 rivnut,bottom,130.8,2.3,6.1
-End rail rear (1x2),underglow M4 rivnut,bottom,215.4,2.3,6.1
-End rail rear (1x2),underglow M4 rivnut,bottom,299.0,2.3,6.1
-End rail rear (1x2),underglow M4 rivnut,bottom,383.5,2.3,6.1
+End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,140.5,0.0,4.9
+End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,373.8,0.0,4.9
 End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,407.2,0.0,4.9
-End rail rear (1x2),underglow M4 rivnut,bottom,467.1,2.3,6.1
+End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,442.2,0.0,4.9
+End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,477.2,0.0,4.9
 End rail rear (1x2),rivet 3/16 (countersunk plate),bottom,502.2,0.0,4.9
 End rail rear (1x2),frame mount #10-32,bottom through both walls,87.2,-5.7,5.2
 End rail rear (1x2),frame mount #10-32,bottom through both walls,257.2,-5.7,5.2
 End rail rear (1x2),frame mount #10-32,bottom through both walls,427.2,-5.7,5.2
 End rail rear (1x2),rivet 3/16,top,12.2,0.0,4.9
 End rail rear (1x2),rivet 3/16,top,107.2,0.0,4.9
+End rail rear (1x2),rivet 3/16,top,140.5,0.0,4.9
+End rail rear (1x2),rivet 3/16,top,373.8,0.0,4.9
 End rail rear (1x2),rivet 3/16,top,407.2,0.0,4.9
 End rail rear (1x2),rivet 3/16,top,502.2,0.0,4.9
 Inner rail L (1x2),rivet 3/16 (countersunk plate),bottom,12.0,0.0,4.9
@@ -131,14 +135,8 @@ Inner rail R (1x2),rivet 3/16,top,757.4,0.0,4.9
 Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,10.0,0.0,4.9
 Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,32.0,0.0,4.9
 Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,60.0,0.0,4.9
-Outer rail L (1x2),underglow M4 rivnut,bottom,78.0,-2.3,6.1
-Outer rail L (1x2),underglow M4 rivnut,bottom,172.3,-2.3,6.1
-Outer rail L (1x2),underglow M4 rivnut,bottom,267.5,-2.3,6.1
-Outer rail L (1x2),underglow M4 rivnut,bottom,361.8,-2.3,6.1
-Outer rail L (1x2),underglow M4 rivnut,bottom,457.0,-2.3,6.1
-Outer rail L (1x2),underglow M4 rivnut,bottom,551.3,-2.3,6.1
-Outer rail L (1x2),underglow M4 rivnut,bottom,646.5,-2.3,6.1
-Outer rail L (1x2),underglow M4 rivnut,bottom,740.8,-2.3,6.1
+Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,88.0,0.0,4.9
+Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,730.8,0.0,4.9
 Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,758.8,0.0,4.9
 Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,786.8,0.0,4.9
 Outer rail L (1x2),rivet 3/16 (countersunk plate),bottom,808.8,0.0,4.9
@@ -159,20 +157,16 @@ Outer rail L (1x2),wheel axle bearing,right (-y),663.4,0.0,28.8
 Outer rail L (1x2),rivet 3/16,top,10.0,0.0,4.9
 Outer rail L (1x2),rivet 3/16,top,32.0,0.0,4.9
 Outer rail L (1x2),rivet 3/16,top,60.0,0.0,4.9
+Outer rail L (1x2),rivet 3/16,top,88.0,0.0,4.9
+Outer rail L (1x2),rivet 3/16,top,730.8,0.0,4.9
 Outer rail L (1x2),rivet 3/16,top,758.8,0.0,4.9
 Outer rail L (1x2),rivet 3/16,top,786.8,0.0,4.9
 Outer rail L (1x2),rivet 3/16,top,808.8,0.0,4.9
 Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,10.0,0.0,4.9
 Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,32.0,0.0,4.9
 Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,60.0,0.0,4.9
-Outer rail R (1x2),underglow M4 rivnut,bottom,78.0,2.3,6.1
-Outer rail R (1x2),underglow M4 rivnut,bottom,172.3,2.3,6.1
-Outer rail R (1x2),underglow M4 rivnut,bottom,267.5,2.3,6.1
-Outer rail R (1x2),underglow M4 rivnut,bottom,361.8,2.3,6.1
-Outer rail R (1x2),underglow M4 rivnut,bottom,457.0,2.3,6.1
-Outer rail R (1x2),underglow M4 rivnut,bottom,551.3,2.3,6.1
-Outer rail R (1x2),underglow M4 rivnut,bottom,646.5,2.3,6.1
-Outer rail R (1x2),underglow M4 rivnut,bottom,740.8,2.3,6.1
+Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,88.0,0.0,4.9
+Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,730.8,0.0,4.9
 Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,758.8,0.0,4.9
 Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,786.8,0.0,4.9
 Outer rail R (1x2),rivet 3/16 (countersunk plate),bottom,808.8,0.0,4.9
@@ -193,6 +187,8 @@ Outer rail R (1x2),axle end-screw access,right (-y),663.4,0.0,14.0
 Outer rail R (1x2),rivet 3/16,top,10.0,0.0,4.9
 Outer rail R (1x2),rivet 3/16,top,32.0,0.0,4.9
 Outer rail R (1x2),rivet 3/16,top,60.0,0.0,4.9
+Outer rail R (1x2),rivet 3/16,top,88.0,0.0,4.9
+Outer rail R (1x2),rivet 3/16,top,730.8,0.0,4.9
 Outer rail R (1x2),rivet 3/16,top,758.8,0.0,4.9
 Outer rail R (1x2),rivet 3/16,top,786.8,0.0,4.9
 Outer rail R (1x2),rivet 3/16,top,808.8,0.0,4.9

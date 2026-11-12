@@ -11,8 +11,8 @@ Every bracket on the box-tube frame, flat, in millimetres, from `cad/glacis/brac
 | Arm knee | 12 | 1/8 in | 86 x 95 | 5 | `arm_knee.dxf` |
 | Arm knee short | 2 | 1/8 in | 86 x 65 | 4 | `arm_knee_short.dxf` |
 | Bellypan (CNC router) | 1 | 1/8 in | 768 x 259 | 24 CSK | `bellypan.dxf` |
-| Corner gusset bottom | 4 | 1/8 in | 100 x 179 | 5 CSK | `corner_gusset_bottom.dxf` |
-| Corner gusset top | 4 | 1/8 in | 100 x 179 | 7 | `corner_gusset_top.dxf` |
+| Corner gusset bottom | 4 | 1/8 in | 100 x 179 | 9 CSK | `corner_gusset_bottom.dxf` |
+| Corner gusset top | 4 | 1/8 in | 100 x 179 | 9 | `corner_gusset_top.dxf` |
 | Inboard plate front tank | 2 | 1/8 in | 80 x 147 | 4 | `inboard_plate_front_tank.dxf` |
 | Inboard plate rear | 2 | 1/8 in | 180 x 78 | 11 | `inboard_plate_rear.dxf` |
 | Inboard plate rear tank | 2 | 1/8 in | 54 x 147 | 4 | `inboard_plate_rear_tank.dxf` |

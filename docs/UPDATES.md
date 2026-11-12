@@ -25,6 +25,21 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-12 - Micah's Windows computer (Claude Code) - CAD matches the list, Sheet notes, LED wiring, centred 3/4 in smoke line, visuals
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (JUDGMENTS B23, B24):
+  - Every list module is in the CAD (relay driver, fog relays, MOSFET modules, MAX6675, fuse holder, DS18B20s), five quick disconnects in the air lines, real HTD 5M teeth on the 112T ring and 16T pinion, the rear fog tube up at z 235, the drive belts (D06) on the list.
+  - Micah's Sheet notes, all answered and cleared: level shifter, level switch, KSD301 cutout, M4 x 6s, rivnuts, coupling nuts and pin headers gone; underglow brackets taped on; ring standoffs printed on the ring; cheaper USB-C, remote charger, canvas, PETG, rivets; nylocs, 1x6s and 3 mm tube owned.
+  - LED wiring: 22 AWG 3-pin wire + servo-lead pigtails, five data lines (left panels, right panels, left frame, right frame, underglow), nothing in parallel.
+  - Gun smoke line 3/4 x 1 in, dead centre between the barrels, oblong holes; new smoke collar with one channel per barrel hole (3 per barrel, now actually through the wall); solid mantlet loft; core clamp screws above and below the barrels.
+  - New "Visuals" STEP (floor, smoke, t-shirts, window glow, headlight beam), never in the checks or the list.
+- Files: `cad/glacis/gun.py`, `misc.py`, `lib.py`, `params.py`, `robot.py`, `partcodes.py`, `visuals.py` (new), `out/`, `docs/glacis/waterjet/`, `docs/glacis/tube_drilling.csv`, `bom/glacis_bom.py` (+ csv/json/codes), `electrical/README.md`, `docs/glacis/JUDGMENTS.md`
+- Checks: full robot.py: interference only the old 64 mm3 fill elbow sliver; sweep 0-90 deg 0 clashes; every print on the bed; 0 multi-piece; gun 18.8 kg, balanced.
+- Parts list: $1,566.22 -> $1,532.42 pre-tax (Order 1 $1,058.28 / $1,154.58 with tax, Order 2 $474.14 / $517.29). Sheet rewritten to match.
+- McMaster: nothing needs to be McMaster; switching away saved about $235 overall (the one dearer swap, rated Sch 80 nipples, is about +$7 net, under the $20 line), so it stays switched.
+- Not done: Onshape re-import of the changed tabs and the Visuals tab with its on/off configuration (next).
+- Questions for Micah: none.
+
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Onshape part names carry their parts-list code
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (Micah: "every part should be named, i want to see what aligns with what on the order list"): every one of the 599 Onshape parts is renamed "<code> <name>" (e.g. "B15-1 Bumper backing rear", "P05-1 Fill plug"), so the assembly tree reads against column A of the order tabs. The 9 sub-assemblies have Part numbers too (ASM-P1 Pneumatics, ASM-P2 Gun, ASM-D, ASM-C, ASM-L, ASM-B1/B2/B3, ASM-R; the main assembly ASM-TC5), so the structured BOM has no blank rows.

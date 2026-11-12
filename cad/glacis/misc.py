@@ -18,6 +18,76 @@ IY = (P.INNER_RAIL_Y[0] + P.INNER_RAIL_Y[1]) / 2       # inner rail centre |y|
 OY = (P.OUTER_RAIL_Y[0] + P.OUTER_RAIL_Y[1]) / 2
 
 
+def qd_inline(tag, points, group="pneu", avoid=()):
+    """One of the five interior quick disconnects (M-style coupler + female-thread plug) in the middle of a tube's
+    longest straight run. Returns the cylinder to cut out of the tube there (Micah 2026-11-11: make the CAD BOM and the
+    parts list match)."""
+    from lib import PARTS
+    segs = sorted([(V(*a), V(*b)) for a, b in zip(points, points[1:])], key=lambda s: -(s[1] - s[0]).Length)
+    pick = None
+    for a, b in segs:                                # longest straight run first, the first spot clear of every part
+        if (b - a).Length < 90.0:
+            continue
+        for fr in (0.5, 0.35, 0.65, 0.25, 0.75):
+            d = (b - a).normalized()
+            q = a + (b - a) * fr
+            if min((q - a).Length, (b - q).Length) < 42.0:
+                continue
+            dt = d.toTuple()
+            body = union([hex_prism(22.0, 10.0, (q - d * 38.0).toTuple(), dt),
+                          tube(11.5, 7.0, 32.0, (q - d * 28.0).toTuple(), dt)])
+            plug = PP.m_plug_f(q + d * 22.0, -d)
+            env = body.fuse(plug)
+            e = env.BoundingBox()
+            clash = False
+            for s_ in avoid:                         # e.g. the gun at every swing angle
+                s = s_.BoundingBox()
+                if s.xmin < e.xmax and e.xmin < s.xmax and s.ymin < e.ymax and e.ymin < s.ymax and s.zmin < e.zmax and e.zmin < s.zmax:
+                    if env.intersect(s_).Volume() > 1.0:
+                        clash = True
+                        break
+            for p in ([] if clash else PARTS):
+                s = p["shape"].BoundingBox()
+                if s.xmin < e.xmax and e.xmin < s.xmax and s.ymin < e.ymax and e.ymin < s.ymax and s.zmin < e.zmax and e.zmin < s.zmax:
+                    if not p["name"].startswith(("Tube", "Service loop")) and env.intersect(p["shape"]).Volume() > 1.0:
+                        clash = True
+                        break
+            if not clash:
+                pick = (q, d, dt, body, plug)
+                break
+        if pick:
+            break
+    if pick is None:                                 # no clear spot: the middle of the longest run, flagged in the log
+        a, b = segs[0]
+        d = (b - a).normalized()
+        q = a + (b - a) * 0.5
+        dt = d.toTuple()
+        body = union([hex_prism(22.0, 10.0, (q - d * 38.0).toTuple(), dt),
+                      tube(11.5, 7.0, 32.0, (q - d * 28.0).toTuple(), dt)])
+        plug = PP.m_plug_f(q + d * 22.0, -d)
+        print(f"QD {tag}: no clear spot, placed mid-run", flush=True)
+        pick = (q, d, dt, body, plug)
+    q, d, dt, body, plug = pick
+    add(f"QD coupler {tag}", body, "brass", group,
+        bom="Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)",
+        note="supply side (the coupler has the shut-off); a push-to-connect in its back")
+    add(f"QD plug {tag}", plug, "steel", group,
+        bom="QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)",
+        note="on the downstream tube, a push-to-connect in its back")
+    return cyl(9.0, 76.0, (q - d * 40.0).toTuple(), dt)
+
+
+def add_split(name, shape, *a, start=None, **k):
+    """A tube cut in two by its quick disconnect: one part per piece (supply side = the piece nearest `start`)."""
+    sols = shape.Solids()
+    if start is not None:
+        sols = sorted(sols, key=lambda s: s.distance(cq.Vertex.makeVertex(*start)))
+    if len(sols) == 1:
+        return add(name, shape, *a, **k)
+    for s, tag in zip(sols, ("supply", "downstream", "3", "4")):
+        add(f"{name} ({tag})", s, *a, **k)
+
+
 def tube_path(points, r=3.175):
     """DOT nylon tube along a polyline (cylinders + joint spheres)."""
     segs = []
@@ -98,7 +168,13 @@ def towers_and_pivot():
         cyl(4.0, P.ELEV_MOTOR_FACE_Y - ya, (mx_, y_face, mz_), (0, 1, 0)))
     add("Elevation motor goBILDA 5203 19.2:1", mot, "black", "frame",
         bom="goBILDA 5203-2402-0019 Yellow Jacket 19.2:1, 312 rpm (FTC motor)", note="Spark MAX, brushed mode")
-    pin = cyl(P.pd(P.ELEV_T[0]) / 2 + 2.5, yb_ - ya, (mx_, -yb_, mz_), (0, 1, 0)).cut(
+    # HTD 5M teeth under the 9 mm belt (y -(ya+11)..-(ya+2)), a 2 mm flange each side (Micah 2026-11-11: "add teeth
+    # to the pulley")
+    from lib import htd_teeth
+    rf = P.pd(P.ELEV_T[0]) / 2 + 2.5
+    pin = union([htd_teeth(P.ELEV_T[0], 9.0, -(ya + 11.0), mx_, mz_),
+                 cyl(rf, 2.0, (mx_, -(ya + 2.0), mz_), (0, 1, 0)),
+                 cyl(rf, (yb_ - ya) - 11.0, (mx_, -yb_, mz_), (0, 1, 0))]).cut(
         cyl(4.1, 40, (mx_, -yb_ - 5, mz_), (0, 1, 0)))
     add("Elevation pinion 16T", pin, "print_d", "frame", bom="Elevation pinion 16T HTD 9 mm (8 mm REX bore)", kind="print",
         note="printed from Micah's own pulley design; sits out on the shaft so the belt is centred between the cradle plate "
@@ -306,11 +382,13 @@ def air():
         zr = 282.0 if sg > 0 else 245.0                   # the left one passes over in valve A's DIN plug
         pts = [t, (t[0], sg * 98.0, max(262.0, zr)), (xr, sg * 98.0, zr), (xr, sg * 98.0, 330.0),
                (e.x, e.y, 330.0), e.toTuple()]
-        add(f"Tube tank {side}", tube_path(pts), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
+        gap = qd_inline(f"tank {side}", pts)
+        add_split(f"Tube tank {side}", tube_path(pts).cut(gap), "tube", "pneu", start=tuple(pts[0]), bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
     m0 = MAIN_OUT[0]
     tf = [m0.toTuple(), (m0.x, m0.y - 12.0, mz), (sx1 - 40.0, m0.y - 12.0, mz - 20.0), (sx1 - 40.0, fy, mz - 25.0),
           (sx1 - 40.0, fy, fz), (fx - vc - 18.0, fy, fz)]
-    add("Tube main valve to cross", tube_path(tf), "tube", "pneu", bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
+    gap = qd_inline("main valve line", tf)
+    add_split("Tube main valve to cross", tube_path(tf).cut(gap), "tube", "pneu", start=tf[0], bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
 
 
 # ------------------------------------------------------------------ fog
@@ -333,7 +411,7 @@ def fog():
             bom="Fog fluid pump: Kamoer NKP 12 V peristaltic")
         yc0, yc1 = sorted([sy * 6.0, sy * 38.0])
         add(f"Fog heater core {'L' if sy > 0 else 'R'}", box(x1 - 104, x1 - 7, yc0, yc1, zb + 3, zb + 39), "steel", "power",
-            bom="Fog heater core 12 V 200 W (cast, 97 x 32 x 36 mm)", note="ceramic-fiber wrap; KSD301 + K probe clamped on")
+            bom="Fog heater core 12 V 200 W (cast, 97 x 32 x 36 mm)", note="ceramic-fiber wrap; K probe clamped on (firmware cut at 245 C)")
     add("Fog heater bracket (1/8 Al)", box(x1 - 110, x1 - 2, y0 + 4, y1 - 4, zb, zb + 3), "alu", "power",
         bom="Fog heater bracket (1/8 Al)", kind="stock")
     for (xp, yp) in ((x0 + 92, y0 + 6), (x0 + 92, y1 - 6), (x1 - 8, y0 + 6), (x1 - 8, y1 - 6)):   # clear of tank and pumps
@@ -347,10 +425,10 @@ def fog():
     for sy in (1, -1):                                     # trail lines out the sides, the gun line out the top
         hub = hub.fuse(tube(11.0, 8.5, 16.0, (cx, sy * 28.0, z1 + 29), (0, sy, 0)))
         barbs.append((cx, sy * 44.0, z1 + 29))
-    hub = hub.fuse(tube(7.0, 5.0, 16.0, (cx - 10, 0, z1 + 44), (0, 0, 1)))        # 1/2 in barb (was 3/8, 7 mm bore)
+    hub = hub.fuse(tube(9.8, 7.5, 18.0, (cx - 8, 0, z1 + 44), (0, 0, 1)))         # 3/4 in barb (was 1/2) for the 3/4 x 1 line
     add("Fog splitter 1-3", hub, "print", "power", bom="Fog splitter 1 -> 3 (printed)", kind="print",
-        note="22 mm barbs for the two trail tubes, a 1/2 in barb (10 mm bore) for the gun's silicone line")
-    FOG_OUT[:] = [V(cx - 10, 0, z1 + 60)]
+        note="22 mm barbs for the two trail tubes, a 3/4 in barb (15 mm bore) for the gun's 3/4 in silicone line")
+    FOG_OUT[:] = [V(cx - 8, 0, z1 + 62)]
     # front: down through the bellypan just ahead of the machine
     side_b = barbs[0]
     vx, vy = P.FOG_VENTS[0]
@@ -367,9 +445,12 @@ def fog():
     add("Fog vent rear", tube(13.0, 10.0, 14.0, (rx, ry, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1)).fuse(
         tube(16.0, 10.0, 3.0, (rx, ry, P.BELLY_Z - P.PLATE_T - 14.0), (0, 0, 1))), "print", "power",
         bom="Fog vent nozzle (under the belly)", kind="print", note="through a hole in the bellypan")
-    add("Fog tube rear", tube_path([side_b, (side_b[0], -70.0, side_b[2]), (165.0, -70.0, side_b[2]), (165.0, ry, 125.0),
-                                    (rx + 30.0, ry, 125.0), (rx, ry, P.BELLY_Z + 10.0), (rx, ry, P.BELLY_Z - P.PLATE_T)],
-                                   r=11.0),
+    # 2026-11-11 (Micah: "the fog tube can move to run above stuff"): it runs high along the centreline at z 235,
+    # under the gun-well floor and over every board, then drops straight to the vent (searched clear of every solid)
+    zt_ = 235.0
+    add("Fog tube rear", tube_path([side_b, (side_b[0], -64.0, side_b[2]), (side_b[0], -64.0, zt_), (150.0, -64.0, zt_),
+                                    (150.0, ry, zt_), (rx, ry, zt_), (rx, ry, P.BELLY_Z + 10.0),
+                                    (rx, ry, P.BELLY_Z - P.PLATE_T)], r=11.0),
         "tube", "power", bom="Fog tube (owner's flexible tube)", kind="stock")
 
 
@@ -432,8 +513,46 @@ def batteries_and_electronics():
                'REV Spark MAX (owned)'),
               ('Valve arm relay 40 A', -15, 13, -35, -17, 0, 36, 'black',
                '12 V 40 A SPDT relay + socket'),
-              ('Valve + fog drivers (MOSFETs, relays, ULN2803A)', 33, 93, 17, 87, 6, 32, 'pcb',
-               'MOSFET switch modules + 12 V 40 A relays + ULN2803A'),
+              # 2026-11-11 (Micah: make the CAD BOM and the parts list match): the old combined
+              # driver block split into the real modules, each spot searched clear of everything
+              ('Relay driver board (ULN2803A)', 43, 83, 36, 66, 6, 12, 'pcb',
+               'ULN2803A Darlington driver on a perfboard: the relay coils'),
+              ('Fog relay 40 A core 1', 49, 77, 15, 33, 0, 36, 'black',
+               '12 V 40 A SPDT relay + socket (fog core)'),
+              ('Fog relay 40 A core 2', 76, 94, 69, 97, 0, 36, 'black',
+               '12 V 40 A SPDT relay + socket (fog core, spare)'),
+              ('Valve MOSFET module 1 (firing valve A)', 97, 131, 78, 95, 6, 10, 'pcb',
+               'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
+              ('Valve MOSFET module 2 (firing valve B)', 46, 80, -30, -13, 6, 10, 'pcb',
+               'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
+              ('Valve MOSFET module 3 (in valve A)', 85, 119, -30, -13, 6, 10, 'pcb',
+               'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
+              ('Valve MOSFET module 4 (in valve B)', 136, 170, 78, 95, 6, 10, 'pcb',
+               'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
+              ('Valve MOSFET module 5 (contactor (controller))', 151, 168, 36, 70, 6, 10, 'pcb',
+               'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
+              ('Valve MOSFET module 6 (contactor (safety node))', 154, 171, -48, -14, 6, 10, 'pcb',
+               'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
+              ('Fog and light MOSFET module 1 (light bar)', 175, 215, 69, 89, 6, 20, 'pcb',
+               'MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)'),
+              ('Fog and light MOSFET module 2 (fog heater)', 124, 144, -87, -47, 6, 20, 'pcb',
+               'MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)'),
+              ('Fog and light MOSFET module 3 (fog heater 2)', 148, 168, -93, -53, 6, 20, 'pcb',
+               'MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)'),
+              ('Fog and light MOSFET module 4 (fog pump)', 220, 260, 69, 89, 6, 20, 'pcb',
+               'MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)'),
+              ('Fog and light MOSFET module 5 (fog blower)', 172, 212, -90, -70, 6, 20, 'pcb',
+               'MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)'),
+              ('Thermocouple amp MAX6675', 283, 298, -15, 10, 6, 8, 'pcb',
+               'Thermocouple amp MAX6675 module (+ K probe on the core)'),
+              ('Inline ATO fuse holder (logic tap)', -263, -218, 81, 96, 0, 15, 'red',
+               'Inline ATO fuse holder + 5 A fuse'),
+              ('DS18B20 probe electronics', -170, -130, 24, 32, 0, 6, 'steel',
+               'DS18B20 waterproof temperature probe'),
+              ('DS18B20 probe battery bay', -191, -183, 57, 97, 0, 6, 'steel',
+               'DS18B20 waterproof temperature probe'),
+              ('DS18B20 probe fogger', 301, 309, -30, 10, 0, 6, 'steel',
+               'DS18B20 waterproof temperature probe'),
               ('Buck 12-5 V 20 A', 97, 147, 17, 73, 0, 25, 'black',
                '12->5 V 20 A buck (B089M5R3NJ)'),
               ('Logic supply 5 V (buck-boost)', 125, 150, -43, -17, 6, 10, 'pcb',
@@ -725,24 +844,10 @@ def underglow():
             b_lo, b_hi = a0 + 0.5, a0 + 2 * half / n - 0.5
             low = prism([(-25.0, 95.0), (-5.0, 95.0), (-5.0, 98.2), (-25.0, 98.2)], b_lo, b_hi).intersect(under)
             seg_ = prism(sec, b_lo, b_hi).cut(top.intersect(under)).fuse(low).cut(clear_).clean()
-            screws_ = []                                  # 2 x M4 up into the rail (or the gusset), clear of the post screws
-            for f_ in (0.25, 0.75, 0.4, 0.6, 0.1, 0.9):
-                at_ = b_lo + (b_hi - b_lo) * f_
-                xy = (at_, oy * (pos - 15.0)) if ox == 0 else (ox * (pos - 15.0), at_)
-                if clear_.intersect(cyl(6.0, 12.0, (xy[0], xy[1], 90.0), (0, 0, 1))).Volume() < 0.5 and \
-                        all(abs(at_ - o_) > 30.0 for o_ in screws_):
-                    seg_ = seg_.cut(cyl(2.25, 20.0, (xy[0], xy[1], 86.0), (0, 0, 1)))
-                    seg_ = seg_.cut(cyl(4.5, 25.0, (xy[0], xy[1], 60.0), (0, 0, 1)))       # driver access through the face
-                    import lib
-                    lib.TUBE_HOLES.append(("underglow M4 rivnut", (xy[0], xy[1], P.RAIL_Z[0] - 1.0), (0, 0, 1), 3.05,
-                                           P.TUBE_WALL + 2.0))
-                    UG_SCREWS.append((xy[0], xy[1]))
-                    screws_.append(at_)
-                if len(screws_) == 2:
-                    break
+            # taped to the rail's bottom wall with the 3M tape (Micah 2026-11-11): no screws, no rivnuts
             add(f"Underglow bracket {tag} {k + 1}", seg_, "print", "bumper",
                 bom="Underglow bracket (printed, 45 deg)", kind="print",
-                note=f"{len(screws_)} x M4 x 8 up into M4 rivnuts in the rail's bottom wall (through the corner gusset where it steps down); the strip on its 45 deg face with 3M tape")
+                note="3M tape on its top onto the rail's bottom wall (and the corner gusset where it steps down); the strip on its 45 deg face with the same tape")
         add(f"LED strip underglow {tag}", prism(strip, -half + 5.0, half - 5.0), "led", "bumper",
             bom="WS2812B strip 10 mm, 60/m (m)", kind="stock", note="aimed 45 deg down and out, its centre just under the bumper's bottom edge; 3M tape")
         total += 2 * half - 10.0

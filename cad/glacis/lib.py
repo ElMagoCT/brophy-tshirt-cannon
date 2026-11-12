@@ -116,6 +116,26 @@ def poly_prism(pts, h, plane="XY", offset=0.0):
     return w.val()
 
 
+def htd_teeth(teeth, width, y0=0.0, x=0.0, z=0.0, pitch=5.0, depth=2.06, groove_r=1.53, steps=10):
+    """HTD 5M toothed rim (Micah 2026-11-11: "add teeth to the pulley"), axis along +y from y0, centred at (x, z).
+    OD = pitch diameter - 1.14 mm; each groove a 1.53 mm radius arc 2.06 mm deep (the HTD 5M pulley groove), so the
+    printed pulley takes a real belt."""
+    pd = teeth * pitch / math.pi
+    ro = pd / 2 - 0.57
+    cg = ro - depth + groove_r                     # groove centre radius
+    half = math.asin(min(1.0, groove_r / cg)) if cg > groove_r else math.pi / teeth
+    pts = []
+    for k in range(teeth):
+        a0 = 2 * math.pi * k / teeth
+        for j in range(steps + 1):                 # groove: polar curve across the groove's angular width
+            phi = -half + 2 * half * j / steps
+            s = cg * cg * math.sin(phi) ** 2
+            r = ro if s > groove_r ** 2 else min(ro, cg * math.cos(phi) - math.sqrt(groove_r ** 2 - s))
+            pts.append((x + r * math.cos(a0 + phi), z + r * math.sin(a0 + phi)))
+    w = cq.Wire.makePolygon([V(u, y0, v) for u, v in pts], close=True)
+    return cq.Solid.extrudeLinear(cq.Face.makeFromWires(w), V(0, width, 0))
+
+
 def _plane_origin(plane, off):
     return {"XY": (0, 0, off), "XZ": (0, off, 0), "YZ": (off, 0, 0)}[plane]
 

@@ -48,8 +48,8 @@ Part number,Part,Tab,CAD label
 3DP-B047,Body frame E38S0,body_frame_2_of_6,Body frame piece E38S0
 3DP-B048,Body frame E20S1,body_frame_2_of_6,Body frame piece E20S1
 3DP-B049,Body frame E37S1,body_frame_2_of_6,Body frame piece E37S1
-3DP-B050,Body frame E24S0+N03+N09,body_frame_2_of_6,Body frame piece E24S0+N03+N09
-3DP-B051,Body frame E29S0+N04+N10,body_frame_2_of_6,Body frame piece E29S0+N04+N10
+3DP-B050,Body frame E24S0+N04+N09,body_frame_2_of_6,Body frame piece E24S0+N04+N09
+3DP-B051,Body frame E29S0+N03+N10,body_frame_2_of_6,Body frame piece E29S0+N03+N10
 3DP-B052,Body frame E21S0,body_frame_2_of_6,Body frame piece E21S0
 3DP-B053,Body frame E36S0,body_frame_2_of_6,Body frame piece E36S0
 3DP-B054,Body frame E23S0,body_frame_3_of_6,Body frame piece E23S0
@@ -133,7 +133,15 @@ Part number,Part,Tab,CAD label
 3DP-C005,Board tray PWM expander PCA9685,power_electronics_smoke,Printed board tray
 3DP-C006,Board tray ADS1115 ADC 1,power_electronics_smoke,Printed board tray
 3DP-C007,Board tray ADS1115 ADC 2,power_electronics_smoke,Printed board tray
-3DP-C008,Board tray Logic supply 5 V,power_electronics_smoke,Printed board tray
+3DP-C008,Board tray Relay driver board,power_electronics_smoke,Printed board tray
+3DP-C009,Board tray Valve MOSFET module 2,power_electronics_smoke,Printed board tray
+3DP-C010,Board tray Valve MOSFET module 3,power_electronics_smoke,Printed board tray
+3DP-C011,Board tray Valve MOSFET module 1,power_electronics_smoke,Printed board tray
+3DP-C012,Board tray Logic supply 5 V,power_electronics_smoke,Printed board tray
+3DP-C013,Board tray Valve MOSFET module 4,power_electronics_smoke,Printed board tray
+3DP-C014,Board tray Valve MOSFET module 5,power_electronics_smoke,Printed board tray
+3DP-C015,Board tray Valve MOSFET module 6,power_electronics_smoke,Printed board tray
+3DP-C016,Board tray Thermocouple amp MAX6675,power_electronics_smoke,Printed board tray
 3DP-D001,Axle spacer inner RL,chassis_pivot_drive_1_of_6,1/2 hex spacer (printed or stash)
 3DP-D002,Axle spacer outer RL,chassis_pivot_drive_1_of_6,1/2 hex spacer (printed or stash)
 3DP-D003,Axle spacer inner RR,chassis_pivot_drive_2_of_6,1/2 hex spacer (printed or stash)
@@ -236,27 +244,31 @@ Part number,Part,Tab,CAD label
 3DP-E002,Pivot bearing block R,chassis_pivot_drive_3_of_6,Pivot bearing block
 3DP-E003,Elevation motor bracket,chassis_pivot_drive_4_of_6,Elevation motor bracket
 3DP-E004,Elevation pinion 16T,chassis_pivot_drive_5_of_6,Elevation pinion 16T HTD 9 mm (8 mm REX bore)
-3DP-E005,Elevation pulley 112T ring,gun_pivots,Elevation pulley 112T HTD 9 mm ring (printed)
-3DP-F001,Smoke collar,gun_pivots,"Smoke collar (printed, one piece)"
+3DP-E005,Elevation pulley 112T ring,gun_pivots_2_of_2,Elevation pulley 112T HTD 9 mm ring (printed)
+3DP-F001,Smoke collar,gun_pivots_2_of_2,"Smoke collar (printed, one piece)"
 3DP-F002,Fog vent rear,power_electronics_smoke,Fog vent nozzle (under the belly)
-3DP-F003,Board tray Valve + fog drivers,power_electronics_smoke,Printed board tray
-3DP-F004,Fog fluid tank,power_electronics_smoke,"Fog fluid tank (printed, about 400 mL)"
-3DP-F005,Smoke machine tray,power_electronics_smoke,Smoke machine tray
-3DP-F006,Fog splitter 1-3,power_electronics_smoke,Fog splitter 1 -> 3 (printed)
-3DP-F007,Fog vent front,power_electronics_smoke,Fog vent nozzle (under bumper)
-3DP-P001,Chamber end cover top,gun_pivots,Chamber end cover (printed)
-3DP-P002,Chamber end cover bottom,gun_pivots,Chamber end cover (printed)
-3DP-P003,Chamber cap top rear,gun_pivots,Chamber cap
-3DP-P004,Chamber saddle rear,gun_pivots,Chamber saddle
-3DP-P005,Chamber cap bottom rear,gun_pivots,Chamber cap
-3DP-P006,Chamber cap top -95,gun_pivots,Chamber cap
-3DP-P007,Chamber saddle -95,gun_pivots,Chamber saddle
-3DP-P008,Chamber cap bottom -95,gun_pivots,Chamber cap
-3DP-P009,Axle hub left,gun_pivots,Axle hub
-3DP-P010,Axle spacer right,gun_pivots,Axle spacer (printed)
-3DP-P011,Gun core right,gun_pivots,"Gun core half (valve blocks + breech block + mantlet, printed)"
-3DP-P012,Gun core left,gun_pivots,"Gun core half (valve blocks + breech block + mantlet, printed)"
-3DP-P013,Muzzle ring,gun_pivots,"Muzzle ring (printed, one piece, LED groove)"
+3DP-F003,Board tray Fog and light MOSFET module 2,power_electronics_smoke,Printed board tray
+3DP-F004,Board tray Fog and light MOSFET module 3,power_electronics_smoke,Printed board tray
+3DP-F005,Board tray Fog and light MOSFET module 5,power_electronics_smoke,Printed board tray
+3DP-F006,Board tray Fog and light MOSFET module 1,power_electronics_smoke,Printed board tray
+3DP-F007,Fog fluid tank,power_electronics_smoke,"Fog fluid tank (printed, about 400 mL)"
+3DP-F008,Board tray Fog and light MOSFET module 4,power_electronics_smoke,Printed board tray
+3DP-F009,Smoke machine tray,power_electronics_smoke,Smoke machine tray
+3DP-F010,Fog splitter 1-3,power_electronics_smoke,Fog splitter 1 -> 3 (printed)
+3DP-F011,Fog vent front,power_electronics_smoke,Fog vent nozzle (under bumper)
+3DP-P001,Chamber end cover top,gun_pivots_1_of_2,Chamber end cover (printed)
+3DP-P002,Chamber end cover bottom,gun_pivots_1_of_2,Chamber end cover (printed)
+3DP-P003,Chamber cap top rear,gun_pivots_1_of_2,Chamber cap
+3DP-P004,Chamber saddle rear,gun_pivots_1_of_2,Chamber saddle
+3DP-P005,Chamber cap bottom rear,gun_pivots_1_of_2,Chamber cap
+3DP-P006,Chamber cap top -99,gun_pivots_1_of_2,Chamber cap
+3DP-P007,Chamber saddle -99,gun_pivots_1_of_2,Chamber saddle
+3DP-P008,Chamber cap bottom -99,gun_pivots_1_of_2,Chamber cap
+3DP-P009,Axle hub left,gun_pivots_2_of_2,Axle hub
+3DP-P010,Axle spacer right,gun_pivots_2_of_2,Axle spacer (printed)
+3DP-P011,Gun core left,gun_pivots_2_of_2,"Gun core half (valve blocks + breech block + mantlet, printed)"
+3DP-P012,Gun core right,gun_pivots_2_of_2,"Gun core half (valve blocks + breech block + mantlet, printed)"
+3DP-P013,Muzzle ring,gun_pivots_2_of_2,"Muzzle ring (printed, one piece, LED groove)"
 3DP-P014,Tank saddle left -60,pneumatics,Tank saddle
 3DP-P015,Tank saddle right -60,pneumatics,Tank saddle
 3DP-P016,Tank saddle left 200,pneumatics,Tank saddle
@@ -265,8 +277,8 @@ Part number,Part,Tab,CAD label
 3DP-S002,Speaker cup top left,lights_speakers_3_of_3,Speaker cup
 3DP-S003,Speaker grille top left,lights_speakers_3_of_3,Speaker grille
 3DP-S004,Speaker grille top right,lights_speakers_3_of_3,Speaker grille
-ABr-P01,Breech adapter top,gun_pivots,"Breech adapter (CNC 6061, stash bar, 1 in NPT tap)"
-ABr-P02,Breech adapter bottom,gun_pivots,"Breech adapter (CNC 6061, stash bar, 1 in NPT tap)"
+ABr-P01,Breech adapter top,gun_pivots_2_of_2,"Breech adapter (CNC 6061, stash bar, 1 in NPT tap)"
+ABr-P02,Breech adapter bottom,gun_pivots_2_of_2,"Breech adapter (CNC 6061, stash bar, 1 in NPT tap)"
 AEx-R01,Rail 20x20 gun left,add_on_rails,"20x20 T-slot extrusion (owned spare, cut)"
 AEx-R02,Rail 20x20 gun right,add_on_rails,"20x20 T-slot extrusion (owned spare, cut)"
 AEx-R03,Rail 20x20 well left,add_on_rails,"20x20 T-slot extrusion (owned spare, cut)"
@@ -323,8 +335,8 @@ ASh-D47,Wheel plate outer (1/8 Al) RR,wheel_rr,Mecanum outer plate (1/8 Al)
 ASh-E01,Tower plate L,chassis_pivot_drive_3_of_6,"Tower plate (1/8 Al, waterjet)"
 ASh-E02,Tower plate R,chassis_pivot_drive_3_of_6,"Tower plate (1/8 Al, waterjet)"
 ASh-F01,Fog heater bracket (1/8 Al),power_electronics_smoke,Fog heater bracket (1/8 Al)
-ASh-P01,Cradle plate left (1/8 Al),gun_pivots,"Gun cradle plate (1/8 Al, CNC router)"
-ASh-P02,Cradle plate right (1/8 Al),gun_pivots,"Gun cradle plate (1/8 Al, CNC router)"
+ASh-P01,Cradle plate left (1/8 Al),gun_pivots_1_of_2,"Gun cradle plate (1/8 Al, CNC router)"
+ASh-P02,Cradle plate right (1/8 Al),gun_pivots_1_of_2,"Gun cradle plate (1/8 Al, CNC router)"
 ATu-D01,End rail rear (1x2),chassis_pivot_drive_1_of_6,Aluminum box tube 1x2 x 1/16 wall (owned)
 ATu-D02,Sled post left -320 (1x1),chassis_pivot_drive_1_of_6,Aluminum box tube 1x1 x 1/16 wall (owned)
 ATu-D03,Sled rail left -320 (1x1),chassis_pivot_drive_1_of_6,Aluminum box tube 1x1 x 1/16 wall (owned)
@@ -357,12 +369,6 @@ Acr-B05,Panel 04,body_panels_clips,Frosted acrylic panel 1/8 in (owned)
 Acr-B06,Panel 01,body_panels_clips,Frosted acrylic panel 1/8 in (owned)
 Acr-B07,Panel 05,body_panels_clips,Frosted acrylic panel 1/8 in (owned)
 Acr-B08,Panel 00,body_panels_clips,Frosted acrylic panel 1/8 in (owned)
-B06-1,Elevation pulley standoff,gun_pivots,"M4 x 10 mm hex coupling nut (standoff), 304 stainless"
-B06-2,Elevation pulley standoff #2,gun_pivots,"M4 x 10 mm hex coupling nut (standoff), 304 stainless"
-B06-3,Elevation pulley standoff #3,gun_pivots,"M4 x 10 mm hex coupling nut (standoff), 304 stainless"
-B06-4,Elevation pulley standoff #4,gun_pivots,"M4 x 10 mm hex coupling nut (standoff), 304 stainless"
-B06-5,Elevation pulley standoff #5,gun_pivots,"M4 x 10 mm hex coupling nut (standoff), 304 stainless"
-B06-6,Elevation pulley standoff #6,gun_pivots,"M4 x 10 mm hex coupling nut (standoff), 304 stainless"
 B15-1,Bumper backing rear,bumpers_wall_standoffs,"Bumper backing, 1x6 ripped to 5 in (3/4 x 5 in)"
 B15-2,Bumper backing left,bumpers_wall_standoffs,"Bumper backing, 1x6 ripped to 5 in (3/4 x 5 in)"
 B15-3,Bumper backing right,bumpers_wall_standoffs,"Bumper backing, 1x6 ripped to 5 in (3/4 x 5 in)"
@@ -381,6 +387,9 @@ C03-1,ADS1115 ADC 1 (pressures),power_electronics_smoke,"ADS1115 16-bit 4-channe
 C03-2,ADS1115 ADC 2 (battery and bus volts),power_electronics_smoke,"ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)"
 C04-1,PWM expander PCA9685,power_electronics_smoke,"PWM expander: PCA9685 16-channel, I2C (Dorhea B07RMTN4NZ)"
 C06-1,Valve arm relay 40 A,power_electronics_smoke,12 V 40 A SPDT relay + socket
+C06-2,Fog relay 40 A core 1,power_electronics_smoke,12 V 40 A SPDT relay + socket (fog core)
+C06-3,Fog relay 40 A core 2,power_electronics_smoke,"12 V 40 A SPDT relay + socket (fog core, spare)"
+C07-1,Relay driver board (ULN2803A),power_electronics_smoke,ULN2803A Darlington driver on a perfboard: the relay coils
 C08-1,PDH contactor 200 A,power_electronics_smoke,"Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
 C08-2,Battery relay A 200 A,power_electronics_smoke,"Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
 C08-3,Battery relay B 200 A,power_electronics_smoke,"Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
@@ -394,6 +403,7 @@ C15-2,Power distribution (REV PDH),power_electronics_smoke,REV PDH (owned) + ATO
 C15-3,Anderson SB50 left,power_electronics_smoke,Anderson SB50 pair + 6 AWG contacts (stash)
 C15-4,Anderson SB50 right,power_electronics_smoke,Anderson SB50 pair + 6 AWG contacts (stash)
 C16-1,ESP32-S3 safety node,power_electronics_smoke,ESP32-S3-DevKitC-1 N8R8 (owned)
+C17-1,Inline ATO fuse holder (logic tap),power_electronics_smoke,Inline ATO fuse holder + 5 A fuse
 D01-1,Falcon 500 RL,chassis_pivot_drive_3_of_6,Falcon 500 (owned)
 D01-2,Falcon 500 RR,chassis_pivot_drive_3_of_6,Falcon 500 (owned)
 D01-3,Falcon 500 FL,chassis_pivot_drive_5_of_6,Falcon 500 (owned)
@@ -418,17 +428,30 @@ D05-1,Wheel axle RL (1/2 hex),chassis_pivot_drive_1_of_6,"1/2 in hex shaft, whee
 D05-2,Wheel axle RR (1/2 hex),chassis_pivot_drive_2_of_6,"1/2 in hex shaft, wheel axle (6 in)"
 D05-3,Wheel axle FL (1/2 hex),chassis_pivot_drive_6_of_6,"1/2 in hex shaft, wheel axle (6 in)"
 D05-4,Wheel axle FR (1/2 hex),chassis_pivot_drive_6_of_6,"1/2 in hex shaft, wheel axle (6 in)"
-D05-5,Pivot axle stub left (1/2 hex),gun_pivots,"1/2 in hex shaft, steel (pivot stub)"
-D05-6,Pivot axle stub right (1/2 hex),gun_pivots,"1/2 in hex shaft, steel (pivot stub)"
+D05-5,Pivot axle stub left (1/2 hex),gun_pivots_2_of_2,"1/2 in hex shaft, steel (pivot stub)"
+D05-6,Pivot axle stub right (1/2 hex),gun_pivots_2_of_2,"1/2 in hex shaft, steel (pivot stub)"
+D06-1,Belt 140T RL,chassis_pivot_drive_2_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
+D06-2,Belt 140T RR,chassis_pivot_drive_2_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
+D06-3,Belt 140T FL,chassis_pivot_drive_6_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
+D06-4,Belt 140T FR,chassis_pivot_drive_6_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
 E01-1,Elevation belt,chassis_pivot_drive_4_of_6,"HTD 5M 9 mm belt, 150T"
 E02-1,Elevation motor goBILDA 5203 19.2:1,chassis_pivot_drive_4_of_6,"goBILDA 5203-2402-0019 Yellow Jacket 19.2:1, 312 rpm (FTC motor)"
 E03-1,Spark MAX (elevation),power_electronics_smoke,REV Spark MAX (owned)
 E04-1,Arm-angle pot,chassis_pivot_drive_4_of_6,"10k linear pot, 1/4 in shaft (arm angle)"
 F01-1,Fog heater core L,power_electronics_smoke,"Fog heater core 12 V 200 W (cast, 97 x 32 x 36 mm)"
 F02-1,Fog pump L,power_electronics_smoke,Fog fluid pump: Kamoer NKP 12 V peristaltic
+F03-1,Thermocouple amp MAX6675,power_electronics_smoke,Thermocouple amp MAX6675 module (+ K probe on the core)
+F05-1,DS18B20 probe battery bay,power_electronics_smoke,DS18B20 waterproof temperature probe
+F05-2,DS18B20 probe electronics,power_electronics_smoke,DS18B20 waterproof temperature probe
+F05-3,DS18B20 probe fogger,power_electronics_smoke,DS18B20 waterproof temperature probe
 F07-1,Fog blower 5015,power_electronics_smoke,12 V 5015 blower
-F10-1,Gun smoke tube,gun_pivots,Silicone tube 1/2 ID x 5/8 OD (ft)
+F10-1,Gun smoke tube,gun_pivots_2_of_2,Silicone tube 3/4 ID x 1 OD (ft)
 F10-2,Fog loop (to gun),power_electronics_smoke,Silicone tube 1/2 ID x 5/8 OD (ft)
+F11-1,Fog and light MOSFET module 2 (fog heater),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
+F11-2,Fog and light MOSFET module 3 (fog heater 2),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
+F11-3,Fog and light MOSFET module 5 (fog blower),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
+F11-4,Fog and light MOSFET module 1 (light bar),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
+F11-5,Fog and light MOSFET module 4 (fog pump),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
 F12-1,Fog tube rear,power_electronics_smoke,Fog tube (owner's flexible tube)
 F12-2,Fog tube front,power_electronics_smoke,Fog tube (owner's flexible tube)
 F13-1,Fog bracket standoff 282 -54,power_electronics_smoke,M5 aluminum standoff (stash)
@@ -490,7 +513,17 @@ P02-4,Chamber relief valve 200 psi A (top cannon),pneumatics,"Relief valve 200 p
 P03-1,Tank transducer 0-300 psi,pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable"
 P03-2,Chamber transducer B (bottom cannon),pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)"
 P03-3,Chamber transducer A (top cannon),pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)"
+P04-1,QD coupler main valve line,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
+P04-2,QD coupler tank right,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
+P04-3,QD coupler service loop B,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
+P04-4,QD coupler service loop A,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
+P04-5,QD coupler tank left,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
 P05-1,"Fill plug (M-style, female)",pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
+P05-2,QD plug main valve line,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
+P05-3,QD plug tank right,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
+P05-4,QD plug service loop B,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
+P05-5,QD plug service loop A,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
+P05-6,QD plug tank left,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
 P06-1,Fill check valve,pneumatics,"Fill check valve, 304 stainless, 1/4 NPT male x male (AliExpress)"
 P07-1,In valve B (bottom cannon),pneumatics,"In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm"
 P07-2,In valve A (top cannon),pneumatics,"In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm"
@@ -510,21 +543,26 @@ P14-1,Tank plug left -80,pneumatics,1/4 NPT brass plug
 P14-2,Tank plug right -80,pneumatics,1/4 NPT brass plug
 P14-3,Tank plug left 80,pneumatics,1/4 NPT brass plug
 P14-4,Tank plug right 80,pneumatics,1/4 NPT brass plug
-P16-1,Gun tube top,gun_pivots,DOT nylon tube 1/4 OD (ft)
-P16-2,Gun tube bottom,gun_pivots,DOT nylon tube 1/4 OD (ft)
-P16-3,Tube main valve to cross,pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-4,Service loop B (bottom cannon),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-5,Tube tank left,pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-6,Tube tank right,pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-7,Service loop A (top cannon),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-1,Gun tube top,gun_pivots_1_of_2,DOT nylon tube 1/4 OD (ft)
+P16-2,Gun tube bottom,gun_pivots_2_of_2,DOT nylon tube 1/4 OD (ft)
+P16-3,Tube main valve to cross (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-4,Tube main valve to cross (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-5,Tube tank right (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-6,Service loop B (bottom cannon) (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-7,Tube tank left (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-8,Service loop A (top cannon) (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-9,Tube tank right (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-10,Service loop B (bottom cannon) (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-11,Service loop A (top cannon) (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-12,Tube tank left (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
 P17-1,Main valve push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
 P17-2,Rear manifold push-to-connect right tank,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
 P17-3,Rear manifold push-to-connect left tank,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
 P17-4,Valve cross push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
 P17-5,Chamber cross B (bottom cannon) push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
 P17-6,Chamber cross A (top cannon) push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
-P18-1,Chamber inlet elbow top,gun_pivots,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)
-P18-2,Chamber inlet elbow bottom,gun_pivots,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)
+P18-1,Chamber inlet elbow top,gun_pivots_1_of_2,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)
+P18-2,Chamber inlet elbow bottom,gun_pivots_1_of_2,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)
 P18-3,Tank elbow push-to-connect left,pneumatics,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT
 P18-4,Tank elbow push-to-connect right,pneumatics,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT
 P20-1,Tank strap left 6,pneumatics,1 in cam-buckle strap
@@ -533,68 +571,69 @@ P20-3,Tank strap left 86,pneumatics,1 in cam-buckle strap
 P20-4,Tank strap right 86,pneumatics,1 in cam-buckle strap
 P21-1,Main valve (1/4 ball valve),pneumatics,"Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG (the old cannon's if it fits)"
 P22-1,Fill nipple,pneumatics,1/4 NPT brass nipple x 1-1/2 in
-P23-1,Firing valve top (U.S. Solid USS-HSV04),gun_pivots,"Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
-P23-2,Firing valve bottom (U.S. Solid USS-HSV04),gun_pivots,"Firing valve bottom: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
-P24-1,Chamber back disc top,gun_pivots,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P24-2,Chamber back disc bottom,gun_pivots,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P24-3,Chamber front disc top,gun_pivots,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P24-4,Chamber front disc bottom,gun_pivots,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P25-1,Chamber pipe top,gun_pivots,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
-P25-2,Chamber pipe bottom,gun_pivots,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
-P26-1,Chamber inlet bung top,gun_pivots,Chamber inlet: 1/4 NPT female steel weld-on bung
-P26-2,Chamber inlet bung bottom,gun_pivots,Chamber inlet: 1/4 NPT female steel weld-on bung
-P27-1,top nipple 1x1.50,gun_pivots,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
-P27-2,bottom nipple 1x1.50,gun_pivots,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
-P28-1,Chamber outlet nipple top,gun_pivots,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
-P28-2,Chamber outlet nipple bottom,gun_pivots,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
-P30-1,"Valve + fog drivers (MOSFETs, relays, ULN2803A)",power_electronics_smoke,MOSFET switch modules + 12 V 40 A relays + ULN2803A
-P31-1,Barrel top,gun_pivots,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
-P31-2,Barrel bottom,gun_pivots,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
+P23-1,Firing valve top (U.S. Solid USS-HSV04),gun_pivots_2_of_2,"Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
+P23-2,Firing valve bottom (U.S. Solid USS-HSV04),gun_pivots_2_of_2,"Firing valve bottom: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
+P24-1,Chamber back disc top,gun_pivots_1_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P24-2,Chamber back disc bottom,gun_pivots_1_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P24-3,Chamber front disc top,gun_pivots_1_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P24-4,Chamber front disc bottom,gun_pivots_2_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P25-1,Chamber pipe top,gun_pivots_1_of_2,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
+P25-2,Chamber pipe bottom,gun_pivots_1_of_2,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
+P26-1,Chamber inlet bung top,gun_pivots_1_of_2,Chamber inlet: 1/4 NPT female steel weld-on bung
+P26-2,Chamber inlet bung bottom,gun_pivots_1_of_2,Chamber inlet: 1/4 NPT female steel weld-on bung
+P27-1,top nipple 1x1.50,gun_pivots_2_of_2,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
+P27-2,bottom nipple 1x1.50,gun_pivots_2_of_2,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
+P28-1,Chamber outlet nipple top,gun_pivots_1_of_2,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
+P28-2,Chamber outlet nipple bottom,gun_pivots_2_of_2,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
+P30-1,Valve MOSFET module 2 (firing valve B),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
+P30-2,Valve MOSFET module 3 (in valve A),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
+P30-3,Valve MOSFET module 1 (firing valve A),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
+P30-4,Valve MOSFET module 4 (in valve B),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
+P30-5,Valve MOSFET module 5 (contactor (controller)),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
+P30-6,Valve MOSFET module 6 (contactor (safety node)),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
+P31-1,Barrel top,gun_pivots_2_of_2,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
+P31-2,Barrel bottom,gun_pivots_2_of_2,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
 S01-1,Speaker top left,lights_speakers_3_of_3,"Siren speaker 200 W, 8 ohm, aluminium (Xprite B01DMSR4L4)"
 S01-2,Speaker top right,lights_speakers_3_of_3,"Siren speaker 200 W, 8 ohm, aluminium (Xprite B01DMSR4L4)"
 S02-1,Audio amp (TPA3255),power_electronics_smoke,"TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm"
 S03-1,Audio boost 12-33 V 1200 W,power_electronics_smoke,"1200 W 20 A boost converter, 8-60 V in, 12-80 V out (set to 33 V)"
-W-1,Belt 140T RL,chassis_pivot_drive_2_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
-W-2,Belt 140T RR,chassis_pivot_drive_2_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
-W-3,Belt 140T FL,chassis_pivot_drive_6_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
-W-4,Belt 140T FR,chassis_pivot_drive_6_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
-W-5,Roller rod FL05,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-6,Roller rod FL04,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-7,Roller rod FL06,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-8,Roller rod FL03,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-9,Roller rod FL07,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-10,Roller rod FL02,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-11,Roller rod FL08,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-12,Roller rod FL01,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-13,Roller rod FL09,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-14,Roller rod FL00,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-15,Roller rod FR05,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-16,Roller rod FR06,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-17,Roller rod FR04,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-18,Roller rod FR07,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-19,Roller rod FR03,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-20,Roller rod FR08,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-21,Roller rod FR02,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-22,Roller rod FR09,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-23,Roller rod FR01,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-24,Roller rod FR00,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-25,Roller rod RL05,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-26,Roller rod RL06,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-27,Roller rod RL04,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-28,Roller rod RL07,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-29,Roller rod RL03,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-30,Roller rod RL08,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-31,Roller rod RL02,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-32,Roller rod RL09,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-33,Roller rod RL01,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-34,Roller rod RL00,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
-W-35,Roller rod RR05,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-36,Roller rod RR04,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-37,Roller rod RR06,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-38,Roller rod RR03,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-39,Roller rod RR07,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-40,Roller rod RR02,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-41,Roller rod RR08,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-42,Roller rod RR01,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-43,Roller rod RR09,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
-W-44,Roller rod RR00,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-1,Roller rod FL05,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-2,Roller rod FL04,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-3,Roller rod FL06,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-4,Roller rod FL03,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-5,Roller rod FL07,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-6,Roller rod FL02,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-7,Roller rod FL08,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-8,Roller rod FL01,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-9,Roller rod FL09,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-10,Roller rod FL00,wheel_fl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-11,Roller rod FR05,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-12,Roller rod FR06,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-13,Roller rod FR04,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-14,Roller rod FR07,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-15,Roller rod FR03,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-16,Roller rod FR08,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-17,Roller rod FR02,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-18,Roller rod FR09,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-19,Roller rod FR01,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-20,Roller rod FR00,wheel_fr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-21,Roller rod RL05,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-22,Roller rod RL06,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-23,Roller rod RL04,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-24,Roller rod RL07,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-25,Roller rod RL03,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-26,Roller rod RL08,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-27,Roller rod RL02,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-28,Roller rod RL09,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-29,Roller rod RL01,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-30,Roller rod RL00,wheel_rl,"M8 threaded rod, roller axle (cut 109 mm)"
+W-31,Roller rod RR05,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-32,Roller rod RR04,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-33,Roller rod RR06,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-34,Roller rod RR03,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-35,Roller rod RR07,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-36,Roller rod RR02,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-37,Roller rod RR08,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-38,Roller rod RR01,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-39,Roller rod RR09,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"
+W-40,Roller rod RR00,wheel_rr,"M8 threaded rod, roller axle (cut 109 mm)"

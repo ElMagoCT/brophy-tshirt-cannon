@@ -21,7 +21,7 @@ from cadquery import Vector as V
 import params as P
 import pneu_parts as PP
 import plates
-from lib import add, box, cyl, tube, hex_prism, union, C, t_slot
+from lib import add, box, cyl, tube, hex_prism, union, C, t_slot, htd_teeth
 from fittings import Chain, OD, ENG, BORE, relief_cap
 
 OD.setdefault("3", 88.9)                                     # 3 in Sch 40 chambers (rev D.1)
@@ -70,7 +70,11 @@ def valve(xv, h, s, v=P.VALVE):
 AD_BODY, AD_SHOULDER, AD_SPIGOT = 30.0, 10.0, 40.0              # breech adapter lengths along the axis
 SMOKE_HOLE_X = AD_SPIGOT + 165.0                             # from the barrel's breech end: just past a 6 in rolled shirt
 ACCENT_T = 8.5                                               # wall of the smoke collar and muzzle ring round the barrels
-SMOKE_Y = 22.0                                               # smoke line: in the valley between the barrels, z = 0
+SMOKE_Y = 0.0                                                # smoke line: dead centre between the barrels (Micah 2026-11-11)
+SMOKE_SQ = (15.0, 10.0)                                      # the 1 in OD line squished to an oval where it runs between
+                                                             # the barrels (25 mm apart): half-axes, same perimeter
+SMOKE_HOLE_DEG = (0.0, 35.0, -35.0)                          # each barrel's 3 smoke holes, from the side facing the other
+                                                             # barrel (the collar's channels line up with them)
 FILL_LANES = (-59.0, -67.0)                                  # fill lines (top, bottom cannon): y beside the couplings
 FILL_DOWN = ((-20.0, -59.0), (-30.0, -67.0))                 # (x, y) where each fill line drops out of the core
 # Pivot hubs (Micah, 2026-11-10: "clean up the cannon hub"; "the pulley should screw to the aluminum side plate instead
@@ -88,7 +92,7 @@ RING_IN, RING_BOLT_R, RING_CB = 68.0, 78.0, 5.5                # ring bore radiu
                                                              # (5.5: the M4 x 12 and the M4 x 8 don't meet inside the 10 mm nut)
 RING_BOLTS = tuple((RING_BOLT_R * math.cos(math.radians(a)), RING_BOLT_R * math.sin(math.radians(a)))
                    for a in (10, 90, 150, 210, 270, 350))
-SMOKE_DOWN = (-8.0, 63.0)                                    # ... and the smoke line, on the other side
+SMOKE_DOWN = (-8.0, 61.0)                                    # ... and the smoke line, on the other side
 
 
 def _rounded_prism(x0, L, W, H, r, edge=0.0):
@@ -142,11 +146,11 @@ def _cannon(k, xf):
     b0 = ax0 + AD_BODY + AD_SHOULDER
     bar = tube(P.BARREL_OD / 2, P.BARREL_OD / 2 - P.BARREL_WALL, P.BARREL_LEN, (b0, 0, h), (1, 0, 0))
     xh = b0 + SMOKE_HOLE_X
-    for i in range(6):                                       # smoke holes just ahead of where the shirt sits
-        a = math.radians(30 + 60 * i)
-        bar = bar.cut(cyl(2.5, 20, (xh, 0, h), (0, math.cos(a), math.sin(a))))
+    for u in _smoke_dirs(h):                                 # 3 smoke holes facing the other barrel, just ahead of the shirt
+        bar = bar.cut(cyl(2.5, P.BARREL_OD, (xh, 0, h), u))
     gadd(f"Barrel {tag}", bar, "pc", bom="Barrel: clear polycarbonate tube 3 in OD x 1/8 wall", kind="stock",
-         note=f"{P.BARREL_LEN / IN:.1f} in; 6 x 5 mm smoke holes {SMOKE_HOLE_X:.0f} mm from the breech end")
+         note=f"{P.BARREL_LEN / IN:.1f} in; 3 x 5 mm smoke holes {SMOKE_HOLE_X:.0f} mm from the breech end, on the side "
+              "facing the other barrel (straight at it and 35 deg either side), drilled through the collar's channels")
     # Brophy Borealis welded chamber (Micah, 2026-11-10): half of a 1 x 4 in nipple (its threaded end into the valve)
     # welded through a 3/8 in A36 front disc (1.33 in hole), flush with the disc's inner face; 3 in Sch 40 plain-end
     # pipe between the two 3.5 in discs; the back disc is blank. The 1/4 NPT weld bung sits 1 in behind the front disc
@@ -325,11 +329,18 @@ def _build(xv):
     # half would be a closed ring round its own barrel: nothing would clamp, and it could only slide on from the
     # muzzle). 2 x M4 x 12 across the split between the barrels clamp them onto their spigots; each half then takes
     # 6 x M4 x 8 through its own cradle plate into inserts
-    bz = P.PITCH / 2 + P.BARREL_OD / 2 + 10.0
+    # the gun's smoke line (Micah 2026-11-11: bigger, dead centre, oblong holes so it can squish): from the collar back
+    # between the barrels, across in front of the valves, along the side and out the bottom behind the pivot
+    xc = b0s[0] + SMOKE_HOLE_X
+    xd_, yd_ = SMOKE_DOWN
+    smoke_pts = [V(xc - 7.5, SMOKE_Y, 0), V(xv - 40.0, SMOKE_Y, 0), V(xv - 40.0, yd_, 0), V(xd_, yd_, 0),
+                 V(xd_, yd_, -(zo + 4.0))]
+    smoke_cut = _smoke_line(smoke_pts, grow=0.6, hollow=False)
+    bz = P.PITCH / 2 + P.BARREL_OD / 2 + 14.0               # +14: room for the clamp screws over / under the barrels
     core = box(bx0, xb1, -CRADLE_Y0, CRADLE_Y0, -bz, bz)
     for h in H:
         core = core.cut(cyl(P.BARREL_OD / 2 + 0.1, 200, (ax0, 0, h), (1, 0, 0))).cut(cyl(25.5, 40, (ax0 - 5, 0, h), (1, 0, 0)))
-    core = core.cut(cyl(P.SMOKE_R + 0.35, 200, (ax0 - 50, SMOKE_Y, 0), (1, 0, 0)))         # smoke line channel (in the left half)
+    core = core.cut(smoke_cut)                               # the smoke line's oblong channel, split by the halves
     for k, h in enumerate(H):
         vk = P.VALVES[k]
         x0v = xv - vk["L"]
@@ -343,37 +354,41 @@ def _build(xv):
     secs = [(mz0, W0, H0, 16.0), (mz0 + 28.0, (W0 + W1) / 2 + 1.0, (H0 + H1) / 2 + 1.0, 30.0),
             (mz1 - 5.0, W1, H1, W1 / 2 - 1.0), (mz1, W1 - 6.0, H1 - 6.0, W1 / 2 - 4.0)]
     man = cq.Solid.makeLoft([_rrect(*s_) for s_ in secs], False)
-    inner = [(xb1, W0 - 8.0, H0 - 8.0, 12.0), (mz0 + 28.0, secs[1][1] - 8.0, secs[1][2] - 8.0, 26.0),
-             (mz1 - 8.0, W1 - 8.0, H1 - 8.0, W1 / 2 - 5.0)]
-    man = man.cut(cq.Solid.makeLoft([_rrect(*s_) for s_ in inner], False))
+    # solid (Micah 2026-11-11: "fix the hollow section in the loft"): the infill does the lightening
     for h in H:
         man = man.cut(cyl(rb + 1.0, 80, (mz0 - 5, 0, h), (1, 0, 0)))
-    man = man.cut(cyl(P.SMOKE_R + 0.65, 80, (mz0 - 5, SMOKE_Y, 0), (1, 0, 0)))
+    man = man.cut(smoke_cut)
     man = man.cut(_groove(mz0 + 14.0, (W0 + secs[1][1]) / 2, (H0 + secs[1][2]) / 2, 23.0))
     core = inserts(core.fuse(man), core_holes)
-    for xcl in (bx0 + 12.0, bx0 + 40.0):                     # clamp screws between the barrels, head in the right half
-        core = core.cut(cyl(2.25, 14.0, (xcl, -7.0, 0.0), (0, 1, 0)))
-        core = core.cut(cyl(4.6, 100.0, (xcl, -7.0, 0.0), (0, -1, 0)))                     # counterbore out to the half's side
-        core = core.cut(cyl(P.INSERT[0], P.INSERT[1], (xcl, 0.5, 0.0), (0, 1, 0)))
+    zcl = P.PITCH / 2 + rb + 7.0                              # clamp screws over the top barrel and under the bottom one
+    for xcl in (bx0 + 12.0, bx0 + 40.0):                      # (the smoke line has the middle), heads in the right half
+        for zc_ in (zcl, -zcl):
+            core = core.cut(cyl(2.25, 14.0, (xcl, -7.0, zc_), (0, 1, 0)))
+            core = core.cut(cyl(4.6, 100.0, (xcl, -7.0, zc_), (0, -1, 0)))                 # counterbore out to the half's side
+            core = core.cut(cyl(P.INSERT[0], P.INSERT[1], (xcl, 0.5, zc_), (0, 1, 0)))
     for y0_, y1_, tag in ((0.5, 500.0, "left"), (-500.0, -0.5, "right")):
         half = core.intersect(box(-1000, 2000, y0_, y1_, -500, 500))
         gadd(f"Gun core {tag}", half.clean(), "print", bom="Gun core half (valve blocks + breech block + mantlet, printed)",
              kind="print",
              note="PETG, 5 walls, 40% gyroid, printed outer face down; the two halves close round both valves and both "
-                  "barrels: 2 x M4 x 12 across the split (heads in the right half, inserts in the left) clamp the "
+                  "barrels: 4 x M4 x 12 across the split, over and under the barrels (heads in the right half, inserts in the left) clamp the "
                   "barrels onto their spigots, then 6 x M4 x 8 through each cradle plate into M4 inserts; a 5 mm LED "
                   "strip in the mantlet groove")
-    # smoke collar: one plenum (the two ring grooves meet between the barrels) over the six holes in each barrel,
-    # fed from the back by the gun's smoke line in a socket at z = 0
-    xc = b0s[0] + SMOKE_HOLE_X
+    # smoke collar (Micah 2026-11-11: "cleaned up ... specific holes that match the ones in the polycarb"): the
+    # squished line plugs into an oblong socket at the back, between the barrels, into a small plenum; from it one
+    # 5 mm channel runs to each of the 3 holes in each barrel (no ring grooves)
     Wa, Ha = 2 * (rb + ACCENT_T), P.PITCH + 2 * (rb + ACCENT_T)
     col = _rounded_prism(xc - 16, 32.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
+    col = col.cut(_oval(V(xc - 17.0, 0, 0), V(1, 0, 0), V(0, 1, 0), SMOKE_SQ[0] + 0.6, SMOKE_SQ[1] + 0.6, 11.0))
+    col = col.cut(_oval(V(xc - 6.5, 0, 0), V(1, 0, 0), V(0, 1, 0), SMOKE_SQ[0] - 3.0, SMOKE_SQ[1] - 2.5, 12.5))
     for h in H:
-        col = col.cut(cyl(rb + 0.3, 40, (xc - 20, 0, h), (1, 0, 0))).cut(tube(rb + 5.0, rb, 14.0, (xc - 7, 0, h), (1, 0, 0)))
-    col = col.cut(cyl(P.SMOKE_R + 0.25, 10.0, (xc - 17, SMOKE_Y, 0), (1, 0, 0))).cut(cyl(5.25, 9.0, (xc - 8, SMOKE_Y, 0), (1, 0, 0)))
-    col = col.cut(cyl(5.25, SMOKE_Y + 1.0, (xc, SMOKE_Y, 0), (0, -1, 0)))
-    gadd("Smoke collar", col, "print", bom="Smoke collar (printed, one piece)", kind="print",
-         note="slides on from the muzzle; seals on the barrels with a bead of RTV; the smoke line plugs into its rear port")
+        for u in _smoke_dirs(h):
+            hp = V(0, rb * u[1], h + rb * u[2])
+            col = col.cut(cyl(2.5, hp.Length + 1.0, (xc, 0, 0), hp.normalized().toTuple()))
+        col = col.cut(cyl(rb + 0.3, 40, (xc - 20, 0, h), (1, 0, 0)))
+    gadd("Smoke collar", col.clean(), "print", bom="Smoke collar (printed, one piece)", kind="print",
+         note="slides on from the muzzle until its 6 channels line up with the barrels' smoke holes; a bead of RTV round "
+              "each barrel seals it; the squished 3/4 in line pushes into the oblong socket at the back")
     xe = b0s[0] + P.BARREL_LEN
     mz = _rounded_prism(xe - 25.0, 25.0, Wa, Ha, rb + ACCENT_T - 0.5, edge=3.0)
     for h in H:
@@ -405,16 +420,16 @@ def _build(xv):
     # centred between the plate and the bearing block; a printed sleeve on the stub does the old hub's locating job
     y0r, y1r = P.ELEV_PULLEY_Y
     ring = elevation_pulley().translate(V(0, -y1r, 0)).cut(cyl(RING_IN, 40, (0, -y1r - 5, 0), (0, 1, 0)))
+    # 2026-11-11 (Micah: print the standoffs instead of buying coupling nuts): six 12 mm posts printed on the ring, an
+    # M4 insert in each one's plate end, an M4 x 8 from inside the plate into it
     for (hx, hz) in RING_BOLTS:
-        ring = ring.cut(cyl(2.25, 20, (hx, -y1r - 1, hz), (0, 1, 0)))
-        ring = ring.cut(cyl(4.6, RING_CB + 0.01, (hx, -y1r - 0.01, hz), (0, 1, 0)))     # counterbore for the M4 x 12 head
-        gadd("Elevation pulley standoff", hex_prism(7.0, P.ELEV_STANDOFF, (hx, -yp, hz), (0, -1, 0)), "alu",
-             bom="M4 x 10 mm hex coupling nut (standoff), 304 stainless", kind="cots",
-             note="M4 x 8 from inside the cradle plate into one end, M4 x 12 through the ring (counterbored) into the other")
+        ring = ring.fuse(cyl(6.0, P.ELEV_STANDOFF + 0.5, (hx, -yp, hz), (0, -1, 0)))
+        ring = ring.cut(cyl(P.INSERT[0], P.INSERT[1], (hx, -yp + 0.01, hz), (0, -1, 0)))
     gadd(f"Elevation pulley {P.ELEV_T[1]}T ring", ring.clean(), "print_d",
          bom=f"Elevation pulley {P.ELEV_T[1]}T HTD 9 mm ring (printed)", kind="print",
-         note=f"PETG, 5 walls, 40% gyroid; a ring ({2 * RING_IN:.0f} mm bore) on 6 standoffs {P.ELEV_STANDOFF:.0f} mm off the "
-              "right cradle plate; the axle passes through its open middle")
+         note=f"PETG, 5 walls, 40% gyroid; a ring ({2 * RING_IN:.0f} mm bore) on 6 printed posts {P.ELEV_STANDOFF:.0f} mm off "
+              "the right cradle plate, an M4 insert in each, M4 x 8 from inside the plate; print it on its outer flange, "
+              "posts up")
     sl = cyl(9.5, yb - 0.3 - yp, (0, -yp, 0), (0, -1, 0)).cut(hex_prism(12.9, yb - yp + 2, (0, -yp + 1, 0), (0, -1, 0)))
     gadd("Axle spacer right", sl, "print_d", bom="Axle spacer (printed)", kind="print",
          note="hex bore on the right stub, from the cradle plate to the inner bearing's inner race: locates the gun sideways")
@@ -429,11 +444,9 @@ def _build(xv):
         gadd(f"Gun tube {TAGS[k]}", _tube_path(pts), "tube", bom="DOT nylon tube 1/4 OD (ft)", kind="stock",
              note="inside the core; leaves the bottom behind the pivot")
         exits.append(pts[-1])
-    xd, yd = SMOKE_DOWN
-    xt = xv - 40.0                                           # crosses over beside the valves, where the reducers are clear
-    pts = [V(xc - 7.5, SMOKE_Y, 0), V(xt, SMOKE_Y, 0), V(xt, yd, 0), V(xd, yd, 0), V(xd, yd, z_exit)]
-    gadd("Gun smoke tube", _tube_path(pts, r=P.SMOKE_R), "tube", bom="Silicone tube 1/2 ID x 5/8 OD (ft)", kind="stock",
-         note="collar to the bottom of the core")
+    pts = smoke_pts
+    gadd("Gun smoke tube", _smoke_line(pts), "tube", bom="Silicone tube 3/4 ID x 1 OD (ft)", kind="stock",
+         note="collar to the bottom of the core, dead centre between the barrels; squished to an oval in the gun")
     return exits, [pts[-1]]
 
 
@@ -492,6 +505,43 @@ def sweep_profile(step=2.5, margin=10.0, ybins=None):
     return {k * 10.0: v - margin for k, v in env.items()}
 
 
+def _smoke_dirs(h):
+    """Unit (0, y, z) directions of one barrel's smoke holes: toward the other barrel and 35 deg either side."""
+    sz = -1.0 if h > 0 else 1.0
+    return [(0.0, math.sin(math.radians(a)), sz * math.cos(math.radians(a))) for a in SMOKE_HOLE_DEG]
+
+
+def _oval(p0, d, wide, a, b, L):
+    """Solid elliptical prism: from p0 along unit d for L, half-axes a (along `wide`) and b."""
+    pl = cq.Plane(origin=p0.toTuple(), xDir=wide.toTuple(), normal=d.toTuple())
+    return cq.Workplane(pl).ellipse(a, b).extrude(L).val()
+
+
+# the oval's wide direction on each run of the gun's smoke line: along the barrels it is squished flat (wide across,
+# y); across the core and along the side it stands on edge (wide in z); the drop out the bottom is wide along x
+_SMOKE_WIDE = (V(0, 1, 0), V(0, 0, 1), V(0, 0, 1), V(1, 0, 0))
+
+
+def _smoke_line(points, grow=0.0, hollow=True):
+    """The gun's 1 in OD silicone line along a polyline, squished to SMOKE_SQ ovals (a printed part cuts it with
+    grow > 0, hollow=False: its oblong holes)."""
+    a, b = SMOKE_SQ[0] + grow, SMOKE_SQ[1] + grow
+    out = []
+    for i, (p, q) in enumerate(zip(points, points[1:])):
+        d = q - p
+        if d.Length < 0.5:
+            continue
+        w = _SMOKE_WIDE[min(i, len(_SMOKE_WIDE) - 1)]
+        s = _oval(p, d.normalized(), w, a, b, d.Length)
+        if hollow:
+            s = s.cut(_oval(p - d.normalized(), d.normalized(), w, a - 3.2, b - 3.2, d.Length + 2))
+        out.append(s)
+    for p in points[1:-1]:
+        j = cq.Solid.makeSphere(b, p, angleDegrees1=-90, angleDegrees2=90)
+        out.append(j.cut(cq.Solid.makeSphere(b - 3.2, p, angleDegrees1=-90, angleDegrees2=90)) if hollow else j)
+    return union(out)
+
+
 def _tube_path(points, r=3.175):
     segs = []
     pts = [V(*p) if not isinstance(p, V) else p for p in points]
@@ -507,5 +557,5 @@ def _tube_path(points, r=3.175):
 def elevation_pulley():
     t, w, fl = P.ELEV_T[1], 9.0, 2.0
     pd = P.pd(t)
-    s = cyl(pd / 2 - 0.57, w, (0, fl, 0), (0, 1, 0))
+    s = htd_teeth(t, w, y0=fl)                     # real HTD 5M grooves (Micah 2026-11-11)
     return s.fuse(cyl(pd / 2 + 2.5, fl, (0, 0, 0), (0, 1, 0))).fuse(cyl(pd / 2 + 2.5, fl, (0, fl + w, 0), (0, 1, 0)))

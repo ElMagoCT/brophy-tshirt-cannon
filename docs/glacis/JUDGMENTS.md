@@ -1204,6 +1204,61 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B24. **Micah's Sheet notes, LED wiring, a bigger centred smoke line** (Micah, 2026-11-11/12: his notes on both order
+    tabs; "add 3p wire for leds, and servo connectors"; "every led should be individually addressable, nothing in
+    parallel"; "have it be all controlled from the one board, just group the panels"; "thermal just complicates
+    wiring"; "go bigger ... make the holes oblong so it can squish ... it should run perfectly in the middle and the 3d
+    print that spreads it should be cleaned up and have specific holes that match the ones you add to the polycarb.
+    also fix the hollow section in the loft thing at the front of the cannon hub").
+    - **Dropped:** the LED level shifter (330 ohm series resistors), the fluid level switch (the pump-time gauge
+      stops the pump), the KSD301 cutout (the firmware cut at 245 C is the only heater limit: Micah's call), M4 x 6s
+      (cut M4 x 8s), both rivnut rows (the underglow brackets are taped to the rails), the coupling nuts (the 112T
+      ring's 6 posts are printed on, an insert in each), the pin headers (his).
+    - **Owned now:** M4 nylocs, the 1x6 boards, the 3 mm silicone tube. **Cheaper / changed:** 30 cm panel USB-C,
+      a TP4056 Type-C board for the remote (no boost), white 2 yd canvas ($24.99), one PETG bundle (he has 3 kg), one
+      pack of dome rivets; both rivet rows in Order 1. **Checked and kept:** the G1/4 adapters, the brass crosses
+      (the cheaper 5-pack is 150 psi), the 2-pack ball valve, the Hillman tee nuts (cheaper per piece, dearer in
+      total).
+    - **LED wiring:** 22 AWG 3-pin wire (100 ft) and 20 servo leads cut into pigtails; five data lines from the main
+      controller: left panels, right panels (each panel its own plug in and out, chained), left frame, right frame,
+      underglow. Every LED individually addressable; nothing shares a data line.
+    - **Smoke line:** 3/4 in ID x 1 in OD silicone (Quickun, 240 C). In the gun it runs dead centre between the
+      barrels (25 mm apart), drawn squished to a 30 x 20 mm oval, and every printed hole it passes is that oval plus
+      0.6 mm; it crosses in front of the valves on edge and drops out of the core beside the chambers. The splitter's
+      gun barb is 3/4 in. Some fog will always condense in the line: wide, short and no low sag is what helps.
+    - **Smoke collar:** an oblong socket and a small plenum between the barrels; one 5 mm channel to each of 3 holes
+      per barrel, facing the other barrel (straight at it and 35 deg either side). The old barrel holes were drawn
+      20 mm long from the axis, so they never actually reached the wall; they go through now. No ring grooves.
+    - **Gun core:** the mantlet loft is solid (was a shelled loft that read as a hollow). The core is 8 mm taller
+      and its clamp screws are 4, over the top barrel and under the bottom one (the line has the middle).
+      Gun 18.8 kg, still balanced on the pivot.
+    - **Parts list:** $1,532.42 pre-tax (Order 1 $1,058.28, Order 2 $474.14).
+B23. **CAD matches the parts list, pulley teeth, fog tube up high, show-off visuals, McMaster check** (Micah,
+    2026-11-11: "make sure the CAD BOM and parts list match" -> "Yes, both" [model the missing modules, list the drive
+    belts]; "add teeth to the pulley"; "the fog tube can move to run above stuff or above the wheels. add visuals ...
+    suppressable via configuration. make them organic. make a fake floor too"; "confirm we don't need any mcmaster
+    stuff and that switching it away saved money").
+    - **Modules now modelled** on the bellypan, each on a printed tray where it stands off: ULN2803A relay driver,
+      SN74AHCT125 level shifter, two 40 A fog relays (one per core), six valve MOSFET modules, five fog / light MOSFET
+      modules with heat sinks, the MAX6675, the inline ATO fuse holder and three DS18B20 probes (electronics, battery
+      bay, fogger). On the fogger: a KSD301 cutout on the core and the fluid level switch on the tank.
+    - **Five quick disconnects** (M-style coupler + plug) in the tank lines, the main valve line and both service
+      loops, each at the first clear spot along the tube's longest run (checked against every part and, for the
+      service loops, the gun at 0-90 deg every 15); the tube is split there into "(supply)" and "(downstream)" parts.
+      The service loops now rise to z 310 straight out of the in valves so their QDs sit below the chambers' swing.
+    - **Pulley teeth:** the 112T ring and the 16T pinion have real HTD 5M grooves (`lib.htd_teeth`).
+    - **Fog tube:** the rear run now climbs to z 235 behind the gun well and runs above the sled to the rear vent,
+      instead of along the floor.
+    - **Visuals** (new `visuals.py`, its own "Visuals" tab, never in the checks or the parts list): a gym floor,
+      billowing smoke under the front and rear vents and at both muzzles, four rolled t-shirts in flight, aurora
+      ribbons behind each window and a headlight cone. Built from overlapping spheres, lofted splines and sine ribbons
+      so they read as organic. In Onshape each kind has a configuration switch.
+    - **Parts list:** + HTD 5M 15 mm drive belt 140T x4 (D06, $35.60, for the CAD's 116T wheel pulley). $1,566.22 ->
+      $1,601.82 pre-tax.
+    - **McMaster:** nothing on the list is McMaster now and nothing needs to be. Every McMaster item in dee53b1 came to
+      $309.25 with shipping; their Amazon / AliExpress equivalents are about $73.81, so about $235 saved overall. The
+      one switch that cost more (rated Sch 80 1 in nipples, +$17.10, net about +$7 after the cheaper relief valves and
+      bushings and no McMaster shipping) is under the $20 line, so it stays.
 B22. **Tube drilling table, lower underglow on tape, axles inside the rail, 3/16 in bumper gap** (Micah, 2026-11-11:
     ".4in 2x [the 3M tape listing], add it to the list for the bottom leds. also add a bracket / also add the holes in
     the extrusions for CNCing it"; "the underglow LEDs need to go lower down and be at least level with the bottom of

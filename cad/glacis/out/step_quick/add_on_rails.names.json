@@ -1,0 +1,46 @@
+[
+{
+"name": "Rail 20x20 deck left",
+"c": [
+-85.0,
+143.5,
+640.0
+],
+"size": [
+470.0,
+20.0,
+20.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "20x20 T-slot extrusion (owned spare, cut)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Rail 20x20 deck right",
+"c": [
+-85.0,
+-143.5,
+640.0
+],
+"size": [
+470.0,
+20.0,
+20.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "20x20 T-slot extrusion (owned spare, cut)",
+"kind": "stock",
+"purpose": ""
+}
+]

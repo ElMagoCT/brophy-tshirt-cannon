@@ -37,23 +37,27 @@ ROW_OF = [
     ("FRC 12 V 18 Ah battery", "FRC 12 V battery"), ("Falcon 500", "Falcon 500"), ("Fill check valve", "Fill check valve"),
     ("Firing valve", "Firing valves"), ("Flanged bearing", "Flanged bearing"), ("Fog fluid pump", "Fog fluid pump"),
     ("Fog heater core", "Fog heater core"), ("Front light bar", "Front light bar"), ("Light bar end bracket", "Front light bar"),
-    ("G1/4 BSPP male x 1/4 NPT male", "Adapters: G1/4"), ("HTD 5M 9 mm belt", "HTD 5M 9 mm belt"),
+    ("G1/4 BSPP male x 1/4 NPT male", "Adapters: G1/4"), ("HTD 5M 9 mm belt", "HTD 5M 9 mm belt"), ("HTD 5M 15 mm belt", "HTD 5M 15 mm drive belt"),
     ("In valve: GOGO", "In valves: GOGO"), ("Latching mushroom E-stop", "Latching mushroom E-stop"),
-    ("Logic supply", "Logic supply"), ("M4 x 10 mm hex coupling nut", "M4 x 10 mm hex coupling nuts"),
-    ("M5 aluminum standoff", "M5 aluminium standoffs"), ("MOSFET switch modules + 12 V 40 A relays", "MOSFET switch module 5-36 V 15 A, 3.3-20 V"),
+    ("Logic supply", "Logic supply"),
+    ("M5 aluminum standoff", "M5 aluminium standoffs"), ("MOSFET switch module 5-36 V 15 A, 3.3-20 V", "MOSFET switch module 5-36 V 15 A, 3.3-20 V"),
+    ("MOSFET switch module 5-36 V 15 A with heat sink", "MOSFET switch module 5-36 V 15 A, 6 pcs"),
+    ("ULN2803A", "ULN2803A"), ("Thermocouple amp MAX6675", "Thermocouple amp MAX6675"),
+    ("Inline ATO fuse holder", "Inline ATO fuse holder"), ("DS18B20", "DS18B20"), ("Thermal cutout KSD301", "Thermal cutout KSD301"),
+    ("Quick disconnect coupler", "Quick disconnects:"),
     ("Main controller", "Main controller"), ("Main valve", "Main valve"), ("PWM expander", "PWM expander"),
     ("Panel-mount USB-C", "Panel-mount USB-C"), ("Pressure transducer", "Pressure transducer"),
     ("QD plugs + fill plug", "QD plugs"), ("REV Spark MAX", "REV Spark MAX"), ("Relief valve", "Relief valve"),
     ("Siren speaker", "Siren speaker"), ("TPA3255", "TPA3255"), ("WCP-0319 12T", "12T HTD 15 mm Falcon pulley"),
     ("goBILDA 5203", "goBILDA 5203"), ("Chamber end disc", "Chamber end plates"), ("1/2 in hex shaft", "1/2 in hex shaft"),
     ("Barrel: clear polycarbonate", "Barrels:"), ("Bumper backing", "Bumper backing"),
-    ("Bumper fabric cover", "Heavy-duty 12 oz cotton duck canvas"), ("Bumper foam strip", "Bumper foam"),
+    ("Bumper fabric cover", "Canvas: HYVAKUPPA"), ("Bumper foam strip", "Bumper foam"),
     ("Chamber inlet", "Chamber inlets"), ("Chamber outlet", "Chamber outlets"), ("Chamber: 3 in Sch 40", "Chambers:"),
     ("DOT nylon tube", "DOT nylon air-brake tube"), ("Fog tube (owner's", "Flexible fog tube"),
-    ("Silicone tube 1/2 ID", "Silicone tube 1/2 in ID"), ("WS2812B strip 10 mm", "WS2812B LED strip 10 mm"),
+    ("Silicone tube 1/2 ID", "Silicone tube 3/4 in ID"), ("Silicone tube 3/4 ID", "Silicone tube 3/4 in ID"), ("WS2812B strip 10 mm", "WS2812B LED strip 10 mm"),
     ("WS2812B strip 5 mm", "WS2812B LED strip 5 mm"),
 ]
-NOT_LISTED = ("HTD 5M 15 mm belt, 140T", "M8 threaded rod", "Mecanum ")   # the printed wheels' parts (deferred)
+NOT_LISTED = ("M8 threaded rod", "Mecanum ")   # the printed wheels' parts (deferred)
 
 
 def system(tab, name):
@@ -100,6 +104,8 @@ def main():
     out, rows, count, missing = {}, [], {}, {}
     for m in man:
         f = m["file"]
+        if f.startswith("visuals"):                  # show-off visuals: not parts, no codes
+            continue
         tab = f[:-5]
         out[f] = {}
         for p in json.load(open(os.path.join(ST, tab + ".names.json"), encoding="utf-8")):

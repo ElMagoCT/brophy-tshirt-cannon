@@ -1,0 +1,1212 @@
+[
+{
+"name": "Firing valve top (U.S. Solid USS-HSV04)",
+"c": [
+69.42368811344487,
+0.0,
+729.2
+],
+"size": [
+131.1,
+64.3,
+110.39999999999998
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi",
+"kind": "cots",
+"purpose": "Fires the cannon: opens to dump the chamber into the barrel."
+},
+{
+"name": "top nipple 1x1.50",
+"c": [
+136.72368811344484,
+0.0,
+701.0
+],
+"size": [
+38.099999999999994,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in Sch 40 close nipple (1-1/2 in)",
+"kind": "cots",
+"purpose": "Close nipple joining the firing valve to the breech adapter."
+},
+{
+"name": "Breech adapter top",
+"c": [
+178.47368811344487,
+0.0,
+701.0
+],
+"size": [
+80.0,
+76.19999999999999,
+76.20000000000005
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Breech adapter (CNC 6061, stash bar, 1 in NPT tap)",
+"kind": "machined",
+"purpose": "Machined adapter: 1 in NPT from the valve to the barrel's spigot."
+},
+{
+"name": "Barrel top",
+"c": [
+635.6736881134449,
+0.0,
+701.0
+],
+"size": [
+914.4,
+76.19999999999999,
+76.20000000000005
+],
+"color": [
+0.88,
+0.93,
+0.98,
+0.4
+],
+"bom": "Barrel: clear polycarbonate tube 3 in OD x 1/8 wall",
+"kind": "stock",
+"purpose": "Polycarbonate barrel; smoke enters through six holes just ahead of the shirt."
+},
+{
+"name": "top chamber nipple 1x1.50",
+"c": [
+2.1236881134448673,
+0.0,
+701.0
+],
+"size": [
+38.10000000000001,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in Sch 40 close nipple (1-1/2 in)",
+"kind": "cots",
+"purpose": "Pipe: part of the chamber or its connection to the firing valve."
+},
+{
+"name": "top chamber reducer 1x3",
+"c": [
+-40.02631188655513,
+0.0,
+701.0
+],
+"size": [
+80.8,
+108.7,
+108.70000000000005
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI)",
+"kind": "cots",
+"purpose": "Reducing coupling: the chamber's end cap, stepping down to the 1 in firing path."
+},
+{
+"name": "top chamber nipple 3x12.00",
+"c": [
+-206.82631188655512,
+0.0,
+701.0
+],
+"size": [
+304.79999999999995,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 in Sch 40 black steel nipple x 12 in",
+"kind": "cots",
+"purpose": "Pipe: part of the chamber or its connection to the firing valve."
+},
+{
+"name": "top chamber reducer 3x1",
+"c": [
+-373.6263118865551,
+0.0,
+701.0
+],
+"size": [
+80.80000000000001,
+108.7,
+108.70000000000005
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI)",
+"kind": "cots",
+"purpose": "Reducing coupling: the chamber's end cap, stepping down to the 1 in firing path."
+},
+{
+"name": "top chamber bushing 1x1/4",
+"c": [
+-408.8763118865551,
+1.7763568394002505e-15,
+701.0
+],
+"size": [
+24.30000000000001,
+40.299048789435886,
+34.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in MNPT x 1/4 FNPT hex bushing, 304 stainless, 350 psi",
+"kind": "cots",
+"purpose": "Steps the chamber's 1 in end down to the 1/4 in fittings."
+},
+{
+"name": "top chamber nipple 1/4x0.87",
+"c": [
+-421.92631188655514,
+0.0,
+701.0
+],
+"size": [
+22.19999999999999,
+13.72,
+13.720000000000027
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass close nipple 7/8 in",
+"kind": "cots",
+"purpose": "Pipe: part of the chamber or its connection to the firing valve."
+},
+{
+"name": "top chamber port block 1/4",
+"c": [
+-438.8263118865551,
+0.0,
+701.0
+],
+"size": [
+32.0,
+32.0,
+32.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": "Brass block on the back of the chamber: fill, relief and transducer ports."
+},
+{
+"name": "top chamber fill push-to-connect",
+"c": [
+-455.62631188655513,
+0.0,
+701.0
+],
+"size": [
+22.0,
+16.5122176988233,
+15.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Chamber inlet: the line from its in valve pushes in here."
+},
+{
+"name": "top chamber relief 200 psi",
+"c": [
+-438.8263118865551,
+0.0,
+728.8
+],
+"size": [
+26.0,
+26.0,
+44.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
+"kind": "cots",
+"purpose": "Chamber relief: vents this chamber above 200 psi; its ring is the hand bleed."
+},
+{
+"name": "top chamber transducer 0-300 psi",
+"c": [
+-438.8263118865551,
+33.8,
+701.0
+],
+"size": [
+20.0,
+56.0,
+22.63213055223332
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH) (+ 1/4 x 1/8 bushing)",
+"kind": "cots",
+"purpose": "Chamber pressure sensor (PT2 top, PT3 bottom): the in valve meters against it."
+},
+{
+"name": "Firing valve bottom (U.S. Solid USS-HSV04)",
+"c": [
+69.42368811344487,
+0.0,
+560.8
+],
+"size": [
+131.1,
+64.3,
+110.39999999999998
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Firing valve bottom: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi",
+"kind": "cots",
+"purpose": "Fires the cannon: opens to dump the chamber into the barrel."
+},
+{
+"name": "bottom nipple 1x1.50",
+"c": [
+136.72368811344484,
+0.0,
+589.0
+],
+"size": [
+38.099999999999994,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in Sch 40 close nipple (1-1/2 in)",
+"kind": "cots",
+"purpose": "Close nipple joining the firing valve to the breech adapter."
+},
+{
+"name": "Breech adapter bottom",
+"c": [
+178.47368811344487,
+0.0,
+589.0
+],
+"size": [
+80.0,
+76.19999999999999,
+76.20000000000005
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Breech adapter (CNC 6061, stash bar, 1 in NPT tap)",
+"kind": "machined",
+"purpose": "Machined adapter: 1 in NPT from the valve to the barrel's spigot."
+},
+{
+"name": "Barrel bottom",
+"c": [
+635.6736881134449,
+0.0,
+589.0
+],
+"size": [
+914.4,
+76.19999999999999,
+76.20000000000005
+],
+"color": [
+0.88,
+0.93,
+0.98,
+0.4
+],
+"bom": "Barrel: clear polycarbonate tube 3 in OD x 1/8 wall",
+"kind": "stock",
+"purpose": "Polycarbonate barrel; smoke enters through six holes just ahead of the shirt."
+},
+{
+"name": "bottom chamber nipple 1x1.50",
+"c": [
+2.1236881134448673,
+0.0,
+589.0
+],
+"size": [
+38.10000000000001,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in Sch 40 close nipple (1-1/2 in)",
+"kind": "cots",
+"purpose": "Pipe: part of the chamber or its connection to the firing valve."
+},
+{
+"name": "bottom chamber reducer 1x3",
+"c": [
+-40.02631188655513,
+0.0,
+589.0
+],
+"size": [
+80.8,
+108.7,
+108.70000000000005
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI)",
+"kind": "cots",
+"purpose": "Reducing coupling: the chamber's end cap, stepping down to the 1 in firing path."
+},
+{
+"name": "bottom chamber nipple 3x10.00",
+"c": [
+-181.42631188655514,
+0.0,
+589.0
+],
+"size": [
+254.00000000000003,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 in Sch 40 black steel nipple x 10 in",
+"kind": "cots",
+"purpose": "Pipe: part of the chamber or its connection to the firing valve."
+},
+{
+"name": "bottom chamber reducer 3x1",
+"c": [
+-322.8263118865551,
+0.0,
+589.0
+],
+"size": [
+80.80000000000001,
+108.7,
+108.70000000000005
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 x 1 black malleable reducing coupling, 150-300 psi (MSI)",
+"kind": "cots",
+"purpose": "Reducing coupling: the chamber's end cap, stepping down to the 1 in firing path."
+},
+{
+"name": "bottom chamber bushing 1x1/4",
+"c": [
+-358.0763118865551,
+1.7763568394002505e-15,
+589.0
+],
+"size": [
+24.30000000000001,
+40.299048789435886,
+34.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in MNPT x 1/4 FNPT hex bushing, 304 stainless, 350 psi",
+"kind": "cots",
+"purpose": "Steps the chamber's 1 in end down to the 1/4 in fittings."
+},
+{
+"name": "bottom chamber nipple 1/4x0.87",
+"c": [
+-371.1263118865552,
+0.0,
+589.0
+],
+"size": [
+22.19999999999999,
+13.72,
+13.720000000000027
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass close nipple 7/8 in",
+"kind": "cots",
+"purpose": "Pipe: part of the chamber or its connection to the firing valve."
+},
+{
+"name": "bottom chamber port block 1/4",
+"c": [
+-388.02631188655516,
+0.0,
+589.0
+],
+"size": [
+32.0,
+32.0,
+32.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": "Brass block on the back of the chamber: fill, relief and transducer ports."
+},
+{
+"name": "bottom chamber fill push-to-connect",
+"c": [
+-404.8263118865552,
+0.0,
+589.0
+],
+"size": [
+22.0,
+16.5122176988233,
+15.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Chamber inlet: the line from its in valve pushes in here."
+},
+{
+"name": "bottom chamber relief 200 psi",
+"c": [
+-388.02631188655516,
+-3.552713678800501e-15,
+561.2
+],
+"size": [
+26.0,
+26.0,
+44.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Relief valve 200 psi, 1/4 NPT, ASME, ring pull (McMaster 48435K72)",
+"kind": "cots",
+"purpose": "Chamber relief: vents this chamber above 200 psi; its ring is the hand bleed."
+},
+{
+"name": "bottom chamber transducer 0-300 psi",
+"c": [
+-388.02631188655516,
+33.8,
+589.0
+],
+"size": [
+20.0,
+56.0,
+22.63213055223332
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (FUSCH) (+ 1/4 x 1/8 bushing)",
+"kind": "cots",
+"purpose": "Chamber pressure sensor (PT2 top, PT3 bottom): the in valve meters against it."
+},
+{
+"name": "Cradle plate left (1/8 Al)",
+"c": [
+-14.276311886555163,
+75.5875,
+645.0
+],
+"size": [
+465.5,
+3.174999999999997,
+244.70000000000005
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Gun cradle plate (1/8 Al)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Rail 20x20 gun left",
+"c": [
+-75.02631188655513,
+64.0,
+757.35
+],
+"size": [
+300.0,
+20.0,
+20.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "20x20 T-slot extrusion (owned spare, cut)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Cradle plate right (1/8 Al)",
+"c": [
+-14.276311886555163,
+-75.5875,
+645.0
+],
+"size": [
+465.5,
+3.1750000000000114,
+244.70000000000005
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Gun cradle plate (1/8 Al)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Rail 20x20 gun right",
+"c": [
+-75.02631188655513,
+-64.0,
+757.35
+],
+"size": [
+300.0,
+20.0,
+20.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "20x20 T-slot extrusion (owned spare, cut)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Chamber saddle -58",
+"c": [
+-98.02631188655515,
+0.0,
+645.0
+],
+"size": [
+28.00000000000003,
+148.0,
+112.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber saddle",
+"kind": "print",
+"purpose": "Printed block carrying both chambers between the cradle plates."
+},
+{
+"name": "Chamber cap top -58",
+"c": [
+-98.02631188655513,
+0.0,
+726.475
+],
+"size": [
+20.0,
+147.0,
+49.950000000000045
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Chamber cap bottom -58",
+"c": [
+-98.02631188655513,
+0.0,
+563.525
+],
+"size": [
+20.0,
+147.0,
+49.950000000000045
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Chamber saddle -177",
+"c": [
+-217.02631188655516,
+0.0,
+645.0
+],
+"size": [
+28.00000000000003,
+148.0,
+112.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber saddle",
+"kind": "print",
+"purpose": "Printed block carrying both chambers between the cradle plates."
+},
+{
+"name": "Chamber cap top -177",
+"c": [
+-217.02631188655513,
+0.0,
+726.475
+],
+"size": [
+20.0,
+147.0,
+49.950000000000045
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Chamber cap bottom -177",
+"c": [
+-217.02631188655513,
+0.0,
+563.525
+],
+"size": [
+20.0,
+147.0,
+49.950000000000045
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Valve side block top L",
+"c": [
+69.42368811344487,
+53.275,
+701.0
+],
+"size": [
+123.1,
+41.45,
+36.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Valve side block",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Valve side block top R",
+"c": [
+69.42368811344487,
+-53.275,
+701.0
+],
+"size": [
+123.1,
+41.45,
+36.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Valve side block",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Valve side block bottom L",
+"c": [
+69.42368811344487,
+53.275,
+589.0
+],
+"size": [
+123.1,
+41.45,
+36.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Valve side block",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Valve side block bottom R",
+"c": [
+69.42368811344487,
+-53.275,
+589.0
+],
+"size": [
+123.1,
+41.45,
+36.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Valve side block",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Breech block upper",
+"c": [
+192.4736881134449,
+0.0,
+697.3
+],
+"size": [
+52.00000000000003,
+148.0,
+103.60000000000002
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Breech block half",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Breech block lower",
+"c": [
+192.4736881134449,
+0.0,
+592.7
+],
+"size": [
+52.00000000000003,
+148.0,
+103.60000000000002
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Breech block half",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Mantlet",
+"c": [
+244.47368811344484,
+0.0,
+645.0
+],
+"size": [
+48.00000020000115,
+146.0000002,
+208.2000002000001
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Mantlet (printed, one piece, LED groove)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Smoke collar",
+"c": [
+383.47368811344484,
+0.0,
+645.0
+],
+"size": [
+32.0,
+93.2000002,
+205.20000019999998
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Smoke collar (printed, one piece)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Muzzle ring",
+"c": [
+1080.3736881134446,
+0.0,
+645.0
+],
+"size": [
+25.0,
+93.2000002,
+205.20000019999998
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Muzzle ring (printed, one piece, LED groove)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Pivot axle stub left (1/2 hex)",
+"c": [
+-40.0,
+108.17500000000001,
+645.0
+],
+"size": [
+12.70000000000001,
+68.35000000000002,
+14.664696837416614
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1/2 in hex shaft, steel (pivot stub)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Axle hub left",
+"c": [
+-40.0,
+82.175,
+645.0
+],
+"size": [
+32.0,
+10.0,
+32.0
+],
+"color": [
+0.22,
+0.23,
+0.26,
+1.0
+],
+"bom": "Axle hub",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Pivot axle stub right (1/2 hex)",
+"c": [
+-40.0,
+-102.17500000000001,
+645.0
+],
+"size": [
+12.70000000000001,
+56.35000000000002,
+14.664696837416614
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1/2 in hex shaft, steel (pivot stub)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Axle hub right",
+"c": [
+-40.0,
+-82.175,
+645.0
+],
+"size": [
+32.0,
+10.0,
+32.0
+],
+"color": [
+0.22,
+0.23,
+0.26,
+1.0
+],
+"bom": "Axle hub",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Elevation pulley 112T",
+"c": [
+-40.00000000000001,
+-101.5,
+645.0
+],
+"size": [
+183.2535362629228,
+13.0,
+183.2535362629228
+],
+"color": [
+0.22,
+0.23,
+0.26,
+1.0
+],
+"bom": "Elevation pulley 112T HTD 9 mm",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Gun tube top",
+"c": [
+-272.3131559432776,
+-29.5,
+611.4124999999999
+],
+"size": [
+430.97631188655515,
+65.35,
+185.52499999999998
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "stock",
+"purpose": "1/4 in line inside the gun's core from the service loop to the chamber's fill push-to-connect."
+},
+{
+"name": "Gun tube bottom",
+"c": [
+-251.9131559432776,
+-33.5,
+583.4124999999999
+],
+"size": [
+370.1763118865552,
+73.35,
+129.52499999999998
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "stock",
+"purpose": "1/4 in line inside the gun's core from the service loop to the chamber's fill push-to-connect."
+},
+{
+"name": "Gun smoke tube",
+"c": [
+160.8118440567224,
+42.5,
+585.0
+],
+"size": [
+430.32368811344486,
+53.699999999999996,
+132.70000000000005
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "Silicone tube 3/8 ID x 1/2 OD (ft)",
+"kind": "stock",
+"purpose": ""
+}
+]
