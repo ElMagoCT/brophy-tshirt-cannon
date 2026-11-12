@@ -25,6 +25,13 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-11 - Micah's Windows computer (Claude Code) - Onshape part names carry their parts-list code
+- Branch / commit: `micah-windows/borealis` (PR #2, not merged)
+- Changed (Micah: "every part should be named, i want to see what aligns with what on the order list"): every one of the 599 Onshape parts is renamed "<code> <name>" (e.g. "B15-1 Bumper backing rear", "P05-1 Fill plug"), so the assembly tree reads against column A of the order tabs. The 9 sub-assemblies have Part numbers too (ASM-P1 Pneumatics, ASM-P2 Gun, ASM-D, ASM-C, ASM-L, ASM-B1/B2/B3, ASM-R; the main assembly ASM-TC5), so the structured BOM has no blank rows.
+- Rule for every future re-import: after the swap, set Part numbers from `cad/glacis/out/part_codes.json` (matched on the STEP's plain names), then rename each part to "<Part number> <name>". The STEPs keep the plain names, so `partcodes.py` matching is unchanged.
+- CAD vs parts list check (out/part_codes.json against bom/glacis_bom.csv): every coded CAD part is on the list. List rows not modelled in the CAD are fasteners, consumables, chips and kits, plus these small modules: fog relays (C06 x2, Order 2), MOSFET modules (F11), MAX6675 (F03), level switch (F04), DS18B20s (F05), thermal cutouts (F06), QD couplers (P04), fuse holder (C17), and the handheld safety remote (C13, C19, second E-stop). The CAD's printed 10 in wheels (code W: 4 x 140T belts, 40 roller rods) are deferred; the list uses the old 9 in wheels (D03).
+- Onshape: version "Part names start with their parts-list code (2026-11-11)".
+
 ## 2026-11-11 - Micah's Windows computer (Claude Code) - Tube holes for the CNC, lower underglow on tape, axles inside the rail, 3/16 in bumper gap
 - Branch / commit: `micah-windows/borealis` (PR #2, not merged)
 - Changed (JUDGMENTS B22):
