@@ -25,7 +25,7 @@ ROW_OF = [
     ("1 in NPT close nipple", "1 in NPT close nipple"), ("1 in cam-buckle strap", "1 in cam-buckle strap"),
     ("1/4 NPT brass 90 deg elbow", "1/4 NPT brass 90 deg elbow"), ("1/4 NPT brass close nipple", "1/4 NPT brass close nipple"),
     ("1/4 NPT brass cross", "1/4 NPT brass cross"), ("Rear manifold: 1/4 NPT brass crosses", "1/4 NPT brass cross"),
-    ("1/4 NPT brass nipple x 1-1/2", "1/4 NPT brass nipple 1-1/2"), ("1/4 NPT brass plug", "1/4 NPT plug, 304"),
+    ("1/4 NPT brass nipple x 2-1/2", "1/4 NPT brass nipple 2-1/2"), ("1/4 NPT brass plug", "1/4 NPT plug, 304"),
     ("1/4 NPT brass street elbow", "1/4 NPT brass street elbow"), ("10k linear pot", "10k linear pot"),
     ("12 V 40 A SPDT relay", "12 V 40 A relay"), ("12 V 5015 blower", "12 V 5015 blower"),
     ("12->5 V 20 A buck", "12/24 V -> 5 V 20 A buck"), ("120 A main breaker", "REV PDH + ATO breakers"),

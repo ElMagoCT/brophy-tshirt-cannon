@@ -124,6 +124,7 @@ ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the
     ("Roller tread", "Roller core"),
     ("Pivot axle", "Pivot bearing"),            # hex inner race turns with the axle
     ("nipple", "manifold block"),               # threads into the block (modelled solid)
+    ("Rear manifold nipple", "Rear manifold cross"), ("Main valve nipple", "Rear manifold cross A"), ("Main valve nipple", "Main valve (1/4"),   # threads
     ("nipple", "Chamber"),                      # 1 in close nipple in the tank's end port
     ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Tube", "push-to-connect"),
     ("Service loop", "push-to-connect"), ("Tank elbow", "Air tank"), ("Gun tube", "Service loop"),
