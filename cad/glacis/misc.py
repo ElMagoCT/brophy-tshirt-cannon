@@ -255,6 +255,11 @@ def air():
             bom="DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT")
         tank_out[side] = (xb0 + 16.0, sgn * ty, zp - 13.0)
         for dx in (-80.0, 80.0):
+            if side == "right" and dx < 0:            # Micah 2026-11-12: the rear manifold is one cross, so the tank
+                add("Tank transducer 0-300 psi", PP.transducer(V(tx + dx, sgn * ty, zp), (0, 0, -1)), "steel", "pneu",
+                    bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable",
+                    note="in the right tank's rear bung (1/4 x 1/8 bushing)")
+                continue
             add(f"Tank plug {side} {dx:.0f}", PP.npt_plug(V(tx + dx, sgn * ty, zp), (0, 0, -1)), "brass", "pneu",
                 bom="1/4 NPT brass plug")
         for xb in (-60.0, 200.0):
@@ -278,31 +283,25 @@ def air():
     mx, my, mz = REAR_MAN
     rear = P.rear_x(mz) + P.CLIP_T + P.ACRYLIC_T          # inner face of the rear panel at this height
     xo = P.rear_x(mz)
-    # Micah 2026-11-12: two real ChillWaves crosses (~33 mm across) on one close nipple, not drawn port blocks.
-    # Both stand upright (nothing out the front: the left sled post and rail are there). Cross A: right tank up,
-    # transducer down, main valve straight off its -y end. Cross B: left tank up, the 200 psi relief down on a
-    # street elbow turned to the rear panel, the fill check valve straight into its +y end
-    cc, pitch = 16.5, 2 * 16.5 + 1.8                       # centre to port face; close nipple shows 1.8 mm
-    yB = my - 17.7
-    yA = yB - pitch
-    cA, cB = V(mx, yA, mz), V(mx, yB, mz)
+    # Micah 2026-11-12: one real ChillWaves cross (~33 mm across), standing upright (nothing out the front: the left
+    # sled post and rail are there): right tank up, left tank down through a swivel elbow (its tube comes in from
+    # the front), main valve straight off its -y end, the fill check valve straight into its +y end. No tank relief
+    # here (Micah's call): the valve cross's relief covers the tanks while the main valve is open. The tank
+    # transducer is in the right tank's rear bung
+    cc = 16.5                                              # centre to port face
+    yB = my - 52.5
+    cA = cB = V(mx, yB, mz)
     yv, zv, xv = V(0, 1, 0), V(0, 0, 1), V(1, 0, 0)
-    add("Rear manifold cross A", PP.npt_cross(cA, (0, 1, 0), (0, 0, 1), c2e=cc), "brass", "pneu",
-        bom="1/4 NPT brass cross (ChillWaves)", note="right tank up, tank transducer down, main valve on -y")
-    add("Rear manifold cross B", PP.npt_cross(cB, (0, 1, 0), (0, 0, 1), c2e=cc), "brass", "pneu",
-        bom="1/4 NPT brass cross (ChillWaves)", note="left tank up, tank relief down, fill check valve on +y")
-    add("Rear manifold nipple", PP.close_nipple(V(mx, (yA + yB) / 2, mz), (0, 1, 0)), "brass", "pneu",
-        bom="1/4 NPT brass close nipple")
-    add("Tank transducer 0-300 psi", PP.transducer(cA - zv * cc, (0, 0, -1)), "steel", "pneu",
-        bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable")
+    add("Rear manifold cross", PP.npt_cross(cA, (0, 1, 0), (0, 0, 1), c2e=cc), "brass", "pneu",
+        bom="1/4 NPT brass cross (ChillWaves)", note="right tank up, left tank down, main valve on -y, fill on +y")
     tops = {}
     add("Rear manifold push-to-connect right tank", PP.ptc_straight(cA + zv * cc, (0, 0, 1)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     tops["right"] = cA + zv * (cc + 18.0)
-    add("Rear manifold push-to-connect left tank", PP.ptc_straight(cB + zv * cc, (0, 0, 1)), "brass", "pneu",
-        bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
-    tops["left"] = cB + zv * (cc + 18.0)
-    # main valve (rev C.3, manual): a 1/4 ball valve on a close nipple straight off cross A's -y end, its stem
+    add("Rear manifold push-to-connect left tank", PP.ptc_elbow(cA - zv * cc, (0, 0, -1), (1, 0, 0)), "brass", "pneu",
+        bom="DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT", note="tube in from the front")
+    tops["left"] = cA - zv * (cc + 13.0) + xv * 16.0
+    # main valve (rev C.3, manual): a 1/4 ball valve on a close nipple straight off the cross's -y end, its stem
     # extended back through the rear panel to its lever outside (open all session, closed for transport and gun work)
     fa = cA - yv * cc
     add("Main valve nipple", PP.close_nipple(fa - yv * 0.9, (0, -1, 0)), "brass", "pneu",
@@ -315,12 +314,12 @@ def air():
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     MAIN_OUT[:] = [vc - V(0, 22.5 + 18.0, 0)]
     # fill (rev D.2; Borealis: the plug is one of the ZKZX female-thread M-style plugs): a FEMALE M-style plug outside the panel on the nipple through it, then
-    # behind the panel a female x female elbow on cross B's axis turns along -y, and the male x male check valve
-    # screws straight into cross B's +y end
+    # behind the panel a female x female elbow on the cross's axis turns along -y, and the male x male check valve
+    # screws straight into the cross's +y end
     e14 = 10.2
     xp = xo - e14 - 4.2                                    # the nipple's outer tip: the plug's hex sits clear outside the panel
     ce = 17.0                                              # F x F barstock elbow, centre to port face (nominal)
-    yb = yB + cc + ce - 2 * e14 + 49.4                     # F x F elbow on cross B's axis, the check valve between
+    yb = yB + cc + ce - 2 * e14 + 49.4                     # F x F elbow on the cross's axis (REAR_HOLES: my + 10)
     xn1 = mx - ce + e14                                    # nipple tip inside the elbow's port
     xp = xn1 - 63.5                                        # a 2-1/2 in nipple: the plug sits 1.5 mm further out
     add("Fill plug (M-style, female)", PP.m_plug_f(V(xp, yb, mz), (-1, 0, 0)), "steel", "pneu",
@@ -333,12 +332,6 @@ def air():
     add("Fill check valve", PP.check_valve_mm(V(mx, y0, mz), (0, -1, 0), length=y0 - y1), "brass", "pneu",
         bom="Fill check valve, 304 stainless, 1/4 NPT male x male (AliExpress)",
         note="holds the tanks behind the open plug; flow arrow toward the manifold")
-    ce_ = cB - zv * (cc + 14.0)                            # street elbow corner under cross B, out toward the panel
-    add("Tank relief elbow", PP.street_elbow(ce_, (-1, 0, 0), (0, 0, 1)), "brass", "pneu",
-        bom="1/4 NPT brass street elbow")
-    rf = ce_ - xv * 14.0
-    add("Tank relief valve 200 psi", PP.relief_valve(rf, (-1, 0, 0), length=rf.x - (xo - 4.0)), "brass",
-        "pneu", bom="Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)", note="pull ring at the rear panel: the hand dump")
     # main valve (the tanks' shut-off, opens only while a chamber fills) into a brass cross; one in valve per chamber
     # off the cross meters its chamber against that chamber's transducer, and its closed seat is what keeps the
     # other cannon's shot from reaching it (no check valves). Main valve to in-valve seats is all brass at tank
@@ -392,8 +385,12 @@ def air():
         xr = -295.0 if sg > 0 else -330.0                 # the right one rises behind service loop B
         e = tops[side]
         zr = 282.0 if sg > 0 else 245.0                   # the left one passes over in valve A's DIN plug
-        pts = [t, (t[0], sg * 98.0, max(262.0, zr)), (xr, sg * 98.0, zr), (xr, sg * 98.0, 330.0),
-               (e.x, e.y, 330.0), e.toTuple()]
+        if sg > 0:                                     # into the cross's bottom elbow from the front
+            pts = [t, (t[0], sg * 98.0, max(262.0, zr)), (xr, sg * 98.0, zr), (xr, sg * 98.0, 330.0),
+                   (e.x + 30.0, e.y, 330.0), (e.x + 30.0, e.y, e.z), e.toTuple()]
+        else:
+            pts = [t, (t[0], sg * 98.0, max(262.0, zr)), (xr, sg * 98.0, zr), (xr, sg * 98.0, 330.0),
+                   (e.x, e.y, 330.0), e.toTuple()]
         gap = qd_inline(f"tank {side}", pts)
         add_split(f"Tube tank {side}", tube_path(pts).cut(gap), "tube", "pneu", start=tuple(pts[0]), bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
     m0 = MAIN_OUT[0]
@@ -598,7 +595,7 @@ def batteries_and_electronics():
         note="in battery B's + lead, between its SB50 and the bus")
     ELEC_MARKS.extend([("Contactor", -175.0, -100.0, -95.0, -35.0), ("Battery relay A", -175.0, -100.0, 35.0, 95.0),
                        ("Battery relay B", -97.0, -22.0, -95.0, -35.0)])
-    # bottom of the rear panel: E-stop, standby charge port (fill port and tank relief come out of the manifold)
+    # bottom of the rear panel: E-stop, standby charge port (the fill port and main valve stem come out of the manifold)
     ey, ez = ESTOP
     xo = P.rear_x(ez)
     xi = xo + P.CLIP_T
@@ -982,8 +979,8 @@ def frame_mounts():
                      "insert; the frame's 1/2 in #10-32 from the outer pocket (bumper ring off first)")
 
 
-REAR_HOLES = ((REAR_MAN[1] - 30.0, REAR_MAN[2], 9.0), (REAR_MAN[1] + 50.0, REAR_MAN[2], 14.0), (ESTOP[0], ESTOP[1], 23.0),
-              (MAIN_Y - 39.5, REAR_MAN[2], 6.0),
+REAR_HOLES = ((REAR_MAN[1] + 10.0, REAR_MAN[2], 9.0), (ESTOP[0], ESTOP[1], 23.0),   # fill nipple (2026-11-12: one cross, no tank relief)
+              (REAR_MAN[1] - 93.3, REAR_MAN[2], 6.0),           # main valve stem
               (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0),
               (BREAKER[0], BREAKER[1], 21.0))
 
@@ -1140,7 +1137,7 @@ def body_parts(log=print):
     nclip = 0
     for i, p in enumerate(panels):
         a = B.slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + P.PANEL_GAP, P.CLIP_T, P.ACRYLIC_T, P.ACRYLIC_R)
-        if p["n"].x < -0.9:                      # rear face: fill port, tank relief, E-stop, charge port, USB-C
+        if p["n"].x < -0.9:                      # rear face: fill port, main valve stem, E-stop, charge port, USB-C
             for (yb, zb, r) in REAR_HOLES:
                 a = a.cut(cyl(r, 30, (-P.FRAME_X - 10, yb, zb), (1, 0, 0)))
         u, w = B._plane_basis(p["n"])

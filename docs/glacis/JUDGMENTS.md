@@ -1204,6 +1204,24 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B27. **Rear manifold is one real cross; no tank relief; no QD on the main valve line** (Micah, 2026-11-12: "P04-1 and
+    P05-2 is redundant remove it. P10-1 idk what it is, its not a 4way"; "for the ChillWaves parts, just up the
+    count on amazon"; "remove P02-1 so it can be a single cross for the rear manifold").
+    - **Rear manifold:** was a drawn block of made-up port blocks (P10-1). Now one ChillWaves 1/4 NPT cross standing
+      upright behind the rear panel: right tank line straight up, left tank line into its bottom through a swivel
+      push-to-connect (the tube comes in from the front), the main ball valve on a close nipple straight off its -y
+      end, and the fill check valve screwed straight into its +y end (the female elbow behind the panel now sits on
+      the cross's axis, so the fill nipple is 2-1/2 in). Nothing points forward: the left sled post and rail are
+      there. Two crosses on a nipple were tried first; the second one hit the sled post.
+    - **Tank transducer** moves into the right tank's rear bung (a 1/4 x 1/8 bushing, same as before) in place of a plug.
+    - **Tank relief (P02-1) deleted, Micah's call.** The valve cross's 200 psi relief now covers the tanks only while
+      the main valve is open, and its ring is the hand dump. Flagged before he chose: with the main valve shut
+      (filling, transport), nothing on the robot limits tank pressure. So fill with the main valve open, or from a
+      source that has its own relief at 200 psi or less.
+    - **Main valve line QD (P04-1 / P05-2) deleted:** the main valve already isolates that line. 4 interior QDs left.
+    - **Parts list:** crosses are one ChillWaves 6-pack ($16.99) instead of two 3-packs ($25.98), 4 used; fill nipple
+      1-1/2 -> 2-1/2 in (Legines B0747L5XQZ, $8.49); street elbows dropped (none left in the design, -$7.49).
+      Total $1,562.42 -> $1,546.94.
 B26. **Smooth smoke channels, LED bands open all round** (Micah, 2026-11-12: "the tube geometry is not very smooth
     ... scrap the air barb system and just try to make the angle smoother and a little longer. the part is thick
     enough"; the mantlet's LED groove "is some weird artifact ... make it exposed all the way around"; "add a spot
