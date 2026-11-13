@@ -1222,7 +1222,7 @@ B27. **Rear manifold is one real cross; no tank relief; no QD on the main valve 
       end, and the fill check valve screwed straight into its +y end (the female elbow behind the panel now sits on
       the cross's axis, so the fill nipple is 2-1/2 in). Nothing points forward: the left sled post and rail are
       there. Two crosses on a nipple were tried first; the second one hit the sled post.
-    - **Tank transducer** moves into the right tank's rear bung (a 1/4 x 1/8 bushing, same as before) in place of a plug.
+    - **Tank transducer** moves into the right tank's front bung (a 1/4 x 1/8 bushing, same as before; the rear bung was tried first and hit the tank-arm knee plate) in place of a plug.
     - **Tank relief (P02-1) deleted, Micah's call.** The valve cross's 200 psi relief now covers the tanks only while
       the main valve is open, and its ring is the hand dump. Flagged before he chose: with the main valve shut
       (filling, transport), nothing on the robot limits tank pressure. So fill with the main valve open, or from a

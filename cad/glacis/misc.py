@@ -226,7 +226,6 @@ def _tank_shell(axis, c):
 
 REAR_MAN = (-347.0, 93.5, 250.0)             # rear manifold centre, back bottom, behind the rear panel
 REAR_DY = -120.0                             # the flat rear cross's y from REAR_MAN (2026-11-12)
-MAIN_Y = 40.0                                # main ball valve's elbow off the manifold's back face (y)
 MAIN_OUT = []
 FILL = (-300.0, 55.0, 200.0)                 # valve cross centre (the tanks' side of the in valves), back bottom bay;
                                              # Borealis: 51 mm further back so the longer GOGO runs clear the rear Falcon
@@ -256,10 +255,11 @@ def air():
             bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)", note="straight down (Micah 2026-11-12: no elbows)")
         tank_out[side] = (xb0, sgn * ty, zp - 18.0)
         for dx in (-80.0, 80.0):
-            if side == "right" and dx < 0:            # Micah 2026-11-12: the rear manifold is one cross, so the tank
+            if side == "right" and dx > 0:            # Micah 2026-11-12: the rear manifold is one cross, so the tank
+                                                     # transducer goes in a tank bung: the front one (the rear one is on the arm knee)
                 add("Tank transducer 0-300 psi", PP.transducer(V(tx + dx, sgn * ty, zp), (0, 0, -1)), "steel", "pneu",
                     bom="Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable",
-                    note="in the right tank's rear bung (1/4 x 1/8 bushing)")
+                    note="in the right tank's front bung (1/4 x 1/8 bushing)")
                 continue
             add(f"Tank plug {side} {dx:.0f}", PP.npt_plug(V(tx + dx, sgn * ty, zp), (0, 0, -1)), "brass", "pneu",
                 bom="1/4 NPT brass plug")
@@ -282,7 +282,7 @@ def air():
     # straight out its back face through the rear panel with the fill plug on its end, the main ball valve straight
     # off its front face inside the robot (lever inside), the two tank lines into its sides. No tank relief here
     # (Micah's call): the valve cross's relief covers the tanks while the main valve is open. The tank transducer
-    # is in the right tank's rear bung
+    # is in the right tank's front bung (the rear one sits on the arm knee)
     mx, my, mz = REAR_MAN
     xo = P.rear_x(mz)
     cc, e14 = 16.5, 10.2                                   # cross centre to port face; NPT engagement
@@ -329,14 +329,14 @@ def air():
     add("Valve cross push-to-connect", PP.ptc_straight(V(fx - vc, fy, fz), (-1, 0, 0)), "brass", "pneu",
         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
     add("Valve cross", PP.npt_cross(V(fx, fy, fz), (1, 0, 0), (0, 1, 0), c2e=vc), "brass", "pneu",
-        bom="1/4 NPT brass cross (ChillWaves)", note="close nipples to the in valves")
+        bom="1/4 NPT brass cross (ChillWaves)", note="G1/4 adapters straight into the in valves")
     add("Line relief valve 200 psi", PP.relief_valve(V(fx, fy, fz) + LINE_RELIEF * vc, LINE_RELIEF), "brass", "pneu",
         bom="Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)")
     CHECKS.clear()
     RELIEF_AT.clear()
     for d, tag, up, plug in VALVE_RUNS:
         # Brophy Borealis (Micah via the Mac chat): GOGO GPG-M03 in valves, G1/4 ports, a G1/4 x 1/4 NPT hex nipple in
-        # each (its QD on the inlet side isn't drawn); coil up, flow toward the chamber. The chamber's transducer and
+        # each, straight into the valve cross; coil up, flow toward the chamber. The chamber's transducer and
         # 200 psi relief sit on a brass cross right after it; one hose (with a QD) runs on to the chamber's bung
         a0 = V(fx, fy, fz) + d * (vc + 11.8)              # the valve's inlet face
         add(f"In valve {tag} inlet nipple", PP.hex_nipple_g(a0, -d), "steel", "pneu",

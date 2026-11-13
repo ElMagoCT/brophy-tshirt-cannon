@@ -114,8 +114,8 @@ Part number,Part,Tab,CAD label
 3DP-B113,Panel clip 03-2,body_panels_clips,Panel corner clip
 3DP-B114,Panel clip 04-1,body_panels_clips,Panel corner clip
 3DP-B115,Panel clip 04-2,body_panels_clips,Panel corner clip
-3DP-B116,Panel clip 00-7,body_panels_clips,Panel corner clip
-3DP-B117,Panel clip 00-6,body_panels_clips,Panel corner clip
+3DP-B116,Panel clip 00-6,body_panels_clips,Panel corner clip
+3DP-B117,Panel clip 00-7,body_panels_clips,Panel corner clip
 3DP-B118,Panel clip 01-1,body_panels_clips,Panel corner clip
 3DP-B119,Panel clip 05-1,body_panels_clips,Panel corner clip
 3DP-B120,Panel clip 00-5,body_panels_clips,Panel corner clip
@@ -525,8 +525,8 @@ P10-3,Chamber cross B (bottom cannon),pneumatics,1/4 NPT brass cross (ChillWaves
 P10-4,Chamber cross A (top cannon),pneumatics,1/4 NPT brass cross (ChillWaves)
 P11-1,Main valve nipple,pneumatics,1/4 NPT brass close nipple
 P14-1,Tank plug left -80,pneumatics,1/4 NPT brass plug
-P14-2,Tank plug left 80,pneumatics,1/4 NPT brass plug
-P14-3,Tank plug right 80,pneumatics,1/4 NPT brass plug
+P14-2,Tank plug right -80,pneumatics,1/4 NPT brass plug
+P14-3,Tank plug left 80,pneumatics,1/4 NPT brass plug
 P16-1,Gun tube bottom,gun_pivots_2_of_3,DOT nylon tube 1/4 OD (ft)
 P16-2,Gun tube top,gun_pivots_2_of_3,DOT nylon tube 1/4 OD (ft)
 P16-3,Tube main valve to cross,pneumatics,DOT nylon tube 1/4 OD (ft)
