@@ -244,8 +244,8 @@ Part number,Part,Tab,CAD label
 3DP-E002,Pivot bearing block R,chassis_pivot_drive_3_of_6,Pivot bearing block
 3DP-E003,Elevation motor bracket,chassis_pivot_drive_4_of_6,Elevation motor bracket
 3DP-E004,Elevation pinion 16T,chassis_pivot_drive_5_of_6,Elevation pinion 16T HTD 9 mm (8 mm REX bore)
-3DP-E005,Elevation pulley 112T ring,gun_pivots_2_of_2,Elevation pulley 112T HTD 9 mm ring (printed)
-3DP-F001,Smoke collar,gun_pivots_2_of_2,"Smoke collar (printed, one piece)"
+3DP-E005,Elevation pulley 112T ring,gun_pivots_2_of_3,Elevation pulley 112T HTD 9 mm ring (printed)
+3DP-F001,Smoke collar,gun_pivots_3_of_3,"Smoke collar (printed, one piece)"
 3DP-F002,Fog vent rear,power_electronics_smoke,Fog vent nozzle (under the belly)
 3DP-F003,Board tray Fog and light MOSFET module 2,power_electronics_smoke,Printed board tray
 3DP-F004,Board tray Fog and light MOSFET module 3,power_electronics_smoke,Printed board tray
@@ -256,19 +256,19 @@ Part number,Part,Tab,CAD label
 3DP-F009,Smoke machine tray,power_electronics_smoke,Smoke machine tray
 3DP-F010,Fog splitter 1-3,power_electronics_smoke,Fog splitter 1 -> 3 (printed)
 3DP-F011,Fog vent front,power_electronics_smoke,Fog vent nozzle (under bumper)
-3DP-P001,Chamber end cover top,gun_pivots_1_of_2,Chamber end cover (printed)
-3DP-P002,Chamber end cover bottom,gun_pivots_1_of_2,Chamber end cover (printed)
-3DP-P003,Chamber cap top rear,gun_pivots_1_of_2,Chamber cap
-3DP-P004,Chamber saddle rear,gun_pivots_1_of_2,Chamber saddle
-3DP-P005,Chamber cap bottom rear,gun_pivots_1_of_2,Chamber cap
-3DP-P006,Chamber cap top -99,gun_pivots_1_of_2,Chamber cap
-3DP-P007,Chamber saddle -99,gun_pivots_1_of_2,Chamber saddle
-3DP-P008,Chamber cap bottom -99,gun_pivots_1_of_2,Chamber cap
-3DP-P009,Axle hub left,gun_pivots_2_of_2,Axle hub
-3DP-P010,Axle spacer right,gun_pivots_2_of_2,Axle spacer (printed)
-3DP-P011,Gun core left,gun_pivots_2_of_2,"Gun core half (valve blocks + breech block + mantlet, printed)"
-3DP-P012,Gun core right,gun_pivots_2_of_2,"Gun core half (valve blocks + breech block + mantlet, printed)"
-3DP-P013,Muzzle ring,gun_pivots_2_of_2,"Muzzle ring (printed, one piece, LED groove)"
+3DP-P001,Chamber end cover top,gun_pivots_1_of_3,Chamber end cover (printed)
+3DP-P002,Chamber end cover bottom,gun_pivots_1_of_3,Chamber end cover (printed)
+3DP-P003,Chamber cap top rear,gun_pivots_1_of_3,Chamber cap
+3DP-P004,Chamber saddle rear,gun_pivots_1_of_3,Chamber saddle
+3DP-P005,Chamber cap bottom rear,gun_pivots_1_of_3,Chamber cap
+3DP-P006,Chamber cap top -95,gun_pivots_1_of_3,Chamber cap
+3DP-P007,Chamber saddle -95,gun_pivots_1_of_3,Chamber saddle
+3DP-P008,Chamber cap bottom -95,gun_pivots_1_of_3,Chamber cap
+3DP-P009,Axle hub left,gun_pivots_2_of_3,Axle hub
+3DP-P010,Axle spacer right,gun_pivots_2_of_3,Axle spacer (printed)
+3DP-P011,Gun core left,gun_pivots_3_of_3,"Gun core half (valve blocks + breech block + mantlet, printed)"
+3DP-P012,Gun core right,gun_pivots_3_of_3,"Gun core half (valve blocks + breech block + mantlet, printed)"
+3DP-P013,Muzzle ring,gun_pivots_3_of_3,"Muzzle ring (printed, one piece, LED groove)"
 3DP-P014,Tank saddle left -60,pneumatics,Tank saddle
 3DP-P015,Tank saddle right -60,pneumatics,Tank saddle
 3DP-P016,Tank saddle left 200,pneumatics,Tank saddle
@@ -277,8 +277,8 @@ Part number,Part,Tab,CAD label
 3DP-S002,Speaker cup top left,lights_speakers_3_of_3,Speaker cup
 3DP-S003,Speaker grille top left,lights_speakers_3_of_3,Speaker grille
 3DP-S004,Speaker grille top right,lights_speakers_3_of_3,Speaker grille
-ABr-P01,Breech adapter top,gun_pivots_2_of_2,"Breech adapter (CNC 6061, stash bar, 1 in NPT tap)"
-ABr-P02,Breech adapter bottom,gun_pivots_2_of_2,"Breech adapter (CNC 6061, stash bar, 1 in NPT tap)"
+ABr-P01,Breech adapter top,gun_pivots_3_of_3,"Breech puck (2.5D CNC from 1 in 6061 plate, 1 in NPT tap)"
+ABr-P02,Breech adapter bottom,gun_pivots_3_of_3,"Breech puck (2.5D CNC from 1 in 6061 plate, 1 in NPT tap)"
 AEx-R01,Rail 20x20 gun left,add_on_rails,"20x20 T-slot extrusion (owned spare, cut)"
 AEx-R02,Rail 20x20 gun right,add_on_rails,"20x20 T-slot extrusion (owned spare, cut)"
 AEx-R03,Rail 20x20 well left,add_on_rails,"20x20 T-slot extrusion (owned spare, cut)"
@@ -335,8 +335,8 @@ ASh-D47,Wheel plate outer (1/8 Al) RR,wheel_rr,Mecanum outer plate (1/8 Al)
 ASh-E01,Tower plate L,chassis_pivot_drive_3_of_6,"Tower plate (1/8 Al, waterjet)"
 ASh-E02,Tower plate R,chassis_pivot_drive_3_of_6,"Tower plate (1/8 Al, waterjet)"
 ASh-F01,Fog heater bracket (1/8 Al),power_electronics_smoke,Fog heater bracket (1/8 Al)
-ASh-P01,Cradle plate left (1/8 Al),gun_pivots_1_of_2,"Gun cradle plate (1/8 Al, CNC router)"
-ASh-P02,Cradle plate right (1/8 Al),gun_pivots_1_of_2,"Gun cradle plate (1/8 Al, CNC router)"
+ASh-P01,Cradle plate left (1/8 Al),gun_pivots_2_of_3,"Gun cradle plate (1/8 Al, CNC router)"
+ASh-P02,Cradle plate right (1/8 Al),gun_pivots_2_of_3,"Gun cradle plate (1/8 Al, CNC router)"
 ATu-D01,End rail rear (1x2),chassis_pivot_drive_1_of_6,Aluminum box tube 1x2 x 1/16 wall (owned)
 ATu-D02,Sled post left -320 (1x1),chassis_pivot_drive_1_of_6,Aluminum box tube 1x1 x 1/16 wall (owned)
 ATu-D03,Sled rail left -320 (1x1),chassis_pivot_drive_1_of_6,Aluminum box tube 1x1 x 1/16 wall (owned)
@@ -428,8 +428,8 @@ D05-1,Wheel axle RL (1/2 hex),chassis_pivot_drive_1_of_6,"1/2 in hex shaft, whee
 D05-2,Wheel axle RR (1/2 hex),chassis_pivot_drive_2_of_6,"1/2 in hex shaft, wheel axle (6 in)"
 D05-3,Wheel axle FL (1/2 hex),chassis_pivot_drive_6_of_6,"1/2 in hex shaft, wheel axle (6 in)"
 D05-4,Wheel axle FR (1/2 hex),chassis_pivot_drive_6_of_6,"1/2 in hex shaft, wheel axle (6 in)"
-D05-5,Pivot axle stub left (1/2 hex),gun_pivots_2_of_2,"1/2 in hex shaft, steel (pivot stub)"
-D05-6,Pivot axle stub right (1/2 hex),gun_pivots_2_of_2,"1/2 in hex shaft, steel (pivot stub)"
+D05-5,Pivot axle stub left (1/2 hex),gun_pivots_2_of_3,"1/2 in hex shaft, steel (pivot stub)"
+D05-6,Pivot axle stub right (1/2 hex),gun_pivots_2_of_3,"1/2 in hex shaft, steel (pivot stub)"
 D06-1,Belt 140T RL,chassis_pivot_drive_2_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
 D06-2,Belt 140T RR,chassis_pivot_drive_2_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
 D06-3,Belt 140T FL,chassis_pivot_drive_6_of_6,"HTD 5M 15 mm belt, 140T (WCP)"
@@ -445,7 +445,7 @@ F05-1,DS18B20 probe battery bay,power_electronics_smoke,DS18B20 waterproof tempe
 F05-2,DS18B20 probe electronics,power_electronics_smoke,DS18B20 waterproof temperature probe
 F05-3,DS18B20 probe fogger,power_electronics_smoke,DS18B20 waterproof temperature probe
 F07-1,Fog blower 5015,power_electronics_smoke,12 V 5015 blower
-F10-1,Gun smoke tube,gun_pivots_2_of_2,Silicone tube 3/4 ID x 1 OD (ft)
+F10-1,Gun smoke tube,gun_pivots_3_of_3,Silicone tube 3/4 ID x 1 OD (ft)
 F10-2,Fog loop (to gun),power_electronics_smoke,Silicone tube 1/2 ID x 5/8 OD (ft)
 F11-1,Fog and light MOSFET module 2 (fog heater),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
 F11-2,Fog and light MOSFET module 3 (fog heater 2),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
@@ -506,24 +506,13 @@ L03-3,Light bar bracket right,lights_speakers_3_of_3,Light bar end bracket (come
 L04-1,Buck 12-5 V 20 A,power_electronics_smoke,12->5 V 20 A buck (B089M5R3NJ)
 P01-1,Air tank right (6 L 200 psi),pneumatics,"Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT (owner's AliExpress pick)"
 P01-2,Air tank left (6 L 200 psi),pneumatics,"Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT (owner's AliExpress pick)"
-P02-1,Tank relief valve 200 psi,pneumatics,"Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)"
-P02-2,Line relief valve 200 psi,pneumatics,"Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)"
-P02-3,Chamber relief valve 200 psi B (bottom cannon),pneumatics,"Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)"
-P02-4,Chamber relief valve 200 psi A (top cannon),pneumatics,"Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)"
-P03-1,Tank transducer 0-300 psi,pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable"
-P03-2,Chamber transducer B (bottom cannon),pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)"
-P03-3,Chamber transducer A (top cannon),pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)"
-P04-1,QD coupler main valve line,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
-P04-2,QD coupler tank right,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
-P04-3,QD coupler service loop B,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
-P04-4,QD coupler service loop A,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
-P04-5,QD coupler tank left,pneumatics,"Quick disconnect coupler: 1/4 NPT female M-style, brass, 300 psi (RUBY.Q)"
-P05-1,"Fill plug (M-style, female)",pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
-P05-2,QD plug main valve line,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
-P05-3,QD plug tank right,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
-P05-4,QD plug service loop B,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
-P05-5,QD plug service loop A,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
-P05-6,QD plug tank left,pneumatics,"QD plugs + fill plug: 1/4 NPT female-thread M-style plugs, brass, 10 pcs (ZKZX B081F9J3VF)"
+P02-1,Line relief valve 200 psi,pneumatics,"Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)"
+P02-2,Chamber relief valve 200 psi B (bottom cannon),pneumatics,"Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)"
+P02-3,Chamber relief valve 200 psi A (top cannon),pneumatics,"Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)"
+P03-1,Chamber transducer B (bottom cannon),pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)"
+P03-2,Chamber transducer A (top cannon),pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)"
+P03-3,Tank transducer 0-300 psi,pneumatics,"Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable"
+P05-1,"Fill plug (M-style, female)",pneumatics,"Fill plug: 1/4 NPT female-thread M-style plug, brass (ZKZX B081F9J3VF)"
 P06-1,Fill check valve,pneumatics,"Fill check valve, 304 stainless, 1/4 NPT male x male (AliExpress)"
 P07-1,In valve B (bottom cannon),pneumatics,"In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm"
 P07-2,In valve A (top cannon),pneumatics,"In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm"
@@ -531,68 +520,58 @@ P08-1,In valve B (bottom cannon) inlet nipple,pneumatics,"G1/4 BSPP male x 1/4 N
 P08-2,In valve B (bottom cannon) outlet nipple,pneumatics,"G1/4 BSPP male x 1/4 NPT male hex nipple, 304"
 P08-3,In valve A (top cannon) inlet nipple,pneumatics,"G1/4 BSPP male x 1/4 NPT male hex nipple, 304"
 P08-4,In valve A (top cannon) outlet nipple,pneumatics,"G1/4 BSPP male x 1/4 NPT male hex nipple, 304"
-P10-1,Rear manifold,pneumatics,Rear manifold: 1/4 NPT brass crosses + close nipples (built)
+P10-1,Rear manifold cross,pneumatics,1/4 NPT brass cross (ChillWaves)
 P10-2,Valve cross,pneumatics,1/4 NPT brass cross (ChillWaves)
 P10-3,Chamber cross B (bottom cannon),pneumatics,1/4 NPT brass cross (ChillWaves)
 P10-4,Chamber cross A (top cannon),pneumatics,1/4 NPT brass cross (ChillWaves)
 P11-1,Main valve nipple,pneumatics,1/4 NPT brass close nipple
-P12-1,Fill elbow panel (F x F),pneumatics,"1/4 NPT brass 90 deg elbow, FNPT x FNPT (ChillWaves)"
-P13-1,Main valve elbow,pneumatics,1/4 NPT brass street elbow
-P13-2,Fill elbow manifold,pneumatics,1/4 NPT brass street elbow
 P14-1,Tank plug left -80,pneumatics,1/4 NPT brass plug
-P14-2,Tank plug right -80,pneumatics,1/4 NPT brass plug
-P14-3,Tank plug left 80,pneumatics,1/4 NPT brass plug
-P14-4,Tank plug right 80,pneumatics,1/4 NPT brass plug
-P16-1,Gun tube top,gun_pivots_1_of_2,DOT nylon tube 1/4 OD (ft)
-P16-2,Gun tube bottom,gun_pivots_2_of_2,DOT nylon tube 1/4 OD (ft)
-P16-3,Tube main valve to cross (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-4,Tube main valve to cross (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-5,Tube tank right (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-6,Service loop B (bottom cannon) (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-7,Tube tank left (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-8,Service loop A (top cannon) (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-9,Tube tank right (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-10,Service loop B (bottom cannon) (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-11,Service loop A (top cannon) (downstream),pneumatics,DOT nylon tube 1/4 OD (ft)
-P16-12,Tube tank left (supply),pneumatics,DOT nylon tube 1/4 OD (ft)
-P17-1,Main valve push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
-P17-2,Rear manifold push-to-connect right tank,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
-P17-3,Rear manifold push-to-connect left tank,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
-P17-4,Valve cross push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
-P17-5,Chamber cross B (bottom cannon) push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
-P17-6,Chamber cross A (top cannon) push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
-P18-1,Chamber inlet elbow top,gun_pivots_1_of_2,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)
-P18-2,Chamber inlet elbow bottom,gun_pivots_1_of_2,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)
-P18-3,Tank elbow push-to-connect left,pneumatics,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT
-P18-4,Tank elbow push-to-connect right,pneumatics,DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT
+P14-2,Tank plug left 80,pneumatics,1/4 NPT brass plug
+P14-3,Tank plug right 80,pneumatics,1/4 NPT brass plug
+P16-1,Gun tube bottom,gun_pivots_2_of_3,DOT nylon tube 1/4 OD (ft)
+P16-2,Gun tube top,gun_pivots_2_of_3,DOT nylon tube 1/4 OD (ft)
+P16-3,Tube main valve to cross,pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-4,Service loop B (bottom cannon),pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-5,Tube tank left,pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-6,Tube tank right,pneumatics,DOT nylon tube 1/4 OD (ft)
+P16-7,Service loop A (top cannon),pneumatics,DOT nylon tube 1/4 OD (ft)
+P17-1,Chamber inlet push-to-connect top,gun_pivots_1_of_3,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-2,Chamber inlet push-to-connect bottom,gun_pivots_2_of_3,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-3,Rear manifold push-to-connect right tank,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-4,Rear manifold push-to-connect left tank,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-5,Valve cross push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-6,Chamber cross B (bottom cannon) push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-7,Main valve push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-8,Chamber cross A (top cannon) push-to-connect,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-9,Tank push-to-connect left,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
+P17-10,Tank push-to-connect right,pneumatics,DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)
 P20-1,Tank strap left 6,pneumatics,1 in cam-buckle strap
 P20-2,Tank strap right 6,pneumatics,1 in cam-buckle strap
 P20-3,Tank strap left 86,pneumatics,1 in cam-buckle strap
 P20-4,Tank strap right 86,pneumatics,1 in cam-buckle strap
 P21-1,Main valve (1/4 ball valve),pneumatics,"Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG (the old cannon's if it fits)"
-P22-1,Fill nipple,pneumatics,1/4 NPT brass nipple x 1-1/2 in
-P23-1,Firing valve top (U.S. Solid USS-HSV04),gun_pivots_2_of_2,"Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
-P23-2,Firing valve bottom (U.S. Solid USS-HSV04),gun_pivots_2_of_2,"Firing valve bottom: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
-P24-1,Chamber back disc top,gun_pivots_1_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P24-2,Chamber back disc bottom,gun_pivots_1_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P24-3,Chamber front disc top,gun_pivots_1_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P24-4,Chamber front disc bottom,gun_pivots_2_of_2,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
-P25-1,Chamber pipe top,gun_pivots_1_of_2,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
-P25-2,Chamber pipe bottom,gun_pivots_1_of_2,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
-P26-1,Chamber inlet bung top,gun_pivots_1_of_2,Chamber inlet: 1/4 NPT female steel weld-on bung
-P26-2,Chamber inlet bung bottom,gun_pivots_1_of_2,Chamber inlet: 1/4 NPT female steel weld-on bung
-P27-1,top nipple 1x1.50,gun_pivots_2_of_2,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
-P27-2,bottom nipple 1x1.50,gun_pivots_2_of_2,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
-P28-1,Chamber outlet nipple top,gun_pivots_1_of_2,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
-P28-2,Chamber outlet nipple bottom,gun_pivots_2_of_2,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
+P23-1,Firing valve top (U.S. Solid USS-HSV04),gun_pivots_3_of_3,"Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
+P23-2,Firing valve bottom (U.S. Solid USS-HSV04),gun_pivots_3_of_3,"Firing valve bottom: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi"
+P24-1,Chamber back disc top,gun_pivots_1_of_3,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P24-2,Chamber back disc bottom,gun_pivots_1_of_3,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P24-3,Chamber front disc top,gun_pivots_2_of_3,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P24-4,Chamber front disc bottom,gun_pivots_2_of_3,"Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)"
+P25-1,Chamber pipe top,gun_pivots_1_of_3,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
+P25-2,Chamber pipe bottom,gun_pivots_1_of_3,"Chamber: 3 in Sch 40 steel pipe, plain end (cut)"
+P26-1,Chamber inlet bung top,gun_pivots_1_of_3,Chamber inlet: 1/4 NPT female steel weld-on bung
+P26-2,Chamber inlet bung bottom,gun_pivots_2_of_3,Chamber inlet: 1/4 NPT female steel weld-on bung
+P27-1,top nipple 1x1.50,gun_pivots_3_of_3,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
+P27-2,bottom nipple 1x1.50,gun_pivots_3_of_3,"1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80"
+P28-1,Chamber outlet nipple top,gun_pivots_2_of_3,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
+P28-2,Chamber outlet nipple bottom,gun_pivots_3_of_3,"Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc"
 P30-1,Valve MOSFET module 2 (firing valve B),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
 P30-2,Valve MOSFET module 3 (in valve A),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
 P30-3,Valve MOSFET module 1 (firing valve A),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
 P30-4,Valve MOSFET module 4 (in valve B),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
 P30-5,Valve MOSFET module 5 (contactor (controller)),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
 P30-6,Valve MOSFET module 6 (contactor (safety node)),power_electronics_smoke,"MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)"
-P31-1,Barrel top,gun_pivots_2_of_2,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
-P31-2,Barrel bottom,gun_pivots_2_of_2,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
+P31-1,Barrel top,gun_pivots_3_of_3,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
+P31-2,Barrel bottom,gun_pivots_3_of_3,Barrel: clear polycarbonate tube 3 in OD x 1/8 wall
 S01-1,Speaker top left,lights_speakers_3_of_3,"Siren speaker 200 W, 8 ohm, aluminium (Xprite B01DMSR4L4)"
 S01-2,Speaker top right,lights_speakers_3_of_3,"Siren speaker 200 W, 8 ohm, aluminium (Xprite B01DMSR4L4)"
 S02-1,Audio amp (TPA3255),power_electronics_smoke,"TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm"

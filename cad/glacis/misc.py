@@ -480,14 +480,14 @@ def batteries_and_electronics():
     add("Power distribution (REV PDH)", box(-370.0, -267.0, -86.5, 86.5, zb, zb + 36), "black", "power",
         bom="REV PDH (owned) + ATO breakers / fuses (stash)")
     ELEC_MARKS.append(("PDH", -370.0, -267.0, -86.5, 86.5))
-    # the main breaker is the robot's on / off switch: on the rear panel beside the E-stop, its red trip button and
-    # reset lever through a hole in the panel (the E-stop only drops the contactor; the logic rail stays up)
+    # the main breaker is the robot's on / off switch and its kill switch (Micah 2026-11-12: no rear E-stop, the
+    # breaker's red trip button already kills everything, logic rail included): its face through a hole in the panel
     by, bz = BREAKER
     xi = P.rear_x(bz) + P.CLIP_T + 4.0                     # behind the acrylic, its face parallel to the slanted panel
     lean = math.degrees(math.atan((P.rear_x(bz + 18.0) - P.rear_x(bz - 18.0)) / 36.0))
     brk_ = box(0.0, 41.0, -26.0, 26.0, -18.0, 18.0).rotate(V(0, 0, 0), V(0, 1, 0), lean).translate(V(xi, by, bz))
     add("Main breaker 120 A", brk_, "black", "power",
-        bom="120 A main breaker (stash)", note="rear panel, bottom strip beside the E-stop: the on / off switch; its face "
+        bom="120 A main breaker (stash)", note="rear panel, bottom strip: the on / off switch and the kill button (red trip); its face "
         "through a 42 mm hole, 2 x #10-32 through its ears and the panel")
     boards = [
               ('Main controller ESP32-P4 + C6 (Waveshare)', -259, -203, -43, 45, 6, 18, 'pcb',
@@ -567,7 +567,7 @@ def batteries_and_electronics():
                 note="PETG; the board heat-staked onto its four pegs; 2 x M4 x 12 up through the bellypan into inserts")
     relay = "Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
     add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power", bom=relay,
-        note="main breaker -> contactor -> PDH; coil through the rear E-stop, the safety node and the main controller in series")
+        note="main breaker -> contactor -> PDH; coil through the safety node and the main controller in series")
     # rev D.2.1: one 200 A relay in each battery's + lead (same part as the contactor), a 4.7 ohm 5 W resistor across each
     add("Battery relay A 200 A", box(-175.0, -100.0, 35.0, 95.0, zb, zb + 70.0), "black", "power", bom=relay,
         note="in battery A's + lead, between its SB50 and the bus; the controller keeps only the fuller pack connected "
@@ -576,15 +576,7 @@ def batteries_and_electronics():
         note="in battery B's + lead, between its SB50 and the bus")
     ELEC_MARKS.extend([("Contactor", -175.0, -100.0, -95.0, -35.0), ("Battery relay A", -175.0, -100.0, 35.0, 95.0),
                        ("Battery relay B", -97.0, -22.0, -95.0, -35.0)])
-    # bottom of the rear panel: E-stop, standby charge port (the fill port and main valve stem come out of the manifold)
-    ey, ez = ESTOP
-    xo = P.rear_x(ez)
-    xi = xo + P.CLIP_T
-    est = cyl(11.0, 12.0, (xi + 6.0, ey, ez), (-1, 0, 0)).fuse(
-        cyl(20.0, 30.0, (xi + 34.0, ey, ez), (-1, 0, 0))).fuse(
-        cq.Solid.makeSphere(22.0, V(xo - 2.0, ey, ez), angleDegrees1=0, angleDegrees2=90).rotate(
-            V(xo - 2.0, ey, ez), V(xo - 2.0, ey + 1, ez), -90))
-    add("E-stop", est, "red", "power", bom="Latching mushroom E-stop, 22 mm, NC", note="rear panel, bottom; contact 1 in the contactor coil, contact 2 in the valve arm relay coil")
+    # bottom of the rear panel, one tight row (Micah 2026-11-12): breaker, charge port, the fill plug, USB-C
     cy, cz = CHARGE
     xc = P.rear_x(cz)
     add("Charge port (SB50 panel mount)", box(xc - 4.0, xc + 26.0, cy - 18.0, cy + 18.0, cz - 14.0, cz + 14.0), "red", "power",
@@ -594,11 +586,11 @@ def batteries_and_electronics():
         bom="Panel-mount USB-C extension (to the main controller)")
 
 
-ESTOP = (-215.0, 255.0)     # (y, z) on the rear panel, bottom strip under the open middle
-BREAKER = (-156.0, 255.0)   # the main breaker, between the E-stop and the charge port
+BREAKER = (-135.0, 255.0)   # (y, z) on the rear panel, bottom strip: one tight row, breaker / charge / fill / USB-C;
+                            # the breaker (41 mm deep) stays outside the tank lines that drop beside the rear cross
 ELEC_MARKS = []             # (label, x0, x1, y0, y1) of every part on the bellypan: engraved on the CNC'd bellypan
-CHARGE = (-95.0, 255.0)
-USB = (182.0, 255.0)
+CHARGE = (-75.0, 255.0)
+USB = (10.0, 255.0)
 
 
 # ------------------------------------------------------------------ speakers + audio
@@ -960,7 +952,7 @@ def frame_mounts():
                      "insert; the frame's 1/2 in #10-32 from the outer pocket (bumper ring off first)")
 
 
-REAR_HOLES = ((REAR_MAN[1] + REAR_DY, REAR_MAN[2], 12.0), (ESTOP[0], ESTOP[1], 23.0),   # fill check valve (2026-11-12: flat cross)
+REAR_HOLES = ((REAR_MAN[1] + REAR_DY, REAR_MAN[2], 12.0),   # fill check valve (2026-11-12: flat cross)
               (CHARGE[0], CHARGE[1], 26.0), (USB[0], USB[1], 10.0),
               (BREAKER[0], BREAKER[1], 21.0))
 
@@ -1117,7 +1109,7 @@ def body_parts(log=print):
     nclip = 0
     for i, p in enumerate(panels):
         a = B.slab(p["poly"], p["n"], P.MEM_W - P.REBATE_W + P.PANEL_GAP, P.CLIP_T, P.ACRYLIC_T, P.ACRYLIC_R)
-        if p["n"].x < -0.9:                      # rear face: fill port, main valve stem, E-stop, charge port, USB-C
+        if p["n"].x < -0.9:                      # rear face: breaker, charge port, fill plug, USB-C
             for (yb, zb, r) in REAR_HOLES:
                 a = a.cut(cyl(r, 30, (-P.FRAME_X - 10, yb, zb), (1, 0, 0)))
         u, w = B._plane_basis(p["n"])
