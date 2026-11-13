@@ -1204,6 +1204,10 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B29. **No rear E-stop; rear panel in one row** (Micah, 2026-11-12: "remove the e-stop bc the frc breaker has a red kill
+    button already. move things tighter in"). The breaker's trip kills the logic rail too (the E-stop only dropped the
+    contactor), so a kill now means a cold restart; the remote's E-stop still drops the contactor through the safety
+    node. Row: breaker, charge port, fill plug, USB-C within 175 mm.
 B28. **No QDs, straight connectors, flat rear cross** (Micah, 2026-11-12: "remove every quick disconnect except the fill
     one, we'll just use the tube connectors if we need to take off the cannon or a tank. we only need 10 tube
     connectors, none of them angled. also remove the angle 1/4 to 1/4 and just adjust the T to be horizontal and have

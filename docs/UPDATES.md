@@ -25,6 +25,16 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-12 - Micah's Windows computer (Claude Code) - Rear panel cleanup: no E-stop, one tight row
+- Branch / commit: micah-windows/borealis (PR #2), commits 73fc60e, 4df65ac
+- Changed (Micah): the rear E-stop is gone; the 120 A breaker's red trip button is the kill switch (it kills everything, logic included). The contactor coil now runs logic tap -> safety node -> controller MOSFET; the valve arm relay is fed from the PDH and armed by the controller. The rear panel is one tight row at z 255: breaker (y -135), SB50 charge port (-75), fill plug (-26.5), USB-C (+10), was spread over -238..+192. The breaker stays outside the tank lines that drop beside the rear cross. Also: the tank transducer moved to the right tank's FRONT bung (the rear bung hit the tank-arm knee plate, found by an independent review).
+- Files: `cad/glacis/misc.py`, `electrical/README.md`, `bom/*`, `docs/glacis/air_wiring_artifact.html`
+- Checks: robot build without the body, brackets included: the panel row, every pneumatic part and tube against everything, 0 hits over 30 mm3. The body panels were rebuilt alone (body solid + panels + clips, no frame sectioning) for their new holes.
+- Parts list: E-stop row 2 -> 1 (the remote's). Total $1,476.84 pre-tax. Sheet synced.
+- Onshape: Body panels & clips, Power, electronics & smoke, and Pneumatics re-imported and coded, old tabs/STEPs deleted, rigid groups rebuilt, every feature OK; versions "Before rear panel cleanup" and "Rear panel: no E-stop, one tight row" (2026-11-12). Artifact republished.
+- Not done: the new tabs sit at the root of the tab bar (drag them into their folders).
+- Questions for Micah: none
+
 ## 2026-11-12 - Micah's Windows computer (Claude Code) - No QDs but the fill, 10 straight push-to-connects, flat rear cross, CheeMuii tube; concept branch
 - Branch / commit: micah-windows/borealis (PR #2), commits a89ba23, 0fd9680
 - Changed (Micah): every quick disconnect removed except the fill plug (the push-to-connects come off if the gun or a tank must); push-to-connects are 10, all straight (tank outlets straight down, chamber inlets straight into their bungs); the F x F elbow and the 2-1/2 in nipple are gone: the rear cross lies flat with the fill check valve straight out its back face through the rear panel (fill plug on its end) and the main ball valve straight off its front face inside the robot (no stem through the panel); tanks into its sides. The cross sits 120 mm to the right of the old manifold spot, clear of in valve A. Tube is now CheeMuii 30 ft (B0DBSNY5X2, DOT SAE J844, 500 psi, $9.99).
