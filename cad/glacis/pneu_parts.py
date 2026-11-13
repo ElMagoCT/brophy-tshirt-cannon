@@ -157,6 +157,30 @@ def solenoid_02f(p, d, up, length=37.0):
     return place(s, p, d, up)
 
 
+def solenoid_gogo(p, d, up, plug=1):
+    """In valve (Brophy Borealis, Micah via the Mac chat): GOGO GPG-M03 2/2 NC direct-acting, G1/4 both ends, from the
+    seller drawing: brass body 40 along the flow x 26 across, port centre 9 above its bottom, 76 overall to the top
+    nut, coil 38 wide, coil + DIN plug 82 long (24 from the valve centre to the coil's far side, 58 to the plug end).
+    p = body centre on the port axis, d = flow, up = the coil; plug = which side the DIN plug points (+1 / -1)."""
+    g = 6.6                                            # G1/4 male OD 13.16
+    body = _box(-9.0, 17.0, -13.0, 13.0, -20.0, 20.0)
+    for z0, dz in ((-20.0, 1), (20.0, -1)):
+        body = body.cut(cyl(g + 0.1, 12.0, (0, 0, z0 - dz * 0.01), (0, 0, dz)))
+    s = union([body, cyl(6.0, 4.0, (17.0, 0, 0), (1, 0, 0)), _box(21.0, 59.0, -24.0, 14.0, -15.0, 15.0),
+               cyl(4.5, 4.0, (59.0, 0, 0), (1, 0, 0)), hex_prism(12.0, 4.0, (63.0, 0, 0), (1, 0, 0)),
+               _box(27.0, 55.0, 14.0, 58.0, -13.0, 13.0)])
+    if plug < 0:
+        s = s.mirror("XZ")
+    return place(s, p, d, up)
+
+
+def hex_nipple_g(p, d):
+    """G1/4 BSPP male x 1/4 NPT male hex nipple, 304: the G1/4 end (12 mm) behind p in the valve's port, a 19 mm hex at
+    p, the 1/4 NPT end out along d (3.8 mm of it left showing when it's made up)."""
+    s = union([cyl(6.58, 12.0, (0, 0, -12.0)), hex_prism(19.0, 8.0), cyl(OD["1/4"] / 2, 14.0, (0, 0, 8.0))])
+    return place(s.cut(cyl(3.5, 40.0, (0, 0, -15.0))), p, d)
+
+
 def relief_valve(p, d, length=44.0, ring=True):
     """Relief valve with a pull ring: thread behind p, hex, spring body, cap, ring on the stem. length = how far it
     stands out of the port."""
@@ -274,10 +298,9 @@ def manifold(p, d, up, stations, half_len=63.5, side=25.4, size="1/4", gap_merge
 # ------------------------------------------------------------------ what each part is for (Onshape Description)
 PURPOSE = [   # (substring of the part name, purpose); first match wins, so specific names come first
     ("Rear manifold push-to-connect", "Takes a tank line into the rear manifold."),
-    ("Rear manifold", "Joins both tanks, the fill port, the tank transducer, the tank relief and the main valve: the 200 psi hub."),
+    ("Rear manifold", "One brass cross that joins both tanks, the fill line and the main valve: the 200 psi hub."),
     ("Tank transducer", "PT1: reads tank pressure for the web UI and the safety node's 210 psi trip."),
-    ("Tank relief valve", "Vents the tanks above 200 psi; pull its ring at the rear panel to dump them by hand."),
-    ("Tank elbow push-to-connect", "Tank outlet: turns the tank's port into the 1/4 in line to the rear manifold."),
+    ("Tank push-to-connect", "Tank outlet: the tank's bottom port straight into the 1/4 in line to the rear manifold."),
     ("Tank plug", "Plugs a tank port that isn't used."),
     ("Tank strap", "Cam strap holding the tank in its saddles."),
     ("Tank saddle", "Printed cradle the tank sits in."),
@@ -285,16 +308,12 @@ PURPOSE = [   # (substring of the part name, purpose); first match wins, so spec
     ("Tank post", "Upright that holds a tank arm off the inner rail."),
     ("Air tank", "Stores the shot air: 6 L at up to 200 psi, refilled from a shop compressor through the fill plug."),
     ("Fill plug", "Where the shop compressor's universal (M-style) coupler snaps on to fill the tanks."),
-    ("Fill nipple", "Carries the fill line through the rear panel."),
-    ("Fill elbow", "Turns the fill line behind the rear panel toward the manifold."),
     ("Fill check valve", "Lets air in from the fill plug but holds the tanks once the hose comes off."),
-    ("Main valve lever", "Main valve handle outside the rear panel: up = open, across = closed."),
-    ("Main valve elbow", "Turns the rear manifold's outlet into the main valve."),
     ("Main valve push-to-connect", "Line from the main valve forward to the valve cross."),
     ("Main valve", "Manual shut-off for both tanks: open all session, closed for transport and any work on the gun."),
     ("Valve cross push-to-connect", "Feed from the main valve into the valve cross."),
     ("Valve cross", "Splits the main valve's air to the two in valves and the line relief."),
-    ("Line relief", "Protects the line between the main valve and the in valves: vents above 200 psi."),
+    ("Line relief", "Vents above 200 psi: the line from the main valve to the in valves, and the tanks too while the main valve is open (the only tank relief, Micah 2026-11-12). Pull its ring to dump them."),
     ("In valve A", "Meters air into the top cannon's chamber until PT2 reads its setpoint; closed, it isolates that chamber."),
     ("In valve B", "Meters air into the bottom cannon's chamber until PT3 reads its setpoint; closed, it isolates that chamber."),
     ("Tube main valve", "1/4 in DOT tube from the main valve to the valve cross."),
@@ -312,7 +331,7 @@ PURPOSE = [   # (substring of the part name, purpose); first match wins, so spec
     ("chamber nipple", "Pipe: part of the chamber or its connection to the firing valve."),
     ("Firing valve", "Fires the cannon: opens to dump the chamber into the barrel."),
     ("nipple", "Close nipple joining the firing valve to the breech adapter."),
-    ("Breech adapter", "Machined adapter: 1 in NPT from the valve to the barrel's spigot."),
+    ("Breech adapter", "Breech puck: 2.5D from 1 in 6061 plate, JB Welded in the barrel, 1 in NPT onto the valve nipple."),
     ("Barrel", "Polycarbonate barrel; smoke enters through six holes just ahead of the shirt."),
     ("Chamber cap", "Printed cap holding the chamber pipe down on its saddle."),
     ("Chamber saddle", "Printed block carrying both chambers between the cradle plates."),

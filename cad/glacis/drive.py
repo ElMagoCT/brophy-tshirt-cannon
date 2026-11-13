@@ -336,42 +336,29 @@ def rod():
 # ------------------------------------------------------------------ build
 def build(log=print):
     rz = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
-    brg_holes = union([cyl(0.5625 * IN + 0.1, 1000, (sx * P.AX_X, -500, P.AXLE_Z), (0, 1, 0)) for sx in (-1, 1)])
+    import lib
+    W_ = P.TUBE_WALL
+    for sx in (-1, 1):
+        for sgn in (1, -1):
+            x = sx * P.AX_X
+            # inner rail: the axle through both walls (flanged bearing on its outboard face, the end screw on its inner face)
+            lib.TUBE_HOLES.append(("wheel axle bearing", (x, sgn * (P.INNER_RAIL_Y[0] - 1.0), P.AXLE_Z), (0, sgn, 0),
+                                   0.5625 * IN + 0.1, P.INNER_RAIL_Y[1] - P.INNER_RAIL_Y[0] + 2.0))
+            # outer rail: the bearing in its inner wall only; a 14 mm hole in the outer wall to put the axle's end
+            # screw and washer in (the bumper covers it: no hole in the bumper)
+            lib.TUBE_HOLES.append(("wheel axle bearing", (x, sgn * (P.OUTER_RAIL_Y[0] - 1.0), P.AXLE_Z), (0, sgn, 0),
+                                   0.5625 * IN + 0.1, W_ + 2.0))
+            lib.TUBE_HOLES.append(("axle end-screw access", (x, sgn * (P.OUTER_RAIL_Y[1] + 1.0), P.AXLE_Z), (0, -sgn, 0),
+                                   7.0, W_ + 2.0))
     for sgn, side in ((1, "L"), (-1, "R")):
         oy = sgn * (P.OUTER_RAIL_Y[0] + P.OUTER_RAIL_Y[1]) / 2
         iy = sgn * (P.INNER_RAIL_Y[0] + P.INNER_RAIL_Y[1]) / 2
-        tube_part(f"Outer rail {side} (1x2)", "x", -P.FRAME_X, P.FRAME_X, oy, rz, (1, 2), cuts=brg_holes)
-        tube_part(f"Inner rail {side} (1x2)", "x", -(P.FRAME_X - P.RAIL_W), P.FRAME_X - P.RAIL_W, iy, rz, (1, 2),
-                  cuts=brg_holes)
+        tube_part(f"Outer rail {side} (1x2)", "x", -P.FRAME_X, P.FRAME_X, oy, rz, (1, 2))
+        tube_part(f"Inner rail {side} (1x2)", "x", -(P.FRAME_X - P.RAIL_W), P.FRAME_X - P.RAIL_W, iy, rz, (1, 2))
     for sx, end in ((1, "front"), (-1, "rear")):
         cx = sx * (P.FRAME_X - P.RAIL_W / 2)
         tube_part(f"End rail {end} (1x2)", "y", -P.OUTER_RAIL_Y[0], P.OUTER_RAIL_Y[0], cx, rz, (1, 2))
-        # U-shaped 1/8 in gussets top and bottom round each wheel end (end rail + outer and inner rails)
-        for sgn, side in ((1, "L"), (-1, "R")):
-            x_in = sx * (P.AX_X + P.WHEEL_R + 3.0)            # clear of the wheel
-            xa, xb = sorted([sx * (P.FRAME_X - 100.0), sx * P.FRAME_X])
-            xe0, xe1 = sorted([x_in, sx * P.FRAME_X])
-            ys = sorted([sgn * P.INNER_RAIL_Y[0], sgn * P.OUTER_RAIL_Y[1]])
-            yo = sorted([sgn * P.OUTER_RAIL_Y[0], sgn * P.OUTER_RAIL_Y[1]])
-            yi = sorted([sgn * P.INNER_RAIL_Y[0], sgn * P.INNER_RAIL_Y[1]])
-            for zt, tag in ((P.RAIL_Z[1], "top"), (P.RAIL_Z[0] - P.PLATE_T, "bottom")):
-                if tag == "bottom":
-                    g = box(xe0, xe1, *ys, zt, zt + P.PLATE_T).fuse(box(xa, xb, *yo, zt, zt + P.PLATE_T))
-                else:
-                    g = union([box(xe0, xe1, *ys, zt, zt + P.PLATE_T), box(xa, xb, *yo, zt, zt + P.PLATE_T),
-                               box(xa, xb, *yi, zt, zt + P.PLATE_T)])
-                add(f"Corner gusset {end} {side} {tag}", g, "alu", "frame", bom="Corner gusset (1/8 Al)", kind="stock",
-                    note="3/16 rivets")
-    belly = box(-P.FRAME_X + P.RAIL_W, P.FRAME_X - P.RAIL_W, -P.INNER_RAIL_Y[1], P.INNER_RAIL_Y[1],
-                P.BELLY_Z - P.PLATE_T, P.BELLY_Z)
-    for x in (-300, -200, 200, 300):
-        belly = belly.cut(cyl(35, 10, (x, 0, P.BELLY_Z - 5)))
-    for vx, vy in P.FOG_VENTS:                             # smoke-trail vents: under the front bumper and near the back
-        belly = belly.cut(cyl(13.5, 10, (vx, vy, P.BELLY_Z - 5)))
-    for x0, x1, tag in ((-P.FRAME_X + P.RAIL_W, 0.0, "rear"), (0.0, P.FRAME_X - P.RAIL_W, "front")):
-        add(f"Bellypan {tag} (1/8 Al)", belly.intersect(box(x0, x1, -500, 500, -10, 500)), "alu", "frame",
-            bom="Bellypan half (1/8 Al)", kind="stock", note="rivets to the inner rails")
-
+        # (corner gussets, bellypan and the Falcon side plates: brackets.py)
     tread, core = roller_parts()
     m8 = rod()
     for front in (True, False):
@@ -380,17 +367,6 @@ def build(log=print):
             ax = (P.AX_X if front else -P.AX_X)
             hand = 1 if (front == (sgn > 0)) else -1          # X pattern seen from above
             fx, fz = P.falcon_xz(front)
-            y_pl = P.DRIVE_PLATE_Y[0] if sgn > 0 else -P.DRIVE_PLATE_Y[1]
-            pl = plate_from_circles(
-                [(ax, P.AXLE_Z, 26), (fx, fz, 36), (ax - math.copysign(55, ax), P.RAIL_Z[0] + 4, 4),
-                 (fx - math.copysign(40, ax), P.RAIL_Z[0] + 4, 4)], y_pl,
-                holes=[(ax, P.AXLE_Z, 18.0), (fx, fz, 10.0)] +
-                      [(fx + 25.4 * math.cos(math.radians(60 * k)), fz + 25.4 * math.sin(math.radians(60 * k)), 2.4)
-                       for k in range(6)] +
-                      [(x, P.RAIL_Z[0] + 12.7, 2.5) for x in (ax - math.copysign(45, ax), fx - math.copysign(30, ax))] +
-                      [(x, P.RAIL_Z[1] - 12.7, 2.5) for x in (ax - math.copysign(45, ax), fx - math.copysign(30, ax))])
-            add(f"Drive plate {corner} (1/8 Al)", pl, "alu", "drive", bom="Drive plate (1/8 Al)", kind="stock",
-                note="rivets to the inner rail; Falcon on 4 x 10-32")
             yf = sgn * P.DRIVE_PLATE_Y[0]
             add(f"Falcon 500 {corner}", falcon(fx, fz, yf, sgn), "falcon", "drive", bom="Falcon 500 (owned)")
             band0 = P.YMID + P.W_PULLEY[0] if sgn > 0 else -(P.YMID + P.W_PULLEY[1])
@@ -422,10 +398,10 @@ def build(log=print):
                 "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
             add(f"Bearing hex wheel {corner} inner", rail_bearing(ax, sgn * P.INNER_RAIL_Y[1], P.AXLE_Z, -sgn), "steel",
                 "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
-            y_a, y_b = sgn * (P.INNER_RAIL_Y[0] + 0.0), sgn * P.OUTER_RAIL_Y[1]
+            y_a, y_b = sgn * (P.INNER_RAIL_Y[0] + 0.0), sgn * (P.OUTER_RAIL_Y[0] + 0.3125 * IN)   # ends in the outer bearing
             shaft = hex_prism(12.7, abs(y_b - y_a), (ax, y_a, P.AXLE_Z), (0, sgn, 0))
             add(f"Wheel axle {corner} (1/2 hex)", shaft, "steel", "drive", bom="1/2 in hex shaft, wheel axle (6 in)",
-                kind="stock", note="tapped 10-32 both ends, button head + washer")
+                kind="stock", note="tapped 10-32 both ends, button head + washer; the outer one inside the outer rail, put in through the 14 mm hole in its outer wall")
             for y0, y1, tag in ((P.INNER_RAIL_Y[1] + 1.6, P.WHEEL_Y[0], "inner"),
                                 (P.YMID + P.W_OUTER_PLATE[1], P.OUTER_RAIL_Y[0] - 1.6, "outer")):
                 if y1 - y0 > 0.3:

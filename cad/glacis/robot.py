@@ -26,6 +26,7 @@ from lib import PARTS
 import drive
 import gun
 import misc
+import brackets
 import render
 import pneu_parts
 
@@ -33,11 +34,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "out")
 os.makedirs(OUT, exist_ok=True)
 LOG = []
+T0 = time.time()
 
 
 def log(*a):
     s = " ".join(str(x) for x in a)
-    print(s, flush=True)
+    t = int(time.time() - T0)
+    print(f"[{t // 3600}:{t // 60 % 60:02d}:{t % 60:02d}] {s}", flush=True)
     LOG.append(s)
 
 
@@ -47,6 +50,7 @@ def pose(shape, elev):
 
 def build(elev=P.ELEV_SHOW):
     PARTS.clear()
+    lib.TUBE_HOLES.clear()
     t = time.time()
     drive.build(log)
     gun.build(log)
@@ -55,15 +59,19 @@ def build(elev=P.ELEV_SHOW):
         f"{min(z for _, z in misc.B.SLOT_PTS):.0f} under the axle")
     belt_len = misc.towers_and_pivot()
     log(f"elevation belt pitch length {belt_len:.0f} mm ({belt_len / 5:.1f} teeth)")
-    misc.air()
     misc.fog()
     misc.batteries_and_electronics()
+    misc.air()                          # after the sleds and boards, so each quick disconnect finds a clear spot
     misc.bumpers()
+    misc.bumper_spacers()
     glow = misc.underglow()
     log(f"underglow: {glow / 1000:.1f} m of strip under the bumpers")
     misc.frame_mounts()
     misc.body_parts(log)
+    misc.deck_rails()
+    misc.front_rails()
     misc.speakers()
+    brackets.build(log)                 # flat waterjet brackets, rivets checked, tubes drilled
     for p in PARTS:
         if p["moving"]:
             p["local"] = p["shape"]
@@ -72,17 +80,21 @@ def build(elev=P.ELEV_SHOW):
     # into the bottom of the gun's core just behind the pivot (they barely move as it swings). Their gun ends ride
     # with the gun; the rest is a slack coil, so the sweep check skips them.
     ex = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.GUN_EXITS]
+    tips = [pose(cq.Vertex.makeVertex(*t.toTuple()), elev).Center() for t, _ in gun.GUN_TIPS[-2:]]
     a, b = misc.CHECKS
     routes = {}
     for tag, c, e, dy in (("A (top cannon)", a, ex[0], 9.0), ("B (bottom cannon)", b, ex[1], -9.0)):
-        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 260.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e]
+        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 310.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e,
+                                         tips[0 if tag.startswith("A") else 1]]
     fx = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.FOG_EXITS]
     for f0, f1 in zip(misc.FOG_OUT, fx):
         routes["Fog loop (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(f1.x + 60.0, f1.y, f1.z - 120.0), V(f1.x, f1.y, f1.z - 50.0), f1]
     for tag, pts in routes.items():
-        r = 6.35 if tag.startswith("Fog") else 3.175
-        lib.add(tag, misc.tube_path([p.toTuple() for p in pts], r=r), "tube", "pneu" if r < 5 else "power",
-                bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 3/8 ID x 1/2 OD (ft)", kind="stock")
+        r = P.SMOKE_R if tag.startswith("Fog") else 3.175
+        sh = misc.tube_path([p.toTuple() for p in pts], r=r)
+        # no quick disconnects (Micah 2026-11-12): the push-to-connects come off if the gun has to
+        misc.add_split(tag, sh, "tube", "pneu" if r < 5 else "power", start=pts[0].toTuple(),
+                       bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 3/4 ID x 1 OD (ft)", kind="stock")
     log(f"built {len(PARTS)} parts in {time.time() - t:.0f} s")
     return PARTS
 
@@ -110,11 +122,13 @@ ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the
     ("Roller tread", "Roller core"),
     ("Pivot axle", "Pivot bearing"),            # hex inner race turns with the axle
     ("nipple", "manifold block"),               # threads into the block (modelled solid)
+    ("Main valve nipple", "Rear manifold cross"), ("Main valve nipple", "Main valve (1/4"), ("Fill check valve", "Fill plug"),   # threads
     ("nipple", "Chamber"),                      # 1 in close nipple in the tank's end port
     ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Tube", "push-to-connect"),
-    ("Service loop", "push-to-connect"), ("Tank elbow", "Air tank"), ("Gun tube", "Service loop"),
+    ("Service loop", "push-to-connect"), ("Tank push-to-connect", "Air tank"), ("Gun tube", "Service loop"),
     ("Fog loop", "Fog vent"), ("Fog loop", "Gun smoke tube"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
     ("Gun smoke tube", "Smoke collar"),
+    ("In valve", "nipple"), ("Valve cross", "In valve"), ("Chamber outlet nipple", "Firing valve"), ("Chamber outlet nipple", "Chamber front disc"),   # threads / weld
 ]
 
 
@@ -128,22 +142,20 @@ def allowed(n1, n2):
 
 
 def check_interference(parts, tol=30.0):
+    import par
     boxes = [bb(p["shape"]) for p in parts]
-    hits = []
     n = len(parts)
     order = sorted(range(n), key=lambda i: boxes[i][0])
+    cand = []
     for ii, i in enumerate(order):
         for j in order[ii + 1:]:
             if boxes[j][0] >= boxes[i][3]:
                 break
-            if not overlap(boxes[i], boxes[j], 0.05):
-                continue
-            pi, pj = parts[i], parts[j]
-            if allowed(pi["name"], pj["name"]):
-                continue
-            v = common_volume(pi["shape"], pj["shape"])
-            if v > tol:
-                hits.append((round(v), pi["name"], pj["name"]))
+            if overlap(boxes[i], boxes[j], 0.05) and not allowed(parts[i]["name"], parts[j]["name"]):
+                cand.append((i, j))
+    paths = {k: par.save(parts[k]["shape"], f"part{k}") for k in sorted({k for c in cand for k in c})}
+    vols = par.run(par.pair_volume, [(paths[i], paths[j]) for i, j in cand], chunk=8)
+    hits = [(round(v), parts[i]["name"], parts[j]["name"]) for (i, j), v in zip(cand, vols) if v > tol]
     hits.sort(reverse=True)
     return hits
 
@@ -153,16 +165,21 @@ def check_sweep(parts, angles=range(int(P.ELEV_RANGE[0]), int(P.ELEV_RANGE[1]) +
     parts = [p for p in parts if not p["name"].startswith(("Service loop", "Fog loop"))]   # flexible, follow the gun
     fixed = [p for p in parts if not p["moving"]]
     fboxes = [bb(p["shape"]) for p in fixed]
+    import par
     hits = defaultdict(set)
+    cand = []
     for a in angles:
-        for m in movers:
-            s = pose(m["local"], a)
-            mb = bb(s)
-            for f, fb in zip(fixed, fboxes):
+        for mi, m in enumerate(movers):
+            mb = bb(pose(m["local"], a))
+            for fi, (f, fb) in enumerate(zip(fixed, fboxes)):
                 if overlap(mb, fb, 0.05) and not allowed(m["name"], f["name"]):
-                    v = common_volume(s, f["shape"])
-                    if v > tol:
-                        hits[(m["name"], f["name"])].add(a)
+                    cand.append((a, mi, fi))
+    mp = {mi: par.save(movers[mi]["local"], f"mover{mi}") for mi in {c[1] for c in cand}}
+    fp = {fi: par.save(fixed[fi]["shape"], f"fixed{fi}") for fi in {c[2] for c in cand}}
+    vols = par.run(par.swept_volume, [(mp[mi], a, fp[fi], tuple(P.PIVOT)) for a, mi, fi in cand], chunk=8)
+    for (a, mi, fi), v in zip(cand, vols):
+        if v > tol:
+            hits[(movers[mi]["name"], fixed[fi]["name"])].add(a)
     return sorted(((sorted(v), k[0], k[1]) for k, v in hits.items()), key=lambda r: r[1])
 
 
@@ -219,8 +236,12 @@ def print_parts(parts):
     for p in parts:
         if p["kind"] != "print":
             continue
-        if not B_.fits_bed(p["shape"]):
-            bad.append((p["name"], [round(x) for x in B_._obb_dims(p["shape"])]))
+        sh = p["local"] if p.get("moving") and p.get("local") is not None else p["shape"]   # a gun part is measured level, as
+        b = sh.BoundingBox()                           # designed, not tilted to the display elevation (2026-11-11: the
+        # gun core halves, 243 x 198 x 74, were reported as 254 x 198 x 83 through the tilted box and the fallback below)
+        square = all(d <= m for d, m in zip(sorted((b.xlen, b.ylen, b.zlen), reverse=True), sorted(P.BED, reverse=True)))
+        if not square and not B_.fits_bed(sh):         # a near-square part's principal axes can come out at 45 deg
+            bad.append((p["name"], [round(x) for x in B_._obb_dims(sh)]))
     return bad
 
 
@@ -230,6 +251,8 @@ GROUPS = {"chassis": ("frame", "drive"), "body": ("body",), "bumpers": ("bumper"
 
 
 STEP_MAX = 9.0e6                                   # Onshape blob upload takes <= 10 MB per call
+GUN_EXPORT_ELEV = 0.0                              # the gun goes to Onshape level (0 deg); a revolute mate on the pivot
+                                                   # axis then swings it (limits = the "Gun min / max angle" config variables)
 
 
 def _save_step(sel, name, path):
@@ -241,8 +264,9 @@ def _save_step(sel, name, path):
         if seen[nm] > 1:
             nm = f"{nm} #{seen[nm]}"
         r, g, b_, a = p["color"]
-        asm.add(p["shape"], name=nm.replace("/", "-"), color=cq.Color(r, g, b_, a))
-        q = p["shape"].BoundingBox()
+        shape = pose(p["local"], GUN_EXPORT_ELEV) if p["moving"] else p["shape"]
+        asm.add(shape, name=nm.replace("/", "-"), color=cq.Color(r, g, b_, a))
+        q = shape.BoundingBox()
         names.append(dict(name=nm, c=[(q.xmin + q.xmax) / 2, (q.ymin + q.ymax) / 2, (q.zmin + q.zmax) / 2],
                           size=[q.xlen, q.ylen, q.zlen], color=p["color"], bom=p["bom"], kind=p["kind"],
                           purpose=pneu_parts.purpose(p["name"]) if p["group"] in ("pneu", "gun") else ""))
@@ -264,8 +288,10 @@ def tabs(parts):
     for p in parts:
         g, n = p["group"], p["name"]
         c = _corner(n) if g == "drive" else None
-        if n.startswith(("LED ", "Speaker")):
+        if n.startswith(("LED ", "Speaker", "Light bar")):
             out["Lights & speakers"].append(p)
+        elif n.startswith("Rail 20x20"):
+            out["Add-on rails"].append(p)
         elif g == "frame" or (g == "drive" and c is None):
             out["Chassis, pivot & drive"].append(p)
         elif g == "drive" and n.startswith(WHEEL_PARTS):
@@ -279,7 +305,7 @@ def tabs(parts):
         elif g in ("body", "bumper"):
             out["Bumpers & wall standoffs"].append(p)
         elif g == "gun":
-            out["Gun (at 20 deg)"].append(p)
+            out["Gun (pivots)"].append(p)
         elif g == "pneu":
             out["Pneumatics"].append(p)
         else:                                   # power, spot
@@ -292,7 +318,7 @@ SUBASSEMBLIES = {"Body panels": ("Body panels & clips",), "Body frame": ("Body f
                  "Lights & speakers": ("Lights & speakers",), "Bumpers": ("Bumpers & wall standoffs",),
                  "Pneumatics": ("Pneumatics",), "Power & smoke": ("Power, electronics & smoke",),
                  "Chassis & drive": ("Chassis, pivot & drive", "Wheel FL", "Wheel FR", "Wheel RL", "Wheel RR"),
-                 "Gun": ("Gun (at 20 deg)",)}
+                 "Gun": ("Gun (pivots)",), "Add-on rails": ("Add-on rails",)}
 
 
 def export(parts):
@@ -302,25 +328,31 @@ def export(parts):
     for f in os.listdir(d):
         os.remove(os.path.join(d, f))
     manifest = []
-    for tab, sel in tabs(parts).items():
+    import par
+    jobs, k = [], 0
+    for tab, sel in tabs(parts).items():          # one tab per core; each worker splits its own tab to fit
         sel = sorted(sel, key=lambda p: p["shape"].BoundingBox().center.x)
-        for nparts in range(1, 9):
-            chunks = [sel[i * len(sel) // nparts:(i + 1) * len(sel) // nparts] for i in range(nparts)]
-            files = []
-            for i, ch in enumerate(chunks):
-                label = tab if nparts == 1 else f"{tab} {i + 1} of {nparts}"
-                fn = re.sub(r"[^a-z0-9]+", "_", label.lower()).strip("_")
-                path = os.path.join(d, f"{fn}.step")
-                names = _save_step(ch, label, path)
-                files.append((label, path, names, len(ch)))
-            if max(os.path.getsize(f[1]) for f in files) <= STEP_MAX:
-                break
-            for f in files:
-                os.remove(f[1])
+        items = []
+        for p in sel:
+            shape = pose(p["local"], GUN_EXPORT_ELEV) if p["moving"] else p["shape"]
+            items.append(dict(name=p["name"], color=p["color"], bom=p["bom"], kind=p["kind"], group=p["group"],
+                              path=par.save(shape, f"exp{k}")))
+            k += 1
+        jobs.append((tab, items, d, STEP_MAX))
+    for files in par.run(par.export_tab, jobs):
         for label, path, names, n in files:
             json.dump(names, open(path[:-5] + ".names.json", "w"), indent=0)
             manifest.append(dict(tab=label, file=os.path.basename(path), parts=n, bytes=os.path.getsize(path)))
             log(f"exported {label}: {n} parts, {os.path.getsize(path) / 1e6:.1f} MB")
+    # show-off visuals (smoke, t-shirts, window glow, headlight beam, floor): their own tab, never in PARTS or checks
+    import visuals
+    vis = [dict(name=n, shape=s, local=s, color=c, bom=None, kind="visual", moving=False, group="visual")
+           for n, s, c in visuals.build(parts)]
+    path = os.path.join(d, "visuals.step")
+    names = _save_step(vis, "Visuals", path)
+    json.dump(names, open(path[:-5] + ".names.json", "w"), indent=0)
+    manifest.append(dict(tab="Visuals", file="visuals.step", parts=len(vis), bytes=os.path.getsize(path)))
+    log(f"exported Visuals: {len(vis)} parts, {os.path.getsize(path) / 1e6:.1f} MB")
     json.dump(manifest, open(os.path.join(d, "manifest.json"), "w"), indent=1)
 
 
@@ -371,6 +403,8 @@ if __name__ == "__main__":
     if "--export" in sys.argv:
         export(parts)
         bom_rollup(parts)
+        brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
+        brackets.export_tube_table(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'tube_drilling.csv'))
         sys.exit(0)
     if not quick:
         t = time.time()
@@ -398,5 +432,7 @@ if __name__ == "__main__":
             sys.exit(0)
         export(parts)
         bom_rollup(parts)
+        brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
+        brackets.export_tube_table(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'tube_drilling.csv'))
         renders(parts)
     open(os.path.join(OUT, "check_log.txt"), "w").write("\n".join(LOG) + "\n")

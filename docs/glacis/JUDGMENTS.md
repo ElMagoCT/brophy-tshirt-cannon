@@ -1045,3 +1045,426 @@ D13 (rev D.2.1). **Money:** $1,702.75 -> **$1,733.78 (+$31.03)**: controller -$0
     ADS1115 2-pack $0, PCA9685 +$5.99, two battery relays +$25.98, bypass resistors +$5.79, C3 remote -$3.79.
 Queued for the next CAD update: the Waveshare board's footprint on the shelf (dimensions not on its page), two more
 200 A relays and their bypass resistors by the battery bay, the PCA9685 and the second ADS1115.
+
+## Brophy Borealis (2026-11-10, Micah's Windows Claude Code chat)
+
+Micah's asks (via his Mac chat): name it Brophy Borealis; two orders; a better fill plug and self-sealing interior
+quick disconnects; the light bar recessed into the front panel with a 3 in gap above it for crowd sensors; 20x20
+extrusion each side of the top and the cannon hub, symmetrical and clear of the pivot; an Onshape assembly that pivots
+with an Upmost / Downmost / Range / Free setting; then a BOM review, a steeper LED lean, and a faster build.
+
+B1. **Name:** "Brophy Borealis" on the Onshape document, CLAUDE.md and the Sheet; the code stays `cad/glacis/`.
+B2. **Two orders** (Sheet tabs "Borealis Order 1 - pneumatics, electronics, speakers" and "Borealis Order 2 -
+    materials, LEDs, smoke"), each with an ALREADY HAVE block under it (owned and stash rows, $0). Old-cannon spares
+    and LATER rows are gone.
+B3. **Plugs:** fill plug is a 303 stainless industrial M-style plug (McMaster 6718K52); the five interior joints are
+    Milton 715 couplers + 728 plugs (300 psi; the coupler seals the supply side when it's pulled), on DOT
+    push-to-connects. $39.88 for all five against $243.60 for McMaster ISO-B pairs. Still rated metal parts: nothing
+    printed on the pressure side.
+B4. **Light bar pocket:** the Zmoon bar sits 20 mm back from the front slant in a pocket with a level floor (z 266),
+    level roof and upright back wall, so the bar and anything mounted on the 3 in blank band above it point straight
+    ahead. A printed liner in two halves (split at y = 0 for the bed) lines it and carries the bar; 6 screws into the
+    frame. The front fog tube was rerouted under the pocket floor (it clashed with the liner).
+B5. **20x20 rails** (Micah's spares, $0): one inside each gun cradle plate (300 mm, 3 x M5 x 10 each), and two pieces
+    each side of the deck along the gun well (245 mm behind the pivot, 155 mm ahead), with a 70 mm gap round the
+    axle stub, angle pot, coupler and its bracket, which the one-piece rail ran into. All mirrored about y = 0 and
+    clear of the 0-45 deg swing. The deck pieces' M5 x 30 screws come up from inside the well; the member's LED light
+    tunnel runs under the rail's inboard half (|y| 137-142), so the screws go outboard of it (|y| 148.5), through a
+    U-slot in the deck acrylic's edge, and the rail clamps that edge. 8 of 8 screws find frame.
+B6. **LED lean 22.5 deg** (was 17.5), reached 15 mm after each corner arc (was 40 mm square + 40 mm ramp), smoothstep
+    so there's no flat spot. A 2 mm square lead-in stays: with 0, OCC built an invalid window loft on the rear panel
+    and the window cut deleted the whole frame (body.build now stops on an invalid window cut or a collapsed frame).
+    Checks: LED strips 0 overlaps, every loop kept 100%, 0 jumpers.
+B7. **Build speed:** `par.py` runs the slow independent OCC jobs on 90% of the cores (14 of 16 here; GLACIS_JOBS=1
+    for serial): frame sectioning, the piece contact table (Shape.distance on the twisted members was ~1.5 h serial),
+    node-merge trial fuses, joint neighbour lookups, interference pairs, the elevation sweep and the STEP export (one
+    tab per worker). Full robot.py: ~2 h 40 min -> 55 min, same results (52 pieces, 54 tenons).
+B8. **Onshape:** each of the 9 sub-assemblies has one rigid group of all its parts and an "Origin" mate connector;
+    Chassis & drive and Gun also have a "Pivot" connector on the axle line (x -40, z 645). At the top, every
+    sub-assembly but the gun is fastened to the origin, the gun has a revolute on the pivot connectors (+ = barrels
+    up, configured limits), and a "Gun angle" configuration: Range (0-45 limits), Free (no limits), Upmost and
+    Downmost (the revolute swapped for a fastened lock at 45 or 0 deg). **Known issue:** Onshape keeps one stored
+    position for every configuration and doesn't re-solve on a switch: server renders of all four settings are the
+    same 45 deg pose, even after re-saving the lock in Downmost. Dragging in Range/Free is the reliable way to set an
+    angle; the fix would be a separate gun instance per fixed setting, shown by configured suppression. Micah
+    (2026-11-10): "Range drag is fine", so the fixed settings stay as they are.
+B9. **Front light bar hole** (Micah, same day: "it should start from the bottom and just be a hole, not plastic frame",
+    aluminum extrusions inside to mount the light and other things, "from the bumper to 4.5in above the bumper").
+    Replaces B4's pocket and liner. The hole runs from the body's bottom edge (z 204.7, on the bumper) to z 317.5
+    (4.5 in above the bumper's top), |y| < 175, open at the bottom; its edges are plain 19 mm frame members, and the
+    front acrylic is now one U-shaped sheet round it (8 panels, was 9). Two 372 mm 20x20 rails cross it behind the
+    shell, lying flat on the frame's inner face (tilted with the 60 deg slant), one along the bottom and one level with
+    the top (372 mm: at 380 their ends touched the LED walls of the windows beside the hole's top corners), each held
+    by one M4 x 8 per end from inside, through a hole CNC'd across the rail into an M4 x 4 insert in the inner face
+    of the frame member beside the hole: screws through that member from outside hit its LED light tunnel near the
+    bottom, and from inside no heads show on the front. The bar
+    stands on the lower rail on its own end brackets (M4 x 8 into T-nuts; its side bolts set the aim), bottom at
+    z 241, clear of the fogger, 4 mm behind the slant at its top edge; the upper rail is free for sensors. The front
+    end of the chassis now has 2 frame mount posts at y +-205 (was 3 at 0 and +-170, which the hole left without frame
+    over them).
+B10. **In-well rails and the pivot mount** (Micah, same day, from a screenshot of the deck rail beside the bearing
+    block: "move the extrusion to be inside the cannon section, not on top of the panel, it can go through the 1x2
+    going up holding the pivot", "push the pivot up a smidge", "cut off the 1x2 at the extrusion and run a plate from it
+    to the extrusion and to the bearing", "outside is fine, just make sure it wraps the frame, i want the extrusion and
+    the frame to be seamless"). Each deck rail is now one 470 mm piece inside the gun well (x -320 to 150), flush with
+    the tower's and bearing block's outboard face (|y| 109.35-129.35) and 2 mm under the deck (z 608-628). The 1x1
+    tower stops under it, the bearing block sits on it (2 x M4 x 12 into T-nuts), and the pivot went up 11 mm
+    (z 645 -> 656). A 1/8 in tower plate on the outboard side (not the inside: the 112T pulley sits just inboard of the
+    right block) runs the rail's length between it and the deck's well-edge member, wraps the tower's outboard, front
+    and back faces (4 rivets) and runs up the block (its 1/4-20s); the axle and pot coupler pass through a hole in it.
+    The rail's screws are M4 x 30s through holes CNC'd across its core (8 mm head access from the well) and the plate
+    into inserts in the member's inner face at z 618, under the member's light tunnel (z 620-623). The elevation motor
+    bracket's web now stops under the right rail and bolts into its bottom slot. The turret tower brackets and their 4
+    rivnuts are gone: the rail screws over the tower hold the deck to it. The deck acrylic's U-slots are gone too.
+B11. **Welded chambers and the Mac chat's batch** (Micah's calls in the Sheet's column J; the Mac chat's answers in
+    column K, now kept in `bom/glacis_bom.py` COMMENTS). 3 in Sch 40 plain-end pipe (top 12.9 in, 1.56 L; bottom
+    10.9 in, 1.32 L) between two 3/8 in A36 discs, 3.5 in OD, flush with the pipe (waterjet). The valve screws onto half
+    of a 1 x 4 in nipple welded through the front disc's 1.33 in hole, flush with its inner face (24 mm between the
+    valve and the disc for the weld). The back disc is blank. The 1/4 NPT weld bung sits 1 in behind the front disc
+    on the tube-lane side (-y), turned 30 deg toward the axis, with a swivel push-to-connect elbow pointing forward to
+    where its tube drops out of the core. At 45 deg straight toward the axis, the two cannons' elbows met between the
+    chambers. The reducing couplings, bushings and the crosses, reliefs and transducers on the chambers' backs are gone.
+    Each chamber's transducer and 200 psi relief now sit on a brass cross right after its in valve on the chassis,
+    modelled at the ChillWaves cross's ~33 mm across the ports (at the generic 25.4 mm the hexes collided). The gun
+    lost 2.5 kg (18.9 kg) and rebalanced with the valves 55 mm further forward. The smoke line is 1/2 in ID x 5/8 OD:
+    the splitter's gun barb is 1/2 in (10 mm bore, was 7 mm), and the breech block, mantlet and collar passages are
+    opened to suit (collar's inner passages 10.5 mm). M4 throughout: every insert M4 x 4 (holes and screw lengths as
+    drawn), cradle-plate rail holes 4.5 mm with M4 x 8s, chamber caps on M4 x 12s. The fill plug comes from the
+    Lnrueg M-style kit and the fill check valve is the 304 stainless male x male one. PITCH stays 112 mm, so the 23 mm
+    gap between the chambers keeps room for the tubes. Cannon A's cross sits beside the left tower, so its transducer
+    stands up and its relief hangs down through a notch in the electronics shelf; cannon B's lie flat (pointing down,
+    its relief hit the main breaker).
+B12. **Elevation 0-85 deg** (Micah, same day: "the gun should swing to 85"; read as 85 deg). The welded chambers are
+    shorter and the pivot is higher, so at 85 deg the chambers' back ends reach about z 290 just behind the pivot. The
+    gun well's floor (cut from the swing) now reaches z 281 under the axle (351 at 45 deg). Precheck: 0 clashes from 0
+    to 85 deg against everything outside the body; the full build's sweep and interference checks cover the body.
+B13. **GOGO in valves** (Micah, via the Mac chat): GOGO GPG-M03 2/2 NC direct-acting 12 V, G1/4 (BSPP) ports,
+    modelled from the seller drawing (40 x 26 mm body, 76 mm to the top nut, coil + DIN plug 82 mm long), coil up,
+    flow toward the chamber. Each port takes a G1/4 x 1/4 NPT 304 hex nipple (19 mm hex drawn) with a bonded seal; the
+    QD on the inlet side isn't drawn. The runs got about 20 mm longer, so the valve cross moved 51 mm back (x -300).
+    That clears the rear-left Falcon, which cannon A's chamber cross hit. Cannon A's DIN plug points +y: pointed -y,
+    it met cannon B's valve. The left tank tube's run behind the valves rose to z 282, over that plug. The valve cross
+    is now drawn at the ChillWaves part's real ~33 mm across the ports (was 25.4), which also cleared the 146 mm3
+    valve cross / line relief sliver that had been on main since rev D.2.
+B14. **Elevation 0-90 deg; Onshape gun mate = one revolute with variable limits** (Micah, same day: "it should just
+    be the limits on the revolute that are variables in the configuration panel. no need for those other fastens. ...
+    at least 0-85 but you can go up to 90 if there's room"). A swing check of the pass-2 build (every gun part rotated
+    about the pivot against every other exported part, 80-95 deg) found no clash with the body, chassis or anything
+    fixed up to 95 deg, so ELEV_RANGE is 0-90. The only hits were with parts that ride on the gun (its two 20x20 rails)
+    or flex with it (service and fog loops). Next build re-cuts the well floor for 90 and its sweep checks 0-90.
+    Onshape: configuration = two variables, "Gun min angle" (default 0) and "Gun max angle" (default 90), 0-90 deg;
+    the "Gun pivot" revolute's limits are #Gun_min / #Gun_max (+ = barrels up: both Pivot connectors were turned 180
+    deg about X, which flips the sense without moving anything). The angle-lock mate is gone. (The 8 fasten-to-origin
+    mates went too at first, with the sub-assemblies only locked, but a lock didn't hold the chassis against the pivot
+    solve, so Micah asked for the static parts to be fixed to the origin: the 8 fastens are back.) The gun's two
+    20x20 rails moved from the
+    Add-on rails sub-assembly into the Gun sub-assembly so they swing with it. The old Gun instance carried a stale
+    stored pose (60 deg and 487 mm sideways, off its pivot) that no solve cleared, so it was replaced with a fresh
+    instance. Onshape doesn't re-pose the gun when the variables change; drag it, or set both to one angle and
+    use the mate's "Apply limit position".
+B15. **Pivot hubs; the pulley bolts to the plate** (Micah, same day: "try to clean up the cannon hub, it needs some work.
+    also the pulley should screw to the aluminum side plate instead of going through the axle"). Before: a 10 mm
+    printed puck on each cradle plate keyed the 1/2 hex stub, the 112T pulley hung on the right stub's hex 18 mm out
+    from the plate, and about 32 mm of bare hex crossed to each bearing block, with nothing locating the gun between
+    the bearings. Now each side has a 72 mm printed boss on the plate's outer face that runs out to 1.5 mm short of the
+    inner pivot bearing, with a 19 mm lip that bears on that bearing's inner race (0.3 mm float), so the hubs also
+    locate the gun sideways. Right: the boss and the 112T HTD pulley are one print ("Elevation pulley 112T (pulley
+    hub)"), with the belt plane unchanged (y -97 to -106) and a round 15.7 mm bore, so the stub only passes through;
+    torque goes pulley -> plate. Left: "Axle hub left", hex bore (it keys the stub that turns the pot). Each takes 4 x
+    M4 x 30 from its outer face (counterbored so 20 mm of print is under the head) through the plate into nylocs
+    inside; the 4 bolts sit on a 28 mm circle at 30 / 120 / 195 / 300 deg, the angles that clear the fill and smoke
+    lines and the valve side blocks inside both plates (checked against the gun). The plates' 6 x M3 hub holes became
+    the 4 x 4.5 mm bolt holes. Checks (full build): interference 1 pair (the old 64 mm3 fill elbow sliver), sweep 0-90
+    deg 0 clashes, every print fits the bed (the pulley hub is 183 mm across), gun 19.0 kg balanced on the axle.
+B16. **Parts list: Kenzo's cheaper list, Amazon or AliExpress only** (Kenzo's "Cheaper Parts" tab, reviewed with every
+    Amazon page re-read; Micah: "do the good ones ... amazon or ali are the ideal for everything. try hard not to have
+    anything else"). Taken: brass close nipples (250 psi), the F x F elbow at $6.39, 2-pc street elbows, a stainless
+    plug 10-pack, Litoexpe bushings (1200 psi), Boeray 35 ft DOT tube (500 psi), step bungs (24.8 mm collar; drill to
+    it), cheaper continuous-duty contactors, a Diann blower 2-pack, $20.99 fog fluid (FogUp rose to $23.95), a MOSFET
+    6-pack, iSANMATE PETG. His QD split is in with the plugs corrected to FEMALE thread (his were male, which don't go
+    on the nipples). Off McMaster/Zoro: Loner ST25-1A ASME 200 psi relief 2-packs (pull ring), Grainger-approved 1 in
+    Sch 80 close nipples (seamless A106, 300 psi; bore 24.3 vs 26.6 mm, about the HSV04's own orifice; the only Sch 40
+    ones on Amazon are 150 psi decorative pipe), Amazon M4 nylocs; the McMaster shipping row is gone. Not taken: his
+    M x F check valve (unrated, wrong gender), the ESP32-P4-WIFI6 (no USB-A, RJ45 or speaker amp), his canvas (no
+    white), and his Amazon copies of AliExpress rows. The 1x6 bumper boards stay Home Depot (Amazon lumber is ~5x).
+    Pre-tax $1,480.86 (Order 1 $1,039.12, Order 2 $441.74, no shipping rows), from $1,516.05.
+B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "remake it and its pair centered between the
+    tower and the cannon. the cannon pulley should be a ring and have standoffs so its screwed to and floating on the
+    side. the other pulley axle should be a touch shorter but the pulley further out ... I have a pulley design for
+    whatever amount of teeth you want"). The 112T is now a printed ring (136 mm bore, the axle runs through its open
+    middle) on 6 M4 x 10 stainless coupling nuts used as standoffs, 10 mm off the right cradle plate: M4 x 8 from
+    inside the plate, M4 x 12 through the ring (7 mm counterbore). They sit on a 78 mm circle at 10 / 90 / 150 / 210 /
+    270 / 350 deg, where the heads inside the plate clear the valve side blocks and fill lines. Belt plane |y| 87.2 to
+    100.2 (centre 93.7; the gap between the plate and the bearing block is centred at 93.1), was 95 to 108. The
+    16T pinion slid out the same 8 mm on the goBILDA's 8 mm REX shaft (shaft drawn 22.8 mm, ending flush; the motor
+    and its bracket don't move), printed from Micah's own pulley design. 16T/112T kept: the 150T belt still fits
+    exactly (750 mm). The left hub (B15) is unchanged; on the right a printed hex sleeve on the stub, from the plate to
+    the inner bearing's race, takes over locating the gun sideways. BEARING_BLOCK_Y is now its own number (109), no
+    longer tied to the pulley. Checked without a full rebuild (Micah: "just rebuild those parts"): the gun and the
+    tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
+    against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
+    fits the bed; gun 18.8 kg, balanced.
+B29. **No rear E-stop; rear panel in one row** (Micah, 2026-11-12: "remove the e-stop bc the frc breaker has a red kill
+    button already. move things tighter in"). The breaker's trip kills the logic rail too (the E-stop only dropped the
+    contactor), so a kill now means a cold restart; the remote's E-stop still drops the contactor through the safety
+    node. Row: breaker, charge port, fill plug, USB-C within 175 mm.
+B28. **No QDs, straight connectors, flat rear cross** (Micah, 2026-11-12: "remove every quick disconnect except the fill
+    one, we'll just use the tube connectors if we need to take off the cannon or a tank. we only need 10 tube
+    connectors, none of them angled. also remove the angle 1/4 to 1/4 and just adjust the T to be horizontal and have
+    the fill valve point out the back, the master pneumatic valve can be right on the inside of the robot").
+    - The rear cross lies flat 120 mm right of the old spot (clear of in valve A's coil): fill check valve out the
+      back through the rear panel with the fill plug on it, main ball valve straight off the front, tanks either side.
+      The check valve's hex sits in a 24 mm panel hole; the main valve lever is inside (reach in through the rear).
+    - Tank outlets and chamber inlets take straight push-to-connects; their tubes leave along the port and bend.
+    - Concept branch in Onshape (not the design): in valves + sensors on the chambers' back ends.
+B27. **Rear manifold is one real cross; no tank relief; no QD on the main valve line** (Micah, 2026-11-12: "P04-1 and
+    P05-2 is redundant remove it. P10-1 idk what it is, its not a 4way"; "for the ChillWaves parts, just up the
+    count on amazon"; "remove P02-1 so it can be a single cross for the rear manifold").
+    - **Rear manifold:** was a drawn block of made-up port blocks (P10-1). Now one ChillWaves 1/4 NPT cross standing
+      upright behind the rear panel: right tank line straight up, left tank line into its bottom through a swivel
+      push-to-connect (the tube comes in from the front), the main ball valve on a close nipple straight off its -y
+      end, and the fill check valve screwed straight into its +y end (the female elbow behind the panel now sits on
+      the cross's axis, so the fill nipple is 2-1/2 in). Nothing points forward: the left sled post and rail are
+      there. Two crosses on a nipple were tried first; the second one hit the sled post.
+    - **Tank transducer** moves into the right tank's front bung (a 1/4 x 1/8 bushing, same as before; the rear bung was tried first and hit the tank-arm knee plate) in place of a plug.
+    - **Tank relief (P02-1) deleted, Micah's call.** The valve cross's 200 psi relief now covers the tanks only while
+      the main valve is open, and its ring is the hand dump. Flagged before he chose: with the main valve shut
+      (filling, transport), nothing on the robot limits tank pressure. So fill with the main valve open, or from a
+      source that has its own relief at 200 psi or less.
+    - **Main valve line QD (P04-1 / P05-2) deleted:** the main valve already isolates that line. 4 interior QDs left.
+    - **Parts list:** crosses are one ChillWaves 6-pack ($16.99) instead of two 3-packs ($25.98), 4 used; fill nipple
+      1-1/2 -> 2-1/2 in (Legines B0747L5XQZ, $8.49); street elbows dropped (none left in the design, -$7.49).
+      Total $1,562.42 -> $1,546.94.
+B26. **Smooth smoke channels, LED bands open all round** (Micah, 2026-11-12: "the tube geometry is not very smooth
+    ... scrap the air barb system and just try to make the angle smoother and a little longer. the part is thick
+    enough"; the mantlet's LED groove "is some weird artifact ... make it exposed all the way around"; "add a spot
+    for a strip like it on the fog and end pieces"; "a 5.5mm groove so i can put COB strips we already have").
+    - **Smoke collar:** baffles gone. 60 mm long: the line's socket, a short plenum (the line's bore), then six
+      swept 3/8 in channels, each leaving the plenum heading forward and curving out, tangent all the way, into
+      its hole. The holes now lean 45 deg toward the muzzle and sit 22 mm ahead of the collar's centre. Checked:
+      no channel breaks out of the collar; each only grazes its barrel's outside beside its hole (~8 mm3, air).
+    - **LED bands:** one helper cuts a 5.5 x 2.5 mm groove from the part's own section, so it is open all the way
+      round: the mantlet (was a fixed rounded rectangle that missed the loft, leaving a partial slot), the smoke
+      collar (new) and the muzzle ring. COB strips Micah already has; no parts-list change.
+B25. **Angled smoke holes, collar baffles, breech pucks** (Micah, 2026-11-12: "make them bigger and angle them
+    towards the open end ... put silencer type air barbs on the inside"; "i don't have any aluminum stock. i can only
+    machine in 2.5D ... an aluminum plug with a flange that's jbwelded in"; "the whole tube assembly should be able to
+    slide in the gun core and screw into the solenoid").
+    - **Smoke holes:** 3/8 in, 3 per barrel facing the other barrel, each leaning 40 deg from radial toward the
+      muzzle, so the shot's air streams past them instead of ramming into them. Drill them after the barrel is
+      screwed home (NPT stops wherever it's tight), so they face the other barrel.
+    - **Smoke collar:** 42 mm long: the line's socket, a chamber with two cone baffles (plate + forward-pointing lip:
+      smoke passes the lips, blast air coming back is caught in the pockets round them), then one 7 mm channel per
+      hole. Simple check-valve-by-shape, nothing moving.
+    - **Breech puck** (replaces the turned adapter): 2.5D from 1 in 6061 flat bar (1 x 4 x 8 in, Amazon, ~$30
+      [UNVERIFIED]): a 3 in x 1/4 in flange and a 2.74 in x 3/4 in spigot JB Welded in the barrel, 1 in NPT tapped
+      through. Barrel + puck slide into the core from the front (clear 3 in bore, +0.4 mm) and screw onto the valve
+      nipple; the core halves just close round them. The core and plates did not move; the barrels sit 34 mm further
+      back (muzzle too). It is downstream of the firing valve: it sees the shot's pulse like the barrel, never held
+      pressure. Gun 18.7 kg, balanced; gun rebuild clean.
+    - **Parts list:** $1,562.42 pre-tax (Order 1 $1,088.28 / $1,187.31 with tax, Order 2 $474.14).
+B24. **Micah's Sheet notes, LED wiring, a bigger centred smoke line** (Micah, 2026-11-11/12: his notes on both order
+    tabs; "add 3p wire for leds, and servo connectors"; "every led should be individually addressable, nothing in
+    parallel"; "have it be all controlled from the one board, just group the panels"; "thermal just complicates
+    wiring"; "go bigger ... make the holes oblong so it can squish ... it should run perfectly in the middle and the 3d
+    print that spreads it should be cleaned up and have specific holes that match the ones you add to the polycarb.
+    also fix the hollow section in the loft thing at the front of the cannon hub").
+    - **Dropped:** the LED level shifter (330 ohm series resistors), the fluid level switch (the pump-time gauge
+      stops the pump), the KSD301 cutout (the firmware cut at 245 C is the only heater limit: Micah's call), M4 x 6s
+      (cut M4 x 8s), both rivnut rows (the underglow brackets are taped to the rails), the coupling nuts (the 112T
+      ring's 6 posts are printed on, an insert in each), the pin headers (his).
+    - **Owned now:** M4 nylocs, the 1x6 boards, the 3 mm silicone tube. **Cheaper / changed:** 30 cm panel USB-C,
+      a TP4056 Type-C board for the remote (no boost), white 2 yd canvas ($24.99), one PETG bundle (he has 3 kg), one
+      pack of dome rivets; both rivet rows in Order 1. **Checked and kept:** the G1/4 adapters, the brass crosses
+      (the cheaper 5-pack is 150 psi), the 2-pack ball valve, the Hillman tee nuts (cheaper per piece, dearer in
+      total).
+    - **LED wiring:** 22 AWG 3-pin wire (100 ft) and 20 servo leads cut into pigtails; five data lines from the main
+      controller: left panels, right panels (each panel its own plug in and out, chained), left frame, right frame,
+      underglow. Every LED individually addressable; nothing shares a data line.
+    - **Smoke line:** 3/4 in ID x 1 in OD silicone (Quickun, 240 C). In the gun it runs dead centre between the
+      barrels (25 mm apart), drawn squished to a 30 x 20 mm oval, and every printed hole it passes is that oval plus
+      0.6 mm; it crosses in front of the valves on edge and drops out of the core beside the chambers. The splitter's
+      gun barb is 3/4 in. Some fog will always condense in the line: wide, short and no low sag is what helps.
+    - **Smoke collar:** an oblong socket and a small plenum between the barrels; one 5 mm channel to each of 3 holes
+      per barrel, facing the other barrel (straight at it and 35 deg either side). The old barrel holes were drawn
+      20 mm long from the axis, so they never actually reached the wall; they go through now. No ring grooves.
+    - **Gun core:** the mantlet loft is solid (was a shelled loft that read as a hollow). The core is 8 mm taller
+      and its clamp screws are 4, over the top barrel and under the bottom one (the line has the middle).
+      Gun 18.8 kg, still balanced on the pivot.
+    - **Parts list:** $1,532.42 pre-tax (Order 1 $1,058.28, Order 2 $474.14).
+B23. **CAD matches the parts list, pulley teeth, fog tube up high, show-off visuals, McMaster check** (Micah,
+    2026-11-11: "make sure the CAD BOM and parts list match" -> "Yes, both" [model the missing modules, list the drive
+    belts]; "add teeth to the pulley"; "the fog tube can move to run above stuff or above the wheels. add visuals ...
+    suppressable via configuration. make them organic. make a fake floor too"; "confirm we don't need any mcmaster
+    stuff and that switching it away saved money").
+    - **Modules now modelled** on the bellypan, each on a printed tray where it stands off: ULN2803A relay driver,
+      SN74AHCT125 level shifter, two 40 A fog relays (one per core), six valve MOSFET modules, five fog / light MOSFET
+      modules with heat sinks, the MAX6675, the inline ATO fuse holder and three DS18B20 probes (electronics, battery
+      bay, fogger). On the fogger: a KSD301 cutout on the core and the fluid level switch on the tank.
+    - **Five quick disconnects** (M-style coupler + plug) in the tank lines, the main valve line and both service
+      loops, each at the first clear spot along the tube's longest run (checked against every part and, for the
+      service loops, the gun at 0-90 deg every 15); the tube is split there into "(supply)" and "(downstream)" parts.
+      The service loops now rise to z 310 straight out of the in valves so their QDs sit below the chambers' swing.
+    - **Pulley teeth:** the 112T ring and the 16T pinion have real HTD 5M grooves (`lib.htd_teeth`).
+    - **Fog tube:** the rear run now climbs to z 235 behind the gun well and runs above the sled to the rear vent,
+      instead of along the floor.
+    - **Visuals** (new `visuals.py`, its own "Visuals" tab, never in the checks or the parts list): a gym floor,
+      billowing smoke under the front and rear vents and at both muzzles, four rolled t-shirts in flight, aurora
+      ribbons behind each window and a headlight cone. Built from overlapping spheres, lofted splines and sine ribbons
+      so they read as organic. In Onshape each kind has a configuration switch.
+    - **Parts list:** + HTD 5M 15 mm drive belt 140T x4 (D06, $35.60, for the CAD's 116T wheel pulley). $1,566.22 ->
+      $1,601.82 pre-tax.
+    - **McMaster:** nothing on the list is McMaster now and nothing needs to be. Every McMaster item in dee53b1 came to
+      $309.25 with shipping; their Amazon / AliExpress equivalents are about $73.81, so about $235 saved overall. The
+      one switch that cost more (rated Sch 80 1 in nipples, +$17.10, net about +$7 after the cheaper relief valves and
+      bushings and no McMaster shipping) is under the $20 line, so it stays.
+B22. **Tube drilling table, lower underglow on tape, axles inside the rail, 3/16 in bumper gap** (Micah, 2026-11-11:
+    ".4in 2x [the 3M tape listing], add it to the list for the bottom leds. also add a bracket / also add the holes in
+    the extrusions for CNCing it"; "the underglow LEDs need to go lower down and be at least level with the bottom of
+    the bumper. also the bumper wood shouldn't need the holes for the bearings, the bearing should just be on the
+    inside face of the extrusion"; "add tolerance between the bumper and chassis? i think 3/16ths on each side").
+    - **Every tube hole is in the CAD and in one table:** each bracket rivet (dome and countersunk), the bearing bores,
+      the axle end-screw access holes, the bumper #10-32s and their access holes, the underglow rivnuts and the
+      frame-mount #10-32s are cut through the box tubes, and `docs/glacis/tube_drilling.csv` lists each hole by tube,
+      face, distance along the tube from its -x/-y/-z end, offset from the face's centre line and diameter, for the
+      CNC program (about 300 holes in 24 tubes).
+    - **Axles:** the axle ends in the outer rail's bearing (bearing in the rail's inner wall). Its end screw and washer go
+      in through a 14 mm hole in the rail's outer wall, which the bumper covers, so the bumper has no axle slots.
+      Axles are 6-3/8 in.
+    - **Underglow:** new printed bracket, the 45 deg face dropped 16 mm on a web from the rail so the strip's centre is
+      2.6 mm under the bumper's bottom edge. The strip sticks on with the 3M tape (0.39 in, 2-pack). Each bracket screws
+      up with M4 x 8s into M4 rivnuts in the rail's bottom wall (28; 1/16 in is too thin to tap), through the corner
+      gussets where it steps down; the gussets have the matching holes (and lost a few rivets, 7 top and 5 bottom,
+      to clear them).
+    - **Bumper gap:** the ring sits 3/16 in off the outer rails and the end rails all round, on six printed 3/16 in
+      spacers at the side screws. To stay 27.75 in wide (the 28 in door), the foam is cut 1-13/16 in deep instead of 2 in.
+    - **Parts list:** + 3M tape $15.99 (L05), + M4 rivnuts 50 pcs $5.49 (B20, grip range for 1/16 in unverified),
+      M4 x 8 button heads 1 -> 2 packs (+$6.74). $1,538.00 -> $1,566.22 pre-tax.
+B21. **Electronics on the bellypan, breaker at the rear panel, part numbers** (Micah, 2026-11-11: "try to put all the
+    electronics on the bottom plate which can also be cnc'ed. make sure the breaker switch thing is accessible or are
+    we just using the E-stop to turn on and off the bot?"; then "give every single part a number or code that
+    corresponds to something on the list ... Acr ... ASh ... ATu ... AEx ... 3DP ... a pneumatic valve could be P24";
+    "things like standoffs we can 3d print"; rows 56 and 57 "i don't think we have either of those"; "move the audio
+    to the second parts order").
+    - **On / off:** the 120 A main breaker is the switch. It moved from the bellypan (behind the bumpers, reachable
+      only with the body open) to the rear panel's bottom strip beside the E-stop, its face parallel to the slanted
+      panel 4 mm behind it, the trip button and reset lever through a 42 mm hole in the acrylic. The E-stop stays a
+      stop, not a switch: it drops the contactor and the logic rail stays up (rev C.3 by design).
+    - **Bellypan:** one piece on the CNC router (768 x 259 mm), the printed shelf gone. Each shelf part's spot was
+      searched for clear of every other solid (the pneumatics over the rear bay, the fog tube and vents, the inboard
+      plates): controller, Spark MAX, safety node and PCA9685 in the rear bay, both ADCs and the valve relay in the
+      middle, the drivers board, LED buck and logic supply ahead of the boost. Every footprint is engraved (layer MARK)
+      so its holes are drilled to the real part; no hole patterns were guessed.
+    - **Board trays (3DP):** one under each board, 6 mm posts with pegs a soldering iron mushrooms over the board's
+      holes, 2 x M4 x 12 up through the bellypan into inserts. Replaces the nylon standoff kit before it was bought.
+    - **Codes:** every list row has one (bom/glacis_bom_codes.json, column A of the Sheet), kept fixed once given. A
+      bought or owned part is its system letter and number (P pneumatics + gun, D drive, E elevation, C controls +
+      power, S sound, F fog, B body + fasteners, R rails, L lights): the firing valves are P23-1 and P23-2. A made part
+      is material + system + number: 3DP-B014, ASh-D02, ATu-D05, AEx-R03, ABr-P01, Acr-B04. `cad/glacis/partcodes.py`
+      writes out/part_codes.json / .csv; every Onshape part's Part number is set from it. W = the deferred printed
+      wheels' belts and rods (not on the list).
+    - **List:** the main ball valve (2-pack, $15.99) and the 1-1/2 in nipple (2-pack, $7.49) are buys now; the M5
+      standoffs under the fog heater stay metal (240 C) and go on the list as stash; audio moved to Order 2.
+    Checks: full robot.py (interference: only the old 64 mm3 fill-elbow sliver; sweep 0-90 deg 0 clashes; prints fit;
+    0 multi-piece), then the trays added and the power tab re-checked against everything and the gun swing: 0 hits.
+
+B20. **Flat waterjet brackets, riveted, tied together** (Micah, 2026-11-11: "add all the brackets, everything can be
+    waterjet from 1/8in or 1/16th aluminum. try to avoid bends because they throw off the holes and we plan to cnc the
+    extrusions ... be metal efficient and feel free to style stuff. try to keep brackets under 12x12"; then "tie the
+    motor mounts into the tank posts and stuff. make it interconnected. include the threaded rivets if/where you use
+    them please but no need for screws").
+    - **New module** `cad/glacis/brackets.py`: every bracket is 2D data (outline, isogrid pockets, holes) that makes
+      the solid, the DXF and the nest. Each rivet hole is checked for its head (dropped if it would hit a part) and
+      cut through the near wall of the tube under it, so the CNC program for every extrusion comes from the model.
+    - **Side plates** (4, replace the drive plates): the Falcon and axle plate grown along the inner rail's outboard
+      face into every post on its stretch. Rear: both sled posts, the tower and the rear tank post; front: the front
+      tank post. Isogrid pockets, countersunk rivets (the wheel runs right beside them). 290 x 146 and 210 x 146 mm.
+    - **Inboard plates** (6) on the rail's inner face round the same posts, clear of the Falcon bodies; the rear one
+      stays low (the valve cross, line relief and in valve A sit just above the rail on the left).
+    - **Arm knees** (14): an L on both faces of every post-to-arm joint (sled rails, tank arms) in place of the old
+      flat top gussets; the -320 sled joint gets one short knee on its front face only (the rear manifold is right
+      behind the post). The tank saddles step down onto the arms where the old gusset was.
+    - **Tower plates** flat (no bent flanges), 293 mm, plus a flat spacer strip for the rest of the in-well rail; the
+      bent tower base gussets are gone (the side and inboard plates hold the tower's foot).
+    - **Corner gussets** as before, now drilled (the bottom ones countersunk: the underglow bracket runs right under).
+    - **Bellypan** in 3 pieces (284, 240, 244 x 259 mm) with a strap under each seam.
+    - Everything is 1/8 in (the only 1/16 part was a seam strap, which would have wasted a sheet): 41 parts, 15
+      different, the biggest 293 mm; they nest on 11 sheets of 12 x 12 in (about 75% of each sheet inside part
+      outlines; the bellypan takes 3 sheets on its own). 3/16 blind rivets: 166 dome, 118 countersunk (120 deg).
+      No threaded rivets: nothing that has to come off screws into a tube.
+    - Not bracketed: the gun cradle plates (490 x 226 mm) are bigger than the 12 x 12 bed, so they go on the CNC
+      router (Micah: "ill use a cnc").
+    Checks: full robot.py (interference 2 pairs: the old 64 mm3 fill-elbow sliver and a 475 mm3 tank line through the
+    lowered tank saddle, then fixed and re-checked alone: 0; sweep 0-90 deg 0 clashes; prints fit; 0 multi-piece;
+    brackets vs every part 0 hits).
+
+B19. **Review pass: every plate hole backed, one gun core (left / right), side screws, electronics shelf, parts list**
+    (Micah, 2026-11-10: "review the holes in it probably combining the manifold and breech blocks into one piece. review
+    all the cannon parts and make sure they all go together well. then review the whole design and make sure its good.
+    then review the parts list one more time and update the artifact and sidenote"; answers: combine all three, the
+    holes are "the screw holes that don't have anything behind them, they should be moved").
+    - **Holes:** the six 6.6 mm tie holes had nothing behind them and are gone. Every hole in both plates now lands on an
+      insert, nyloc, T-nut or standoff (21 left, 23 right, all 4.5 mm for M4, plus the hex): 8 into the saddles, 4 into
+      the chamber caps and 6 into the gun core per side (M4 x 8 into M4 x 4 inserts), 3 into the rail's T-nuts, the
+      hub's 4 or the ring's 6. The chevrons were re-phased so every screw sits in a solid web. 704 g per plate.
+    - **Gun core:** the valve side blocks, breech block and mantlet are one printed part split LEFT / RIGHT on the plane
+      through both barrel axes. Micah's pick said top / bottom, but a top / bottom split leaves each half a closed ring
+      round its barrel that can only slide on, not clamp; left / right halves close from the sides and 2 x M4 x 12
+      across the split clamp both barrels onto their spigots. 243 x 198 x 74 mm and about 0.5 kg each, printed outer
+      face down.
+    - **Caps and saddles** screw in from the sides through the plates (the old vertical cap screws sat under the add-on
+      rail). Left hub flange 3 mm (4 mm left an M4 x 12 too short for a nyloc); the ring's standoff screws are
+      counterbored so the M4 x 8 and M4 x 12 don't meet inside the 10 mm coupling nut. Pivot stubs tapped 1/4-20 both
+      ends with a bolt and washer each side.
+    - **Electronics shelf** now matches the rev D.2.1 parts: Waveshare ESP32-P4-Module-DEV-KIT (88 x 56 x 18), a PCA9685
+      where the music board was, both ADS1115s, a battery relay each side of the bellypan, the amp 40 mm forward, the
+      1200 W boost (130 x 55 x 55, [UNVERIFIED] size). Stale CAD labels (McMaster relief, Lnrueg plug, FUSCH
+      transducer, Sch 40 nipple) refreshed.
+    - **Parts list:** PETG 1 -> 2 spools (the prints come to about 6.5 kg), M4 inserts 1 -> 2 packs, the logic supply
+      row got its link (3.6-32 V buck-boost, $2.67), new $0 rows for the gun plates, breech-adapter bar, printed gun parts
+      and aluminium stock, the drive rows get their own section, two stale notes corrected. $1,525.57 pre-tax.
+    Checks: full robot.py (interference 1 pair, the old 64 mm3 fill-elbow sliver; sweep 0-90 deg 0 clashes; 0
+    multi-piece; 50 frame pieces; all rail and speaker screws found; gun 18.5 kg, CG 1 mm ahead). The bed check flagged
+    the two core halves at 254 x 198 x 83: it measured them tilted to the 20 deg display pose; robot.py now measures gun
+    parts level (243 x 198 x 74, fits). The new shelf parts, rebuilt alone and swapped into the power STEP: 0 hits over
+    30 mm3 against every other part and the gun over 0-90 deg.
+
+B18. **Gun restyle: chevron + turret-wheel plates, cannons 30% closer, V rear holder, printed end covers** (Micah, same
+    day, after 15 side-plate concepts (claude.ai artifact "Borealis Side Plates"): "combine chevron and turret wheel.
+    make the wheel chevrons", then "just 1 set in the ring", "shorten the back ... leave the chambers where they are",
+    "go 3 and 3", "push the chamber holder thing up ... to align it with the indent on the back ... make it match the
+    profile"; earlier: "the turret hub needs to be cleaned up. fix these holes. lighten the sideplates and make them
+    look cool. also make the chamber caps 3d printed and better. make the back more interesting. make the top and
+    bottom profiles more dynamic. also put the cannons 30% closer together").
+    - **Cannons:** GUN_GAP 35.8 -> 25.1 mm (read as the gap shrinking 30%; a 30% cut to the axis-to-axis spacing would
+      overlap the 3 in chambers). Axes 101 mm apart (was 112), chambers 12 mm apart, the gun 11 mm shorter top to
+      bottom. The old 35.8 came from two 3 x 1 reducing couplings side by side, gone since the chambers are welded.
+    - **Plates** (new `plates.py`): the Chevron concept's swallowtail back and pointed nose, plus the turret wheel's
+      round boss (r = plate half-height + 6) breaking the top and bottom edges round the pivot. Pockets: 3 forward
+      chevrons behind the hub, 3 ahead of it, an X of 4 outward chevrons round the hub between the ring's standoffs;
+      6 mm webs, 4 mm corner rounds, a 10 mm rim, solid at the pivot boss, the ring's standoff pads, the breech block,
+      the top rail, the valve-block pads, the tie bolts and the saddle screws (the chevrons may be broken by those
+      pads). The back is shorter: it ends 4 mm behind the rear saddle line (was 30), the chambers unchanged. 717 g each
+      (was 846).
+    - **Rear chamber holder:** the rear saddle and its two caps are now V-shaped, a 24 mm band 4 mm in from the plates'
+      swallowtail edge, so they line up with the indent. Front saddle stays straight.
+    - **Chamber caps** (both stations): solid blocks that fill out to the plates (stepping in under the add-on rail on
+      top), so there are no open corners round the pipes (the holes in Micah's screenshot); 2 x M4 x 12 down through
+      counterbores into inserts in the saddle. The saddles now also screw to the plates: 2 x M4 x 8 per saddle per side
+      into inserts in their sides (the plates had no saddle screws before).
+    - **End covers:** a printed sleeve over each chamber's welded back end with an octagonal faceted nose and an LED
+      groove, held with RTV; cosmetic, the steel disc is the pressure boundary.
+    - **Left hub:** a slim flanged hub (4 mm flange on the plate, 44 mm barrel to the inner bearing, the inner-race
+      lip, 4 x M4 x 12 into nylocs) instead of the 72 mm block; the plate's turret boss is the visual hub now.
+    - **Gun rails** 300 -> 276 mm (the plate starts later).
+    Checks: full robot.py (on the 7-chevron version: interference 1 pair, the 64 mm3 fill elbow sliver; sweep 0-90 deg
+    0 clashes; all prints on the bed; 0 multi-piece; the gun well floor re-cut, 261 under the axle; 50 frame pieces,
+    58 tenons; all rail and speaker screws found), then the final gun rebuilt and swapped into those STEPs: the gun vs
+    everything over 0-90 deg every 5 and the rebuilt chassis parts vs everything, 0 hits over 30 mm3; no clashes
+    inside the gun; every print fits the bed; gun 18.5 kg, balanced.
+D14 (Borealis). **Money:** $2,002.43 before the review -> $1,777.71, then $1,600.79 after Micah's Sheet changes
+    (welded chambers, the M-style QD kit, M4 hardware, cheaper transducers and boost; Order 1 $1,082.69 + $10 shipping,
+    Order 2 $508.10), then $1,584.06 with the GOGO in valves (Order 1 $1,065.96 + $10). The MSI vs Supply Giant coupling
+    question is moot: the chambers are welded.
+Not changed (already on main): two pneumatic fitting slivers in the interference check (valve cross / 200 psi relief
+146 mm3, fill elbow / rear manifold 64 mm3), from rev D.2.

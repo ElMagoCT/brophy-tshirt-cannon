@@ -104,10 +104,12 @@ WHEEL_FREE_FPS = FALCON_FREE_RPM / RATIO * math.pi * 10 / 60 / 12
 FRAME_X = AX_X + WHEEL_R + 3.0 + RAIL_W     # outside face of the end rails
 
 # ------------------------------------------------------------------ bumpers (FRC style)
-FOAM_D, FOAM_H = 2.0 * IN, 5.0 * IN          # rev D.2: GoTo Foam 43 ILD strips, 2 in deep x 5 in tall (was 2 stacked 2.5 in noodles)
+BUMP_GAP = 0.1875 * IN                      # Micah 2026-11-11: 3/16 in between the chassis and the bumper ring, all round
+FOAM_D, FOAM_H = 2.0 * IN - BUMP_GAP, 5.0 * IN   # foam 1-13/16 in deep so the gap keeps 27.75 in over the bumpers (door 28)
+# (rev D.2: GoTo Foam 43 ILD strips, 2 in deep x 5 in tall (was 2 stacked 2.5 in noodles)
 BUMP_BACK_T = 0.75 * IN                      # rev D.2 (Micah): a 1x6 ripped to 5 in. 1/2 in thicker than the old 1/4 ply, so
                                             # the foam is 2 in deep: still 27.75 in over the bumpers (door limit 28)
-BUMP_DEPTH = BUMP_BACK_T + FOAM_D
+BUMP_DEPTH = BUMP_GAP + BUMP_BACK_T + FOAM_D
 BUMP_Z = (GROUND_CLEAR, GROUND_CLEAR + FOAM_H)
 
 # ------------------------------------------------------------------ body (printed frame + recessed acrylic)
@@ -130,6 +132,8 @@ TNUT = 3.2                                  # #10-32 4-prong T-nut hole through 
 SIDE_MOUNT_X = (-280.0, -205.0, 100.0, 280.0)   # frame mount posts along each outer rail (clear of the x -105 seam
                                             # and of the x -153 frame joint's cross screw)
 END_MOUNT_Y = (-170.0, 0.0, 170.0)          # ... and along each end rail (the outer two stand on the corner gussets)
+FRONT_MOUNT_Y = (-205.0, 205.0)             # the front end's: the light bar hole (|y| < 175) leaves no frame over the
+                                            # middle of the front rail, so two, just outboard of it
 BUMP_SIDE_X = (-80.0, 0.0, 80.0)            # bumper screws through each outer rail, between the wheels, driven from
                                             # the open bay under the robot; the four backings are one ring, so the
                                             # ends need none (their rails are behind the wheels, the PDH and the bellypan)
@@ -150,12 +154,15 @@ TENON_CLEAR = 0.3                           # per side, for a 0.6 mm nozzle (pri
 # panel light (rev D.1.2, Micah 2026-11-04): the window wall IS the LED surface. Below the acrylic's ledge it runs
 # straight back, past the member as a thin web, and its last 10 mm (the strip) leans a little toward the panel on the
 # straight runs. No rail, no flange, no step but the ledge the acrylic sits on.
-LED_BAND = (10.0, 25.0, 17.5, 2.5)          # strip width (a 10 mm strip; ~8 is enough to stick to), strip centre this
+LED_BAND = (10.0, 25.0, 22.5, 2.5)          # strip width (a 10 mm strip; ~8 is enough to stick to), strip centre this
                                             # far behind the acrylic's back face, lean toward the panel (deg) on the
                                             # straight runs, web thickness below the member
 LED_STRIP_T = 1.6                           # 60/m strip thickness on the band
-LED_TWIST = 40.0                            # runs stay square this far from each corner (a strip can't bend round a
-                                            # cone), then the lean ramps in over the next LED_TWIST
+LED_SQUARE = 2.0                            # runs stay square this far from each corner (a strip can't bend round a
+                                            # cone; the corner arc itself stays square). 0 made OCC build an invalid
+                                            # window loft on the rear panel that took the whole frame with it
+LED_TWIST = 15.0                            # then the lean ramps in over this (Micah 2026-11-10: lean 5 deg more, reach
+                                            # it quicker at the corners, no flat spots; was 40 square + 40 ramp)
 WINDOW_IN = dict(coplanar=MEM_W, open=MEM_W, notch=MEM_W, notch_top=MEM_W, slot=24.0, shared=MEM_W)
                                             # window edge (= LED surface) in from each panel edge, before the checks:
                                             # a shared edge then moves in until its web and strip stay on their own side
@@ -215,8 +222,26 @@ def front_x(z, inner=False):
     return x - MEM_H / math.sin(math.radians(FRONT_ANGLE)) if inner else x
 
 
-LIGHT_BAR = (330.0, 30.0, 45.0, 229.0, 120.0)   # front light bar (Zmoon 12 in single row): length, height, depth, z of its
-                                            # centre (just above the bumper), |y| of its two brackets
+LIGHT_BAR = (330.0, 30.0, 45.0, 285.0, 120.0)   # front light bar (Zmoon 12 in single row): length, height, depth, z of its
+                                            # centre, |y| of its two end bolts
+# Brophy Borealis (2026-11-10, Micah): the bar sits in a plain hole in the front slant, open at the bottom, from the
+# body's bottom edge (on the bumper) to 4.5 in above the bumper. No liner: two 20x20 rails run across it behind the
+# shell (one along its bottom, one along its top), the bar stands on the lower one on its own brackets, and the upper
+# one is free for sensors and the like.
+BAR_HOLE = dict(height=4.5 * IN, y=175.0, rail_len=372.0, bar_z=241.0, recess=4.0)
+                                            # above the bumper's top; half width (the bar and its brackets inside);
+                                            # rail length (into the frame members either side, short of the windows'
+                                            # LED walls, which reach |y| 186.5 at the hole's top corners); the bar's bottom (above the fogger's top at 237.6); how far
+                                            # its face sits behind the slant at its top edge
+# 20x20 T-slot rails for add-ons (Micah's spares): one each side of the deck along the gun well, one inside each
+# gun cradle plate, all mirrored about y = 0 and clear of the pivot
+RAIL20 = 20.0
+# Brophy Borealis (Micah, 2026-11-10): the deck rails moved inside the gun well, one piece each side, flush with the
+# towers' and bearing blocks' outboard face (|y| 129.35) and 2 mm under the deck; the towers stop under them and the
+# bearing blocks sit on them, so the pivot went up 11 mm. M4 x 30s across the rail's core (z 618, under the deck
+# member's light tunnel at z 620-623) through the tower plate into inserts in the member's inner face
+DECK_RAIL = dict(y=(INNER_RAIL_Y[1] - 20.0, INNER_RAIL_Y[1]), x=(-320.0, 150.0), z=(608.0, 628.0), screw_z=618.0,
+                 screws_x=(-290.0, -170.0, -95.0, 40.0, 125.0))
 
 
 
@@ -241,23 +266,38 @@ HSV04 = dict(L=131.1, W=64.3, BODY=(-27.0, 27.0), COIL_R=24.0, COIL_TOP=75.4)  #
 VALVES = (HSV04, HSV04)                     # (top, bottom) firing valves (rev D.2: both HSV04, both to full tank pressure)
 # chamber: 2 in Sch 40 x 8 in nipple between two 2 x 1 black malleable reducing couplings (about 0.53 L; a longer
 # nipple swings the chamber low enough at the back to open the rear face down through its controls)
-CH_PIPE, CH_NIPPLE_L = "3", (12.0 * IN, 10.0 * IN)   # rev D.1: 3 in Sch 40, top 12 in, bottom 10 in
+CH_PIPE = "3"                               # rev D.1: 3 in Sch 40
+# Brophy Borealis (Micah, 2026-11-10): welded chambers. Plain-end pipe between two 3/8 in A36 discs (3.5 in OD, flush
+# with the pipe), the valve on half of a 1 x 4 in nipple welded through the front disc, a 1/4 NPT weld bung 1 in
+# behind the front disc for the fill line. Top 12.9 in (1.56 L), bottom 10.9 in (1.32 L)
+CH_PIPE_L = (12.9 * IN, 10.9 * IN)
+CH_DISC_T = 0.375 * IN
+CH_TOE_L = 2.0 * IN                         # half of the 1 x 4 in nipple: threaded end into the valve
+CH_BUNG_X, CH_BUNG_H = 1.0 * IN, 16.0       # bung centre behind the front disc; its height off the pipe
+SMOKE_R = 0.5 * IN                          # the gun's smoke line: 3/4 in ID x 1 in OD silicone (Micah 2026-11-11: bigger; was 1/2 x 5/8)
 RED = dict(L=80.8, OD_IN=44.0, OD_OUT=108.7, BAND_IN=16.0, BAND_OUT=28.0, MASS=0.9)   # 3 x 1 malleable reducing coupling
-GUN_GAP = 35.8                              # between the barrels: 112 mm between axes, the 3 x 1 couplings side by side + 3
+GUN_GAP = 35.8 * 0.70                       # between the barrels (Micah 2026-11-10: "30% closer"; was 35.8 for the old 3 x 1
+                                            # couplings side by side, gone since the chambers are welded): 101 mm axes,
+                                            # the 3 in chambers 12 mm apart
 PITCH = BARREL_OD + GUN_GAP                 # cannons at z = +/- PITCH / 2 about the axis
 CRADLE_Y0 = 74.0                            # inner faces of the two cradle plates: the 109 mm couplings plus the fill
                                             # and smoke lines that run beside them
 X_VALVE = 190.0                             # valve front faces ahead of the axis (from the balance calc, see gun.py)
 CH_SADDLE_S = (233.0, 352.0)                # chamber saddles, distance behind the valve front faces (both pipes there)
-ELEV_RANGE = (0.0, 45.0)                    # rev D.1: the longer chambers swing down through the back
+ELEV_RANGE = (0.0, 90.0)                    # Brophy Borealis (Micah, 2026-11-10): at least 0-85 deg, 90 if it fits.
+                                            # The pass-2 build clears to 95 deg (sweep90 check, B14), so 0-90.
 ELEV_SHOW = 20.0
 ELEV_T = (16, 112)                          # goBILDA 312 rpm pinion -> pulley on the right axle end (HTD 5M 9 mm), 7:1
 ELEV_BELT_T = 150
-ELEV_PULLEY_Y = (95.0, 108.0)               # |y| of the elevation pulley, just outside the gun
+ELEV_STANDOFF = 10.0                        # Micah 2026-11-10: the gun pulley is a ring on standoffs off the right cradle
+                                            # plate, the belt centred between the plate and the bearing block
+ELEV_PULLEY_Y = (CRADLE_Y0 + PLATE_T + ELEV_STANDOFF, CRADLE_Y0 + PLATE_T + ELEV_STANDOFF + 13.0)   # |y| of both pulleys
+ELEV_MOTOR_FACE_Y = 110.0                   # |y| of the elevation motor's face (unchanged; the pinion moved out on the shaft)
 Y_GUN = CRADLE_Y0 + PLATE_T                 # half width of the gun over its cradle plates
 
-PIVOT = (-40.0, 645.0)                      # axle between the cannons; high enough that the gun's swing
-                                            # clears the Falcons' inboard ends
+PIVOT = (-40.0, 656.0)                      # axle between the cannons; high enough that the gun's swing
+                                            # clears the Falcons' inboard ends (Borealis: 645 -> 656, the
+                                            # bearing blocks now sit on the in-well rails at z 628)
 Y_SLOT = 133.0                              # gun well half width (the elevation pulley turns inside it)
 X_SLOT_REAR = -2000.0                       # the well is open at the back: at 0 deg the chambers reach the rear face
 
@@ -265,7 +305,7 @@ X_SLOT_REAR = -2000.0                       # the well is open at the back: at 0
 # runs forward from each to the axle
 TOWER_X = (-182.7, -157.3)
 TOWER_L_X = TOWER_R_X = TOWER_X
-BEARING_BLOCK_Y = (ELEV_PULLEY_Y[1] + 1.0, INNER_RAIL_Y[1])
+BEARING_BLOCK_Y = (109.0, INNER_RAIL_Y[1])     # inner bearing face (was the old pulley's outer face + 1)
 ELEV_MOTOR_Z = 468.0                        # under the top speaker's LED rail, over the side tank
 ELEV_C = centre_for_belt(ELEV_BELT_T, pd(ELEV_T[0]), pd(ELEV_T[1]))
 ELEV_MOTOR_X = PIVOT[0] + math.sqrt(ELEV_C ** 2 - (PIVOT[1] - ELEV_MOTOR_Z) ** 2)

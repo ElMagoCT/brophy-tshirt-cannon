@@ -1,38 +1,69 @@
 drive: built
-gun: valves at x 174.5 from the axis, centre of mass (0.3, 1.5) mm, 21.1 kg; chambers 1.63 L (top) and 1.38 L (bottom), barrels 35.8 mm apart
-gun well: floor at z 513 where it meets the front, 317 at the back, 307 under the axle
+gun: valves at x 134.0 from the axis, centre of mass (0.7, 2.8) mm, 18.8 kg; chambers 1.56 L (top) and 1.32 L (bottom), barrels 25.1 mm apart
+gun well: floor at z 546 where it meets the front, 367 at the back, 256 under the axle
 elevation belt pitch length 750 mm (150.0 teeth)
 underglow: 2.5 m of strip under the bumpers
-body: 34 faces, volume 118.8 L
-shell volume 22.51 L, 1 solid
+body: 46 faces, volume 109.2 L
+shell volume 21.87 L, 1 solid
 8 panels
 shared edges, interior angle -> window/LED inset (mm): 91 deg -> 36.2, 94 deg -> 34.7, 98 deg -> 32.5, 100 deg -> 31.4
-  round 1: front@x286 edge 1 (open) -> 23
-window/LED insets: front@x286 35 23 35 19 19 19 19 19 | right@x127 35 19 19 19 19 32 19 19 | right@x-238 32 36 19 19 | deck@x-85 32 19 24 31 | deck@x-85 24 19 32 31 | left@x127 19 19 19 19 35 19 19 32 | left@x-238 19 36 32 19 | rear@x-367 36 31 24 24 24 31 36 19
+  round 1: front@x313 edge 1 (open) -> 23; front@x313 edge 5 (open) -> 23
+window/LED insets: front@x313 35 23 19 19 19 23 35 19 19 19 19 19 | right@x127 35 19 19 19 19 32 19 19 | right@x-238 32 36 19 19 | deck@x-85 32 19 24 31 | deck@x-85 24 19 32 31 | left@x127 19 19 19 19 35 19 19 32 | left@x-238 19 36 32 19 | rear@x-365 36 31 24 24 24 31 36 19
 corner fills: 10 shared edges filled solid between their back-to-back LED skins
 clip inserts: 12 short (M4 x 4 + M4 x 6: a slanted face, or a neighbour's screw), 0 screws dropped, 0 pairs still meeting; corners with no clip that laps the acrylic: none
 clip inserts crossing a light tunnel: none
-frame network volume 5.09 L, 38 corner clips, strip 11.2 m in 8 panel loops + 7.6 m in 28 frame tunnels
+frame network volume 5.18 L, 40 corner clips, strip 11.4 m in 8 panel loops + 7.7 m in 30 frame tunnels
 LED strips overlapping before trimming: 0 pairs, worst 0 mm3
 LED loops: 0 jumpers where neighbours' webs or loops cross a corner; strip kept per panel 100%, 100%, 100%, 100%, 100%, 100%, 100%, 100%
-38 edges
-cheek L: 2 segments + 1 node parts -> 1 piece(s), main [120, 133, 147]
-cheek R: 2 segments + 1 node parts -> 1 piece(s), main [120, 133, 147]
-47 pieces (19 nodes, 1 extra glued splits to fit the bed; 20 nodes merged into a neighbouring segment: E05S0+N00a, E05S1+N00b, E34S0+N01, E36S0+N02, E20S0+N03, E25S0+N04, E20S0+N03+N05, E25S0+N04+N06, E15S0+N07, E24S0+N08, E08S0+N09, E29S0+N10, E07S0+N11, E03S0+N12, E37S2+N13, E37S0+N14, E01S0+N15, E01S2+N16, E13S1+N17, E31S1+N18; short segments joined to their one neighbour: E08S0+N09+E09S0, E29S0+N10+E28S0)
-joints: 53 tapered tenons (0 small), 35 with M4 cross screws and 18 glued (filled corners, small tenons), 0 carried by the neighbour to keep a piece on the bed; segment ends with no neighbour piece: none
-frame mounts: 16 #10-32 inserts in the frame
-speaker cup screws: 8 of 8, light bar bracket screws: 4 of 4
-body: 47 frame pieces (loose chunks: none), 8 panels, 38 clips, LED strip 11.2 m in panel loops + 7.6 m in the frame
-built 554 parts in 2862 s
-envelope at  0 deg: 62.2 L x 27.9 W x 30.9 H in
-envelope at 90 deg: 37.9 L x 27.9 W x 70.0 H in
+42 edges
+cheek L: 2 segments + 1 node parts -> 1 piece(s), main [112, 117, 120]
+cheek R: 2 segments + 1 node parts -> 1 piece(s), main [112, 117, 120]
+50 pieces (23 nodes, 1 extra glued splits to fit the bed; 24 nodes merged into a neighbouring segment: E08S0+cheek L, E10S0+cheek R, E10S0+cheek R+N00a, E08S0+cheek L+N00b, E29S0+N03, E24S0+N04, E02S0+N05, E04S0+N06, E01S0+N07, E05S0+N08, E24S0+N04+N09, E29S0+N03+N10, E19S0+N11, E28S0+N12, E13S0+N13, E32S0+N14, E11S0+N15, E07S0+N16, E41S2+N17, E41S0+N18, E01S0+N07+N19, E05S0+N08+N20, E17S1+N21, E35S1+N22; short segments joined to their one neighbour: E02S0+N05+E03S0)
+joints: 58 tapered tenons (0 small), 40 with M4 cross screws and 18 glued (filled corners, small tenons), 0 carried by the neighbour to keep a piece on the bed; segment ends with no neighbour piece: none
+frame mounts: 13 #10-32 inserts in the frame
+speaker cup screws: 8 of 8, front rail screws: 4 of 4, in-well rail screws: 10 of 10
+body: 50 frame pieces (loose chunks: ['E12S0 87 mm3 -> E00S0', 'E33S0 87 mm3 -> E06S0']), 8 panels, 40 clips, LED strip 11.4 m in panel loops + 7.7 m in the frame
+rivets dropped (head would hit a part): {'Corner gusset top': 2}
+tube holes: 299 in 24 tubes
+brackets: 37 flat parts (14 different), 262 rivets into tubes (116 countersunk) + 0 through the bellypan seam straps; biggest 768 mm
+built 638 parts in 2795 s
+envelope at  0 deg: 60.3 L x 27.9 W x 31.1 H in
+envelope at 90 deg: 37.9 L x 27.9 W x 68.8 H in
 body over bumpers: 37.7 x 27.7 in (door limits 40 x 28)
-mass estimate 84.2 kg (186 lb): body 6.4, bumper 5.2, drive 15.0, frame 5.0, gun 21.1, pneu 9.4, power 22.1
-gun 21.1 kg, CG 0 mm ahead / 1 mm above the pivot -> 0.1 N*m at 0 deg
-interference: 3 pairs over 30 mm^3 (351 s)
-    (146, 'Valve cross push-to-connect', 'Line relief valve 200 psi')
+mass estimate 86.7 kg (191 lb): body 7.1, bumper 5.4, drive 15.0, frame 6.2, gun 18.8, pneu 11.3, power 23.0
+gun 18.8 kg, CG 1 mm ahead / 3 mm above the pivot -> 0.1 N*m at 0 deg
+interference: 1 pairs over 30 mm^3 (549 s)
     (64, 'Fill elbow manifold', 'Rear manifold')
-    (53, 'Fill nipple', 'Fill check valve')
-elevation sweep 0-45 deg: 0 clashes (17 s)
+elevation sweep 0-90 deg: 0 clashes (28 s)
 printed parts that don't fit a 250 mm cube (CC1/CC2): 0 []
 parts in more than one piece: 0 []
+exported Chassis, pivot & drive 1 of 6: 17 parts, 2.0 MB
+exported Chassis, pivot & drive 2 of 6: 18 parts, 8.6 MB
+exported Chassis, pivot & drive 3 of 6: 18 parts, 3.0 MB
+exported Chassis, pivot & drive 4 of 6: 17 parts, 2.8 MB
+exported Chassis, pivot & drive 5 of 6: 18 parts, 6.9 MB
+exported Chassis, pivot & drive 6 of 6: 18 parts, 2.5 MB
+exported Wheel FL: 35 parts, 6.9 MB
+exported Wheel FR: 35 parts, 7.6 MB
+exported Wheel RL: 35 parts, 6.9 MB
+exported Wheel RR: 35 parts, 7.6 MB
+exported Gun (pivots) 1 of 2: 21 parts, 2.3 MB
+exported Gun (pivots) 2 of 2: 21 parts, 8.8 MB
+exported Add-on rails: 6 parts, 1.7 MB
+exported Power, electronics & smoke: 79 parts, 2.5 MB
+exported Pneumatics: 67 parts, 4.5 MB
+exported Bumpers & wall standoffs: 49 parts, 2.6 MB
+exported Lights & speakers 1 of 3: 17 parts, 6.6 MB
+exported Lights & speakers 2 of 3: 17 parts, 6.7 MB
+exported Lights & speakers 3 of 3: 17 parts, 4.0 MB
+exported Body frame 1 of 6: 8 parts, 7.5 MB
+exported Body frame 2 of 6: 8 parts, 7.4 MB
+exported Body frame 3 of 6: 9 parts, 8.2 MB
+exported Body frame 4 of 6: 8 parts, 7.9 MB
+exported Body frame 5 of 6: 8 parts, 8.3 MB
+exported Body frame 6 of 6: 9 parts, 7.4 MB
+exported Body panels & clips: 48 parts, 1.8 MB
+exported Visuals: 30 parts, 9.2 MB
+BOM rollup: 187 distinct items -> C:\Users\micah\brophy-tshirt-cannon\cad\glacis\out\parts_from_cad.csv
+waterjet: 12 different parts, 1/8 in 8 sheet(s) 40% used
+renders written

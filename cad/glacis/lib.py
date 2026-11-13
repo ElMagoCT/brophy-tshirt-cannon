@@ -46,6 +46,7 @@ C = {
 }
 
 PARTS = []
+TUBE_HOLES = []          # (what, point, direction, radius, length): cut through the tubes by brackets.drill_tubes
 
 
 def add(name, shape, color, group, bom=None, kind="cots", moving=False, note="", mass=None):
@@ -115,6 +116,26 @@ def poly_prism(pts, h, plane="XY", offset=0.0):
     return w.val()
 
 
+def htd_teeth(teeth, width, y0=0.0, x=0.0, z=0.0, pitch=5.0, depth=2.06, groove_r=1.53, steps=10):
+    """HTD 5M toothed rim (Micah 2026-11-11: "add teeth to the pulley"), axis along +y from y0, centred at (x, z).
+    OD = pitch diameter - 1.14 mm; each groove a 1.53 mm radius arc 2.06 mm deep (the HTD 5M pulley groove), so the
+    printed pulley takes a real belt."""
+    pd = teeth * pitch / math.pi
+    ro = pd / 2 - 0.57
+    cg = ro - depth + groove_r                     # groove centre radius
+    half = math.asin(min(1.0, groove_r / cg)) if cg > groove_r else math.pi / teeth
+    pts = []
+    for k in range(teeth):
+        a0 = 2 * math.pi * k / teeth
+        for j in range(steps + 1):                 # groove: polar curve across the groove's angular width
+            phi = -half + 2 * half * j / steps
+            s = cg * cg * math.sin(phi) ** 2
+            r = ro if s > groove_r ** 2 else min(ro, cg * math.cos(phi) - math.sqrt(groove_r ** 2 - s))
+            pts.append((x + r * math.cos(a0 + phi), z + r * math.sin(a0 + phi)))
+    w = cq.Wire.makePolygon([V(u, y0, v) for u, v in pts], close=True)
+    return cq.Solid.extrudeLinear(cq.Face.makeFromWires(w), V(0, width, 0))
+
+
 def _plane_origin(plane, off):
     return {"XY": (0, 0, off), "XZ": (0, off, 0), "YZ": (off, 0, 0)}[plane]
 
@@ -147,3 +168,16 @@ def belt_loop(c1, r1, c2, r2, width, y0, t=1.6):
 def bbox_centre(s):
     b = s.BoundingBox()
     return ((b.xmin + b.xmax) / 2, (b.ymin + b.ymax) / 2, (b.zmin + b.zmax) / 2)
+
+
+def t_slot(x0, x1, ys, zs, slot=6.2, depth=6.0, bore=2.1):
+    """20x20-style T-slot rail along x (simplified: a 6.2 mm slot down the middle of each face and the centre bore)."""
+    (y0, y1), (z0, z1) = ys, zs
+    yc, zc = (y0 + y1) / 2, (z0 + z1) / 2
+    s = box(x0, x1, y0, y1, z0, z1)
+    h = slot / 2
+    for cut in (box(x0 - 1, x1 + 1, yc - h, yc + h, z1 - depth, z1 + 1), box(x0 - 1, x1 + 1, yc - h, yc + h, z0 - 1, z0 + depth),
+                box(x0 - 1, x1 + 1, y1 - depth, y1 + 1, zc - h, zc + h), box(x0 - 1, x1 + 1, y0 - 1, y0 + depth, zc - h, zc + h),
+                cyl(bore, x1 - x0 + 2, (x0 - 1, yc, zc), (1, 0, 0))):
+        s = s.cut(cut)
+    return s
