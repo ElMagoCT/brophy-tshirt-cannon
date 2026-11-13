@@ -1204,6 +1204,15 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B28. **No QDs, straight connectors, flat rear cross** (Micah, 2026-11-12: "remove every quick disconnect except the fill
+    one, we'll just use the tube connectors if we need to take off the cannon or a tank. we only need 10 tube
+    connectors, none of them angled. also remove the angle 1/4 to 1/4 and just adjust the T to be horizontal and have
+    the fill valve point out the back, the master pneumatic valve can be right on the inside of the robot").
+    - The rear cross lies flat 120 mm right of the old spot (clear of in valve A's coil): fill check valve out the
+      back through the rear panel with the fill plug on it, main ball valve straight off the front, tanks either side.
+      The check valve's hex sits in a 24 mm panel hole; the main valve lever is inside (reach in through the rear).
+    - Tank outlets and chamber inlets take straight push-to-connects; their tubes leave along the port and bend.
+    - Concept branch in Onshape (not the design): in valves + sensors on the chambers' back ends.
 B27. **Rear manifold is one real cross; no tank relief; no QD on the main valve line** (Micah, 2026-11-12: "P04-1 and
     P05-2 is redundant remove it. P10-1 idk what it is, its not a 4way"; "for the ChillWaves parts, just up the
     count on amazon"; "remove P02-1 so it can be a single cross for the rear manifold").
