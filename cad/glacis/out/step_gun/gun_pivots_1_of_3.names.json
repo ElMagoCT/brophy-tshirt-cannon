@@ -1,0 +1,310 @@
+[
+{
+"name": "Chamber end cover top",
+"c": [
+-402.0321565919629,
+0.0,
+706.63
+],
+"size": [
+48.00000010000002,
+96.9,
+96.90000000000009
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber end cover (printed)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Chamber back disc top",
+"c": [
+-399.26965654196295,
+0.0,
+706.63
+],
+"size": [
+9.524999999999977,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)",
+"kind": "machined",
+"purpose": ""
+},
+{
+"name": "Chamber end cover bottom",
+"c": [
+-351.23215659196296,
+0.0,
+605.37
+],
+"size": [
+48.00000010000002,
+96.9,
+96.90000000000009
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber end cover (printed)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Chamber back disc bottom",
+"c": [
+-348.469656541963,
+0.0,
+605.37
+],
+"size": [
+9.524999999999977,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)",
+"kind": "machined",
+"purpose": ""
+},
+{
+"name": "Chamber cap top rear",
+"c": [
+-269.8930805625407,
+7.105427357601002e-15,
+732.105
+],
+"size": [
+48.70815195884464,
+147.0,
+49.95000000000016
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Chamber cap bottom rear",
+"c": [
+-269.8930805625407,
+0.0,
+579.895
+],
+"size": [
+48.70815195884464,
+147.0,
+49.95000000000016
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Chamber saddle rear",
+"c": [
+-244.76941613832247,
+0.0,
+656.0
+],
+"size": [
+49.04451919271892,
+148.0,
+101.2600000000001
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber saddle",
+"kind": "print",
+"purpose": "Printed block carrying both chambers between the cradle plates."
+},
+{
+"name": "Chamber pipe top",
+"c": [
+-230.67715654196294,
+0.0,
+706.63
+],
+"size": [
+327.66,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 in Sch 40 steel pipe, plain end (cut)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Chamber pipe bottom",
+"c": [
+-205.277156541963,
+0.0,
+605.37
+],
+"size": [
+276.86,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber: 3 in Sch 40 steel pipe, plain end (cut)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Chamber cap bottom -95",
+"c": [
+-135.24715654196302,
+-1.4210854715202004e-14,
+579.895
+],
+"size": [
+20.00000000000003,
+147.00000000000003,
+49.95000000000016
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Chamber saddle -95",
+"c": [
+-135.24715654196297,
+0.0,
+656.0
+],
+"size": [
+28.000000000000114,
+148.0,
+101.2600000000001
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber saddle",
+"kind": "print",
+"purpose": "Printed block carrying both chambers between the cradle plates."
+},
+{
+"name": "Chamber cap top -95",
+"c": [
+-135.24715654196302,
+0.0,
+732.105
+],
+"size": [
+20.0,
+147.0,
+49.950000000000045
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Chamber cap",
+"kind": "print",
+"purpose": "Printed cap holding the chamber pipe down on its saddle."
+},
+{
+"name": "Chamber inlet bung top",
+"c": [
+-92.24715654196301,
+-44.824356895337615,
+680.7506454802249
+],
+"size": [
+22.000000199999988,
+26.05375772686341,
+27.74385004370754
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber inlet: 1/4 NPT female steel weld-on bung",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Chamber inlet push-to-connect top",
+"c": [
+-92.24715654196301,
+-55.413734733528486,
+675.0005960043845
+],
+"size": [
+15.0,
+30.65191638672119,
+24.8906765311541
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": ""
+}
+]

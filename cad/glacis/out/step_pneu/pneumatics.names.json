@@ -1,0 +1,1014 @@
+[
+{
+"name": "Fill plug (M-style, female)",
+"c": [
+-424.21238777390596,
+-26.500000000000004,
+250.0
+],
+"size": [
+39.200000000000045,
+15.900000000000013,
+18.359738560230085
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Fill plug: 1/4 NPT female-thread M-style plug, brass (ZKZX B081F9J3VF)",
+"kind": "cots",
+"purpose": "Where the shop compressor's universal (M-style) coupler snaps on to fill the tanks."
+},
+{
+"name": "Fill check valve",
+"c": [
+-391.112387773906,
+-26.250000000000007,
+250.0
+],
+"size": [
+49.39999999999998,
+19.500000000000014,
+21.9393102292058
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Fill check valve, 304 stainless, 1/4 NPT male x male (AliExpress)",
+"kind": "cots",
+"purpose": "Lets air in from the fill plug but holds the tanks once the hose comes off."
+},
+{
+"name": "Rear manifold cross",
+"c": [
+-360.112387773907,
+-26.5,
+250.0
+],
+"size": [
+33.0,
+33.0,
+20.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": "One brass cross that joins both tanks, the fill line and the main valve: the 200 psi hub."
+},
+{
+"name": "Rear manifold push-to-connect right tank",
+"c": [
+-360.112387773907,
+-46.9,
+250.0
+],
+"size": [
+15.0,
+28.200000000000003,
+16.512217698823292
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Takes a tank line into the rear manifold."
+},
+{
+"name": "Rear manifold push-to-connect left tank",
+"c": [
+-360.112387773907,
+-6.1,
+250.0
+],
+"size": [
+15.0,
+28.2,
+16.512217698823292
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Takes a tank line into the rear manifold."
+},
+{
+"name": "Main valve nipple",
+"c": [
+-342.712387773907,
+-26.5,
+250.0
+],
+"size": [
+22.200000000000045,
+14.300000000000008,
+16.512217698823292
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass close nipple",
+"kind": "cots",
+"purpose": "Manual shut-off for both tanks: open all session, closed for transport and any work on the gun."
+},
+{
+"name": "Chamber transducer B (bottom cannon)",
+"c": [
+-340.65,
+-41.60000000000001,
+200.0
+],
+"size": [
+61.69999999999999,
+22.000000000000064,
+25.403411844343566
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)",
+"kind": "cots",
+"purpose": "Chamber pressure sensor (PT2 top, PT3 bottom): the in valve meters against it."
+},
+{
+"name": "Valve cross push-to-connect",
+"c": [
+-320.4,
+55.0,
+200.0
+],
+"size": [
+28.19999999999999,
+15.0,
+16.512217698823292
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Feed from the main valve into the valve cross."
+},
+{
+"name": "Tube main valve to cross",
+"c": [
+-310.15619388695325,
+14.249999999999998,
+210.0
+],
+"size": [
+99.03761222609353,
+87.85,
+86.35000000000002
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "cots",
+"purpose": "Manual shut-off for both tanks: open all session, closed for transport and any work on the gun."
+},
+{
+"name": "Valve cross",
+"c": [
+-300.0,
+55.0,
+200.0
+],
+"size": [
+33.0,
+33.0,
+20.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": "Splits the main valve's air to the two in valves and the line relief."
+},
+{
+"name": "Line relief valve 200 psi",
+"c": [
+-300.0,
+90.60000005,
+200.0
+],
+"size": [
+19.0,
+58.6000001,
+21.939310229205773
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)",
+"kind": "cots",
+"purpose": "Vents above 200 psi: the line from the main valve to the in valves, and the tanks too while the main valve is open (the only tank relief, Micah 2026-11-12). Pull its ring to dump them."
+},
+{
+"name": "In valve B (bottom cannon) inlet nipple",
+"c": [
+-300.0,
+31.700000000000003,
+200.0
+],
+"size": [
+19.0,
+34.0,
+21.939310229205773
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the bottom cannon's chamber until PT3 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "In valve B (bottom cannon) outlet nipple",
+"c": [
+-300.0,
+-18.299999999999997,
+200.0
+],
+"size": [
+19.0,
+34.0,
+21.939310229205773
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the bottom cannon's chamber until PT3 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "Chamber cross B (bottom cannon)",
+"c": [
+-300.0,
+-41.6,
+200.0
+],
+"size": [
+33.0,
+33.000000000000014,
+20.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Chamber cross B (bottom cannon) push-to-connect",
+"c": [
+-300.0,
+-62.0,
+200.0
+],
+"size": [
+15.0,
+28.19999999999999,
+16.512217698823292
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Main valve (1/4 ball valve)",
+"c": [
+-299.562387773906,
+-26.5,
+251.24999995000002
+],
+"size": [
+84.5,
+23.000000200000002,
+25.500000099999994
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Main valve: 1/4 NPT brass ball valve, FNPT x FNPT, 600 WOG (the old cannon's if it fits)",
+"kind": "cots",
+"purpose": "Manual shut-off for both tanks: open all session, closed for transport and any work on the gun."
+},
+{
+"name": "Main valve push-to-connect",
+"c": [
+-292.91238777390595,
+-26.5,
+250.0
+],
+"size": [
+28.19999999999999,
+15.0,
+16.512217698823292
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Line from the main valve forward to the valve cross."
+},
+{
+"name": "In valve B (bottom cannon)",
+"c": [
+-283.0,
+6.699999999999999,
+229.0
+],
+"size": [
+82.0,
+40.0,
+76.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm",
+"kind": "cots",
+"purpose": "Meters air into the bottom cannon's chamber until PT3 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "In valve A (top cannon) inlet nipple",
+"c": [
+-276.7,
+55.0,
+200.0
+],
+"size": [
+34.0,
+19.00000000000003,
+21.939310229205773
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the top cannon's chamber until PT2 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "Chamber relief valve 200 psi B (bottom cannon)",
+"c": [
+-264.39999995,
+-41.60000000000001,
+200.0
+],
+"size": [
+58.60000009999999,
+19.00000000000002,
+21.939310229205773
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "In valve A (top cannon)",
+"c": [
+-251.7,
+72.0,
+229.0
+],
+"size": [
+40.0,
+82.0,
+76.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm",
+"kind": "cots",
+"purpose": "Meters air into the top cannon's chamber until PT2 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "In valve A (top cannon) outlet nipple",
+"c": [
+-226.7,
+55.0,
+200.0
+],
+"size": [
+34.0,
+19.00000000000003,
+21.939310229205773
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the top cannon's chamber until PT2 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "Chamber cross A (top cannon)",
+"c": [
+-203.4,
+55.0,
+200.0
+],
+"size": [
+33.0,
+20.0,
+33.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Chamber transducer A (top cannon)",
+"c": [
+-203.4,
+55.0,
+240.65
+],
+"size": [
+22.000000000000057,
+25.403411844343566,
+61.69999999999999
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)",
+"kind": "cots",
+"purpose": "Chamber pressure sensor (PT2 top, PT3 bottom): the in valve meters against it."
+},
+{
+"name": "Chamber relief valve 200 psi A (top cannon)",
+"c": [
+-203.4,
+55.0,
+164.39999995
+],
+"size": [
+19.0,
+21.93931022920578,
+58.60000009999999
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Chamber cross A (top cannon) push-to-connect",
+"c": [
+-183.0,
+55.0,
+200.0
+],
+"size": [
+28.19999999999999,
+15.0,
+16.512217698823292
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Service loop B (bottom cannon)",
+"c": [
+-165.099590551481,
+-71.55,
+414.5615802492235
+],
+"size": [
+276.15081889703805,
+15.449999999999989,
+429.12316049844696
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "stock",
+"purpose": "Flexible 1/4 in line from an in valve up to its chamber; slack so the gun can elevate."
+},
+{
+"name": "Tube tank left",
+"c": [
+-157.05619388695325,
+87.0875,
+288.5
+],
+"size": [
+412.4623877739065,
+158.175,
+89.35000000000002
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "cots",
+"purpose": "1/4 in DOT tube from a tank to the rear manifold."
+},
+{
+"name": "Tube tank right",
+"c": [
+-157.05619388695325,
+-113.5875,
+287.5
+],
+"size": [
+412.4623877739065,
+105.17500000000001,
+91.35000000000002
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "cots",
+"purpose": "1/4 in DOT tube from a tank to the rear manifold."
+},
+{
+"name": "Service loop A (top cannon)",
+"c": [
+-94.85112744755143,
+-6.465906980807198,
+425.33332077441577
+],
+"size": [
+154.4477451048971,
+129.28181396161438,
+450.66664154883154
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "stock",
+"purpose": "Flexible 1/4 in line from an in valve up to its chamber; slack so the gun can elevate."
+},
+{
+"name": "Tank saddle left -60",
+"c": [
+-60.0,
+163.0,
+304.8376081318116
+],
+"size": [
+28.0,
+136.00000000000003,
+46.07521626362313
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Tank saddle",
+"kind": "print",
+"purpose": "Printed cradle the tank sits in."
+},
+{
+"name": "Tank saddle right -60",
+"c": [
+-60.0,
+-162.99999999999991,
+304.83760813181175
+],
+"size": [
+28.0,
+136.00000000000017,
+46.07521626362342
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Tank saddle",
+"kind": "print",
+"purpose": "Printed cradle the tank sits in."
+},
+{
+"name": "Tank plug left -80",
+"c": [
+-34.0,
+163.0,
+281.6
+],
+"size": [
+14.300000000000008,
+16.512217698823292,
+17.19999999999999
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass plug",
+"kind": "cots",
+"purpose": "Plugs a tank port that isn't used."
+},
+{
+"name": "Tank plug right -80",
+"c": [
+-34.0,
+-163.0,
+281.6
+],
+"size": [
+14.300000000000008,
+16.512217698823292,
+17.19999999999999
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass plug",
+"kind": "cots",
+"purpose": "Plugs a tank port that isn't used."
+},
+{
+"name": "Tank strap left 6",
+"c": [
+6.0,
+163.0,
+364.0
+],
+"size": [
+25.0,
+157.0,
+157.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "1 in cam-buckle strap",
+"kind": "cots",
+"purpose": "Cam strap holding the tank in its saddles."
+},
+{
+"name": "Tank strap right 6",
+"c": [
+6.0,
+-163.0,
+364.0
+],
+"size": [
+25.0,
+157.0,
+157.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "1 in cam-buckle strap",
+"kind": "cots",
+"purpose": "Cam strap holding the tank in its saddles."
+},
+{
+"name": "Tank push-to-connect left",
+"c": [
+46.0,
+163.0,
+276.1
+],
+"size": [
+15.0,
+16.512217698823292,
+28.19999999999999
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Tank outlet: the tank's bottom port straight into the 1/4 in line to the rear manifold."
+},
+{
+"name": "Tank push-to-connect right",
+"c": [
+46.0,
+-163.0,
+276.1
+],
+"size": [
+15.0,
+16.512217698823292,
+28.19999999999999
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": "Tank outlet: the tank's bottom port straight into the 1/4 in line to the rear manifold."
+},
+{
+"name": "Air tank right (6 L 200 psi)",
+"c": [
+46.00000000000003,
+-163.0,
+360.0
+],
+"size": [
+360.0000002,
+152.0000002,
+160.00000020000004
+],
+"color": [
+0.12,
+0.12,
+0.13,
+1.0
+],
+"bom": "Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT (owner's AliExpress pick)",
+"kind": "cots",
+"purpose": "Stores the shot air: 6 L at up to 200 psi, refilled from a shop compressor through the fill plug."
+},
+{
+"name": "Air tank left (6 L 200 psi)",
+"c": [
+46.00000005,
+163.0,
+360.0
+],
+"size": [
+360.00000009999997,
+152.0000002,
+160.00000020000004
+],
+"color": [
+0.12,
+0.12,
+0.13,
+1.0
+],
+"bom": "Air tank 6 L / 1.6 gal, 200 psi, 1/4 NPT (owner's AliExpress pick)",
+"kind": "cots",
+"purpose": "Stores the shot air: 6 L at up to 200 psi, refilled from a shop compressor through the fill plug."
+},
+{
+"name": "Tank strap left 86",
+"c": [
+86.0,
+163.0,
+364.0
+],
+"size": [
+25.0,
+157.0,
+157.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "1 in cam-buckle strap",
+"kind": "cots",
+"purpose": "Cam strap holding the tank in its saddles."
+},
+{
+"name": "Tank strap right 86",
+"c": [
+86.0,
+-163.0,
+364.0
+],
+"size": [
+25.0,
+157.0,
+157.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "1 in cam-buckle strap",
+"kind": "cots",
+"purpose": "Cam strap holding the tank in its saddles."
+},
+{
+"name": "Tank plug left 80",
+"c": [
+126.0,
+163.0,
+281.6
+],
+"size": [
+14.300000000000011,
+16.512217698823292,
+17.19999999999999
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass plug",
+"kind": "cots",
+"purpose": "Plugs a tank port that isn't used."
+},
+{
+"name": "Tank transducer 0-300 psi",
+"c": [
+126.0,
+-163.0,
+255.85
+],
+"size": [
+22.000000000000057,
+25.403411844343566,
+61.69999999999999
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Pressure transducer 0-300 psi, 0.5-4.5 V, 5 V, 1/8 NPT, stainless, with plug cable",
+"kind": "cots",
+"purpose": "PT1: reads tank pressure for the web UI and the safety node's 210 psi trip."
+},
+{
+"name": "Tank saddle left 200",
+"c": [
+200.0,
+163.0,
+304.8376081318116
+],
+"size": [
+28.0,
+136.00000000000003,
+46.07521626362313
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Tank saddle",
+"kind": "print",
+"purpose": "Printed cradle the tank sits in."
+},
+{
+"name": "Tank saddle right 200",
+"c": [
+200.0,
+-162.99999999999991,
+304.83760813181175
+],
+"size": [
+28.0,
+136.00000000000017,
+46.07521626362342
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Tank saddle",
+"kind": "print",
+"purpose": "Printed cradle the tank sits in."
+}
+]

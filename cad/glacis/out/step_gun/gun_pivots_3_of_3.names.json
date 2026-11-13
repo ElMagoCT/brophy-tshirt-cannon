@@ -1,0 +1,310 @@
+[
+{
+"name": "Axle spacer right",
+"c": [
+-40.0,
+-92.9375,
+656.0
+],
+"size": [
+19.0,
+31.52500000000002,
+19.0
+],
+"color": [
+0.22,
+0.23,
+0.26,
+1.0
+],
+"bom": "Axle spacer (printed)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Firing valve top (U.S. Solid USS-HSV04)",
+"c": [
+32.20284345803698,
+0.0,
+734.8299999999999
+],
+"size": [
+131.1,
+64.3,
+110.39999999999998
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Firing valve top: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi",
+"kind": "cots",
+"purpose": "Fires the cannon: opens to dump the chamber into the barrel."
+},
+{
+"name": "Firing valve bottom (U.S. Solid USS-HSV04)",
+"c": [
+32.20284345803698,
+0.0,
+577.1700000000001
+],
+"size": [
+131.1,
+64.3,
+110.39999999999998
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Firing valve bottom: U.S. Solid USS-HSV04 1 in NPT, 12 V DC, NC, pilot, 725 psi",
+"kind": "cots",
+"purpose": "Fires the cannon: opens to dump the chamber into the barrel."
+},
+{
+"name": "top nipple 1x1.50",
+"c": [
+99.50284345803698,
+0.0,
+706.63
+],
+"size": [
+38.10000000000001,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80",
+"kind": "cots",
+"purpose": "Close nipple joining the firing valve to the breech adapter."
+},
+{
+"name": "bottom nipple 1x1.50",
+"c": [
+99.50284345803698,
+0.0,
+605.37
+],
+"size": [
+38.10000000000001,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1 in NPT close nipple (1-1/2 in), seamless steel, Sch 80",
+"kind": "cots",
+"purpose": "Close nipple joining the firing valve to the breech adapter."
+},
+{
+"name": "Gun smoke tube",
+"c": [
+109.07642172901849,
+28.000000000001524,
+607.96
+],
+"size": [
+344.152843658037,
+86.00000020000304,
+126.0800002000002
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "Silicone tube 3/4 ID x 1 OD (ft)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Gun core left",
+"c": [
+109.95284380803703,
+37.24999999999988,
+656.0
+],
+"size": [
+242.6000007000001,
+73.50000020000023,
+205.46000019999997
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Gun core half (valve blocks + breech block + mantlet, printed)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Gun core right",
+"c": [
+109.95284380803703,
+-37.24999999999996,
+656.0
+],
+"size": [
+242.6000007000001,
+73.50000020000007,
+205.46000019999997
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Gun core half (valve blocks + breech block + mantlet, printed)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Breech adapter top",
+"c": [
+113.95284345803698,
+0.0,
+706.63
+],
+"size": [
+25.400000000000006,
+76.19999999999999,
+76.20000000000005
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Breech puck (2.5D CNC from 1 in 6061 plate, 1 in NPT tap)",
+"kind": "machined",
+"purpose": "Breech puck: 2.5D from 1 in 6061 plate, JB Welded in the barrel, 1 in NPT onto the valve nipple."
+},
+{
+"name": "Breech adapter bottom",
+"c": [
+113.95284345803698,
+0.0,
+605.37
+],
+"size": [
+25.400000000000006,
+76.19999999999999,
+76.20000000000005
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Breech puck (2.5D CNC from 1 in 6061 plate, 1 in NPT tap)",
+"kind": "machined",
+"purpose": "Breech puck: 2.5D from 1 in 6061 plate, JB Welded in the barrel, 1 in NPT onto the valve nipple."
+},
+{
+"name": "Smoke collar",
+"c": [
+301.6528434580369,
+-3.552713678800501e-15,
+656.0
+],
+"size": [
+60.000000200000045,
+93.2000002,
+194.46000019999997
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Smoke collar (printed, one piece)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Barrel top",
+"c": [
+564.8028434580369,
+0.0,
+706.63
+],
+"size": [
+914.4000002,
+76.20000019999999,
+76.20000019999998
+],
+"color": [
+0.88,
+0.93,
+0.98,
+0.4
+],
+"bom": "Barrel: clear polycarbonate tube 3 in OD x 1/8 wall",
+"kind": "stock",
+"purpose": "Polycarbonate barrel; smoke enters through six holes just ahead of the shirt."
+},
+{
+"name": "Barrel bottom",
+"c": [
+564.8028434580369,
+0.0,
+605.37
+],
+"size": [
+914.4000002,
+76.20000019999999,
+76.20000019999998
+],
+"color": [
+0.88,
+0.93,
+0.98,
+0.4
+],
+"bom": "Barrel: clear polycarbonate tube 3 in OD x 1/8 wall",
+"kind": "stock",
+"purpose": "Polycarbonate barrel; smoke enters through six holes just ahead of the shirt."
+},
+{
+"name": "Muzzle ring",
+"c": [
+1009.502843458037,
+-3.552713678800501e-15,
+656.0
+],
+"size": [
+25.0,
+93.2000002,
+194.46000019999997
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Muzzle ring (printed, one piece, LED groove)",
+"kind": "print",
+"purpose": ""
+}
+]

@@ -1,0 +1,310 @@
+[
+{
+"name": "In valve A (top cannon) inlet nipple (concept, on chamber)",
+"c": [
+-539.8644845696224,
+-2.6350477355663315e-11,
+706.6300000002622
+],
+"size": [
+34.0,
+21.939310229205788,
+19.0
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the top cannon's chamber until PT2 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "In valve A (top cannon) (concept, on chamber)",
+"c": [
+-514.8644845696224,
+28.999999999973653,
+689.6300000002622
+],
+"size": [
+40.0,
+76.0,
+82.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm",
+"kind": "cots",
+"purpose": "Meters air into the top cannon's chamber until PT2 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "In valve A (top cannon) outlet nipple (concept, on chamber)",
+"c": [
+-489.86448456962245,
+-2.6343371928305714e-11,
+706.6300000002622
+],
+"size": [
+34.0,
+21.939310229205788,
+19.0
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the top cannon's chamber until PT2 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "Chamber cross A (top cannon) (concept, on chamber)",
+"c": [
+-466.56448456962244,
+-2.6346924641984515e-11,
+706.6300000002622
+],
+"size": [
+33.00000000000006,
+33.0,
+20.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Chamber transducer A (top cannon) (concept, on chamber)",
+"c": [
+-466.56448456962244,
+40.64999999997365,
+706.6300000002622
+],
+"size": [
+22.000000000000114,
+61.7,
+25.403411844343736
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)",
+"kind": "cots",
+"purpose": "Chamber pressure sensor (PT2 top, PT3 bottom): the in valve meters against it."
+},
+{
+"name": "Chamber relief valve 200 psi A (top cannon) (concept, on chamber)",
+"c": [
+-466.56448456962244,
+-35.600000050026345,
+706.6300000002622
+],
+"size": [
+19.0,
+58.6000001,
+21.93931022920583
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Chamber cross A (top cannon) push-to-connect (concept, on chamber)",
+"c": [
+-446.16448456962246,
+-2.6350477355663315e-11,
+706.6300000002622
+],
+"size": [
+28.200000000000045,
+16.512217698823306,
+15.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "In valve B (bottom cannon) inlet nipple (concept, on chamber)",
+"c": [
+-489.0644845696225,
+-2.630695661309801e-11,
+605.370000000262
+],
+"size": [
+34.0,
+19.00000000000002,
+21.93931022920583
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the bottom cannon's chamber until PT3 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "In valve B (bottom cannon) (concept, on chamber)",
+"c": [
+-464.0644845696225,
+-17.000000000026304,
+576.370000000262
+],
+"size": [
+40.0,
+82.0,
+76.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "In valve: GOGO GPG-M03 2/2 NC direct-acting 12 V DC, G1/4, 2.5 mm",
+"kind": "cots",
+"purpose": "Meters air into the bottom cannon's chamber until PT3 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "In valve B (bottom cannon) outlet nipple (concept, on chamber)",
+"c": [
+-439.0644845696225,
+-2.630784479151771e-11,
+605.370000000262
+],
+"size": [
+34.0,
+19.00000000000002,
+21.93931022920583
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "G1/4 BSPP male x 1/4 NPT male hex nipple, 304",
+"kind": "cots",
+"purpose": "Meters air into the bottom cannon's chamber until PT3 reads its setpoint; closed, it isolates that chamber."
+},
+{
+"name": "Chamber cross B (bottom cannon) (concept, on chamber)",
+"c": [
+-415.7644845696225,
+-2.6297186650481308e-11,
+605.370000000262
+],
+"size": [
+33.00000000000006,
+33.0,
+20.0
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "1/4 NPT brass cross (ChillWaves)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Chamber transducer B (bottom cannon) (concept, on chamber)",
+"c": [
+-415.7644845696225,
+40.6499999999737,
+605.370000000262
+],
+"size": [
+22.000000000000114,
+61.70000000000001,
+25.40341184434351
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Pressure transducer 0-300 psi, 0.5-4.5 V, 1/8 NPT (+ 1/4 x 1/8 bushing)",
+"kind": "cots",
+"purpose": "Chamber pressure sensor (PT2 top, PT3 bottom): the in valve meters against it."
+},
+{
+"name": "Chamber relief valve 200 psi B (bottom cannon) (concept, on chamber)",
+"c": [
+-415.7644845696225,
+-35.600000050026296,
+605.370000000262
+],
+"size": [
+19.0,
+58.600000099999995,
+21.93931022920583
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "Relief valve 200 psi, 1/4 NPT male, ASME, ring pull, brass (Loner ST25-1A200, B0F4QP9CG2)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Chamber cross B (bottom cannon) push-to-connect (concept, on chamber)",
+"c": [
+-395.3644845696225,
+-2.6325608359911712e-11,
+605.370000000262
+],
+"size": [
+28.200000000000045,
+15.0,
+16.512217698823406
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": ""
+}
+]

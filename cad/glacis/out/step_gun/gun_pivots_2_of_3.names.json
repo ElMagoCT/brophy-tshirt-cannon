@@ -1,0 +1,310 @@
+[
+{
+"name": "Chamber inlet bung bottom",
+"c": [
+-92.24715654196301,
+-44.82435689533761,
+631.2493545197751
+],
+"size": [
+22.000000199999988,
+26.05375772686342,
+27.74385004370754
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber inlet: 1/4 NPT female steel weld-on bung",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Chamber inlet push-to-connect bottom",
+"c": [
+-92.24715654196301,
+-55.41373473352874,
+636.9994039956161
+],
+"size": [
+15.0,
+30.651916386721133,
+24.890676531154213
+],
+"color": [
+0.8,
+0.64,
+0.28,
+1.0
+],
+"bom": "DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Gun tube bottom",
+"c": [
+-79.5360782709815,
+-73.53202428993568,
+599.845
+],
+"size": [
+25.422156541963005,
+19.41404857987135,
+109.85000000000002
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "stock",
+"purpose": "1/4 in line inside the gun's core from the service loop to the chamber's fill push-to-connect."
+},
+{
+"name": "Gun tube top",
+"c": [
+-74.5360782709815,
+-69.53202428993568,
+604.25
+],
+"size": [
+35.422156541963005,
+27.41404857987135,
+118.66000000000008
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "DOT nylon tube 1/4 OD (ft)",
+"kind": "stock",
+"purpose": "1/4 in line inside the gun's core from the service loop to the chamber's fill push-to-connect."
+},
+{
+"name": "Chamber front disc top",
+"c": [
+-62.084656541963014,
+0.0,
+706.63
+],
+"size": [
+9.525000000000006,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)",
+"kind": "machined",
+"purpose": ""
+},
+{
+"name": "Chamber front disc bottom",
+"c": [
+-62.084656541963014,
+0.0,
+605.37
+],
+"size": [
+9.525000000000006,
+88.9,
+88.90000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber end disc: 3/8 in A36, 3.5 in OD (waterjet)",
+"kind": "machined",
+"purpose": ""
+},
+{
+"name": "Cradle plate left (1/8 Al)",
+"c": [
+-53.49715654196302,
+75.5875,
+656.0
+],
+"size": [
+489.5,
+3.1750000000000256,
+226.16000000000008
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Gun cradle plate (1/8 Al, CNC router)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Cradle plate right (1/8 Al)",
+"c": [
+-53.49715654196302,
+-75.5875,
+656.0
+],
+"size": [
+489.5,
+3.1750000000000256,
+226.16000000000008
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Gun cradle plate (1/8 Al, CNC router)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Chamber outlet nipple top",
+"c": [
+-41.44715654196301,
+0.0,
+706.63
+],
+"size": [
+50.800000000000004,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc",
+"kind": "stock",
+"purpose": "Close nipple joining the firing valve to the breech adapter."
+},
+{
+"name": "Chamber outlet nipple bottom",
+"c": [
+-41.44715654196301,
+0.0,
+605.37
+],
+"size": [
+50.800000000000004,
+33.4,
+33.40000000000009
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Chamber outlet: 1 in TOE nipple (half of a 1 x 4 in black nipple), welded through the front disc",
+"kind": "stock",
+"purpose": "Close nipple joining the firing valve to the breech adapter."
+},
+{
+"name": "Pivot axle stub left (1/2 hex)",
+"c": [
+-40.0,
+108.17500000000001,
+656.0
+],
+"size": [
+12.70000000000001,
+68.35000000000002,
+14.664696837416614
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1/2 in hex shaft, steel (pivot stub)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Pivot axle stub right (1/2 hex)",
+"c": [
+-40.0,
+-102.17500000000001,
+656.0
+],
+"size": [
+12.70000000000001,
+56.35000000000002,
+14.664696837416614
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "1/2 in hex shaft, steel (pivot stub)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Axle hub left",
+"c": [
+-40.0,
+92.9375,
+656.0
+],
+"size": [
+72.0,
+31.52500000000002,
+72.0
+],
+"color": [
+0.22,
+0.23,
+0.26,
+1.0
+],
+"bom": "Axle hub",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Elevation pulley 112T ring",
+"c": [
+-40.00000000000001,
+-88.675,
+656.0
+],
+"size": [
+183.2535362629228,
+23.0,
+183.2535362629228
+],
+"color": [
+0.22,
+0.23,
+0.26,
+1.0
+],
+"bom": "Elevation pulley 112T HTD 9 mm ring (printed)",
+"kind": "print",
+"purpose": ""
+}
+]

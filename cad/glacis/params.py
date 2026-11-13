@@ -130,16 +130,17 @@ FALCON_D, FALCON_L = 60.0, 89.9
 FALCON_FREE_RPM = 6380
 WHEEL_FREE_FPS = FALCON_FREE_RPM / RATIO * math.pi * 10 / 60 / 12
 FRAME_X = AX_X + WHEEL_R + 3.0 + RAIL_W     # outside face of the end rails
-# posts and arms (40x40): the arms sit on the posts, their top raised 14.6 mm (to 296.4) so a 40 mm arm clears the
-# wheels (8 mm or more at the -215 sled rail); the battery sleds and side tanks go up with them
-POST_H = 109.4                              # rail top to arm bottom
-ARM_TOP = RAIL_Z[1] + POST_H + SMALL_W      # 296.4
+# posts and arms (40x40): the arms sit on the posts, the sled rails' top raised 19.6 mm (to 301.4) so a 40 mm rail
+# clears the wheel's 127 mm swept circle by 8.2 mm at the -215 rail's near edge (the plan's 296.4 left 3.7); the battery
+# sleds go up with them
+POST_H = 114.4                              # rail top to arm bottom
+ARM_TOP = RAIL_Z[1] + POST_H + SMALL_W      # 301.4
 ARM_REACH = 262.0                           # |y| of the arms' outboard ends
 SLED_POST_X = (-332.0, -215.0)           # the rear one 12 mm back of the old -320: the valve cross's
                                             # line relief points at it
-TANK_POST_X = (-50.0, 180.0)                # the rear one 10 mm forward of the old -60 (a 40 mm post at -60 hits the rear
-                                            # Falcon); the front one 20 mm back of the old 200, so its arm clears the
-                                            # front wheel by 11.6 mm with the tank arms left at the old height:
+TANK_POST_X = (0.0, 165.0)                  # the rear one 60 mm forward of the old -60 (a 40 mm post at -60 hits the rear
+                                            # Falcon, and the tank's three bungs must fall between the arms); the front one 35 mm back of the old 200, so its arm clears the
+                                            # front wheel's swept circle by 8.2 mm with the tank arms at the old height:
 TANK_ARM_TOP = 281.8                        # raising the tanks 14.6 like the sleds puts them into the elevation motor
 TANK_POST_H = TANK_ARM_TOP - SMALL_W - RAIL_Z[1]
 CORNER_PLATE_X = FRAME_X - 70.0             # corner plates run from here to the frame's end (clear of the -332 post)
@@ -356,9 +357,10 @@ ELEV_MOTOR_X = PIVOT[0] + math.sqrt(ELEV_C ** 2 - (PIVOT[1] - ELEV_MOTOR_Z) ** 2
 
 # ------------------------------------------------------------------ pneumatics / power
 TANK_D, TANK_L = 152.0, 360.0               # owner's AliExpress 6 L / 1.6 gal 200 psi tank (bare shell)
-TANK_SIDE = (62.0, 163.0, TANK_ARM_TOP + 82.2)   # (x, |y|, z): reservoirs lying along x, left and right, above the
-                                            # front wheels (extrusion-4040: 16 mm forward of the old x 46 so the rear
-                                            # bung's plug clears the 40 mm rear tank arm; z 364 as before)
+TANK_SIDE = (47.5, 163.0, TANK_ARM_TOP + 82.2)   # (x, |y|, z): reservoirs lying along x, left and right, above the
+                                            # front wheels (extrusion-4040: 1.5 mm ahead of the old x 46: its bungs fall
+                                            # between and ahead of the 40 mm arms at x 0 and 165, its back end 1.4 mm
+                                            # ahead of the battery sleds; z 364 as before)
 BATT = (7.13 * IN, 3.01 * IN, 6.57 * IN)    # FRC battery L, W, H
 BELLY_Z = RAIL_Z[0]
 BATT_Z = ARM_TOP + 6.0                      # battery bottoms on their sleds (over the rear wheels; was 287.8)

@@ -271,7 +271,7 @@ def air():
                              f"Tank saddle {side} {xb:.0f}")
             add(f"Tank saddle {side} {xb:.0f}", sad, "print", "pneu", bom="Tank saddle", kind="print",
                 note="2 x M5 x 12 into T-nuts in the arm's top slots (before the tank goes in), plus the cam strap")
-        for xs in (tx - 40.0, tx + 40.0):
+        for xs in (tx - 114.5, tx + 40.0):                 # between the bungs, clear of the 40 mm saddles at x 0 and 165
             add(f"Tank strap {side} {xs:.0f}", tube(R + 2.5, R + 0.5, 25.0, (xs - 12.5, sgn * ty, tz), (1, 0, 0)), "black",
                 "pneu", bom="1 in cam-buckle strap")
     # rear manifold (200 psi zone), back bottom (Micah 2026-11-12): one ChillWaves cross lying flat. Fill check valve

@@ -1,0 +1,1718 @@
+[
+{
+"name": "Charge port (SB50 panel mount)",
+"c": [
+-389.53075287036415,
+-75.0,
+255.0
+],
+"size": [
+30.0,
+36.0,
+28.0
+],
+"color": [
+0.86,
+0.1,
+0.18,
+1.0
+],
+"bom": "Anderson SB50 panel-mount charge port",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "USB-C panel pass-through",
+"c": [
+-388.53075287036415,
+10.0,
+255.0
+],
+"size": [
+28.0,
+17.0,
+17.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "Panel-mount USB-C extension (to the main controller)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Main breaker 120 A",
+"c": [
+-373.8421939336139,
+-135.0,
+251.44021235782793
+],
+"size": [
+46.628452269510035,
+52.0,
+42.572654392783676
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "120 A main breaker (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Power distribution (REV PDH)",
+"c": [
+-318.5,
+0.0,
+119.6
+],
+"size": [
+103.0,
+173.0,
+36.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "REV PDH (owned) + ATO breakers / fuses (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Anderson SB50 left",
+"c": [
+-242.0,
+125.0,
+312.5
+],
+"size": [
+20.0,
+24.0,
+25.0
+],
+"color": [
+0.86,
+0.1,
+0.18,
+1.0
+],
+"bom": "Anderson SB50 pair + 6 AWG contacts (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Anderson SB50 right",
+"c": [
+-242.0,
+-125.0,
+312.5
+],
+"size": [
+20.0,
+24.0,
+25.0
+],
+"color": [
+0.86,
+0.1,
+0.18,
+1.0
+],
+"bom": "Anderson SB50 pair + 6 AWG contacts (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Inline ATO fuse holder (logic tap)",
+"c": [
+-240.5,
+88.5,
+109.1
+],
+"size": [
+45.0,
+15.0,
+15.0
+],
+"color": [
+0.86,
+0.1,
+0.18,
+1.0
+],
+"bom": "Inline ATO fuse holder + 5 A fuse",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Main controller ESP32-P4 + C6 (Waveshare)",
+"c": [
+-231.0,
+1.0,
+116.6
+],
+"size": [
+56.0,
+88.0,
+18.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Main controller ESP32-P4 + C6",
+"c": [
+-231.0,
+1.0,
+104.6
+],
+"size": [
+56.0,
+88.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "ESP32-S3 safety node",
+"c": [
+-228.5,
+63.0,
+115.1
+],
+"size": [
+69.0,
+28.0,
+15.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "ESP32-S3-DevKitC-1 N8R8 (owned)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray ESP32-S3 safety node",
+"c": [
+-228.5,
+63.0,
+104.6
+],
+"size": [
+69.0,
+28.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Battery sled left",
+"c": [
+-228.449,
+187.727,
+297.29999999999995
+],
+"size": [
+189.102,
+91.45400000000001,
+31.000000000000057
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Battery sled (pulls out its side's battery door)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "FRC battery left",
+"c": [
+-228.449,
+183.227,
+371.23900000000003
+],
+"size": [
+181.102,
+76.45400000000001,
+166.878
+],
+"color": [
+0.1,
+0.1,
+0.11,
+1.0
+],
+"bom": "FRC 12 V 18 Ah battery (owned, MK ES17-12)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Battery sled right",
+"c": [
+-228.449,
+-187.727,
+297.29999999999995
+],
+"size": [
+189.102,
+91.45400000000001,
+31.000000000000057
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Battery sled (pulls out its side's battery door)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "FRC battery right",
+"c": [
+-228.449,
+-183.227,
+371.23900000000003
+],
+"size": [
+181.102,
+76.45400000000001,
+166.878
+],
+"color": [
+0.1,
+0.1,
+0.11,
+1.0
+],
+"bom": "FRC 12 V 18 Ah battery (owned, MK ES17-12)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Spark MAX (elevation)",
+"c": [
+-228.0,
+-65.5,
+114.1
+],
+"size": [
+70.0,
+35.0,
+25.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "REV Spark MAX (owned)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "DS18B20 probe battery bay",
+"c": [
+-187.0,
+77.0,
+104.6
+],
+"size": [
+8.0,
+40.0,
+6.0
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "DS18B20 waterproof temperature probe",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "PWM expander PCA9685",
+"c": [
+-186.0,
+0.0,
+113.6
+],
+"size": [
+26.0,
+62.0,
+12.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "PWM expander: PCA9685 16-channel, I2C (Dorhea B07RMTN4NZ)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray PWM expander PCA9685",
+"c": [
+-186.0,
+0.0,
+104.6
+],
+"size": [
+26.0,
+62.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "DS18B20 probe electronics",
+"c": [
+-150.0,
+28.0,
+104.6
+],
+"size": [
+40.0,
+8.0,
+6.0
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "DS18B20 waterproof temperature probe",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog vent rear",
+"c": [
+-140.0,
+0.0,
+91.425
+],
+"size": [
+32.0,
+32.0,
+14.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Fog vent nozzle (under the belly)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "PDH contactor 200 A",
+"c": [
+-137.5,
+-65.0,
+136.6
+],
+"size": [
+75.0,
+60.0,
+70.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Battery relay A 200 A",
+"c": [
+-137.5,
+65.0,
+136.6
+],
+"size": [
+75.0,
+60.0,
+70.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "ADS1115 ADC 1 (pressures)",
+"c": [
+-97.0,
+-22.0,
+110.6
+],
+"size": [
+28.0,
+18.0,
+6.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray ADS1115 ADC 1",
+"c": [
+-97.0,
+-22.0,
+104.6
+],
+"size": [
+28.0,
+18.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "ADS1115 ADC 2 (battery and bus volts)",
+"c": [
+-65.0,
+-22.0,
+110.6
+],
+"size": [
+28.0,
+18.0,
+6.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray ADS1115 ADC 2",
+"c": [
+-65.0,
+-22.0,
+104.6
+],
+"size": [
+28.0,
+18.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Battery relay B 200 A",
+"c": [
+-59.5,
+-65.0,
+136.6
+],
+"size": [
+75.0,
+60.0,
+70.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Audio amp (TPA3255)",
+"c": [
+-34.0,
+58.5,
+116.6
+],
+"size": [
+122.0,
+73.0,
+30.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Valve arm relay 40 A",
+"c": [
+-1.0,
+-26.0,
+119.6
+],
+"size": [
+28.0,
+18.0,
+36.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "12 V 40 A SPDT relay + socket",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Audio boost 12-33 V 1200 W",
+"c": [
+55.0,
+-67.5,
+129.1
+],
+"size": [
+130.0,
+55.0,
+55.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "1200 W 20 A boost converter, 8-60 V in, 12-80 V out (set to 33 V)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Relay driver board (ULN2803A)",
+"c": [
+63.0,
+51.0,
+113.6
+],
+"size": [
+40.0,
+30.0,
+12.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "ULN2803A Darlington driver on a perfboard: the relay coils",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Relay driver board",
+"c": [
+63.0,
+51.0,
+104.6
+],
+"size": [
+40.0,
+30.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog relay 40 A core 1",
+"c": [
+63.0,
+24.0,
+119.6
+],
+"size": [
+28.0,
+18.0,
+36.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "12 V 40 A SPDT relay + socket (fog core)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Valve MOSFET module 2 (firing valve B)",
+"c": [
+63.0,
+-21.5,
+112.6
+],
+"size": [
+34.0,
+17.0,
+10.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Valve MOSFET module 2",
+"c": [
+63.0,
+-21.5,
+104.6
+],
+"size": [
+34.0,
+17.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog tube rear",
+"c": [
+65.0,
+-32.0,
+188.01250000000002
+],
+"size": [
+432.0,
+86.0,
+179.175
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "Fog tube (owner's flexible tube)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Fog relay 40 A core 2",
+"c": [
+85.0,
+83.0,
+119.6
+],
+"size": [
+18.0,
+28.0,
+36.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "12 V 40 A SPDT relay + socket (fog core, spare)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Valve MOSFET module 3 (in valve A)",
+"c": [
+102.0,
+-21.5,
+112.6
+],
+"size": [
+34.0,
+17.0,
+10.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Valve MOSFET module 3",
+"c": [
+102.0,
+-21.5,
+104.6
+],
+"size": [
+34.0,
+17.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Valve MOSFET module 1 (firing valve A)",
+"c": [
+114.0,
+86.5,
+112.6
+],
+"size": [
+34.0,
+17.0,
+10.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Valve MOSFET module 1",
+"c": [
+114.0,
+86.5,
+104.6
+],
+"size": [
+34.0,
+17.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Buck 12-5 V 20 A",
+"c": [
+122.0,
+45.0,
+114.1
+],
+"size": [
+50.0,
+56.0,
+25.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "12->5 V 20 A buck (B089M5R3NJ)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog loop (to gun)",
+"c": [
+126.237028277164,
+30.5,
+424.241391268248
+],
+"size": [
+296.925943445672,
+86.4,
+249.28278253649592
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "Silicone tube 3/4 ID x 1 OD (ft)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Fog and light MOSFET module 2 (fog heater)",
+"c": [
+134.0,
+-67.0,
+117.6
+],
+"size": [
+20.0,
+40.0,
+20.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Fog and light MOSFET module 2",
+"c": [
+134.0,
+-67.0,
+104.6
+],
+"size": [
+20.0,
+40.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Logic supply 5 V (buck-boost)",
+"c": [
+137.5,
+-30.0,
+112.6
+],
+"size": [
+25.0,
+26.0,
+10.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "Logic supply: 5 V 5 A buck-boost module, 3.6-32 V in",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Logic supply 5 V",
+"c": [
+137.5,
+-30.0,
+104.6
+],
+"size": [
+25.0,
+26.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Valve MOSFET module 4 (in valve B)",
+"c": [
+153.0,
+86.5,
+112.6
+],
+"size": [
+34.0,
+17.0,
+10.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Valve MOSFET module 4",
+"c": [
+153.0,
+86.5,
+104.6
+],
+"size": [
+34.0,
+17.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog and light MOSFET module 3 (fog heater 2)",
+"c": [
+158.0,
+-73.0,
+117.6
+],
+"size": [
+20.0,
+40.0,
+20.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Fog and light MOSFET module 3",
+"c": [
+158.0,
+-73.0,
+104.6
+],
+"size": [
+20.0,
+40.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Valve MOSFET module 5 (contactor (controller))",
+"c": [
+159.5,
+53.0,
+112.6
+],
+"size": [
+17.0,
+34.0,
+10.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Valve MOSFET module 5",
+"c": [
+159.5,
+53.0,
+104.6
+],
+"size": [
+17.0,
+34.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Valve MOSFET module 6 (contactor (safety node))",
+"c": [
+162.5,
+-31.0,
+112.6
+],
+"size": [
+17.0,
+34.0,
+10.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Valve MOSFET module 6",
+"c": [
+162.5,
+-31.0,
+104.6
+],
+"size": [
+17.0,
+34.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog and light MOSFET module 5 (fog blower)",
+"c": [
+192.0,
+-80.0,
+117.6
+],
+"size": [
+40.0,
+20.0,
+20.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Fog and light MOSFET module 5",
+"c": [
+192.0,
+-80.0,
+104.6
+],
+"size": [
+40.0,
+20.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog and light MOSFET module 1 (light bar)",
+"c": [
+195.0,
+79.0,
+117.6
+],
+"size": [
+40.0,
+20.0,
+20.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Fog and light MOSFET module 1",
+"c": [
+195.0,
+79.0,
+104.6
+],
+"size": [
+40.0,
+20.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog fluid tank",
+"c": [
+236.0,
+0.0,
+136.6
+],
+"size": [
+84.0,
+108.0,
+58.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Fog fluid tank (printed, about 400 mL)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog and light MOSFET module 4 (fog pump)",
+"c": [
+240.0,
+79.0,
+117.6
+],
+"size": [
+40.0,
+20.0,
+20.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Fog and light MOSFET module 4",
+"c": [
+240.0,
+79.0,
+104.6
+],
+"size": [
+40.0,
+20.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Smoke machine tray",
+"c": [
+270.0,
+0.0,
+114.6
+],
+"size": [
+172.0,
+132.0,
+26.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Smoke machine tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog blower 5015",
+"c": [
+270.0,
+0.0,
+244.6
+],
+"size": [
+50.0,
+50.0,
+14.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "12 V 5015 blower",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog splitter 1-3",
+"c": [
+270.0,
+0.0,
+275.6
+],
+"size": [
+44.0,
+88.0,
+48.00000000000003
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Fog splitter 1 -> 3 (printed)",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog bracket standoff 282 -54",
+"c": [
+282.0,
+-54.0,
+143.6
+],
+"size": [
+6.0,
+6.0,
+72.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "M5 aluminum standoff (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog bracket standoff 282 54",
+"c": [
+282.0,
+54.0,
+143.6
+],
+"size": [
+6.0,
+6.0,
+72.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "M5 aluminum standoff (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Thermocouple amp MAX6675",
+"c": [
+290.5,
+-2.5,
+111.6
+],
+"size": [
+15.0,
+25.0,
+8.0
+],
+"color": [
+0.12,
+0.42,
+0.3,
+1.0
+],
+"bom": "Thermocouple amp MAX6675 module (+ K probe on the core)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Board tray Thermocouple amp MAX6675",
+"c": [
+290.5,
+-2.5,
+104.6
+],
+"size": [
+15.0,
+25.0,
+6.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Printed board tray",
+"kind": "print",
+"purpose": ""
+},
+{
+"name": "Fog heater bracket (1/8 Al)",
+"c": [
+294.0,
+0.0,
+181.1
+],
+"size": [
+108.0,
+112.0,
+3.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "Fog heater bracket (1/8 Al)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Fog heater core L",
+"c": [
+294.5,
+22.0,
+200.6
+],
+"size": [
+97.0,
+32.0,
+36.0
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "Fog heater core 12 V 200 W (cast, 97 x 32 x 36 mm)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "DS18B20 probe fogger",
+"c": [
+305.0,
+-10.0,
+104.6
+],
+"size": [
+8.0,
+40.0,
+6.0
+],
+"color": [
+0.42,
+0.44,
+0.47,
+1.0
+],
+"bom": "DS18B20 waterproof temperature probe",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog pump L",
+"c": [
+312.0,
+32.0,
+124.6
+],
+"size": [
+56.0,
+36.0,
+34.0
+],
+"color": [
+0.08,
+0.08,
+0.09,
+1.0
+],
+"bom": "Fog fluid pump: Kamoer NKP 12 V peristaltic",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog tube front",
+"c": [
+319.39596209250607,
+65.03729233238329,
+187.84015126324226
+],
+"size": [
+119.20807581498786,
+51.92541533523344,
+178.8303025264845
+],
+"color": [
+0.3,
+0.55,
+0.85,
+1.0
+],
+"bom": "Fog tube (owner's flexible tube)",
+"kind": "stock",
+"purpose": ""
+},
+{
+"name": "Fog bracket standoff 342 -54",
+"c": [
+342.0,
+-54.0,
+143.6
+],
+"size": [
+6.0,
+6.0,
+72.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "M5 aluminum standoff (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog bracket standoff 342 54",
+"c": [
+342.0,
+54.0,
+143.6
+],
+"size": [
+6.0,
+6.0,
+72.0
+],
+"color": [
+0.74,
+0.76,
+0.79,
+1.0
+],
+"bom": "M5 aluminum standoff (stash)",
+"kind": "cots",
+"purpose": ""
+},
+{
+"name": "Fog vent front",
+"c": [
+368.0,
+80.0,
+91.425
+],
+"size": [
+32.0,
+32.0,
+14.0
+],
+"color": [
+0.94,
+0.94,
+0.95,
+1.0
+],
+"bom": "Fog vent nozzle (under bumper)",
+"kind": "print",
+"purpose": ""
+}
+]
