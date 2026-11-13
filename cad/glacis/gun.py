@@ -129,7 +129,9 @@ def _band_groove(part, xg, w=LED_GROOVE[0], d=LED_GROOVE[1]):
     """Cutter for an LED strip band round `part` at x = xg: everything outside the part's own section there, offset
     in by d, over width w (so it is open all the way round whatever the part's shape)."""
     sl = part.intersect(box(xg - w / 2, xg + w / 2, -1e3, 1e3, -1e3, 1e3))
-    f0 = min((f for f in sl.Faces() if abs(f.normalAt().x) > 0.99), key=lambda f: f.Center().x)
+    xs = min(f.Center().x for f in sl.Faces() if abs(f.normalAt().x) > 0.99)        # the slab's back face(s); if the
+    f0 = max((f for f in sl.Faces() if abs(f.normalAt().x) > 0.99 and abs(f.Center().x - xs) < 0.01),
+             key=lambda f: f.Area())                     # section is in pieces, the big one carries the outline
     fo = cq.Face.makeFromWires(f0.outerWire())
     b = fo.BoundingBox()
     sy, sz = (b.ylen - 2 * d) / b.ylen, (b.zlen - 2 * d) / b.zlen     # shrink the section by d each side
