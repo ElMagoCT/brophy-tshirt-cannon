@@ -80,21 +80,19 @@ def build(elev=P.ELEV_SHOW):
     # into the bottom of the gun's core just behind the pivot (they barely move as it swings). Their gun ends ride
     # with the gun; the rest is a slack coil, so the sweep check skips them.
     ex = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.GUN_EXITS]
+    tips = [pose(cq.Vertex.makeVertex(*t.toTuple()), elev).Center() for t, _ in gun.GUN_TIPS[-2:]]
     a, b = misc.CHECKS
     routes = {}
     for tag, c, e, dy in (("A (top cannon)", a, ex[0], 9.0), ("B (bottom cannon)", b, ex[1], -9.0)):
-        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 310.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e]
+        routes[f"Service loop {tag}"] = [c, V(c.x, c.y, 310.0), V(e.x - 70.0, e.y + dy, 380.0), V(e.x, e.y, e.z - 50.0), e,
+                                         tips[0 if tag.startswith("A") else 1]]
     fx = [pose(cq.Vertex.makeVertex(*p.toTuple()), elev).Center() for p in gun.FOG_EXITS]
     for f0, f1 in zip(misc.FOG_OUT, fx):
         routes["Fog loop (to gun)"] = [f0, V(f0.x, f0.y, f0.z + 40.0), V(f1.x + 60.0, f1.y, f1.z - 120.0), V(f1.x, f1.y, f1.z - 50.0), f1]
-    swing = [pose(p["local"], a) for p in PARTS if p["moving"] and p["name"].startswith("Chamber")
-             for a in range(int(P.ELEV_RANGE[0]), int(P.ELEV_RANGE[1]) + 1, 15)]    # QDs stay out of the gun's swing
     for tag, pts in routes.items():
         r = P.SMOKE_R if tag.startswith("Fog") else 3.175
         sh = misc.tube_path([p.toTuple() for p in pts], r=r)
-        if tag.startswith("Service loop"):
-            sh = sh.cut(misc.qd_inline(tag.split(" (")[0].replace("Service loop", "service loop"),
-                                       [p.toTuple() for p in pts[:3]], avoid=swing))
+        # no quick disconnects (Micah 2026-11-12): the push-to-connects come off if the gun has to
         misc.add_split(tag, sh, "tube", "pneu" if r < 5 else "power", start=pts[0].toTuple(),
                        bom="DOT nylon tube 1/4 OD (ft)" if r < 5 else "Silicone tube 3/4 ID x 1 OD (ft)", kind="stock")
     log(f"built {len(PARTS)} parts in {time.time() - t:.0f} s")
@@ -124,10 +122,10 @@ ALLOWED = [  # (name fragment A, name fragment B): contacts that are part of the
     ("Roller tread", "Roller core"),
     ("Pivot axle", "Pivot bearing"),            # hex inner race turns with the axle
     ("nipple", "manifold block"),               # threads into the block (modelled solid)
-    ("Main valve nipple", "Rear manifold cross"), ("Main valve nipple", "Main valve (1/4"),   # threads
+    ("Main valve nipple", "Rear manifold cross"), ("Main valve nipple", "Main valve (1/4"), ("Fill check valve", "Fill plug"),   # threads
     ("nipple", "Chamber"),                      # 1 in close nipple in the tank's end port
     ("tube", "push-to-connect"), ("tube", "Push-to-connect"), ("Tube", "push-to-connect"),
-    ("Service loop", "push-to-connect"), ("Tank elbow", "Air tank"), ("Gun tube", "Service loop"),
+    ("Service loop", "push-to-connect"), ("Tank push-to-connect", "Air tank"), ("Gun tube", "Service loop"),
     ("Fog loop", "Fog vent"), ("Fog loop", "Gun smoke tube"), ("Fog loop", "Fog splitter"), ("Fog tube", "Fog splitter"), ("Fog tube", "Fog vent"),
     ("Gun smoke tube", "Smoke collar"),
     ("In valve", "nipple"), ("Valve cross", "In valve"), ("Chamber outlet nipple", "Firing valve"), ("Chamber outlet nipple", "Chamber front disc"),   # threads / weld

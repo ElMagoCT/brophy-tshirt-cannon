@@ -178,7 +178,7 @@ def _cannon(k, xf):
     # Brophy Borealis welded chamber (Micah, 2026-11-10): half of a 1 x 4 in nipple (its threaded end into the valve)
     # welded through a 3/8 in A36 front disc (1.33 in hole), flush with the disc's inner face; 3 in Sch 40 plain-end
     # pipe between the two 3.5 in discs; the back disc is blank. The 1/4 NPT weld bung sits 1 in behind the front disc
-    # on the tube-lane side (-y), turned 30 deg toward the axis, with a swivel push-to-connect elbow.
+    # on the tube-lane side (-y), turned 30 deg toward the axis, with a straight push-to-connect (2026-11-12).
     # The transducer and relief moved to a cross after the in valve on the chassis (misc.air)
     e1, T = ENG["1"], P.CH_DISC_T
     xr0 = xv - hl                                            # the valve's rear face
@@ -221,11 +221,12 @@ def _cannon(k, xf):
         cyl(R_PIPE, 60, (xb_ - 30, 0, h), (1, 0, 0)))
     gadd(f"Chamber inlet bung {tag}", bung, "steel", bom="Chamber inlet: 1/4 NPT female steel weld-on bung", kind="stock",
          note="welded over a 1/2 in hole in the pipe wall")
-    out = V(1, 0, 0)                                         # forward, to where its tube drops out of the core
-    gadd(f"Chamber inlet elbow {tag}", PP.ptc_elbow(top, dn.toTuple(), out.toTuple()), "brass",
-         bom="DOT push-to-connect swivel elbow 1/4 tube x 1/4 NPT (Boeray)")
-    tip = top + dn * 13.0 + out * 16.0
-    return tip, ax0
+    # Micah 2026-11-12: straight push-to-connects only (no swivel elbows); its tube leaves along the bung's axis
+    gadd(f"Chamber inlet push-to-connect {tag}", PP.ptc_straight(top, dn.toTuple()), "brass",
+         bom="DOT push-to-connect 1/4 tube x 1/4 NPT (Boeray)")
+    tip = top + dn * 18.0
+    GUN_TIPS.append((tip, tip + dn * 14.0))
+    return tip + dn * 14.0, ax0
 
 
 def _build(xv):
@@ -498,6 +499,7 @@ def build(log=print):
     """Build once, find the centre of mass, shift the cannons so it sits on the axle, rebuild, register."""
     xv = P.X_VALVE
     for _ in range(3):
+        GUN_TIPS.clear()
         exits, fogs = _build(xv)
         mtot = sum(_mass(p) for p in LOCAL)
         cg = sum(_mass(p) * p["shape"].Center().x for p in LOCAL) / mtot
@@ -516,6 +518,7 @@ def build(log=print):
 
 
 GUN_EXITS, FOG_EXITS, BALANCE, CH_VOL = [], [], {}, [0.0, 0.0]
+GUN_TIPS = []                                                # (push-to-connect tube end, lead point) per chamber
 
 
 def sweep_profile(step=2.5, margin=10.0, ybins=None):
