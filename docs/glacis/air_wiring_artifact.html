@@ -268,9 +268,8 @@ details.sys > summary .num { font: 600 13px var(--mono) }
       <div class="dgwrap"><svg class="dg" id="el-svg" viewBox="0 0 1240 820" role="img" aria-label="Electrical schematic with power lines, data lines and every transistor"></svg></div>
       <p class="status" id="el-status" aria-live="polite"></p>
       <div class="strip" id="el-ctl">
-        <span class="ci"><span class="k">Breaker</span><button type="button" class="tog" id="e-breaker" aria-pressed="true">On</button></span>
+        <span class="ci" title="The 120 A main breaker's red trip button on the rear panel is the kill switch"><span class="k">Kill (main breaker)</span><button type="button" class="tog" id="e-breaker" aria-pressed="true">On</button></span>
         <span class="ci" title="Battery A stays at 12.6 V"><label for="e-vb">Battery B</label><input type="range" id="e-vb" min="11.4" max="13.4" step="0.1" value="12.6"><output id="e-vb-o">12.6 V</output></span>
-        <span class="ci"><span class="k">Rear E-stop</span><button type="button" class="tog danger" id="e-rear" aria-pressed="false">Released</button></span>
         <span class="ci"><span class="k">Remote</span><button type="button" class="tog" id="e-link" aria-pressed="true">Link up</button><button type="button" class="tog danger" id="e-rstop" aria-pressed="false">E-stop</button></span>
         <span class="sep"></span>
         <span class="ci"><span class="k">Dashboard</span><button type="button" class="tog" id="e-enable" aria-pressed="true">Enabled</button><button type="button" class="tog" id="e-arm" aria-pressed="false">Valves safe</button></span>
@@ -455,10 +454,10 @@ const P = {
   batrelay: { name: "Battery relay 200 A ×2", img: "contactor.jpg", bom: "contactor + battery relays", what: "One in each battery's + lead, between its SB50 and the bus. The firmware keeps both closed while the packs are within 0.3 V. Further apart, only the fuller pack stays connected, so a fresh battery never dumps 20–40 A into a flat one; the other closes when the fuller one, read under load, comes within 0.3 V.", facts: [["Part", "The same 200 A relay as the contactor; 3 bought"], ["Coil", "About 0.15 A, on a ULN2803 channel driven by the PCA9685"], ["Default", "Normally open: at power-up, or with a dead controller, both are open"], ["Charging", "Bus over 13.4 V: the emptier pack takes the charge first"], ["Swap", "Tap Swap A/B on the dashboard and that relay opens first"], ["Why two", "With one, a fuller pack on the unswitched side could never be held off"]] },
   bypass: { name: "Bypass resistor 4.7 Ω 5 W ×2", icon: "resistor", bom: "battery relay bypass", what: "One across each battery relay. It feeds the logic rail and boots the controller while both relays are open, and trickle-balances the packs at well under 1 A.", facts: [["Drop", "About 1 V at standby draw"], ["Heat", "Under 1 W each in the worst case"], ["Pack", "10; 2 used"]] },
   sb50: { name: "Charge port, SB50", icon: "sb50", bom: "sb50 flush", what: "On the bus, so it charges in standby without pulling batteries.", facts: [] },
-  breaker: { name: "120 A main breaker (stash)", icon: "breaker", bom: "rev pdh", what: "The main-line manual kill: everything, logic included.", facts: [], owned: true },
+  breaker: { name: "120 A main breaker (stash)", icon: "breaker", bom: "rev pdh", what: "The kill switch, on the rear panel. Its red trip button opens the main line, so everything dies, the logic rail included. Reset it with its lever. There is no separate rear E-stop.", facts: [["Kill", "Red trip button, rear panel"], ["Reset", "Lever"]], owned: true },
   logic: { name: "5 V logic supply (buck-boost)", icon: "logic", bom: "logic supply", what: "Always-on 5 V for the controller, safety node and sensors, tapped ahead of the contactor, so status reads with the PDH dead.", facts: [["In", "3.6–32 V (a drive sag can't reset it)"], ["Out", "5 V 5 A: pick the '5V' option"]] },
-  contactor: { name: "Contactor 200 A", img: "contactor.jpg", bom: "contactor + battery relays", what: "The power cut-off between the breaker and the PDH. Its coil runs through the rear E-stop, the safety node's switch and the controller's switch in series, so any one of them kills drive, valves, LEDs, audio and fog.", facts: [["Rating", "200 A continuous, 12 V, 4-pin, isolated coil"], ["Bought", "3: this one and the two battery relays"]] },
-  estop: { name: "Rear E-stop (LA38, 2 NC)", icon: "estop", bom: "mushroom e-stop", what: "Contact 1 opens the contactor coil (everything switched dies); contact 2 opens the valve arm relay coil. Hardwired: no software can hold power on. The second one on the list goes in the handheld remote.", facts: [["Contacts", "2 × NC, about 10 A each"]] },
+  contactor: { name: "Contactor 200 A", img: "contactor.jpg", bom: "contactor + battery relays", what: "The power cut-off between the breaker and the PDH. Its coil runs from the logic tap through the safety node's switch and the controller's switch in series, so either one kills drive, valves, LEDs, audio and fog.", facts: [["Rating", "200 A continuous, 12 V, 4-pin, isolated coil"], ["Bought", "3: this one and the two battery relays"]] },
+  estop: { name: "Remote E-stop (LA38 mushroom)", icon: "estop", bom: "mushroom e-stop", what: "In the handheld remote. Pressing it makes the remote tell the safety node over ESP-NOW, which opens its switch in the contactor coil line (everything switched dies; logic stays up). There is no rear E-stop: on the robot, the main breaker's red button is the kill.", facts: [["Qty", "1, in the remote"], ["Contacts", "2 × NC, about 10 A each"]] },
   pdh: { name: "REV PDH (stash)", icon: "pdh", bom: "rev pdh", what: "Breakered channels for every switched load; dead when the contactor is open.", facts: [], owned: true },
   falcon: { name: "Falcon 500 ×4 (yours)", icon: "motor", bom: "falcon 500 (owned)", what: "Drive. Plain PWM from the PCA9685; no gate, the contactor is the cut-off.", facts: [["Draw", "Up to 40 A each"]], owned: true },
   spark: { name: "Spark MAX + goBILDA 312 rpm", icon: "gearmotor", bom: "spark max", what: "Gun elevation, 0–90°. PWM from the PCA9685; the 10k pot on the left pivot stub reads the angle.", facts: [["Belt", "16T → 112T ring pulley on the right cradle plate (7:1)"], ["At the gun", "About 45 rpm free, 16.7 N·m stall; backdrives when off"]], owned: true },
@@ -476,7 +475,7 @@ const P = {
   core: { name: "Fog heater core 200 W", icon: "heater", bom: "fog heater core", what: "Two MOSFET channels in parallel switch it to hold 220–240 °C; the firmware cuts it at 245 °C.", facts: [["Draw", "About 17.5 A, on its own 30 A PDH channel"]] },
   pump: { name: "Fog pump", icon: "pump", bom: "peristaltic", what: "Meters fluid into the core.", facts: [["Flow", "70 mL/min"]] },
   blower: { name: "5015 blower", icon: "fan", bom: "5015 blower", what: "Pushes fog to the barrel collar and trail vents.", facts: [["Flow", "6.5 CFM, 2.16 W"]] },
-  armrelay: { name: "Valve arm relay", icon: "relay", bom: "40 a relay", sec: "CONTROLS, FAILSAFE + POWER", what: "Feeds the valve rail from the PDH. Its coil goes through the rear E-stop's 2nd contact; the controller arms it through the ULN2803A.", facts: [] },
+  armrelay: { name: "Valve arm relay", icon: "relay", bom: "40 a relay", sec: "CONTROLS, FAILSAFE + POWER", what: "Feeds the valve rail from the PDH. Its coil is fed from the PDH too, so it drops with the contactor; the controller arms it through the ULN2803A.", facts: [] },
   ctrl: { name: "Main controller: Waveshare ESP32-P4-Module-DEV-KIT", icon: "ctrl", bom: "main controller", what: "Runs the whole robot: web UI and WebSocket, valves and chamber metering, the elevation loop, every LED strip, audio out of its own speaker amp, the contactor and, through the PCA9685, the battery relays. WiFi comes from the ESP32-C6 on the same board.", facts: [["Chips", "ESP32-P4 + ESP32-C6"], ["WiFi", "2.4 GHz WiFi 6 only"], ["Ports", "4 USB-A, 2 USB-C, RJ45 (PoE header)"], ["Header", "40-pin Pi-style, 28 GPIO"], ["Audio", "ES8311 codec + NS4150B 2 W speaker amp, mic"], ["Size", "85 × 56 mm"], ["Power", "5 V from the logic rail on its SH1.0 header"]], extra: CTRL_EXTRA },
   pca: { name: "PWM expander, PCA9685", icon: "pca", bom: "pca9685", what: "I2C, 16 PWM channels, 12 used: drive PWM to the 4 Falcons and the Spark MAX, fog heater ×2, pump, blower, light bar, both battery relays. Valves, LED data and the contactor stay on the controller's own pins, for timing and safety.", facts: [["Why", "28 header pins can't take about 38 signals; this frees 12"], ["Frequency", "One for all 16: about 200 Hz suits the Falcons, Spark MAX and light bar; on/off loads use full-on and full-off"], ["Fail-off", "OE is pulled up and held low by the controller: a reset or crash turns every output off"]] },
   safety: { name: "Safety node (your ESP32-S3)", icon: "safety", bom: "esp32-s3 boards", what: "Holds the contactor coil only while the remote's and the controller's heartbeats are alive.", facts: [["Link", "ESP-NOW, 20 ms heartbeats, 200 ms trip"]], owned: true },
@@ -524,18 +523,19 @@ const SYS = {
       chain: CANNON("chamB"), notes: ["Same build as the top cannon, 2 in shorter. The two sit 101 mm apart on centres, 25.1 mm between the barrels.", "Both chambers come out of one 24 in pipe with 0.2 in to spare."] }
   ],
   el: [
-    { id: "power", name: "Power + kill path", what: "Batteries and their relays, breaker, contactor, E-stops, safety node.", parts: ["bat", "batrelay", "bypass", "sb50", "breaker", "logic", "contactor", "estop", "pdh", "safety", "remote"], keys: ["frc 12 v battery", "contactor + battery relays", "battery relay bypass", "sb50", "rev pdh", "logic supply", "mushroom e-stop", "safety remote", "esp32-s3 boards", "ato fuse"],
-      notes: ["<b>Where the E-stop goes:</b> in the contactor's coil circuit, a hardwired power wire, not data. It can't sit in the main power line: a 22 mm E-stop's contacts are rated about 10 A and the main line peaks near 160 A. The contactor does the heavy switching; the E-stop cuts its coil, so no software can hold power on.",
-        "The 120 A breaker is the main-line manual kill, and it kills logic too.",
-        "On an E-stop the logic rail stays up, so the dashboard keeps showing pressures; nothing on it can move or fire.",
-        "Coil chain: fused 12 V → rear E-stop contact 1 → coil → safety node's switch → controller's switch → ground. Both switches are channels of the MOSFET 10-pack.",
+    { id: "power", name: "Power + kill path", what: "Batteries and their relays, the main breaker (the kill), contactor, remote E-stop, safety node.", parts: ["bat", "batrelay", "bypass", "sb50", "breaker", "logic", "contactor", "estop", "pdh", "safety", "remote"], keys: ["frc 12 v battery", "contactor + battery relays", "battery relay bypass", "sb50", "rev pdh", "logic supply", "mushroom e-stop", "safety remote", "esp32-s3 boards", "ato fuse"],
+      notes: ["<b>The kill switch is the 120 A main breaker</b> (Micah, 12 Nov): its red trip button on the rear panel opens the main line, so everything dies, the logic rail included. Reset it with its lever. There is no rear E-stop any more.",
+        "Rear panel, one tight row: main breaker, SB50 charge port, fill plug, USB-C.",
+        "The handheld remote keeps its own mushroom E-stop: ESP-NOW to the safety node, which opens its switch in the contactor coil. On a remote E-stop the logic rail stays up, so the dashboard keeps showing pressures; nothing on it can move or fire.",
+        "Coil chain: logic tap (5 A fuse) → coil → safety node's switch → controller's switch → ground. Both switches are channels of the MOSFET 10-pack.",
+        "The valve arm relay's coil is fed from the PDH and armed by the controller, so it drops with the contactor.",
         "<b>Battery relays:</b> each battery's + lead goes through its own 200 A relay to the bus, with a 4.7 Ω 5 W resistor across it. Within 0.3 V both are closed; further apart only the fuller pack is connected. They are not part of the kill path: they are normally open, so a dead controller opens both, the resistors keep the logic rail fed, and the contactor drops anyway."] },
     { id: "ctrl", name: "Controller", what: "One Waveshare ESP32-P4 + C6 board, a PCA9685 for the slow outputs, two ADS1115s.", parts: ["ctrl", "pca", "sensors", "shift", "usbc", "browser"], keys: ["main controller", "pca9685", "ads1115", "74ahct125", "usb-c", "resistors and caps"], notes: ["2.4 GHz WiFi 6 only, so the access point runs 2.4 GHz."], extra: CTRL_EXTRA },
     { id: "drive", name: "Drive + elevation", what: "Four Falcons and the gun's elevation motor, 0–90°.", parts: ["falcon", "spark", "pca"], keys: ["falcon 500", "spark max", "gobilda", "htd 5m", "10k linear pot", "wcp-0319", "wcp-0783"], notes: ["Plain PWM from the PCA9685, about 200 Hz. With the contactor open they have no power at all.", "A controller reset releases the PCA9685's output enable, so every PWM output goes off."] },
     { id: "leds", name: "LEDs", what: "About 1,680 WS2812B on 8 data lanes.", parts: ["ledbuck", "leds", "shift", "lightbar"], keys: ["ws2812b", "5 v 20 a buck", "74ahct125", "light bar"], notes: ["Capped at 20% white in firmware (sun heat in the tunnels).", "8 lanes: about 6 ms a frame instead of 50 on one line."] },
     { id: "audio", name: "Audio", what: "Horn and effects from the controller's own speaker output to two sirens.", parts: ["boost", "amp", "tap", "speaker"], keys: ["1200 w 20 a boost", "tpa3255", "speaker tap", "siren speaker", "speaker cups"], notes: ["The controller mixes everything and sets the volume in software; the amp's gain pot sets the top end.", "About 70 W a speaker on 33 V.", "Phone music has no part on the list any more: the Bluetooth board is gone, and the C6 on the controller is Bluetooth LE only. Anything that plays has to come from the controller itself."] },
     { id: "fog", name: "Fog", what: "Relay master switch, heater on two channels, pump, blower.", parts: ["fogrelay", "core", "pump", "blower", "mosfet"], keys: ["fog heater core", "peristaltic", "5015", "max6675", "xkc-y25", "ds18b20", "ksd301", "silicone tube", "fog fluid", "SMOKE|40 a relay", "6 pcs with heat sinks"], notes: ["KSD301 250 °C cutout in the relay's coil line is the hardware backstop.", "Heater, pump and blower switch through the MOSFET 6-pack, driven by the PCA9685."] },
-    { id: "valves", name: "Valves", what: "Arm relay → valve rail → four valve MOSFETs.", parts: ["armrelay", "uln", "mosfet", "hsv04", "inv"], keys: ["3.3-20 v trigger", "uln2803", "CONTROLS, FAILSAFE + POWER|40 a relay", "gogo gpg-m03", "hsv04"], notes: ["The four valve channels stay on the controller's own pins, not the PCA9685: timing and safety.", "A flyback diode across each valve coil.", "The arm relay dies with the contactor, and E-stop contact 2 is in its coil, so a stuck MOSFET can't fire a disarmed gun."] },
+    { id: "valves", name: "Valves", what: "Arm relay → valve rail → four valve MOSFETs.", parts: ["armrelay", "uln", "mosfet", "hsv04", "inv"], keys: ["3.3-20 v trigger", "uln2803", "CONTROLS, FAILSAFE + POWER|40 a relay", "gogo gpg-m03", "hsv04"], notes: ["The four valve channels stay on the controller's own pins, not the PCA9685: timing and safety.", "A flyback diode across each valve coil.", "The arm relay's coil is fed from the PDH, so it dies with the contactor, and the controller has to arm it: a stuck valve MOSFET can't fire a disarmed gun."] },
     { id: "sensors", name: "Sensors", what: "Pressures, angle, volts, temperatures, fluid.", parts: ["sensors", "pt"], keys: ["pressure transducer", "ads1115", "max6675", "xkc-y25", "ds18b20", "10k linear pot", "resistors and caps"], notes: ["All on the always-on 5 V rail: they read in standby.", "The chamber transducers are on the chassis, so their wires never cross the pivot."] }
   ]
 };
@@ -906,15 +906,14 @@ function drawTraj() {
 }
 
 /* ================================================================== ELECTRONICS SIM */
-const E = { breaker: true, rear: false, link: true, rstop: false, enable: true, arm: false, drive: 0, led: "glow", bright: 20, bar: 0, fog: "off", music: false, honkT: -1e6, va: 12.6, vb: 12.6 };
+const E = { breaker: true, link: true, rstop: false, enable: true, arm: false, drive: 0, led: "glow", bright: 20, bar: 0, fog: "off", music: false, honkT: -1e6, va: 12.6, vb: 12.6 };
 function elecState() {
   const logic = E.breaker, safetyOK = logic && E.link && !E.rstop;
-  const contactor = logic && E.enable && safetyOK && !E.rear, vrail = contactor && E.arm;
+  const contactor = logic && E.enable && safetyOK, vrail = contactor && E.arm;
   /* battery relays: both closed while the packs are within 0.3 V, else only the fuller one; normally open, so no controller = both open */
   const dv = E.va - E.vb, relA = logic && dv > -0.305, relB = logic && dv < 0.305;
   let why = "";
-  if (!E.breaker) why = "Main breaker is off: everything is dead, logic included.";
-  else if (E.rear) why = "Rear E-stop pressed: its contact opened the contactor coil, PDH dead.";
+  if (!E.breaker) why = "Kill switch: the main breaker's red button is tripped, so everything is dead, logic included. Reset it with its lever.";
   else if (E.rstop) why = "Remote E-stop pressed: the safety node opened its switch in the coil line.";
   else if (!E.link) why = "Remote link lost: after 200 ms the safety node opened the coil line.";
   else if (!E.enable) why = "Robot disabled from the dashboard: contactor open.";
@@ -953,7 +952,7 @@ function buildElec() {
   s.push(`<rect x="222" y="160" width="24" height="14" rx="3" fill="var(--sheet)" stroke="var(--ink)" stroke-width="1.3"/><text class="sm" x="252" y="171">5 A</text>`);
   s.push(W("w-pdh", "p12", "M328 76H346"));
   s.push(`<rect id="pdh-bar" x="346" y="40" width="18" height="580" rx="4" fill="var(--power)"/><g class="tile" data-part="pdh" tabindex="0" role="button" aria-label="PDH: details"><rect x="340" y="40" width="30" height="580" fill="transparent"/></g><text class="sm" x="355" y="636" text-anchor="middle">PDH</text>`);
-  s.push(W("w-coil", "p12 thin", "M246 167H300V282M300 328V350M300 388V424M300 456V544"));
+  s.push(W("w-coil", "p12 thin", "M246 167H300V350M300 388V424M300 456V544"));
   s.push(`<path class="sym" id="coil" d="${coilPath(300, 350, 388)}"/><path class="data" d="M308 369H330V106" style="stroke-dasharray:3 3"/><text class="sm" x="292" y="372" text-anchor="end">contactor coil</text>`);
   s.push(mos("m-safe", 300, 440, "", false), mos("m-coil", 300, 560, ""));
   s.push(`<text class="sm" x="290" y="420" text-anchor="end">safety node switch</text><text class="sm" x="290" y="542" text-anchor="end">controller switch</text>`);
@@ -970,7 +969,7 @@ function buildElec() {
   s.push(D("M422 688V257H490"), D("M429 688V343H582"), D("M520 688V630H625V620"), D("M540 688V652H978M678 652V608M778 652V608M878 652V608M978 652V608"));
   s.push(D("M566 257H604V230"), D("M612 332V326"));
   s.push(D("M370 760H272V560H278"), D("M370 775H140V490H160"), D("M250 466H262V440H278"));
-  s.push(D("M532 556V572M532 588V604H590"), D("M640 596V500H722V384"));
+  s.push(D("M532 556V604H590"),D("M640 596V500H722V384"));
   s.push(D("M660 710H630"), D("M630 786H1060V760H1080", "rf"), D("M630 740H650", "later"));
   s.push(chip("c-pca", 370, 644, 48, 22, "PCA9685", "pca"));
   s.push(dtag(436, 76, "PWM ×4"), dtag(436, 150, "PWM"), dtag(436, 257, "LED ×8"), dtag(436, 343, "SPK+"), dtag(436, 488, "sw ×5"), dtag(566, 652, "gate ×4"), dtag(316, 655, "bat ×2"));
@@ -982,12 +981,10 @@ function buildElec() {
   s.push(`<text class="sm" x="14" y="262">battery relay coils:</text><text class="sm" x="14" y="275">PCA9685 → ULN2803A</text><text class="sm" x="14" y="288">4.7 Ω across each relay</text>`);
   s.push(tile("sb50", 20, 172, 100, 38, "Charge port", "SB50, on the bus"));
   s.push(tile("breaker", 150, 50, 74, 52, "", "", { gid: "g-breaker" }));
-  s.push(`<text x="187" y="42" text-anchor="middle">120 A breaker</text>`);
+  s.push(`<text x="187" y="42" text-anchor="middle">120 A breaker</text><text class="sm" x="187" y="116" text-anchor="middle">kill button</text>`);
   s.push(tile("contactor", 244, 46, 84, 60, "", "", { gid: "g-contactor" }));
   s.push(`<text x="286" y="38" text-anchor="middle">Contactor</text><text class="val" id="cont-v" x="286" y="122" text-anchor="middle">–</text>`);
   s.push(tile("logic", 194, 196, 80, 52, "5 V logic", "always on", { gid: "g-logic" }));
-  s.push(tile("estop", 266, 282, 68, 46, "", "", { gid: "g-estop" }));
-  s.push(`<text x="258" y="300" text-anchor="end">Rear E-stop</text><text class="sm" x="258" y="313" text-anchor="end">contact 1, in the coil</text>`);
   s.push(tile("remote", 20, 452, 96, 48, "Remote (C3)", "", { gid: "g-remote" }));
   s.push(`<g id="espnow" fill="none" stroke="var(--rf)" stroke-width="2"><path d="M120 458q7 4 0 12"/><path d="M127 454q12 8 0 20"/><path d="M134 450q17 12 0 28"/></g>`);
   s.push(tile("safety", 160, 452, 90, 48, "Safety node (S3)", "", { gid: "g-safety" }));
@@ -1013,7 +1010,7 @@ function buildElec() {
   s.push(`<text x="1064" y="384">Light bar + fog</text><text class="val" id="bar-v" x="1064" y="400"></text><text class="val" id="fog-v" x="1064" y="414"></text>`);
   s.push(tile("armrelay", 500, 512, 64, 40, "", "", { gid: "g-armrelay" }));
   s.push(`<text class="sm" x="532" y="508" text-anchor="middle">arm relay</text>`);
-  s.push(`<path class="sym" d="M526 572h12M526 588h12M532 572V566M532 588V594M523 580h18" style="stroke-width:1.4"/><text class="sm" x="520" y="584" text-anchor="end">E-stop 2</text>`);
+  s.push(`<text class="sm" x="524" y="584" text-anchor="end">coil: PDH</text>`);
   s.push(chip("c-uln", 590, 596, 70, 24, "ULN2803A", "uln"));
   s.push(tile("hsv04", 668, 544, 64, 40, "", "", { gid: "g-evA" }), tile("hsv04", 768, 544, 64, 40, "", "", { gid: "g-evB" }));
   s.push(tile("inv", 868, 544, 64, 40, "", "", { gid: "g-ivA" }), tile("inv", 968, 544, 64, 40, "", "", { gid: "g-ivB" }));
@@ -1048,7 +1045,7 @@ function renderElec() {
   dead("g-relA", !st.relA); dead("g-relB", !st.relB);
   $("#espnow").style.opacity = st.logic && E.link ? 1 : 0.15;
   const mon = (id, v) => { const m = $("#" + id); if (m) m.classList.toggle("on", !!v); };
-  mon("m-safe", st.safetyOK); mon("m-coil", st.logic && E.enable && !E.rear && st.safetyOK);
+  mon("m-safe", st.safetyOK); mon("m-coil", st.logic && E.enable && st.safetyOK);
   mon("m-bar", st.pdh && E.bar > 0); mon("m-h1", st.pdh && E.fog !== "off"); mon("m-h2", st.pdh && E.fog !== "off");
   mon("m-pump", st.pdh && E.fog === "puff"); mon("m-blow", st.pdh && E.fog === "puff");
   mon("m-fA", st.vrail && now - A.fireT.A < 400); mon("m-fB", st.vrail && now - A.fireT.B < 400); mon("m-iA", st.vrail && A.inv.A); mon("m-iB", st.vrail && A.inv.B);
@@ -1068,10 +1065,10 @@ function renderElec() {
     a += E.bar * 6 + (E.fog === "heat" ? 9 : E.fog === "puff" ? 18.1 : 0) + 0.5 + (E.music ? 5 : 0) + (now - E.honkT < 700 ? 14 : 0) + (st.vrail && (A.inv.A || A.inv.B) ? 1.5 : 0);
   }
   $("#amps-v").textContent = a.toFixed(1) + " A";
-  $("#run-v").textContent = !st.logic ? "breaker off" : a < 0.8 ? "standby: lasts days" : `about ${Math.round(10.8 * nRel / a * 60)} min at this draw${nRel < 2 ? ", on one pack" : ""}`;
+  $("#run-v").textContent = !st.logic ? "breaker tripped" : a < 0.8 ? "standby: lasts days" : `about ${Math.round(10.8 * nRel / a * 60)} min at this draw${nRel < 2 ? ", on one pack" : ""}`;
   tog($("#e-arm"), st.vrail, "Valves armed", "Valves safe");
   const bal = st.logic && nRel < 2 ? ` Battery ${st.relA ? "B" : "A"} is ${Math.abs(st.dv).toFixed(1)} V lower, so its relay stays open until the packs are within 0.3 V; the robot runs on the fuller one.` : "";
-  sayE((st.vrail ? "<b>Everything live:</b> the valves are armed." : st.contactor ? "<b>Robot enabled:</b> PDH live, valves safe." : `<b>${esc(st.why)}</b>${st.logic ? " The logic rail stays up, so the dashboard still shows pressures, temperatures and battery." : " Both battery relays drop open; the bypass resistors still tie the packs to the bus."}${!E.enable && E.breaker && !E.rear && !E.rstop && E.link ? " It stays off after a trip until you press Enable." : ""}`) + bal);
+  sayE((st.vrail ? "<b>Everything live:</b> the valves are armed." : st.contactor ? "<b>Robot enabled:</b> PDH live, valves safe." : `<b>${esc(st.why)}</b>${st.logic ? " The logic rail stays up, so the dashboard still shows pressures, temperatures and battery." : " Both battery relays drop open; the bypass resistors still tie the packs to the bus."}${!E.enable && E.breaker && !E.rstop && E.link ? " It stays off after a trip until you press Enable." : ""}`) + bal);
 }
 function ledFrame(now) {
   const st = elecState(), on = st.pdh && E.led !== "off", b = E.bright / 40;
@@ -1092,8 +1089,7 @@ function latch(was) {
   if (was && !elecState().contactor && E.enable) { E.enable = false; E.arm = false; tog($("#e-enable"), false, "Enabled", "Disabled"); }
 }
 const btnTog = (id, key, yes, no) => $("#" + id).addEventListener("click", () => { const was = elecState().contactor; E[key] = !E[key]; tog($("#" + id), E[key], yes, no); latch(was); renderElec(); });
-btnTog("e-breaker", "breaker", "On", "Off");
-btnTog("e-rear", "rear", "Pressed", "Released");
+btnTog("e-breaker", "breaker", "On", "Tripped");
 btnTog("e-link", "link", "Link up", "Link lost");
 btnTog("e-rstop", "rstop", "E-stop pressed", "E-stop");
 btnTog("e-enable", "enable", "Enabled", "Disabled");
@@ -1172,6 +1168,7 @@ const ISSUES = [
   ["Test", "Parts with no psi on the listing", "The fill check valve (leak-test at 200 psi with soapy water) and the M-style fill plug state none; none is recorded for the stainless plugs, the G1/4 adapters or the outlet nipples. The chamber pipe is covered by the water test; the barrels have no rating, so clamp them.", "check"],
   ["Check", "In valves are G1/4, not NPT", "Each port takes a G1/4 × 1/4 NPT adapter with a bonded seal under its hex, sealant on the NPT side only. Soap-test at 200 psi. Coil power isn't listed.", "inv"],
   ["Check", "No tank relief with the main valve shut", "The rear manifold's relief is gone (Micah, 12 Nov). The valve cross's 200 psi relief covers the tanks only while the main valve is open: fill with it open, or from a source with its own relief at 200 psi or less.", "rv200"],
+  ["Check", "Rear panel is one tight row", "No rear E-stop now (Micah, 12 Nov): the main breaker's red trip button is the kill. Breaker, SB50 charge port, fill plug and USB-C share one row; keep the red button and reset lever reachable without reaching past the SB50 lead or the fill hose.", "breaker"],
   ["Check", "Transducer option", "Confirm the 0.5–4.5 V output on the '1set-300PSI' option page before ordering.", "pt"],
   ["CAD", "Tanks vs the CAD", "The listing photos show two side bungs, an end port and welded feet; the CAD has three bungs underneath and strap saddles.", "tank"],
   ["Stock", "PETG may run short", "One 4 kg spool is on the list against about 6.5 kg of sliced prints.", null, () => { const r = bomFind("petg filament"); return !!r && r.qty * 4 < 6.5; }],

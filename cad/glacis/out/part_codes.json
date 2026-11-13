@@ -322,7 +322,6 @@
 "Rail 20x20 front lower": "AEx-R06"
 },
 "power_electronics_smoke.step": {
-"E-stop": "C11-1",
 "Charge port (SB50 panel mount)": "C01-1",
 "USB-C panel pass-through": "C12-1",
 "Main breaker 120 A": "C15-1",

@@ -394,7 +394,6 @@ C08-1,PDH contactor 200 A,power_electronics_smoke,"Contactor + battery relays: 1
 C08-2,Battery relay A 200 A,power_electronics_smoke,"Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
 C08-3,Battery relay B 200 A,power_electronics_smoke,"Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
 C10-1,Logic supply 5 V (buck-boost),power_electronics_smoke,"Logic supply: 5 V 5 A buck-boost module, 3.6-32 V in"
-C11-1,E-stop,power_electronics_smoke,"Latching mushroom E-stop, 22 mm, NC"
 C12-1,USB-C panel pass-through,power_electronics_smoke,Panel-mount USB-C extension (to the main controller)
 C14-1,FRC battery left,power_electronics_smoke,"FRC 12 V 18 Ah battery (owned, MK ES17-12)"
 C14-2,FRC battery right,power_electronics_smoke,"FRC 12 V 18 Ah battery (owned, MK ES17-12)"
@@ -446,7 +445,7 @@ F05-2,DS18B20 probe electronics,power_electronics_smoke,DS18B20 waterproof tempe
 F05-3,DS18B20 probe fogger,power_electronics_smoke,DS18B20 waterproof temperature probe
 F07-1,Fog blower 5015,power_electronics_smoke,12 V 5015 blower
 F10-1,Gun smoke tube,gun_pivots_3_of_3,Silicone tube 3/4 ID x 1 OD (ft)
-F10-2,Fog loop (to gun),power_electronics_smoke,Silicone tube 1/2 ID x 5/8 OD (ft)
+F10-2,Fog loop (to gun),power_electronics_smoke,Silicone tube 3/4 ID x 1 OD (ft)
 F11-1,Fog and light MOSFET module 2 (fog heater),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
 F11-2,Fog and light MOSFET module 3 (fog heater 2),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
 F11-3,Fog and light MOSFET module 5 (fog blower),power_electronics_smoke,MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)
