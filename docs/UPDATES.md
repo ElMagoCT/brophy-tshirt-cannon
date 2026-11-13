@@ -33,6 +33,7 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Parts list: no change (Micah: not yet). Hardware delta in B30.
 - Not done: Onshape (STEPs for the changed tabs in `cad/glacis/out/step_4040/` with manifest.json, for an Onshape branch); the parts list; the Falcon spline engagement (9.9 mm, was 14.6).
 - Questions for Micah: M5 heat-set inserts in the body too (one screw size everywhere)? Brackets under the arms don't fit beside the wheels: OK on end taps alone?
+- Onshape: branch (workspace) "40x40 extrusion frame" from version "Rear panel: no E-stop, one tight row": 28 tabs re-imported (chassis 9, wheels 4, body frame 7, lights 3, add-on rails, power, bumpers, panels, pneumatics), 587 parts coded (the 13 cast corner brackets show X: not on the parts list yet), old tabs/STEPs deleted in the branch, rigid groups rebuilt, every assembly feature OK including the main assembly's gun mates; version "40x40 extrusion frame (2026-11-12)". Main workspace untouched.
 
 ## 2026-11-12 - Micah's Windows computer (Claude Code) - Rear panel cleanup: no E-stop, one tight row
 - Branch / commit: micah-windows/borealis (PR #2), commits 73fc60e, 4df65ac
