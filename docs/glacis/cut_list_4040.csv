@@ -1,0 +1,25 @@
+Member (40x40 20-series),"Length (mm), square cut +0/-0.3",M5 end taps at the -x/-y/-z end,M5 end taps at the +x/+y/+z end,10 mm access holes,Access holes along it from its -x/-y/-z end (mm)
+End rail front (4040),547.5,2,2,4,154.4; 174.4; 373.1; 393.1
+End rail rear (4040),547.5,2,2,4,154.4; 174.4; 373.1; 393.1
+Inner rail L (4040),768.0,2,2,10,42.0; 62.0; 159.0; 179.0; 204.0; 224.0; 374.0; 394.0; 539.0; 559.0
+Inner rail R (4040),768.0,2,2,10,42.0; 62.0; 159.0; 179.0; 204.0; 224.0; 374.0; 394.0; 539.0; 559.0
+Outer rail L (4040),848.0,0,0,4,10.0; 30.0; 818.0; 838.0
+Outer rail R (4040),848.0,0,0,4,10.0; 30.0; 818.0; 838.0
+Sled post left -215 (4040),114.4,2,2,0,
+Sled post left -332 (4040),114.4,2,2,0,
+Sled post right -215 (4040),114.4,2,2,0,
+Sled post right -332 (4040),114.4,2,2,0,
+Sled rail left -215 (4040),172.7,0,0,2,10.0; 30.0
+Sled rail left -332 (4040),172.7,0,0,2,10.0; 30.0
+Sled rail right -215 (4040),172.7,0,0,2,142.7; 162.7
+Sled rail right -332 (4040),172.7,0,0,2,142.7; 162.7
+Tank arm left 0 (4040),172.7,0,0,2,10.0; 30.0
+Tank arm left 165 (4040),172.7,0,0,2,10.0; 30.0
+Tank arm right 0 (4040),172.7,0,0,2,142.7; 162.7
+Tank arm right 165 (4040),172.7,0,0,2,142.7; 162.7
+Tank post left 0 (4040),94.8,2,2,0,
+Tank post left 165 (4040),94.8,2,2,0,
+Tank post right 0 (4040),94.8,2,2,0,
+Tank post right 165 (4040),94.8,2,2,0,
+Turret tower L (4040),461.0,2,2,0,
+Turret tower R (4040),461.0,2,2,0,

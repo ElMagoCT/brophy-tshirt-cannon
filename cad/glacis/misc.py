@@ -371,7 +371,9 @@ def air():
         # in along y (no quick disconnects, Micah 2026-11-12)
         yt_ = 84.5                                         # inboard of the 40x40 posts (|y| 89.35+)
         pts = [t, (t[0], t[1], t[2] - 15.0), (t[0], sg * yt_, max(262.0, zr)), (xr, sg * yt_, zr), (xr, sg * yt_, 330.0),
-               (e.x, sg * yt_, 330.0), (e.x, sg * yt_, e.z), e.toTuple()]
+               (e.x + 25.0, sg * yt_, 330.0), (e.x + 25.0, sg * yt_, e.z), (e.x, sg * yt_, e.z), e.toTuple()]
+        # (the drop runs 25 mm ahead of the cross: at |y| 84.5 a drop straight over it grazes the wider body's rear
+        # frame nodes and the rear panel's LED loop)
         add_split(f"Tube tank {side}", tube_path(pts), "tube", "pneu", start=tuple(pts[0]), bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
     m0 = MAIN_OUT[0]                                       # forward out of the main valve, down, back under the valve cross
     tf = [m0.toTuple(), (m0.x + 15.0, m0.y, mz), (m0.x + 15.0, m0.y, 170.0), (fx - vc - 40.0, fy, 170.0),

@@ -25,6 +25,15 @@ below lands. If someone else has claimed a file you need, wait or ask Micah.
 - Questions for Micah: <decisions that are his, or "none">
 ```
 
+## 2026-11-12 - Micah's Windows computer (Claude Code) - Frame in 40x40 T-slot (design branch)
+- Branch / commit: micah-windows/extrusion-4040 (design branch, not merged; nothing on borealis or main changed)
+- Changed: every 1x2 / 1x1 box tube member is 40x40 20-series T-slot (24 members, 7.47 m), joined by M5 end taps through 10 mm access holes, M5 T-nut plates and 13 cast 40-series corner brackets; no rivets. FW 627.5 mm (gun side fixed at GUN_RAIL_Y 129.35); live hex axles kept, flanged bearings pressed through two 1/8 plates each (side plate + inner bearing plate; two outer bearing plates), no axle hole in any extrusion, wheel drops out of the side plate's slot. Sled rails up 19.6 mm (8.7 mm over the wheel), tank arms kept at 281.8 with the posts at x 0 / 165 and the tanks at x 47.5. Bumpers on 6 printed hanger blocks, underglow and frame mounts on T-nuts. Details: JUDGMENTS B30.
+- Files: `cad/glacis/params.py`, `lib.py`, `drive.py`, `misc.py`, `brackets.py`, `robot.py`, `partcodes.py`, `docs/glacis/waterjet/*`, `docs/glacis/cut_list_4040.csv` (new; `tube_drilling.csv` removed on this branch), `docs/glacis/JUDGMENTS.md`
+- Checks: full build with the body (629 parts, 1 h 53 min): interference 2 pairs over 30 mm3, both the old gun-internal ones (cradle plate vs gun tubes, 115 / 110, same as before the branch); it also flagged the tank lines against the wider body's rear frame (46-74 mm3), rerouted and rechecked against the exported body STEPs: 0 mm3. Gun sweep 0-90 every 5: 0. check_fasteners: 273 T-nut screws + 56 end taps, 0 off a slot line / core, 0 too close, 0 missed. Every print fits the 250 mm bed; no part in more than one piece. Arms 8.7 mm (sleds) and 6.9 mm (front tank arms) off the wheels' 127 mm swept circle.
+- Parts list: no change (Micah: not yet). Hardware delta in B30.
+- Not done: Onshape (STEPs for the changed tabs in `cad/glacis/out/step_4040/` with manifest.json, for an Onshape branch); the parts list; the Falcon spline engagement (9.9 mm, was 14.6).
+- Questions for Micah: M5 heat-set inserts in the body too (one screw size everywhere)? Brackets under the arms don't fit beside the wheels: OK on end taps alone?
+
 ## 2026-11-12 - Micah's Windows computer (Claude Code) - Rear panel cleanup: no E-stop, one tight row
 - Branch / commit: micah-windows/borealis (PR #2), commits 73fc60e, 4df65ac
 - Changed (Micah): the rear E-stop is gone; the 120 A breaker's red trip button is the kill switch (it kills everything, logic included). The contactor coil now runs logic tap -> safety node -> controller MOSFET; the valve arm relay is fed from the PDH and armed by the controller. The rear panel is one tight row at z 255: breaker (y -135), SB50 charge port (-75), fill plug (-26.5), USB-C (+10), was spread over -238..+192. The breaker stays outside the tank lines that drop beside the rear cross. Also: the tank transducer moved to the right tank's FRONT bung (the rear bung hit the tank-arm knee plate, found by an independent review).

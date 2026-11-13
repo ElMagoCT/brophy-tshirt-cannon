@@ -1204,6 +1204,64 @@ B17. **Elevation: ring pulley on standoffs, belt centred** (Micah, same day: "re
     tower/pivot/elevation parts rebuilt and swapped into the last full build's STEPs, then the rebuilt chassis parts
     against everything and the gun swung 0-90 deg every 5 against everything fixed: 0 hits over 30 mm3; every print
     fits the bed; gun 18.8 kg, balanced.
+B30. **Frame in 40x40 T-slot (design branch `micah-windows/extrusion-4040`, not merged)** (Micah, 2026-11-12: replace all
+    the 1x2 / 1x1 box tube with 40x40 T-slot, he has lots spare; M5 T-nuts, end taps and new brackets instead of rivets;
+    bumpers may be bigger than the battery door).
+    - **Profile:** standard 40x40 20-series: 2 slots per face (6.2 mm opening) at face centre +/- 10, four 4.2 mm cores at
+      (+/-10, +/-10) tapped M5 for end taps, a centre bore (`lib.ext4040`; `simple=True` drops cores and bore for fast
+      booleans). Taken at 1.5 kg/m. Check the vendor drawing for the core size before tapping.
+    - **Members (24, 7.47 m):** outer rails 848 (full length), inner rails 768 and end rails 547.5 (butting), towers 461,
+      sled posts 114.4, tank posts 94.8, arms 172.7 (8). Cut list: `docs/glacis/cut_list_4040.csv` (lengths, end taps,
+      access holes). Every butt joint is 2 x M5 x 16 end taps on the diagonal cores, the socket head through a 10 mm access
+      hole in the far face of the member it butts against (52 holes; the 4 tower tops take M5 x 35 down through the
+      in-well 20x20 rail instead). The corners also get flat 1/8 corner plates top (C) and bottom (L) on T-nuts.
+    - **Y stack (gun side fixed):** `GUN_RAIL_Y` 129.35 is the datum, so the gun well, deck rails, bearing blocks, towers
+      and pulleys don't move. Outward: side plate, inner bearing plate, flange, 1.5 mm printed thrust spacer, wheel,
+      1/4 in hex collar, flange, two outer bearing plates, outer rail. FW 627.5 mm (24.70 in, was 22.25); 30.2 in over the
+      bumpers (they come off), 26.6 in over the body; length 38.9 in over the bumpers (FRAME_X 424, +14.6). The plan's
+      option B (+29.2) wasn't enough once the bearings needed two plates each side and the collar.
+    - **Axle (Micah: keep the live 1/2 hex axles and the 9 in wheels):** no hole in any extrusion. A flanged hex bearing's
+      5/16 in body needs two 1/8 plates, so the inner one is pressed through the side plate (bottom-open slot) and a bolted
+      inner bearing plate over it, the outer one through two stacked outer bearing plates on the outer rail's inboard face.
+      The hex axle is captive 0.5 mm off each rail face; a 1/4 in clamping hex collar outboard of the wheel locates it.
+      The 8 bearing-plate screws per wheel are countersunk M5 x 12 on the wheel hub's light-hole circle (r 43), so a hex
+      key reaches each through a light hole. Wheel off: unbolt the Falcon (belt slack), take the 8 screws out through the
+      hub, and the wheel, axle, bearings and plates drop out of the side plate's slot. The 12 bearing plates are one
+      waterjet part (press fit 28.68 mm: ream to the bearing in hand).
+    - **Arm heights:** the sled rails' top goes to 301.4 (+19.6; batteries to 307.4): the plan's 296.4 left 3.7 mm at the
+      -215 rail's near edge over the wheel's 127 mm swept circle, now 8.7 (19.5 at -332); the tower is 5.0 mm from the -215 post. The tank arms stay at 281.8 and the tanks at
+      z 364 (raising them 14.6 puts the right tank 0.3 mm under the elevation motor); instead the front tank post moves
+      to x 165 (its arm's lower corner 6.9 mm off the front wheel's 127 mm circle, 8.2 straight up; the Falcon 6.2 mm
+      from the post) and the rear one to x 0 (a 40 mm post at -60 hits the rear Falcon),
+      the tanks to x 47.5 so all three bungs fall between and ahead of the arms, straps between the bungs. The rear sled
+      post moves to -332 (the valve cross's line relief points at it); the corner plates start at x 354 to clear it.
+    - **Side plates stay 1/8 with M5 x 10 button heads:** the inner bearing plate sits between the side plate and the
+      wheel, so the wheel is 6.3 mm off the side plate and a 2.75 mm button head clears it; countersinking 1/8 for M5
+      (2.8 mm head) would leave a knife edge. Countersunk only where flush matters: bearing plates (beside the wheel),
+      bottom corner plates and bellypan (underglow, floor), underglow brackets.
+    - **Brackets:** dropped the inboard plates (6), arm knees (14) and the riveted corner gussets; added 12 bearing plates,
+      8 corner plates on T-nuts, and 13 cast 40-series corner brackets at the post feet and inner/end corners where they
+      fit (the placer drops any that would hit a part or a wheel's swept circle: 19 of 32 candidates; the arms rely on
+      their end taps, about 220 N per screw for a 3 kg pack 150 mm out). `check_fasteners`: every T-nut screw on a slot
+      centre line, none closer than 12 mm in a slot or 8 mm from an end, every end tap on a core, nothing in an access hole.
+    - **Bumpers:** 6 printed hanger blocks under the outer rails (2 x M5 x 12 into the bottom slots each), one M5 x 30 from
+      each into an M5 tee nut in the 1x6 (was a #10-32 through the tube). Underglow brackets screw up into the outer
+      slots (2 x M5 x 8 countersunk each) instead of 3M tape. Frame-mount posts: 2 x M5 x 12 into the rails' top slots
+      (M5 x 16 where they stand on a corner plate) instead of the 2-1/2 in #10-32s; the body's own #10-32 x 1/2 screws and
+      heat-set inserts are unchanged (swapping them to M5 is easy but touches every body print; left for Micah).
+    - **Electronics:** the 40 mm inner rails' inner faces are at |y| 89.35 (were 103.95), so every bellypan part is
+      inside |y| 87; eleven moved a few mm to stay clear of each other (the engraving marks follow).
+      The tank lines run at |y| 84.5 (inboard of the posts, was 98) and drop 25 mm ahead of the rear cross (a drop
+      straight over it grazed the wider body's rear frame nodes and the rear panel's LED loop).
+    - **Hardware (CAD count):** 273 T-nuts (M5, 6 mm slot); M5 x 10 button 116, x 12 button 8, x 8 countersunk 79,
+      x 12 countersunk 32, x 12 socket 30, x 16 socket 8, x 16 socket end taps 52, x 35 socket 4; plus 6 M5 x 30 and 6 M5
+      tee nuts (bumper), 4 hex collars. No rivets (262 before), no CNC'd tube holes (299 before), no 2-1/2 in #10-32s.
+    - **Mass:** extrusion 11.2 kg (the box tube was 3.9 kg real). Whole robot 95.9 kg in the CAD; without the body 79.3 -> 89.4 kg;
+      about 1.8 kg of that is the old model under-weighing the tube, and about 1.5 kg of screws and T-nuts isn't in the
+      CAD, so the real gain is about +10 kg.
+    - **Open:** the Falcon spline now engages its pulley 9.9 mm (was 14.6: the pulley moved out 4.8 mm with the wheel);
+      check the real spline length or use a 1/8 thinner inner bearing plate. The 4 tank-arm and 8 sled-arm joints have no
+      bracket. Parts list not updated (Micah: not yet).
 B29. **No rear E-stop; rear panel in one row** (Micah, 2026-11-12: "remove the e-stop bc the frc breaker has a red kill
     button already. move things tighter in"). The breaker's trip kills the logic rail too (the E-stop only dropped the
     contactor), so a kill now means a cold restart; the remote's E-stop still drops the contactor through the safety

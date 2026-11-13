@@ -131,7 +131,7 @@ FALCON_FREE_RPM = 6380
 WHEEL_FREE_FPS = FALCON_FREE_RPM / RATIO * math.pi * 10 / 60 / 12
 FRAME_X = AX_X + WHEEL_R + 3.0 + RAIL_W     # outside face of the end rails
 # posts and arms (40x40): the arms sit on the posts, the sled rails' top raised 19.6 mm (to 301.4) so a 40 mm rail
-# clears the wheel's 127 mm swept circle by 8.2 mm at the -215 rail's near edge (the plan's 296.4 left 3.7); the battery
+# clears the wheel's 127 mm swept circle by 8.7 mm at the -215 rail's near edge (the plan's 296.4 left 3.7); the battery
 # sleds go up with them
 POST_H = 114.4                              # rail top to arm bottom
 ARM_TOP = RAIL_Z[1] + POST_H + SMALL_W      # 301.4
@@ -140,7 +140,7 @@ SLED_POST_X = (-332.0, -215.0)           # the rear one 12 mm back of the old -3
                                             # line relief points at it
 TANK_POST_X = (0.0, 165.0)                  # the rear one 60 mm forward of the old -60 (a 40 mm post at -60 hits the rear
                                             # Falcon, and the tank's three bungs must fall between the arms); the front one 35 mm back of the old 200, so its arm clears the
-                                            # front wheel's swept circle by 8.2 mm with the tank arms at the old height:
+                                            # front wheel's swept circle by 6.9 mm with the tank arms at the old height:
 TANK_ARM_TOP = 281.8                        # raising the tanks 14.6 like the sleds puts them into the elevation motor
 TANK_POST_H = TANK_ARM_TOP - SMALL_W - RAIL_Z[1]
 CORNER_PLATE_X = FRAME_X - 70.0             # corner plates run from here to the frame's end (clear of the -332 post)
