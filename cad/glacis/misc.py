@@ -10,12 +10,12 @@ import body as B
 import speakers as SPK
 import lightbar as LB
 from lib import add, box, cyl, tube, hex_prism, union, t_slot
-from drive import tube_part, fr8, _hull, bearing_seat
+from drive import frame_member, end_tap, fr8, _hull, bearing_seat
+import lib
 import pneu_parts as PP
 
 IN = P.IN
-IY = (P.INNER_RAIL_Y[0] + P.INNER_RAIL_Y[1]) / 2       # inner rail centre |y|
-OY = (P.OUTER_RAIL_Y[0] + P.OUTER_RAIL_Y[1]) / 2
+IY, OY = P.IY, P.OY                                    # inner / outer rail centre |y|
 
 
 def qd_inline(tag, points, group="pneu", avoid=()):
@@ -103,40 +103,25 @@ def tube_path(points, r=3.175):
 
 
 def post(name, x, y, z0, z1):
-    if abs(x) > P.FRAME_X - 100.0 - 12.7 and abs(z0 - P.RAIL_Z[1]) < 0.1:
-        z0 += P.PLATE_T                               # stands on the corner gusset
-    return tube_part(name, "z", z0, z1, x, y, (1, 1))
+    """A 40x40 post standing on the inner rail (extrusion-4040): 2 x M5 end taps up into its foot from below, through
+    10 mm access holes in the rail's bottom face (fitted before the bellypan; the bellypan has a hole under each), plus
+    the cast corner brackets brackets.py fits where they clear."""
+    side = "L" if y > 0 else "R"
+    frame_member(name, "z", z0, z1, x, y, note="M5 end taps both ends")
+    end_tap(f"{name} (4040)", 0, ((1, 1), (-1, -1)), f"Inner rail {side} (4040)", P.RAIL_Z[0],
+            f"{name}: foot into the inner rail")
+    return f"{name} (4040)"
+
+
+def arm(name, x, sgn, post_name, top=P.ARM_TOP):
+    """A 40x40 arm along y on top of its post, tapped down into the post's top: 2 x M5 from the arm's top face."""
+    frame_member(name, "y", sgn * P.INNER_RAIL_Y[0], sgn * P.ARM_REACH, x, top - P.SMALL_W / 2,
+                 note="10 mm access holes in its top face for the post's end taps")
+    end_tap(post_name, 1, ((1, -1), (-1, 1)), f"{name} (4040)", top, f"{post_name}: top into {name}")
+    return f"{name} (4040)"
 
 
 # ------------------------------------------------------------------ pivot, elevation, angle sensor
-def tower_plate(sgn):
-    """The 1/8 in plate on the outboard side of one tower (Micah: "cut off the 1x2 at the extrusion and run a plate from
-    it to the extrusion and to the bearing", "make sure it wraps the frame"): a strip the length of the in-well rail
-    between the rail and the deck's well-edge member, a tab down the tower's outboard face with flanges bent round its
-    front and back faces, and a tab up the bearing block's outboard face (a hole for the axle and pot coupler)."""
-    t = P.PLATE_T
-    x0, x1 = P.TOWER_X
-    (rx0, rx1), (ry0, ry1), (rz0, rz1) = P.DECK_RAIL["x"], P.DECK_RAIL["y"], P.DECK_RAIL["z"]
-    px, pz = P.PIVOT
-    ya, yb = ry1, ry1 + t                                  # outboard of the rail, the tower and the block
-    zt = rz0 - 50.0                                        # how far down the tower
-    pl = union([box(rx0, rx1, ya, yb, rz0, rz1),                          # along the rail
-                box(x0 - t, x1 + t, ya, yb, zt, rz0 + 1.0),               # down the tower
-                box(x0 - t, x0, P.INNER_RAIL_Y[0] + 4.0, yb, zt, rz0),    # flanges round its back and front faces
-                box(x1, x1 + t, P.INNER_RAIL_Y[0] + 4.0, yb, zt, rz0),
-                box(x1, px + 25.0, ya, yb, rz1 - 1.0, pz + 28.0)])         # up the bearing block
-    pl = pl.cut(cyl(10.0, 20.0, (px, ya - 5.0, pz), (0, 1, 0)))
-    for x_, z_ in ((x0 + 6.0, zt + 12.0), (x1 - 6.0, zt + 12.0), (x0 + 6.0, rz0 - 12.0), (x1 - 6.0, rz0 - 12.0)):
-        pl = pl.cut(cyl(2.45, 20.0, (x_, ya - 5.0, z_), (0, 1, 0)))       # 3/16 rivets into the tower
-    for x_ in (x1 + 25.0, (x1 + px) / 2.0, px - 20.0):
-        pl = pl.cut(cyl(3.4, 20.0, (x_, ya - 5.0, pz - 14.0 if x_ > px - 30 else rz1 + 26.0), (0, 1, 0)))   # 1/4-20s
-    for x_ in DECK_RAIL_SCREWS:
-        pl = pl.cut(cyl(2.25, 20.0, (x_, ya - 5.0, P.DECK_RAIL["screw_z"]), (0, 1, 0)))
-    if sgn < 0:
-        pl = pl.mirror("XZ")
-    return pl
-
-
 def towers_and_pivot():
     px, pz = P.PIVOT
     x0, x1 = P.TOWER_X
@@ -145,8 +130,12 @@ def towers_and_pivot():
         yc = sgn * IY
         # Brophy Borealis (Micah, 2026-11-10): the tower stops under the in-well rail, the rail runs over it and the
         # bearing block sits on the rail; one 1/8 in plate on the outboard side wraps the tower and ties the three
-        post(f"Turret tower {side} (1x1)", (x0 + x1) / 2, yc, P.RAIL_Z[1], P.DECK_RAIL["z"][0])
-        # (the tower's base is riveted to the side and inboard plates: brackets.py)
+        tw = post(f"Turret tower {side}", (x0 + x1) / 2, yc, P.RAIL_Z[1], P.DECK_RAIL["z"][0])
+        # its top: 2 x M5 x 35 down through the in-well 20x20 rail (its centre line y IY + 10 is the tower's core line)
+        end_tap(tw, 1, ((1, sgn), (-1, sgn)), f"Rail 20x20 well {'left' if sgn > 0 else 'right'}", P.DECK_RAIL["z"][1],
+                f"{tw}: top, down through the in-well rail", spec="M5 x 35 socket head (down through the 20x20 rail)",
+                access=False)
+        # (the tower's base: end taps + the side plate's T-nuts; the tower plate up top: brackets.py)
         # bearing block from the tower's front face forward to the axle: two flanged 1/2 hex bearings
         blk = box(x1, px + 25.0, min(sgn * y0, sgn * y1), max(sgn * y0, sgn * y1), pz - 28, pz + 28)
         blk = blk.cut(cyl(9.0, 800, (px, -400, pz), (0, 1, 0)))
@@ -263,18 +252,25 @@ def air():
                 continue
             add(f"Tank plug {side} {dx:.0f}", PP.npt_plug(V(tx + dx, sgn * ty, zp), (0, 0, -1)), "brass", "pneu",
                 bom="1/4 NPT brass plug")
-        for xb in (-60.0, 200.0):
-            post(f"Tank post {side} {xb:.0f} (1x1)", xb, sgn * IY, P.RAIL_Z[1], P.RAIL_Z[1] + 104.0)
-            tube_part(f"Tank arm {side} {xb:.0f} (1x1)", "y", sgn * P.INNER_RAIL_Y[0], sgn * 262.0, xb,
-                      P.RAIL_Z[1] + 104.0 + 12.7)
-            # (the arm knees on both faces of the joint: brackets.py)
-            zt_ = P.RAIL_Z[1] + 129.4                      # the arm's top
-            sad = box(xb - 14, xb + 14, sgn * ty - 68, sgn * ty + 68, zt_ + P.PLATE_T, tz).cut(
+        for xb in P.TANK_POST_X:
+            pn = post(f"Tank post {side} {xb:.0f}", xb, sgn * IY, P.RAIL_Z[1], P.RAIL_Z[1] + P.TANK_POST_H)
+            arm(f"Tank arm {side} {xb:.0f}", xb, sgn, pn, top=P.TANK_ARM_TOP)
+            # (the cast corner brackets at the joints: brackets.py)
+            zt_ = P.TANK_ARM_TOP                           # the arm's top
+            sad = box(xb - 20, xb + 20, sgn * ty - 68, sgn * ty + 68, zt_ + P.PLATE_T, tz).cut(
                 cyl(R + 1.0, 60, (xb - 30, sgn * ty, tz), (1, 0, 0)))
-            # a foot down onto the arm where the old top gusset was (the knees now hold the arm), clear of the tank line
+            # a foot down onto the arm, clear of the tank line
             fy = sorted([sgn * max(ty - 68.0, P.INNER_RAIL_Y[0]), sgn * min(ty + 68.0, 210.0)])
-            sad = sad.fuse(box(xb - 12.7, xb + 12.7, fy[0], fy[1], zt_, zt_ + P.PLATE_T + 0.5))
-            add(f"Tank saddle {side} {xb:.0f}", sad, "print", "pneu", bom="Tank saddle", kind="print")
+            sad = sad.fuse(box(xb - 20, xb + 20, fy[0], fy[1], zt_, zt_ + P.PLATE_T + 0.5))
+            # extrusion-4040: 2 x M5 x 12 button heads down into T-nuts in the arm's top slots (fitted before the tank),
+            # heads in counterbores that open into the cradle
+            for dx_, yy in ((-P.SLOT_OFF, ty - 30.0), (P.SLOT_OFF, ty + 40.0)):
+                sad = sad.cut(cyl(P.M5["hole"], 30.0, (xb + dx_, sgn * yy, zt_ - 1.0), (0, 0, 1))).cut(
+                    cyl(P.M5["access_r"], 80.0, (xb + dx_, sgn * yy, zt_ + P.PLATE_T + 4.5), (0, 0, 1)))
+                lib.fastener("tnut", "M5 x 12 button head + T-nut", (xb + dx_, sgn * yy, zt_), (0, 0, -1),
+                             f"Tank saddle {side} {xb:.0f}")
+            add(f"Tank saddle {side} {xb:.0f}", sad, "print", "pneu", bom="Tank saddle", kind="print",
+                note="2 x M5 x 12 into T-nuts in the arm's top slots (before the tank goes in), plus the cam strap")
         for xs in (tx - 40.0, tx + 40.0):
             add(f"Tank strap {side} {xs:.0f}", tube(R + 2.5, R + 0.5, 25.0, (xs - 12.5, sgn * ty, tz), (1, 0, 0)), "black",
                 "pneu", bom="1 in cam-buckle strap")
@@ -373,8 +369,9 @@ def air():
         zr = 282.0 if sg > 0 else 245.0                   # the left one passes over in valve A's DIN plug
         # down out of the tank's straight push-to-connect, across, up and over, then down beside the flat cross and
         # in along y (no quick disconnects, Micah 2026-11-12)
-        pts = [t, (t[0], t[1], t[2] - 15.0), (t[0], sg * 98.0, max(262.0, zr)), (xr, sg * 98.0, zr), (xr, sg * 98.0, 330.0),
-               (e.x, sg * 98.0, 330.0), (e.x, sg * 98.0, e.z), e.toTuple()]
+        yt_ = 84.5                                         # inboard of the 40x40 posts (|y| 89.35+)
+        pts = [t, (t[0], t[1], t[2] - 15.0), (t[0], sg * yt_, max(262.0, zr)), (xr, sg * yt_, zr), (xr, sg * yt_, 330.0),
+               (e.x, sg * yt_, 330.0), (e.x, sg * yt_, e.z), e.toTuple()]
         add_split(f"Tube tank {side}", tube_path(pts), "tube", "pneu", start=tuple(pts[0]), bom="DOT nylon tube 1/4 OD (ft)", note="SAE J844")
     m0 = MAIN_OUT[0]                                       # forward out of the main valve, down, back under the valve cross
     tf = [m0.toTuple(), (m0.x + 15.0, m0.y, mz), (m0.x + 15.0, m0.y, 170.0), (fx - vc - 40.0, fy, 170.0),
@@ -448,12 +445,11 @@ def fog():
 # ------------------------------------------------------------------ power + controls
 def batteries_and_electronics():
     L, W, H = P.BATT
-    zs = P.RAIL_Z[1] + 104.0 + 25.4                       # sled rail top
+    zs = P.ARM_TOP                                         # sled rail top
     for sgn, side in ((1, "left"), (-1, "right")):
-        for xr in (-320.0, -215.0):
-            post(f"Sled post {side} {xr:.0f} (1x1)", xr, sgn * IY, P.RAIL_Z[1], P.RAIL_Z[1] + 104.0)
-            tube_part(f"Sled rail {side} {xr:.0f} (1x1)", "y", sgn * P.INNER_RAIL_Y[0], sgn * 262.0, xr,
-                      P.RAIL_Z[1] + 104.0 + 12.7)
+        for xr in P.SLED_POST_X:
+            pn = post(f"Sled post {side} {xr:.0f}", xr, sgn * IY, P.RAIL_Z[1], P.RAIL_Z[1] + P.POST_H)
+            arm(f"Sled rail {side} {xr:.0f}", xr, sgn, pn)
         ya, yb = sorted([sgn * (P.BATT_Y[0] - 3.0), sgn * (P.BATT_Y[1] + 4.0)])
         sled = box(P.BATT_X[0] - 4.0, P.BATT_X[1] + 4.0, ya, yb, zs, P.BATT_Z)
         for (x0, x1) in ((P.BATT_X[0] - 4.0, P.BATT_X[0] - 2.0), (P.BATT_X[1] + 2.0, P.BATT_X[1] + 4.0)):
@@ -470,7 +466,8 @@ def batteries_and_electronics():
             b = b.fuse(box(P.BATT_X[0] + dx - 8, P.BATT_X[0] + dx + 8, y0 + 25, y0 + 45, P.BATT_Z + H - 12, P.BATT_Z + H))
         add(f"FRC battery {side}", b, "battery", "power", bom="FRC 12 V 18 Ah battery (owned, MK ES17-12)")
         add(f"Anderson SB50 {side}", box(-252.0, -232.0, min(sgn * 113.0, sgn * 137.0), max(sgn * 113.0, sgn * 137.0),
-                                          300.0, 325.0), "red", "power", bom="Anderson SB50 pair + 6 AWG contacts (stash)")
+                                          P.BATT_Z + 12.2, P.BATT_Z + 37.2), "red", "power",
+            bom="Anderson SB50 pair + 6 AWG contacts (stash)")
     # Everything on the bellypan (Micah, 2026-11-11: "try to put all the electronics on the bottom plate which can also
     # be cnc'ed"): the printed shelf is gone. Each part's spot was found clear of every other part (the pneumatics over
     # the rear bay, the fog tube, the vents, the inner plates); boards stand on 6 mm M3 nylon standoffs. The CNC'd
@@ -490,19 +487,19 @@ def batteries_and_electronics():
         bom="120 A main breaker (stash)", note="rear panel, bottom strip: the on / off switch and the kill button (red trip); its face "
         "through a 42 mm hole, 2 x #10-32 through its ears and the panel")
     boards = [
-              ('Main controller ESP32-P4 + C6 (Waveshare)', -259, -203, -43, 45, 6, 18, 'pcb',
+              ('Main controller ESP32-P4 + C6 (Waveshare)', -259, -203, -47, 41, 6, 18, 'pcb',
                'Main controller: Waveshare ESP32-P4-Module-DEV-KIT, ESP32-P4 + ESP32-C6 (B0FDWZ6KWT)'),
-              ('ESP32-S3 safety node', -263, -194, 49, 77, 6, 15, 'pcb',
+              ('ESP32-S3 safety node', -263, -194, 42, 70, 6, 15, 'pcb',
                'ESP32-S3-DevKitC-1 N8R8 (owned)'),
-              ('PWM expander PCA9685', -199, -173, -31, 31, 6, 12, 'pcb',
+              ('PWM expander PCA9685', -203, -177, -31, 31, 6, 12, 'pcb',
                'PWM expander: PCA9685 16-channel, I2C (Dorhea B07RMTN4NZ)'),
-              ('ADS1115 ADC 1 (pressures)', -111, -83, -31, -13, 6, 6, 'pcb',
+              ('ADS1115 ADC 1 (pressures)', -111, -83, -25, -7, 6, 6, 'pcb',
                'ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)'),
-              ('ADS1115 ADC 2 (battery and bus volts)', -79, -51, -31, -13, 6, 6, 'pcb',
+              ('ADS1115 ADC 2 (battery and bus volts)', -79, -51, -25, -7, 6, 6, 'pcb',
                'ADS1115 16-bit 4-channel ADC module, I2C, 2-pack (B0DZSP4CG8)'),
               ('Spark MAX (elevation)', -263, -193, -83, -48, 0, 25, 'black',
                'REV Spark MAX (owned)'),
-              ('Valve arm relay 40 A', -15, 13, -35, -17, 0, 36, 'black',
+              ('Valve arm relay 40 A', -15, 13, -29, -11, 0, 36, 'black',
                '12 V 40 A SPDT relay + socket'),
               # 2026-11-11 (Micah: make the CAD BOM and the parts list match): the old combined
               # driver block split into the real modules, each spot searched clear of everything
@@ -510,7 +507,7 @@ def batteries_and_electronics():
                'ULN2803A Darlington driver on a perfboard: the relay coils'),
               ('Fog relay 40 A core 1', 49, 77, 15, 33, 0, 36, 'black',
                '12 V 40 A SPDT relay + socket (fog core)'),
-              ('Fog relay 40 A core 2', 76, 94, 69, 97, 0, 36, 'black',
+              ('Fog relay 40 A core 2', 66, 94, 69, 87, 0, 36, 'black',
                '12 V 40 A SPDT relay + socket (fog core, spare)'),
               ('Valve MOSFET module 1 (firing valve A)', 97, 131, 78, 95, 6, 10, 'pcb',
                'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
@@ -522,7 +519,7 @@ def batteries_and_electronics():
                'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
               ('Valve MOSFET module 5 (contactor (controller))', 151, 168, 36, 70, 6, 10, 'pcb',
                'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
-              ('Valve MOSFET module 6 (contactor (safety node))', 154, 171, -48, -14, 6, 10, 'pcb',
+              ('Valve MOSFET module 6 (contactor (safety node))', 154, 171, -46, -12, 6, 10, 'pcb',
                'MOSFET switch module 5-36 V 15 A, 3.3-20 V trigger (valve / contactor driver)'),
               ('Fog and light MOSFET module 1 (light bar)', 175, 215, 69, 89, 6, 20, 'pcb',
                'MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)'),
@@ -536,20 +533,21 @@ def batteries_and_electronics():
                'MOSFET switch module 5-36 V 15 A with heat sink (light bar / fog)'),
               ('Thermocouple amp MAX6675', 283, 298, -15, 10, 6, 8, 'pcb',
                'Thermocouple amp MAX6675 module (+ K probe on the core)'),
-              ('Inline ATO fuse holder (logic tap)', -263, -218, 81, 96, 0, 15, 'red',
+              ('Inline ATO fuse holder (logic tap)', -263, -218, 72, 87, 0, 15, 'red',
                'Inline ATO fuse holder + 5 A fuse'),
-              ('DS18B20 probe electronics', -170, -130, 24, 32, 0, 6, 'steel',
+              ('DS18B20 probe electronics', -170, -130, 14, 22, 0, 6, 'steel',
                'DS18B20 waterproof temperature probe'),
               ('DS18B20 probe battery bay', -191, -183, 57, 97, 0, 6, 'steel',
                'DS18B20 waterproof temperature probe'),
               ('DS18B20 probe fogger', 301, 309, -30, 10, 0, 6, 'steel',
                'DS18B20 waterproof temperature probe'),
-              ('Buck 12-5 V 20 A', 97, 147, 17, 73, 0, 25, 'black',
+              ('Buck 12-5 V 20 A', 97, 147, 13, 69, 0, 25, 'black',
                '12->5 V 20 A buck (B089M5R3NJ)'),
               ('Logic supply 5 V (buck-boost)', 125, 150, -43, -17, 6, 10, 'pcb',
                'Logic supply: 5 V 5 A buck-boost module, 3.6-32 V in'),
     ]
     for name, x0, x1, y0, y1, so, h, col, bom in boards:
+        y0, y1 = _in_bay(y0, y1)
         add(name, box(x0, x1, y0, y1, zb + so, zb + so + h), col, "power", bom=bom,
             note="heat-staked onto its printed board tray" if so else "screwed to the bellypan (M4)")
         ELEC_MARKS.append((name.split(" (")[0], x0, x1, y0, y1))
@@ -566,16 +564,16 @@ def batteries_and_electronics():
             add(f"Board tray {name.split(' (')[0]}", tr.clean(), "print", "power", bom="Printed board tray", kind="print",
                 note="PETG; the board heat-staked onto its four pegs; 2 x M4 x 12 up through the bellypan into inserts")
     relay = "Contactor + battery relays: 12 V 200 A continuous duty, isolated coil, 4-pin (B0D97PSZBB)"
-    add("PDH contactor 200 A", box(-175.0, -100.0, -95.0, -35.0, zb, zb + 70.0), "black", "power", bom=relay,
+    add("PDH contactor 200 A", box(-175.0, -100.0, -87.0, -27.0, zb, zb + 70.0), "black", "power", bom=relay,
         note="main breaker -> contactor -> PDH; coil through the safety node and the main controller in series")
     # rev D.2.1: one 200 A relay in each battery's + lead (same part as the contactor), a 4.7 ohm 5 W resistor across each
-    add("Battery relay A 200 A", box(-175.0, -100.0, 35.0, 95.0, zb, zb + 70.0), "black", "power", bom=relay,
+    add("Battery relay A 200 A", box(-175.0, -100.0, 27.0, 87.0, zb, zb + 70.0), "black", "power", bom=relay,
         note="in battery A's + lead, between its SB50 and the bus; the controller keeps only the fuller pack connected "
              "until the two are within 0.3 V")
-    add("Battery relay B 200 A", box(-97.0, -22.0, -95.0, -35.0, zb, zb + 70.0), "black", "power", bom=relay,
+    add("Battery relay B 200 A", box(-97.0, -22.0, -87.0, -27.0, zb, zb + 70.0), "black", "power", bom=relay,
         note="in battery B's + lead, between its SB50 and the bus")
-    ELEC_MARKS.extend([("Contactor", -175.0, -100.0, -95.0, -35.0), ("Battery relay A", -175.0, -100.0, 35.0, 95.0),
-                       ("Battery relay B", -97.0, -22.0, -95.0, -35.0)])
+    ELEC_MARKS.extend([("Contactor", -175.0, -100.0, -87.0, -27.0), ("Battery relay A", -175.0, -100.0, 27.0, 87.0),
+                       ("Battery relay B", -97.0, -22.0, -87.0, -27.0)])
     # bottom of the rear panel, one tight row (Micah 2026-11-12): breaker, charge port, the fill plug, USB-C
     cy, cz = CHARGE
     xc = P.rear_x(cz)
@@ -584,6 +582,16 @@ def batteries_and_electronics():
     xu = P.rear_x(USB[1])
     add("USB-C panel pass-through", cyl(8.5, 28.0, (xu - 2.0, USB[0], USB[1]), (1, 0, 0)), "black", "power",
         bom="Panel-mount USB-C extension (to the main controller)")
+
+
+def _in_bay(y0, y1, lim=87.0):
+    """extrusion-4040: the 40x40 inner rails' inner faces are at |y| 89.35 (was 103.95), so every bellypan part moves
+    in to |y| <= 87."""
+    if y1 > lim:
+        return y0 - (y1 - lim), lim
+    if y0 < -lim:
+        return -lim, y1 + (-lim - y0)
+    return y0, y1
 
 
 BREAKER = (-135.0, 255.0)   # (y, z) on the rear panel, bottom strip: one tight row, breaker / charge / fill / USB-C;
@@ -628,10 +636,10 @@ def audio_power():
     """The siren amp and its boost converter on the middle of the bellypan (their own function so the electronics
     can be rebuilt without the body)."""
     zb = P.BELLY_Z                             # middle of the bellypan, beside the smoke tube and under the gun's swing
-    add("Audio amp (TPA3255)", box(-95.0, 27.0, 22.0, 95.0, zb, zb + 30.0), "pcb", "power",       # moved 40 mm forward: battery relay A sits behind it
+    add("Audio amp (TPA3255)", box(-95.0, 27.0, 14.0, 87.0, zb, zb + 30.0), "pcb", "power",       # moved 40 mm forward: battery relay A sits behind it
         bom="TPA3255 2 x 300 W class-D amp board, 19-50 V DC, 122 x 73 x 30 mm", note="one channel per speaker, about 70 W each on 33 V")
-    ELEC_MARKS.extend([("Amp", -95.0, 27.0, 22.0, 95.0), ("Boost", -10.0, 120.0, -95.0, -40.0)])
-    add("Audio boost 12-33 V 1200 W", box(-10.0, 120.0, -95.0, -40.0, zb, zb + 55.0), "black", "power",
+    ELEC_MARKS.extend([("Amp", -95.0, 27.0, 14.0, 87.0), ("Boost", -10.0, 120.0, -87.0, -32.0)])
+    add("Audio boost 12-33 V 1200 W", box(-10.0, 120.0, -87.0, -32.0, zb, zb + 55.0), "black", "power",
         bom="1200 W 20 A boost converter, 8-60 V in, 12-80 V out (set to 33 V)", note="feeds the amp from a 40 A PDH channel; "
              "size not on the listing [UNVERIFIED], drawn 130 x 55 x 55 like the same module on Amazon")
 
@@ -649,6 +657,9 @@ def deck_rails():
     for sg, side in ((1, "left"), (-1, "right")):
         ys = (y0, y1) if sg > 0 else (-y1, -y0)
         r = t_slot(x0, x1, ys, (z0, z1))
+        for f in lib.FASTENERS:                           # extrusion-4040: the tower's M5 x 35s down through it
+            if f["kind"] == "endtap" and f.get("cross") == f"Rail 20x20 well {side}":
+                r = r.cut(cyl(P.M5["hole"], 40.0, (f["at"][0], f["at"][1], z0 - 10.0), (0, 0, 1)))
         for x_ in DECK_RAIL_SCREWS:                       # the CNC'd cross holes: 4.5 through, 8 mm head access
             zs = P.DECK_RAIL["screw_z"]
             r = r.cut(cyl(2.25, 30.0, (x_, sg * (y0 - 5.0), zs), (0, sg, 0)))
@@ -657,7 +668,8 @@ def deck_rails():
             mass=0.47 * (x1 - x0) / 1000.0,
             note=f"{x1 - x0:.0f} mm inside the gun well, over the cut-down tower; {n_} x M4 x 30 through CNC'd cross holes "
                  "(8 mm head access from the well side, the head on the core) and the tower plate into inserts in the deck's well-edge member; the bearing "
-                 "block on top, the elevation motor bracket under the right one")
+                 "block on top, the elevation motor bracket under the right one; 2 x 5.5 mm holes down its centre line for "
+                 "the tower's M5 x 35 end taps (heads on its top face)")
         # (the tower plate, flat now, and the rail's spacer strip: brackets.py)
 
 
@@ -727,16 +739,10 @@ def bumpers():
             by0, by1 = sorted([sgm["pos"], sgm["pos"] + oy * t])
             backing = box(-xf, xf, by0, by1, zb0, zb1)
         piece = backing
-        zr = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
-        if sgm["axis"] == "x":                        # side strips (no axle slots: the axles end inside the rail)
+        zr = HANGER_Z
+        if sgm["axis"] == "x":                        # side strips: an M5 tee nut at each hanger block
             for x in P.BUMP_SIDE_X:
                 piece = piece.cut(cyl(P.TNUT, t + 2, (x, sgm["pos"] - oy, zr), (0, oy, 0)))
-                import lib
-                sg_ = 1 if oy > 0 else -1
-                lib.TUBE_HOLES.append(("bumper #10-32", (x, sg_ * (P.OUTER_RAIL_Y[1] + 1.0), zr), (0, -sg_, 0), 2.6,
-                                       P.TUBE_WALL + 2.0))
-                lib.TUBE_HOLES.append(("bumper screw access", (x, sg_ * (P.OUTER_RAIL_Y[0] - 1.0), zr), (0, sg_, 0), 6.0,
-                                       P.TUBE_WALL + 2.0))
             for kind, sg_, h_ in ring_holes:
                 if kind == "side" and sg_ == oy:
                     piece = piece.cut(h_)
@@ -745,7 +751,7 @@ def bumpers():
                 if kind == "end" and sg_ == ox:
                     piece = piece.cut(h_)
         add(f"Bumper backing {name}", piece, "wood", "bumper", bom="Bumper backing, 1x6 ripped to 5 in (3/4 x 5 in)", kind="stock",
-            note=("#10-32 x 1-1/4 in from inside the outer rail into a pronged T-nut at x -80, 0, 80" if sgm["axis"] == "x"
+            note=("M5 x 30 from each printed hanger block (x -80, 0, 80) into an M5 pronged tee nut" if sgm["axis"] == "x"
                   else "no screws to the robot: held by the side strips through the corner brackets"))
         # one foam strip per side (cut from 24 in lengths of the GoTo block, butt-joined under the cover), mitred at the corners
         if sgm["axis"] == "y":
@@ -769,16 +775,38 @@ def bumpers():
             bom="Bumper fabric cover (white canvas, owner's pick)", kind="stock")
 
 
+HANGER_Z = P.RAIL_Z[0] - P.BUMP_HANGER[1] / 2      # the bumper screw's height (was the rail centre)
+
+
+def hanger_box(x, sgn, pad=0.0):
+    L, drop = P.BUMP_HANGER
+    y0, y1 = P.OUTER_RAIL_Y[0], P.OUTER_RAIL_Y[1] + P.BUMP_GAP
+    return box(x - L / 2 - pad, x + L / 2 + pad, *sorted([sgn * (y0 - pad), sgn * (y1 + pad)]), P.RAIL_Z[0] - drop - pad,
+               P.RAIL_Z[0] + pad)
+
+
 def bumper_spacers():
-    """A printed 3/16 in spacer on each of the 6 bumper screws, between the outer rail and the ring's backing, so the
-    screws clamp the ring 3/16 in off the chassis."""
-    zr = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
+    """extrusion-4040: a printed hanger block under the outer rail at each of the 6 bumper stations (between the wheels,
+    reached from the open bay underneath), in place of the old spacer on a #10-32 through the tube. 2 x M5 x 12 up into
+    T-nuts in the rail's two bottom slots; one M5 x 30 from its inboard face (counterbored 34 mm) out through the
+    3/16 in it fills behind the board and the 1x6 into an M5 pronged tee nut on the foam side."""
+    L, drop = P.BUMP_HANGER
+    z0 = P.RAIL_Z[0] - drop
     for sgn, side in ((1, "left"), (-1, "right")):
         for x in P.BUMP_SIDE_X:
-            sp = cyl(9.0, P.BUMP_GAP, (x, sgn * P.OUTER_RAIL_Y[1], zr), (0, sgn, 0)).cut(
-                cyl(2.7, 20.0, (x, sgn * (P.OUTER_RAIL_Y[1] - 5.0), zr), (0, sgn, 0)))
-            add(f"Bumper spacer {side} {x:.0f}", sp, "print", "bumper", bom="Bumper spacer (printed, 3/16 in)", kind="print",
-                note="on the bumper's #10-32 between the outer rail and the 1x6")
+            hb = hanger_box(x, sgn)
+            for dx_, dy_ in ((-12.0, -P.SLOT_OFF), (12.0, P.SLOT_OFF)):
+                yy = sgn * (OY + dy_)
+                hb = hb.cut(cyl(P.M5["hole"], drop + 2, (x + dx_, yy, z0 - 1), (0, 0, 1))).cut(
+                    cyl(P.M5["access_r"], drop - 8.0 + 1, (x + dx_, yy, z0 - 1), (0, 0, 1)))
+                lib.fastener("tnut", "M5 x 12 socket head + T-nut", (x + dx_, yy, P.RAIL_Z[0]), (0, 0, 1),
+                             f"Bumper hanger {side} {x:.0f}")
+            ys = sgn * P.OUTER_RAIL_Y[0]
+            hb = hb.cut(cyl(P.M5["hole"], 80.0, (x, ys - sgn, HANGER_Z), (0, sgn, 0))).cut(
+                cyl(P.M5["access_r"], P.RAIL_W - 6.0 + 1.0, (x, ys - sgn, HANGER_Z), (0, sgn, 0)))
+            add(f"Bumper hanger {side} {x:.0f}", hb, "print", "bumper", bom="Bumper hanger block (printed)", kind="print",
+                note="PETG-CF, 5 walls, 40%: 2 x M5 x 12 up into the outer rail's bottom T-nuts; the bumper's M5 x 30 from "
+                     "its inboard face (34 mm counterbore) into an M5 tee nut in the 1x6")
 
 
 UG_SCREWS = []                                # (x, y) of every underglow bracket screw (corner gussets get holes)
@@ -788,12 +816,13 @@ def underglow():
     """Underglow: a printed 45 deg strip bracket under the outer and end rails, just inside the bumper backing, each
     carrying a 60/m strip aimed down and out. The light passes under the bumper (its bottom is 3 in up) and pools on
     the floor round the robot; a strip inside the bumper would mostly light the foam."""
-    dz = 0.0                                              # flat on the rail; relieved under the corner gussets
+    dz = 0.0                                              # flat on the rail; relieved under the corner plates
     UG_SCREWS.clear()
+    zr0 = P.RAIL_Z[0]                                     # the rail's bottom face (107 on 40x40; the strip stays put)
     # 2026-11-11 (Micah: "the underglow LEDs need to go lower down and be at least level with the bottom of the bumper"):
     # the 45 deg face drops 16 mm on a web from the rail, so the strip's centre is 2.6 mm under the bumper's bottom edge
-    sec = [(u, z + dz) for u, z in ((-19.0, 68.6), (-5.0, 82.6), (-5.0, 101.6), (-25.0, 101.6), (-25.0, 98.6), (-8.0, 98.6),
-                                    (-8.0, 86.0), (-21.1, 72.9))]
+    sec = [(u, z + dz) for u, z in ((-19.0, 68.6), (-5.0, 82.6), (-5.0, zr0), (-25.0, zr0), (-25.0, zr0 - 3.0),
+                                    (-8.0, zr0 - 3.0), (-8.0, 86.0), (-21.1, 72.9))]
     c, d, nn = (-14.0, 73.6 + dz), (0.7071, 0.7071), (0.7071, -0.7071)
     strip = [(c[0] - 5 * d[0], c[1] - 5 * d[1]), (c[0] + 5 * d[0], c[1] + 5 * d[1]),
              (c[0] + 5 * d[0] + 1.6 * nn[0], c[1] + 5 * d[1] + 1.6 * nn[1]),
@@ -811,26 +840,47 @@ def underglow():
             q = [(ox * (pos + u), z) for u, z in pts]
             return cq.Workplane("XZ", origin=(0, a1, 0)).polyline(q).close().extrude(a1 - a0).val()
         n = math.ceil(2 * half / 230.0)
-        # where the rail is covered: the bottom corner gussets (relief in the flange's top) and the heads of the
-        # frame-mount posts' rail screws (a 12 mm hole through the flange)
+        # where the rail is covered: the bottom corner plates (relief in the flange's top); on the sides, the bumper
+        # hanger blocks (the bracket stops 1 mm short of each)
         if ox == 0:
-            ug = [box(*sorted([sg_ * (P.FRAME_X - 100.0), sg_ * (P.FRAME_X + 1.0)]), -400, 400, -1000, 1000) for sg_ in (-1, 1)]
-            heads = [(x_, oy * sum(P.OUTER_RAIL_Y) / 2) for x_ in P.SIDE_MOUNT_X]
+            ug = [box(*sorted([sg_ * P.CORNER_PLATE_X, sg_ * (P.FRAME_X + 1.0)]), -400, 400, -1000, 1000) for sg_ in (-1, 1)]
+            clear_ = union([hanger_box(x_, oy, pad=1.0) for x_ in P.BUMP_SIDE_X])
         else:
             ug = [box(-500, 500, *sorted([sg_ * P.INNER_RAIL_Y[0], sg_ * 400.0]), -1000, 1000) for sg_ in (-1, 1)]
-            heads = [(ox * (P.FRAME_X - 7.0), y_) for y_ in (P.FRONT_MOUNT_Y if ox > 0 else P.END_MOUNT_Y)]
-        under = union(ug)                                 # under a gusset the flange steps down by the plate
-        top = box(-1000, 1000, -1000, 1000, 98.2, 102.0)
-        clear_ = union([cyl(6.0, 30.0, (hx, hy, 80.0), (0, 0, 1)) for hx, hy in heads])
+            clear_ = None
+        under = union(ug)                                 # under a corner plate the flange steps down by the plate
+        top = box(-1000, 1000, -1000, 1000, zr0 - 3.4, zr0 + 0.4)
         for k in range(n):
             a0 = -half + 2 * half * k / n
             b_lo, b_hi = a0 + 0.5, a0 + 2 * half / n - 0.5
-            low = prism([(-25.0, 95.0), (-5.0, 95.0), (-5.0, 98.2), (-25.0, 98.2)], b_lo, b_hi).intersect(under)
-            seg_ = prism(sec, b_lo, b_hi).cut(top.intersect(under)).fuse(low).cut(clear_).clean()
-            # taped to the rail's bottom wall with the 3M tape (Micah 2026-11-11): no screws, no rivnuts
+            low = prism([(-25.0, zr0 - 6.6), (-5.0, zr0 - 6.6), (-5.0, zr0 - 3.4), (-25.0, zr0 - 3.4)], b_lo,
+                        b_hi).intersect(under)
+            seg_ = prism(sec, b_lo, b_hi).cut(top.intersect(under)).fuse(low)
+            if clear_ is not None:
+                seg_ = seg_.cut(clear_)
+            seg_ = seg_.clean()
+            # extrusion-4040: countersunk M5 x 8 up through the 3 mm flange into T-nuts in the rail's outer bottom slot
+            # (u -10 = the slot line), two per bracket, clear of the corner plates and the hanger blocks
+            nsc = 0
+            for fr_ in (0.22, 0.78, 0.5, 0.35, 0.65):
+                if nsc == 2:
+                    break
+                a_ = b_lo + (b_hi - b_lo) * fr_
+                pt = (a_, oy * (pos - P.SLOT_OFF), zr0) if ox == 0 else (ox * (pos - P.SLOT_OFF), a_, zr0)
+                hole = cyl(P.M5["hole"], 12.0, (pt[0], pt[1], zr0 - 8.0), (0, 0, 1))
+                if hole.intersect(under).Volume() > 0.01 or (clear_ is not None and hole.intersect(clear_).Volume() > 0.01):
+                    continue
+                if any(math.hypot(pt[0] - q[0], pt[1] - q[1]) < 20.0 for q in UG_SCREWS):
+                    continue
+                seg_ = seg_.cut(hole).cut(cq.Solid.makeCone(P.M5["csk_r"], P.M5["hole"], P.M5["csk_h"],
+                                                            V(pt[0], pt[1], zr0 - 3.0 - 0.01), V(0, 0, 1)))
+                UG_SCREWS.append((pt[0], pt[1]))
+                lib.fastener("tnut", "M5 x 8 countersunk + T-nut", pt, (0, 0, 1), f"Underglow bracket {tag} {k + 1}")
+                nsc += 1
             add(f"Underglow bracket {tag} {k + 1}", seg_, "print", "bumper",
                 bom="Underglow bracket (printed, 45 deg)", kind="print",
-                note="3M tape on its top onto the rail's bottom wall (and the corner gusset where it steps down); the strip on its 45 deg face with the same tape")
+                note=f"{nsc} x M5 x 8 countersunk up into T-nuts in the rail's outer bottom slot; the strip on its 45 deg "
+                     "face with 3M tape")
         add(f"LED strip underglow {tag}", prism(strip, -half + 5.0, half - 5.0), "led", "bumper",
             bom="WS2812B strip 10 mm, 60/m (m)", kind="stock", note="aimed 45 deg down and out, its centre just under the bumper's bottom edge; 3M tape")
         total += 2 * half - 10.0
@@ -887,69 +937,62 @@ def mount_tab(name, q):
                P.Z_WALL_BOT, P.Z_WALL_BOT + h)
 
 
+MOUNT_SCREWS = []                         # (x, y, z) of every frame-mount post's M5 into the rail (corner plates
+                                          # get clearance holes where a post stands on one)
+
+
 def frame_mounts():
-    """The chassis side of mount_points(), sized for Micah's own #10-32s. A printed post on each outer and end rail
-    station is held by a 2-1/2 in #10-32 up through the rail (and gusset) into a heat-set insert in its foot, with a
-    relief above the insert for the screw's tip. The frame's own 1/2 in #10-32 goes up through the post's 4 mm top
-    into the frame; its head sits in a pocket that opens outward, behind the bumper (take the bumper ring off and
-    every frame screw is in reach). (The turret towers' brackets and rivnuts went with Brophy Borealis: the in-well
-    rails tie the deck to the towers now.)"""
+    """The chassis side of mount_points(). extrusion-4040: each printed post stands on the outer or end rail's top face
+    (or on the top corner plate there) and is held by 2 x M5 x 12 socket heads down into T-nuts in the rail's top slots,
+    driven from above through 10 mm counterbores before the body goes on (no more 2-1/2 in #10-32 up through a tube).
+    The frame's own 1/2 in #10-32 still goes up through the post's 4 mm top into the frame's heat-set insert; its head
+    sits in a pocket that opens outward, behind the bumper (take the bumper ring off and every frame screw is in
+    reach)."""
+    MOUNT_SCREWS.clear()
     zb, zr0, zr1 = P.Z_WALL_BOT, P.RAIL_Z[0], P.RAIL_Z[1]
     top_t = 4.0                                           # post top under the frame: 4 + 0.5 gap + 8.2 in the insert
     clear = lambda q, t=top_t: cyl(2.6, t + 2.0, (q.x, q.y, q.z - 0.5 - t - 1.0), (0, 0, 1))
 
-    def foot(x, y, z0):                                   # the rail screw's insert, and room past it for its tip
-        return cyl(P.INSERT_1032[0], P.INSERT_1032[1], (x, y, z0), (0, 0, 1)).fuse(cyl(2.6, 13.5, (x, y, z0), (0, 0, 1)))
+    def screws(post, pts, z0, name):
+        for (x, y) in pts:
+            post = post.cut(cyl(P.M5["hole"], 30.0, (x, y, z0 - 1.0), (0, 0, 1))).cut(
+                cyl(P.M5["access_r"], zb, (x, y, z0 + 8.0), (0, 0, 1)))
+            MOUNT_SCREWS.append((x, y, z0))
+            lib.fastener("tnut", "M5 x 12 socket head + T-nut" if z0 < zr1 + 0.1 else "M5 x 16 socket head + T-nut",
+                         (x, y, zr1), (0, 0, -1), f"Frame mount {name}")
+        return post
     for name, q in mount_points():
         if name.startswith(("L ", "R ")):
             sgn = 1 if name[0] == "L" else -1
             y_in, y_out = P.OUTER_RAIL_Y
-            yc = sgn * (y_in + y_out) / 2
-            post = box(q.x - 15, q.x + 15, min(sgn * y_in, sgn * y_out), max(sgn * y_in, sgn * y_out), zr1, zb - 0.5)
+            post = box(q.x - 20, q.x + 20, min(sgn * y_in, sgn * y_out), max(sgn * y_in, sgn * y_out), zr1, zb - 0.5)
             ya, yb_ = sorted([q.y - sgn * 6.0, sgn * (y_out + 3.0)])
             pocket = box(q.x - 7, q.x + 7, ya, yb_, zr1 + 16.0, zb - 0.5 - top_t)
-            post = post.cut(pocket).cut(clear(q)).cut(foot(q.x, yc, zr1))
-            import lib
-            lib.TUBE_HOLES.append(("frame mount #10-32", (q.x, yc, P.RAIL_Z[0] - 1.0), (0, 0, 1), 2.6,
-                                   P.RAIL_Z[1] - P.RAIL_Z[0] + 2.0))
+            post = post.cut(pocket).cut(clear(q))
+            post = screws(post, [(q.x - 13.0, sgn * (OY - P.SLOT_OFF)), (q.x + 13.0, sgn * (OY - P.SLOT_OFF))], zr1, name)
             add(f"Frame mount {name}", post, "print", "body", bom="Frame mount post (printed)", kind="print",
-                note="2-1/2 in #10-32 up through the rail into its insert; the frame's 1/2 in #10-32 up from the outer "
-                     "pocket into the frame tab (bumper ring off first)")
-        elif name.startswith("tower"):
-            sgn = 1 if name.endswith("L") else -1
-            x0, x1 = P.TOWER_X
-            yt = P.INNER_RAIL_Y[1]                        # tower's outer face
-            web = box(x0, x1, min(sgn * yt, sgn * (yt + 8)), max(sgn * yt, sgn * (yt + 8)), q.z - 45.0, q.z - 0.5)
-            plate = box(x0, x1, min(sgn * yt, sgn * (q.y * sgn + 9.0)), max(sgn * yt, sgn * (q.y * sgn + 9.0)),
-                        q.z - 7.5, q.z - 0.5)
-            brk = web.fuse(plate).cut(clear(q, 7.0))
-            xm = (x0 + x1) / 2
-            for zs in (q.z - 18.0, q.z - 34.0):          # two #10-32 x 1/2 in into rivnuts, slotted +-3 mm
-                y0_, y1_ = sorted([sgn * (yt - 1.0), sgn * (yt + 9.0)])
-                brk = brk.cut(box(xm - 2.6, xm + 2.6, y0_, y1_, zs - 5.6, zs + 5.6))
-                brk = brk.cut(cyl(5.5, 1.2, (xm, sgn * yt, zs), (0, sgn, 0)))     # the rivnut's flange
-            add(f"Tower bracket {name[-1]}", brk, "print", "body", bom="Turret tower bracket (printed)", kind="print",
-                note="2 x #10-32 x 1/2 in in slots into rivnuts in the tower wall; the deck's 1/2 in #10-32 up "
-                     "through its plate. Print it on an end face (the L flat on the bed)")
+                note="2 x M5 x 12 down into T-nuts in the outer rail's inner top slot (before the body); the frame's "
+                     "1/2 in #10-32 up from the outer pocket into the frame tab (bumper ring off first)")
         else:
             sx = 1 if name.startswith("front") else -1
             xi, xo = sx * (P.FRAME_X - P.RAIL_W), sx * P.FRAME_X
-            z0 = zr1 + (P.PLATE_T if abs(q.y) + 15 > P.INNER_RAIL_Y[0] else 0.0)   # on the corner gusset
-            post = box(min(xi, xo), max(xi, xo), q.y - 15, q.y + 15, z0, zb - 0.5)
+            on_plate = abs(q.y) + 20 > P.INNER_RAIL_Y[0]          # on the top corner plate
+            z0 = zr1 + (P.PLATE_T if on_plate else 0.0)
+            post = box(min(xi, xo), max(xi, xo), q.y - 20, q.y + 20, z0, zb - 0.5)
             inner = q.x - sx * 6.0                        # the pocket's inner end, round the screw head
             if (inner - xi) * sx < 3.0:                   # too close to the rail's inner edge: a cap over it,
                 cap_x = xi - sx * 7.0                     # high above the wheel, keeps 3 mm of skin
-                post = post.fuse(box(min(cap_x, xi), max(cap_x, xi), q.y - 15, q.y + 15, zb - 20.0, zb - 0.5))
+                post = post.fuse(box(min(cap_x, xi), max(cap_x, xi), q.y - 20, q.y + 20, zb - 20.0, zb - 0.5))
                 inner = xi - sx * 4.0
             pocket = box(min(inner, xo + sx * 3.0), max(inner, xo + sx * 3.0), q.y - 7, q.y + 7, z0 + 16.0,
                          zb - 0.5 - top_t)
-            post = post.cut(pocket).cut(clear(q)).cut(foot(sx * (P.FRAME_X - 7.0), q.y, z0))
-            import lib
-            lib.TUBE_HOLES.append(("frame mount #10-32", (sx * (P.FRAME_X - 7.0), q.y, P.RAIL_Z[0] - 1.0), (0, 0, 1), 2.6,
-                                   P.RAIL_Z[1] - P.RAIL_Z[0] + 2.0))
+            post = post.cut(pocket).cut(clear(q))
+            xs_ = sx * (P.FRAME_X - P.RAIL_W / 2 - P.SLOT_OFF)            # the end rail's inner top slot
+            post = screws(post, [(xs_, q.y - 14.0), (xs_, q.y + 14.0)], z0, name)
             add(f"Frame mount {name}", post, "print", "body", bom="Frame mount post (printed)", kind="print",
-                note="2-1/2 in #10-32 up through the end rail" + (" and gusset" if z0 > zr1 else "") + " into its "
-                     "insert; the frame's 1/2 in #10-32 from the outer pocket (bumper ring off first)")
+                note="2 x M5 down into T-nuts in the end rail's inner top slot" + (" through the corner plate" if on_plate
+                                                                                    else "") +
+                     " (before the body); the frame's 1/2 in #10-32 from the outer pocket (bumper ring off first)")
 
 
 REAR_HOLES = ((REAR_MAN[1] + REAR_DY, REAR_MAN[2], 12.0),   # fill check valve (2026-11-12: flat cross)

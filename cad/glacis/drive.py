@@ -1,7 +1,10 @@
-"""Base frame (1x2 / 1x1 x 1/16 aluminum box tube, 1/8 in gussets) and the four drive corners:
+"""Base frame (extrusion-4040 branch: 40x40 20-series T-slot, M5 end taps, T-nuts and flat 1/8 in plates; the old
+1x2 / 1x1 box tube is still drawable with P.FRAME_PROFILE = "tube" through tube_part) and the four drive corners:
 Falcon 500 -> 12T WCP pulley -> 140T belt -> 116T printed into a 10 in vector-style printed mecanum
 (10 rollers on 608 2RS + fixed M8 rods, three flat aluminum plates).
-Each wheel sits on a 1/2 in hex live axle running in flanged hex bearings in the inner and outer rails."""
+Each wheel sits on a 1/2 in hex live axle running in flanged hex bearings pressed through two 1/8 in plates each: the
+side plate + inner bearing plate on the inner rail, two outer bearing plates on the outer rail (no axle holes in the
+extrusion)."""
 import math
 import cadquery as cq
 from cadquery import Vector as V
@@ -26,17 +29,50 @@ def box_tube_solid(axis, a0, a1, c1, c2, size=(1, 1), wall=P.TUBE_WALL):
 
 
 def tube_part(name, axis, a0, a1, c1, c2, size=(1, 1), group="frame", cuts=None):
+    """Old box-tube member (FRAME_PROFILE "tube"); mass passed explicitly (0.63 kg/m 1x2, 0.41 kg/m 1x1)."""
     s = box_tube_solid(axis, a0, a1, c1, c2, size)
     if cuts is not None:
         s = s.cut(cuts)
     prof = "1x2" if max(size) > 1.5 else "1x1"
     return add(name, s, "extr", group, bom=f"Aluminum box tube {prof} x 1/16 wall (owned)", kind="stock",
-               note=f"{abs(a1 - a0) / IN:.2f} in")
+               note=f"{abs(a1 - a0) / IN:.2f} in", mass=(0.63 if prof == "1x2" else 0.41) * abs(a1 - a0) / 1000.0,
+               frame=True)
 
 
-# kept for misc.py callers
-def ext(name, axis, a0, a1, c1, c2, size=(1, 1), bom=None):
-    return tube_part(name, axis, a0, a1, c1, c2, size)
+EXTR_BOM = "40x40 T-slot extrusion, 20 series, cut (owned spare)"
+
+
+def frame_member(name, axis, a0, a1, c1, c2, group="frame", note=""):
+    """One 40x40 frame member (extrusion-4040), "<name> (4040)", registered in lib.MEMBERS for the fastener checks.
+    End taps and access holes are added by brackets.finish_members once every joint is known."""
+    import lib
+    a0, a1 = min(a0, a1), max(a0, a1)
+    full = f"{name} (4040)"
+    lib.MEMBERS.append(dict(name=full, axis=axis, a0=a0, a1=a1, c1=c1, c2=c2))
+    return add(full, lib.ext4040(axis, a0, a1, c1, c2), "extr", group, bom=EXTR_BOM, kind="stock",
+               note=f"{a1 - a0:.1f} mm, square cut" + (f"; {note}" if note else ""),
+               mass=P.EXTR_KG_M * (a1 - a0) / 1000.0, frame=True)
+
+
+def end_tap(member, end, cores, cross, entry_face, by, spec="M5 x 16 socket head (end tap, 10 mm access hole)",
+            access=True):
+    """Register M5 end taps: `member` (a lib.MEMBERS name) is tapped M5 at its `end` (0 = its a0 end, 1 = a1) in the
+    given `cores` ((s1, s2) = +/-1 multiples of CORE_OFF on (c1, c2)). Each screw comes through the `cross` member,
+    whose far face along the tap axis is at coordinate `entry_face`: a 10 mm access hole from that face (`access`)
+    lets the socket head through to bear on the cross member's slot lips at the joint face."""
+    import lib
+    m = next(q for q in lib.MEMBERS if q["name"] == member)
+    ax = "xyz".index(m["axis"])
+    o = [k for k in range(3) if k != ax]
+    sgn = 1 if end == 0 else -1                           # direction into the member from that end
+    for s1, s2 in cores:
+        at = [0.0, 0.0, 0.0]
+        at[ax] = m["a0"] if end == 0 else m["a1"]
+        at[o[0]] = m["c1"] + s1 * P.CORE_OFF
+        at[o[1]] = m["c2"] + s2 * P.CORE_OFF
+        d = [0.0, 0.0, 0.0]
+        d[ax] = sgn
+        lib.fastener("endtap", spec, at, d, by, cross=cross, entry=entry_face, access=access)
 
 
 def plate_from_circles(circles, y0, holes=(), t=P.PLATE_T):
@@ -336,29 +372,25 @@ def rod():
 # ------------------------------------------------------------------ build
 def build(log=print):
     rz = (P.RAIL_Z[0] + P.RAIL_Z[1]) / 2
-    import lib
-    W_ = P.TUBE_WALL
-    for sx in (-1, 1):
-        for sgn in (1, -1):
-            x = sx * P.AX_X
-            # inner rail: the axle through both walls (flanged bearing on its outboard face, the end screw on its inner face)
-            lib.TUBE_HOLES.append(("wheel axle bearing", (x, sgn * (P.INNER_RAIL_Y[0] - 1.0), P.AXLE_Z), (0, sgn, 0),
-                                   0.5625 * IN + 0.1, P.INNER_RAIL_Y[1] - P.INNER_RAIL_Y[0] + 2.0))
-            # outer rail: the bearing in its inner wall only; a 14 mm hole in the outer wall to put the axle's end
-            # screw and washer in (the bumper covers it: no hole in the bumper)
-            lib.TUBE_HOLES.append(("wheel axle bearing", (x, sgn * (P.OUTER_RAIL_Y[0] - 1.0), P.AXLE_Z), (0, sgn, 0),
-                                   0.5625 * IN + 0.1, W_ + 2.0))
-            lib.TUBE_HOLES.append(("axle end-screw access", (x, sgn * (P.OUTER_RAIL_Y[1] + 1.0), P.AXLE_Z), (0, -sgn, 0),
-                                   7.0, W_ + 2.0))
+    # extrusion-4040: outer rails run the full length; the end rails butt between them and the inner rails between the
+    # end rails. Every butt joint: 2 x M5 end taps on the diagonal cores, through 10 mm access holes in the outer
+    # member's outer face (behind the bumper), plus the flat corner plates top and bottom (brackets.py)
     for sgn, side in ((1, "L"), (-1, "R")):
-        oy = sgn * (P.OUTER_RAIL_Y[0] + P.OUTER_RAIL_Y[1]) / 2
-        iy = sgn * (P.INNER_RAIL_Y[0] + P.INNER_RAIL_Y[1]) / 2
-        tube_part(f"Outer rail {side} (1x2)", "x", -P.FRAME_X, P.FRAME_X, oy, rz, (1, 2))
-        tube_part(f"Inner rail {side} (1x2)", "x", -(P.FRAME_X - P.RAIL_W), P.FRAME_X - P.RAIL_W, iy, rz, (1, 2))
+        frame_member(f"Outer rail {side}", "x", -P.FRAME_X, P.FRAME_X, sgn * P.OY, rz,
+                     note="the end rails' end taps come through 10 mm access holes in its outer face")
+        frame_member(f"Inner rail {side}", "x", -(P.FRAME_X - P.RAIL_W), P.FRAME_X - P.RAIL_W, sgn * P.IY, rz,
+                     note="M5 end taps both ends")
     for sx, end in ((1, "front"), (-1, "rear")):
         cx = sx * (P.FRAME_X - P.RAIL_W / 2)
-        tube_part(f"End rail {end} (1x2)", "y", -P.OUTER_RAIL_Y[0], P.OUTER_RAIL_Y[0], cx, rz, (1, 2))
-        # (corner gussets, bellypan and the Falcon side plates: brackets.py)
+        frame_member(f"End rail {end}", "y", -P.OUTER_RAIL_Y[0], P.OUTER_RAIL_Y[0], cx, rz,
+                     note="M5 end taps both ends; the inner rails' end taps come through its outer face")
+    for sx, end in ((1, "front"), (-1, "rear")):
+        for sgn, side in ((1, "L"), (-1, "R")):
+            end_tap(f"End rail {end} (4040)", 1 if sgn > 0 else 0, ((1, 1), (-1, -1)), f"Outer rail {side} (4040)",
+                    sgn * P.OUTER_RAIL_Y[1], f"corner {end} {side}: end rail into outer rail")
+            end_tap(f"Inner rail {side} (4040)", 1 if sx > 0 else 0, ((1, 1), (-1, -1)), f"End rail {end} (4040)",
+                    sx * P.FRAME_X, f"corner {end} {side}: inner rail into end rail")
+        # (corner plates, bellypan and the Falcon side plates: brackets.py)
     tread, core = roller_parts()
     m8 = rod()
     for front in (True, False):
@@ -393,20 +425,30 @@ def build(log=print):
                 add(f"Roller rod {corner}{i:02d}", put(place(m8, c, axv)), "steel", "drive",
                     bom="M8 threaded rod, roller axle (cut 109 mm)", kind="stock",
                     note="Loctite 243 in the captured nyloc; slot the outboard end")
-            # live axle: 1/2 hex in two flanged hex bearings (outer rail inner wall, inner rail outer wall)
-            add(f"Bearing hex wheel {corner} outer", rail_bearing(ax, sgn * P.OUTER_RAIL_Y[0], P.AXLE_Z, sgn), "steel",
-                "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
-            add(f"Bearing hex wheel {corner} inner", rail_bearing(ax, sgn * P.INNER_RAIL_Y[1], P.AXLE_Z, -sgn), "steel",
-                "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)")
-            y_a, y_b = sgn * (P.INNER_RAIL_Y[0] + 0.0), sgn * (P.OUTER_RAIL_Y[0] + 0.3125 * IN)   # ends in the outer bearing
+            # live axle (extrusion-4040): 1/2 hex in two flanged hex bearings, each pressed through two 1/8 in plates
+            # (the bearing's 5/16 in body needs both): the inner one through the side plate and the inner bearing plate
+            # on it, the outer one through the two outer bearing plates on the outer rail's inboard face. The axle is
+            # captive between the two rail faces (no hole in either extrusion); a 1/4 in hex shaft collar outboard of the
+            # wheel and a printed thrust spacer inboard of it locate the wheel.
+            add(f"Bearing hex wheel {corner} inner", rail_bearing(ax, sgn * P.IN_BRG_PLATE_Y[1], P.AXLE_Z, -sgn), "steel",
+                "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)",
+                note="pressed through the inner bearing plate and the side plate, flange outboard")
+            add(f"Bearing hex wheel {corner} outer", rail_bearing(ax, sgn * P.OUT_BRG_PLATE_Y[0], P.AXLE_Z, sgn), "steel",
+                "drive", bom="Flanged bearing 1/2 hex bore, 1.125 OD (WCP-0783)",
+                note="pressed through both outer bearing plates, flange inboard")
+            y_a, y_b = sgn * (P.INNER_RAIL_Y[1] + 0.5), sgn * (P.OUTER_RAIL_Y[0] - 0.5)
             shaft = hex_prism(12.7, abs(y_b - y_a), (ax, y_a, P.AXLE_Z), (0, sgn, 0))
             add(f"Wheel axle {corner} (1/2 hex)", shaft, "steel", "drive", bom="1/2 in hex shaft, wheel axle (6 in)",
-                kind="stock", note="tapped 10-32 both ends, button head + washer; the outer one inside the outer rail, put in through the 14 mm hole in its outer wall")
-            for y0, y1, tag in ((P.INNER_RAIL_Y[1] + 1.6, P.WHEEL_Y[0], "inner"),
-                                (P.YMID + P.W_OUTER_PLATE[1], P.OUTER_RAIL_Y[0] - 1.6, "outer")):
-                if y1 - y0 > 0.3:
-                    sp = cyl(12.0, y1 - y0 - 0.2, (ax, sgn * (y0 + 0.1), P.AXLE_Z), (0, sgn, 0)).cut(
-                        hex_prism(12.9, 40, (ax, sgn * (y0 - 10), P.AXLE_Z), (0, sgn, 0)))
-                    add(f"Axle spacer {tag} {corner}", sp, "print_d", "drive", bom="1/2 hex spacer (printed or stash)",
-                        kind="print", note=f"{y1 - y0:.1f} mm")
+                kind="stock", note=f"{abs(y_b - y_a):.1f} mm, plain ends: captive 0.5 mm off each rail face (no end screws)")
+            ty0, ty1 = P.IN_BRG_PLATE_Y[1] + P.BRG_FLANGE_T, P.WHEEL_Y[0]
+            sp = cyl(12.0, ty1 - ty0 - 0.2, (ax, sgn * (ty0 + 0.1), P.AXLE_Z), (0, sgn, 0)).cut(
+                hex_prism(12.9, 40, (ax, sgn * (ty0 - 10), P.AXLE_Z), (0, sgn, 0)))
+            add(f"Axle spacer inner {corner}", sp, "print_d", "drive", bom="1/2 hex spacer (printed or stash)",
+                kind="print", note=f"{ty1 - ty0:.1f} mm thrust spacer between the inner bearing and the wheel")
+            c0, c1_ = P.OUT_COLLAR_Y
+            col = cyl(14.3, c1_ - c0, (ax, sgn * c0, P.AXLE_Z), (0, sgn, 0)).cut(
+                hex_prism(12.9, 40, (ax, sgn * (c0 - 10), P.AXLE_Z), (0, sgn, 0))).fuse(
+                cyl(3.5, 6.0, (ax, sgn * (c0 + (c1_ - c0) / 2), P.AXLE_Z + 13.0), (0, 0, 1)))   # its clamp screw boss
+            add(f"Axle collar {corner}", col, "steel", "drive",
+                bom="1/2 in hex shaft collar, clamping, 1/4 in wide", note="outboard of the wheel, against the outer bearing")
     log("drive: built")

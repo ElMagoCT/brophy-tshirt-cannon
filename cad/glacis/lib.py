@@ -47,16 +47,65 @@ C = {
 
 PARTS = []
 TUBE_HOLES = []          # (what, point, direction, radius, length): cut through the tubes by brackets.drill_tubes
+MEMBERS = []             # 40x40 frame members: dict(name, axis, a0, a1, c1, c2) (extrusion-4040)
+FASTENERS = []           # every M5 into the extrusion: dict(kind="tnut"|"endtap", spec, at, d, by) where `at` is the
+                         # point on the member face (T-nut) or the member's end face (end tap) and `d` the direction
+                         # into the member; checked by brackets.check_fasteners, counted for the hardware list
 
 
-def add(name, shape, color, group, bom=None, kind="cots", moving=False, note="", mass=None):
+def fastener(kind, spec, at, d, by, **kw):
+    FASTENERS.append(dict(kind=kind, spec=spec, at=tuple(float(c) for c in at), d=tuple(float(c) for c in d), by=by,
+                          **kw))
+
+
+def add(name, shape, color, group, bom=None, kind="cots", moving=False, note="", mass=None, frame=False):
     """Register one part. `bom` groups identical parts on the parts list; `mass` (kg) overrides the
-    density estimate for hollow or mixed-material parts."""
+    density estimate for hollow or mixed-material parts. `frame` tags a structural frame member."""
     if isinstance(shape, cq.Workplane):
         shape = shape.val() if len(shape.vals()) == 1 else cq.Compound.makeCompound(shape.vals())
     PARTS.append(dict(name=name, shape=shape, color=C[color] if isinstance(color, str) else color,
-                      group=group, bom=bom or name, kind=kind, moving=moving, note=note, mass=mass))
+                      group=group, bom=bom or name, kind=kind, moving=moving, note=note, mass=mass, frame=frame))
     return shape
+
+
+def profile4040(simple=False, slot=6.2, lip=1.8, cav=(8.6, 5.5), core=2.1, bore=2.5, off=10.0, chamfer=0.5):
+    """40x40 20-series T-slot section in a local (u, v) plane centred on the origin, as a cq.Face: the outline with two
+    T-slots per face (6.2 mm opening through a 1.8 mm lip into an 8.6 mm wide cavity, 5.5 mm deep) at +/- `off`, and
+    unless `simple`, the four 4.2 mm end-tap cores at (+/-off, +/-off) and the centre bore."""
+    h = 20.0
+    c = chamfer
+    pts = []
+    s2, cw = slot / 2, cav[0] / 2
+    d1, d2 = h - lip, h - cav[1]
+
+    def face_pts():                                       # one face (the +v face) from u = +h to u = -h
+        out = [(h - c, h)]
+        for uc in (off, -off):
+            out += [(uc + s2, h), (uc + s2, d1), (uc + cw, d1), (uc + cw, d2), (uc - cw, d2), (uc - cw, d1),
+                    (uc - s2, d1), (uc - s2, h)]
+        out.append((-h + c, h))
+        return out
+    for k in range(4):                                    # rotate the +v face 90 deg at a time
+        ang = math.pi / 2 * k
+        ca, sa = math.cos(ang), math.sin(ang)
+        pts += [(u * ca - v * sa, u * sa + v * ca) for u, v in face_pts()]
+    w = cq.Wire.makePolygon([V(u, v, 0) for u, v in pts], close=True)
+    inner = []
+    if not simple:
+        inner = [cq.Wire.makeCircle(core, V(su * off, sv * off, 0), V(0, 0, 1)) for su in (-1, 1) for sv in (-1, 1)]
+        inner.append(cq.Wire.makeCircle(bore, V(0, 0, 0), V(0, 0, 1)))
+    return cq.Face.makeFromWires(w, inner)
+
+
+def ext4040(axis, a0, a1, c1, c2, simple=False):
+    """40x40 T-slot extrusion along `axis` ("x", "y" or "z") from a0 to a1, centred at (c1, c2) on the other two axes
+    (x, y, z order)."""
+    a0, a1 = min(a0, a1), max(a0, a1)
+    f = profile4040(simple)
+    s = cq.Solid.extrudeLinear(f, V(0, 0, a1 - a0))       # along local z
+    org, xd, nd = {"x": ((a0, c1, c2), (0, 1, 0), (1, 0, 0)), "y": ((c1, a0, c2), (0, 0, 1), (0, 1, 0)),
+                   "z": ((c1, c2, a0), (1, 0, 0), (0, 0, 1))}[axis]
+    return s.moved(cq.Location(cq.Plane(origin=org, xDir=xd, normal=nd)))
 
 
 # ------------------------------------------------------------------ primitives (return cq.Shape)

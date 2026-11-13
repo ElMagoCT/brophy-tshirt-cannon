@@ -51,6 +51,8 @@ def pose(shape, elev):
 def build(elev=P.ELEV_SHOW):
     PARTS.clear()
     lib.TUBE_HOLES.clear()
+    lib.MEMBERS.clear()
+    lib.FASTENERS.clear()
     t = time.time()
     drive.build(log)
     gun.build(log)
@@ -71,7 +73,7 @@ def build(elev=P.ELEV_SHOW):
     misc.deck_rails()
     misc.front_rails()
     misc.speakers()
-    brackets.build(log)                 # flat waterjet brackets, rivets checked, tubes drilled
+    brackets.build(log)                 # flat plates + cast corner brackets on M5 T-nuts, end-tap access holes
     for p in PARTS:
         if p["moving"]:
             p["local"] = p["shape"]
@@ -404,7 +406,7 @@ if __name__ == "__main__":
         export(parts)
         bom_rollup(parts)
         brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
-        brackets.export_tube_table(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'tube_drilling.csv'))
+        brackets.export_cut_list(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'cut_list_4040.csv'))
         sys.exit(0)
     if not quick:
         t = time.time()
@@ -419,6 +421,7 @@ if __name__ == "__main__":
         log(f"elevation sweep {P.ELEV_RANGE[0]:.0f}-{P.ELEV_RANGE[1]:.0f} deg: {len(sw)} clashes ({time.time() - t:.0f} s)")
         for s in sw[:40]:
             log("   ", s)
+        brackets.check_fasteners(log)
         bad = print_parts(parts)
         log(f"printed parts that don't fit a 250 mm cube (CC1/CC2): {len(bad)}", bad[:10])
         split = [p["name"] for p in parts if len(p["shape"].Solids()) > 1]
@@ -433,6 +436,6 @@ if __name__ == "__main__":
         export(parts)
         bom_rollup(parts)
         brackets.export_flat(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'waterjet'), log)
-        brackets.export_tube_table(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'tube_drilling.csv'))
+        brackets.export_cut_list(os.path.join(HERE, '..', '..', 'docs', 'glacis', 'cut_list_4040.csv'))
         renders(parts)
     open(os.path.join(OUT, "check_log.txt"), "w").write("\n".join(LOG) + "\n")

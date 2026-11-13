@@ -30,11 +30,24 @@ def centre_for_belt(teeth_belt, d1, d2):    # solve centre distance for a stock 
     return (lo + hi) / 2
 
 
-# ------------------------------------------------------------------ frame (1x2 / 1x1 x 1/16 aluminum box tube)
-RAIL_W, RAIL_H = 1 * IN, 2 * IN             # 1x2 standing on edge
-TUBE_WALL = 0.0625 * IN
+# ------------------------------------------------------------------ frame
+# Branch extrusion-4040 (Micah, 2026-11-12: "replace all the 1x2 / 1x1 box tube with 40x40 T-slot, I have lots spare"):
+# every frame member is 40x40 20-series T-slot (2 slots per face, 6.2 mm opening, at face centre +/- 10; four 4.2 mm
+# core holes at (+/-10, +/-10) tapped M5 for end taps; a centre bore), joined by M5 end taps, M5 T-nuts and flat
+# 1/8 in plates / cast 40-series corner brackets. No rivets, no CNC'd tube holes.
+FRAME_PROFILE = "4040"
+RAIL_W = RAIL_H = 40.0                      # 40x40 rails (were 1x2 on edge)
+SMALL_W = 40.0                              # posts, towers, arms (were 1x1)
+SLOT_OFF, SLOT_W = 10.0, 6.2                # slot centre lines at face centre +/- 10, 6.2 mm opening
+CORE_OFF, CORE_R = 10.0, 2.1                # end-tap cores (M5 tap drill 4.2) at (+/-10, +/-10)
+EXTR_KG_M = 1.5                             # 40x40 20-series, light profile
+TUBE_WALL = 0.0625 * IN                     # (old box tube; kept for the old drawings' numbers)
 PLATE_T = 0.125 * IN                        # gussets, drive plates, cradle plates
-FW = 22.25 * IN                             # over the outer rails (27.7 in over the bumpers, door limit 28)
+M5 = dict(hole=2.75, head_r=4.75, head_h=2.75, csk_r=5.2, csk_h=2.8, sh_head_r=4.25, access_r=5.0)
+                                            # 5.5 clearance; button head (ISO 7380) 9.5 x 2.75; countersunk 10.4 x 2.8;
+                                            # socket head 8.5; 10 mm end-tap access hole
+GUN_RAIL_Y = 129.35                         # the gun side's datum: the in-well rails' and bearing blocks' outboard face,
+                                            # the towers' and inner rails' outboard face (the old 1x2 inner rail's face)
 
 # ------------------------------------------------------------------ drive
 WHEEL_R = 5 * IN                            # 10 in printed mecanum
@@ -78,11 +91,26 @@ W_PULLEY = (-W_FACE - 16.0, -W_FACE)        # 15 mm belt on 16 mm of printed tee
 W_INNER_PLATE = (W_PULLEY[0] - WPLATE_T, W_PULLEY[0])  # aluminum inboard belt flange
 W_OUT = W_OUTER_PLATE[1]                    # outermost point
 
-OUTER_RAIL_Y = (FW / 2 - RAIL_W, FW / 2)
-YMID = OUTER_RAIL_Y[0] - 3.0 - W_OUT        # roller centre plane of the wheel (left side)
+# Y stack, built from the gun side out (extrusion-4040): inner rail | side plate (1/8, Falcon + inner bearing, button
+# heads) | inner bearing plate (1/8: the flanged bearing's 5/16 body needs two 1/8 plates) | flange | 1.5 mm thrust
+# spacer | wheel | 1/4 in hex shaft collar between the wheel and the outer flange | outer bearing plates (2 x 1/8,
+# countersunk M5 on a 43 mm radius, reached through the wheel's hub light holes) | outer rail. No axle hole in any
+# extrusion: the hex axle is captive between the two rail faces (0.5 mm each end).
+INNER_RAIL_Y = (GUN_RAIL_Y - RAIL_W, GUN_RAIL_Y)
+DRIVE_PLATE_Y = (INNER_RAIL_Y[1], INNER_RAIL_Y[1] + PLATE_T)          # side plate
+IN_BRG_PLATE_Y = (DRIVE_PLATE_Y[1], DRIVE_PLATE_Y[1] + PLATE_T)       # inner bearing plate (on the side plate)
+BRG_FLANGE_T, THRUST_T, COLLAR_W = 1.6, 1.5, 0.25 * IN               # bearing flange; printed thrust spacer; collar
+WHEEL_Y0 = IN_BRG_PLATE_Y[1] + BRG_FLANGE_T + THRUST_T
+YMID = WHEEL_Y0 - W_INNER_PLATE[0]          # roller centre plane of the wheel (left side)
 WHEEL_Y = (YMID + W_INNER_PLATE[0], YMID + W_OUT)
-DRIVE_PLATE_Y = (WHEEL_Y[0] - 1.5 - PLATE_T, WHEEL_Y[0] - 1.5)
-INNER_RAIL_Y = (DRIVE_PLATE_Y[0] - RAIL_W, DRIVE_PLATE_Y[0])
+OUT_COLLAR_Y = (WHEEL_Y[1] + 0.5, WHEEL_Y[1] + 0.5 + COLLAR_W)       # the collar (0.5 clear of the wheel)
+OUT_BRG_PLATE_Y = (OUT_COLLAR_Y[1] + BRG_FLANGE_T, OUT_COLLAR_Y[1] + BRG_FLANGE_T + 2 * PLATE_T)
+OUTER_RAIL_Y = (OUT_BRG_PLATE_Y[1], OUT_BRG_PLATE_Y[1] + RAIL_W)
+FW = 2 * OUTER_RAIL_Y[1]                    # 627.5 mm = 24.70 in over the outer rails (was 22.25 in); 30.2 in over the
+                                            # bumpers (they come off, Micah 2026-11-12), 26.6 in over the body
+IY = (INNER_RAIL_Y[0] + INNER_RAIL_Y[1]) / 2       # inner rail centre |y|
+OY = (OUTER_RAIL_Y[0] + OUTER_RAIL_Y[1]) / 2       # outer rail centre |y|
+BRG_SCREW_R = 43.0                          # bearing plate screws on the wheel hub's light-hole circle (r 43)
 
 # one stage HTD 5M 15 mm: Falcon 12T -> 116T printed into the wheel hub (9.67:1)
 T_PIN, T_WHEEL = 12, 116
@@ -102,10 +130,24 @@ FALCON_D, FALCON_L = 60.0, 89.9
 FALCON_FREE_RPM = 6380
 WHEEL_FREE_FPS = FALCON_FREE_RPM / RATIO * math.pi * 10 / 60 / 12
 FRAME_X = AX_X + WHEEL_R + 3.0 + RAIL_W     # outside face of the end rails
+# posts and arms (40x40): the arms sit on the posts, their top raised 14.6 mm (to 296.4) so a 40 mm arm clears the
+# wheels (8 mm or more at the -215 sled rail); the battery sleds and side tanks go up with them
+POST_H = 109.4                              # rail top to arm bottom
+ARM_TOP = RAIL_Z[1] + POST_H + SMALL_W      # 296.4
+ARM_REACH = 262.0                           # |y| of the arms' outboard ends
+SLED_POST_X = (-332.0, -215.0)           # the rear one 12 mm back of the old -320: the valve cross's
+                                            # line relief points at it
+TANK_POST_X = (-50.0, 180.0)                # the rear one 10 mm forward of the old -60 (a 40 mm post at -60 hits the rear
+                                            # Falcon); the front one 20 mm back of the old 200, so its arm clears the
+                                            # front wheel by 11.6 mm with the tank arms left at the old height:
+TANK_ARM_TOP = 281.8                        # raising the tanks 14.6 like the sleds puts them into the elevation motor
+TANK_POST_H = TANK_ARM_TOP - SMALL_W - RAIL_Z[1]
+CORNER_PLATE_X = FRAME_X - 70.0             # corner plates run from here to the frame's end (clear of the -332 post)
 
 # ------------------------------------------------------------------ bumpers (FRC style)
 BUMP_GAP = 0.1875 * IN                      # Micah 2026-11-11: 3/16 in between the chassis and the bumper ring, all round
-FOAM_D, FOAM_H = 2.0 * IN - BUMP_GAP, 5.0 * IN   # foam 1-13/16 in deep so the gap keeps 27.75 in over the bumpers (door 28)
+FOAM_D, FOAM_H = 2.0 * IN - BUMP_GAP, 5.0 * IN   # foam 1-13/16 in deep (extrusion-4040: 30.2 in over the bumpers, more
+                                            # than the 28 in door: the ring comes off, Micah 2026-11-12; 26.6 in without)
 # (rev D.2: GoTo Foam 43 ILD strips, 2 in deep x 5 in tall (was 2 stacked 2.5 in noodles)
 BUMP_BACK_T = 0.75 * IN                      # rev D.2 (Micah): a 1x6 ripped to 5 in. 1/2 in thicker than the old 1/4 ply, so
                                             # the foam is 2 in deep: still 27.75 in over the bumpers (door limit 28)
@@ -127,8 +169,10 @@ CLIP_R, CLIP_OVER = 15.0, 6.0               # corner clip: round head radius, ho
 INSERT = (2.35, 6.5)                        # M4 x 6 heat-set insert (5 mm OD) hole: radius, depth; clips take M4 x 8
 INSERT_SHORT = (2.35, 4.6)                  # M4 x 4 insert, M4 x 6 screw: where two neighbours' clip screws would meet
 INSERT_1032 = (3.15, 10.5)                  # #10-32 x 3/8 in heat-set insert hole (6.3 mm drill): frame mounts
-TNUT = 3.2                                  # #10-32 4-prong T-nut hole through the bumper plywood (driven from the
-                                            # foam side; rev D.2: 3/4 in board, #10-32 x 1-1/4 in screws)
+TNUT = 3.5                                  # M5 4-prong tee nut barrel hole (7 mm) through the bumper board (driven from
+                                            # the foam side; extrusion-4040: M5 x 30 from the printed hanger block)
+BUMP_HANGER = (30.0, 27.0)                  # printed bumper hanger under the outer rail: length along x, drop below the
+                                            # rail (it fills BUMP_GAP behind the board)
 SIDE_MOUNT_X = (-280.0, -205.0, 100.0, 280.0)   # frame mount posts along each outer rail (clear of the x -105 seam
                                             # and of the x -153 frame joint's cross screw)
 END_MOUNT_Y = (-170.0, 0.0, 170.0)          # ... and along each end rail (the outer two stand on the corner gussets)
@@ -240,7 +284,7 @@ RAIL20 = 20.0
 # towers' and bearing blocks' outboard face (|y| 129.35) and 2 mm under the deck; the towers stop under them and the
 # bearing blocks sit on them, so the pivot went up 11 mm. M4 x 30s across the rail's core (z 618, under the deck
 # member's light tunnel at z 620-623) through the tower plate into inserts in the member's inner face
-DECK_RAIL = dict(y=(INNER_RAIL_Y[1] - 20.0, INNER_RAIL_Y[1]), x=(-320.0, 150.0), z=(608.0, 628.0), screw_z=618.0,
+DECK_RAIL = dict(y=(GUN_RAIL_Y - 20.0, GUN_RAIL_Y), x=(-320.0, 150.0), z=(608.0, 628.0), screw_z=618.0,
                  screws_x=(-290.0, -170.0, -95.0, 40.0, 125.0))
 
 
@@ -303,25 +347,26 @@ X_SLOT_REAR = -2000.0                       # the well is open at the back: at 0
 
 # towers: 1x1 on the inner rails behind the pivot (clear of the rear Falcons); a printed bearing block
 # runs forward from each to the axle
-TOWER_X = (-182.7, -157.3)
+TOWER_X = (-170.0 - SMALL_W / 2, -170.0 + SMALL_W / 2)   # 40x40 (extrusion-4040; was 1x1 at -182.7..-157.3)
 TOWER_L_X = TOWER_R_X = TOWER_X
-BEARING_BLOCK_Y = (109.0, INNER_RAIL_Y[1])     # inner bearing face (was the old pulley's outer face + 1)
+BEARING_BLOCK_Y = (109.0, GUN_RAIL_Y)       # inner bearing face (was the old pulley's outer face + 1)
 ELEV_MOTOR_Z = 468.0                        # under the top speaker's LED rail, over the side tank
 ELEV_C = centre_for_belt(ELEV_BELT_T, pd(ELEV_T[0]), pd(ELEV_T[1]))
 ELEV_MOTOR_X = PIVOT[0] + math.sqrt(ELEV_C ** 2 - (PIVOT[1] - ELEV_MOTOR_Z) ** 2)
 
 # ------------------------------------------------------------------ pneumatics / power
 TANK_D, TANK_L = 152.0, 360.0               # owner's AliExpress 6 L / 1.6 gal 200 psi tank (bare shell)
-TANK_SIDE = (46.0, 163.0, 364.0)            # (x, |y|, z): reservoirs lying along x, left and right, above the
-                                            # front wheels
+TANK_SIDE = (62.0, 163.0, TANK_ARM_TOP + 82.2)   # (x, |y|, z): reservoirs lying along x, left and right, above the
+                                            # front wheels (extrusion-4040: 16 mm forward of the old x 46 so the rear
+                                            # bung's plug clears the 40 mm rear tank arm; z 364 as before)
 BATT = (7.13 * IN, 3.01 * IN, 6.57 * IN)    # FRC battery L, W, H
 BELLY_Z = RAIL_Z[0]
-BATT_Z = 287.8                              # battery bottoms on their sleds (over the rear wheels)
+BATT_Z = ARM_TOP + 6.0                      # battery bottoms on their sleds (over the rear wheels; was 287.8)
 BATT_X = (-319.0, -319.0 + BATT[0])         # one battery each side, long axis along x, inside its door's rails
 BATT_Y = (145.0, 145.0 + BATT[1])           # |y|: they slide out the side walls
 ELEC_BAY = ((-380.0, -192.0), (-100.0, 100.0), (BELLY_Z, 250.0))   # back bottom
 FOG_BOX = ((190.0, 350.0), (-60.0, 60.0), (BELLY_Z + 6.0, BELLY_Z + 136.0))   # custom 12 V fogger (2 x 200 W cores), front bay
-FOG_VENTS = ((368.0, 80.0), (-140.0, 0.0))  # smoke trails (x, y), both down through the bellypan: front under the bumper,
+FOG_VENTS = ((368.0, 77.6), (-140.0, 0.0))  # smoke trails (x, y), both down through the bellypan: front under the bumper,
                                             # rear just ahead of the electronics bay
 
 

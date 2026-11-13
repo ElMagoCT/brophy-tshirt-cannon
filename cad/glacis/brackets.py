@@ -21,18 +21,18 @@ import math
 import cadquery as cq
 from cadquery import Vector as V
 import params as P
+import lib
 from lib import add, box, cyl, union, PARTS
 
 T8, T16 = P.PLATE_T, 1.5875
-WALL = P.TUBE_WALL
-RIV = 2.45                                  # 3/16 blind rivet in a #11 hole (4.9 mm)
 SHEET = 304.8                               # the waterjet's 12 x 12 in bed
 FLAT = []                                   # every flat part: name, key, t, outline, pockets, holes, mirrored copies
-RIVETS = []                                 # (plate name, point on the tube face, direction into the tube)
-IY = (P.INNER_RAIL_Y[0] + P.INNER_RAIL_Y[1]) / 2
+RIVETS = []                                 # (plate name, point on the extrusion face, direction into it, countersunk):
+                                            # extrusion-4040: every plate's M5 into a T-nut (the name stayed)
+IY = P.IY
 ZR0, ZR1 = P.RAIL_Z
-ZARM = ZR1 + 104.0                          # top of the posts = bottom of the arms
-TOP = ZARM - 4.4                            # side / inboard plates stop under the arm knees
+ZARM = ZR1 + P.POST_H                       # top of the posts = bottom of the arms
+TOP = ZARM - 44.0                           # side plates stop under the arm brackets (cast L under each arm)
 
 
 # ------------------------------------------------------------------ 2D helpers (convex polygons, CCW)
@@ -210,26 +210,32 @@ def solid(outline, pockets, holes, t, fr):
 
 
 SPECS = []
+HEAD = dict(button=("M5 x 10 button head + T-nut", False), csk=("M5 x 8 countersunk + T-nut", True),
+            csk2=("M5 x 12 countersunk + T-nut", True))
 
 
-def plate(name, key, t, fr, outline, holes, rivets, pockets=(), group="frame", bom=None, note="", mirrors=(),
-          tube="far", flush=False, marks=()):
-    """Queue one flat part (built in realise() once the rivets are checked). `rivets` = [(u, v)] into the tube on the
-    plate's `tube` side: "far" = beyond the plate along n (the plate is w 0..t), "near" = behind the origin face.
-    `mirrors` = [(name, solid -> solid, frame)] for the other copies of the same flat part. `flush` = countersunk
-    rivets (no head stands proud)."""
-    SPECS.append(dict(name=name, key=key, t=t, fr=fr, outline=ccw(outline), holes=list(holes), rivets=list(rivets),
-                      pockets=[ccw(p) for p in pockets], group=group, note=note, mirrors=list(mirrors), tube=tube,
-                      flush=flush, bom=bom or f"{key} ({'1/8' if t > 2 else '1/16'} Al, waterjet)", marks=list(marks)))
+def plate(name, key, t, fr, outline, holes, fasteners, pockets=(), group="frame", bom=None, note="", mirrors=(),
+          tube="far", head="button", marks=(), stack=0.0):
+    """Queue one flat part (built in realise() once its fasteners are checked). `fasteners` = [(u, v)]: M5 screws into
+    T-nuts in the extrusion on the plate's `tube` side: "far" = beyond the plate along n (the plate is w 0..t),
+    "near" = behind the origin face. `head` = "button" (M5 x 10, the head stands 2.75 proud and is checked against
+    every part) or "csk"/"csk2" (countersunk, flush; csk2 through two stacked plates). `mirrors` = [(name, solid ->
+    solid, frame)] for the other copies of the same flat part. `stack` = other plates between this one and the
+    extrusion (the screws pass through them)."""
+    SPECS.append(dict(name=name, key=key, t=t, fr=fr, outline=ccw(outline), stack=stack,
+                      holes=list(holes), rivets=list(fasteners), pockets=[ccw(p) for p in pockets], group=group,
+                      note=note, mirrors=list(mirrors), tube=tube, head=head, flush=HEAD[head][1],
+                      bom=bom or f"{key} ({'1/8' if t > 2 else '1/16'} Al, waterjet)", marks=list(marks)))
 
 
 def _rivet_at(sp, f_, uv):
-    """(point on the tube face, direction into the tube, point on the head face, outward direction)."""
+    """(point on the extrusion face, direction into it, point on the head face, outward direction)."""
     n = f_["n"]
     t = sp["t"]
+    st = sp.get("stack", 0.0)
     if sp["tube"] == "far":
-        return world(f_, uv, t), n, world(f_, uv, 0.0), tuple(-c for c in n)
-    return world(f_, uv, 0.0), tuple(-c for c in n), world(f_, uv, t), n
+        return world(f_, uv, t + st), n, world(f_, uv, 0.0), tuple(-c for c in n)
+    return world(f_, uv, -st), tuple(-c for c in n), world(f_, uv, t), n
 
 
 def _bb(sh, pad=0.0):
@@ -241,14 +247,22 @@ def _ov(a, b):
     return all(a[i] < b[i + 3] and b[i] < a[i + 3] for i in range(3))
 
 
+def _obstacles():
+    return [(p["shape"], _bb(p["shape"])) for p in PARTS if not p["moving"] and not p.get("frame")]
+
+
+def _hits(sh, others, tol=0.5):
+    b = _bb(sh)
+    return any(_ov(b, bo) and sh.intersect(so).Volume() > tol for so, bo in others)
+
+
 def realise(log=print):
-    """Drop rivets whose heads would hit another part, then build and register every queued plate."""
+    """Drop button heads that would hit another part, then build and register every queued plate and its fasteners."""
     plain = []
     for sp in SPECS:
         s0 = solid(sp["outline"], [], [], sp["t"], sp["fr"])
         plain.append([s0] + [fn(s0) for _, fn, _ in sp["mirrors"]])
-    obst = [(p["shape"], _bb(p["shape"])) for p in PARTS if not p["moving"] and not (
-        p["name"].endswith("(1x2)") or p["name"].endswith("(1x1)"))]
+    obst = _obstacles()
     dropped = {}
     for k, sp in enumerate(SPECS):
         others = obst + [(s_, _bb(s_)) for j, ss in enumerate(plain) if j != k for s_ in ss]
@@ -259,13 +273,8 @@ def realise(log=print):
             if not sp["flush"]:
                 for f_ in frames:
                     _, _, hp, out = _rivet_at(sp, f_, uv)
-                    hd = cyl(4.8, 1.6, hp, out)
-                    hb = _bb(hd)
-                    for sh, b in others:
-                        if _ov(hb, b) and hd.intersect(sh).Volume() > 0.5:
-                            bad = True
-                            break
-                    if bad:
+                    if _hits(cyl(P.M5["head_r"], P.M5["head_h"], hp, out), others):
+                        bad = True
                         break
             if bad:
                 dropped[sp["key"]] = dropped.get(sp["key"], 0) + 1
@@ -273,18 +282,26 @@ def realise(log=print):
                 keep.append(uv)
         sp["rivets"] = keep
     if dropped:
-        log("rivets dropped (head would hit a part):", dropped)
+        log("M5 button heads dropped (would hit a part):", dropped)
     for sp in SPECS:
-        holes = sp["holes"] + [(u, v, RIV) for u, v in sp["rivets"]]
+        holes = sp["holes"] + [(u, v, P.M5["hole"]) for u, v in sp["rivets"]]
         s = solid(sp["outline"], sp["pockets"], holes, sp["t"], sp["fr"])
+        if sp["flush"] and sp["rivets"]:                      # 90 deg countersinks on the head side
+            for f_ in [sp["fr"]]:
+                for uv in sp["rivets"]:
+                    _, _, hp, out = _rivet_at(sp, f_, uv)
+                    inward = tuple(-c for c in out)
+                    s = s.cut(cq.Solid.makeCone(P.M5["csk_r"] + 0.1, P.M5["hole"], P.M5["csk_h"] + 0.1,
+                                                V(*[hp[i] - inward[i] * 0.1 for i in range(3)]), V(*inward)))
         copies = [(sp["name"], s, sp["fr"])] + [(nm, fn(s), f_) for nm, fn, f_ in sp["mirrors"]]
+        spec = HEAD[sp["head"]][0]
         for nm, sh, f_ in copies:
             add(nm, sh, "alu", sp["group"], bom=sp["bom"], kind="stock",
-                note=sp["note"] + (f"; {len(sp['rivets'])} x 3/16 {'countersunk ' if sp['flush'] else ''}blind rivets"
-                                   if sp["rivets"] else ""))
+                note=sp["note"] + (f"; {len(sp['rivets'])} x {spec}" if sp["rivets"] else ""))
             for uv in sp["rivets"]:
                 p_, d_, _, _ = _rivet_at(sp, f_, uv)
                 RIVETS.append((nm, p_, d_, sp["flush"]))
+                lib.fastener("tnut", spec, p_, d_, nm)
         FLAT.append(dict(name=sp["name"], key=sp["key"], t=sp["t"], outline=sp["outline"], pockets=sp["pockets"],
                          holes=holes, qty=len(copies), rivets=len(sp["rivets"]), flush=sp["flush"], marks=sp["marks"]))
 
@@ -303,114 +320,146 @@ def mirror_fr_x(fr, x0):
     return dict(o=(2 * x0 - o[0], o[1], o[2]), u=(-u[0], u[1], u[2]), v=(-v[0], v[1], v[2]), n=(-n[0], n[1], n[2]))
 
 
+def notch_bottom(poly, x, zc, r, n=16):
+    """Splice a bottom-open slot (width 2r, up to a half round at zc) into a CCW polygon whose bottom edge is flat."""
+    zb = min(p[1] for p in poly)
+    out = []
+    for i in range(len(poly)):
+        a, b = poly[i], poly[(i + 1) % len(poly)]
+        out.append(a)
+        if abs(a[1] - zb) < 1e-6 and abs(b[1] - zb) < 1e-6 and a[0] < x - r < x + r < b[0]:
+            out += [(x - r, zb), (x - r, zc)]
+            out += [(x + r * math.cos(math.pi - math.pi * k / n), zc + r * math.sin(math.pi - math.pi * k / n))
+                    for k in range(1, n)]
+            out += [(x + r, zc), (x + r, zb)]
+    assert len(out) > len(poly), "no flat bottom edge under the notch"
+    return out
+
+
+def poly_union(polys):
+    """Union of simple polygons (CCW list of (u, v)) as one polygon, through OCC faces."""
+    from OCP.BRepTools import BRepTools_WireExplorer
+    fs = [cq.Face.makeFromWires(cq.Wire.makePolygon([V(u, v, 0) for u, v in p], close=True)) for p in polys]
+    u_ = fs[0]
+    for f in fs[1:]:
+        u_ = u_.fuse(f)
+    u_ = u_.clean()
+    faces = u_.Faces()
+    assert len(faces) == 1, "the polygons don't overlap"
+    ex = BRepTools_WireExplorer(faces[0].outerWire().wrapped)
+    pts = []
+    while ex.More():
+        v = cq.Vertex(ex.CurrentVertex())
+        pts.append((v.X, v.Y))
+        ex.Next()
+    return ccw(pts)
+
+
+def post_top(kind):
+    """Top of a post (= the bottom of its arm), and how high the side plate's tab runs up it (44 mm under the arm,
+    so a cast corner bracket fits under the arm above the plate)."""
+    z = (P.TANK_ARM_TOP if kind == "tank" else P.ARM_TOP) - P.SMALL_W
+    return z, z - 44.0
+
+
+def stadium(u, v, r, du, dv, n=12):
+    """A slot of radius r from (u, v) - (du, dv) to (u, v) + (du, dv), as a CCW polygon."""
+    L = math.hypot(du, dv)
+    a = math.atan2(dv, du)
+    pts = []
+    for sgn, (cu, cv) in ((1, (u + du, v + dv)), (-1, (u - du, v - dv))):
+        base = a - math.pi / 2 if sgn > 0 else a + math.pi / 2
+        pts += [(cu + r * math.cos(base + math.pi * k / n), cv + r * math.sin(base + math.pi * k / n)) for k in range(n + 1)]
+    return ccw(pts)
+
+
 # ------------------------------------------------------------------ the brackets
-POSTS = {"rear": [(-320.0, "sled"), (-215.0, "sled"), (-170.0, "tower"), (-60.0, "tank")],
-         "front": [(200.0, "tank")]}
+POSTS = {"rear": [(P.SLED_POST_X[0], "sled"), (P.SLED_POST_X[1], "sled"), (-170.0, "tower"), (P.TANK_POST_X[0], "tank")],
+         "front": [(P.TANK_POST_X[1], "tank")]}
+BRG_R = 0.5625 * P.IN + 0.05                # flanged bearing body (1.125 in) press fit
+
+
+def _brg_screws(ax):
+    """The 4 bearing-plate screws: on the rail's slot lines (AXLE_Z +/- 10) at radius BRG_SCREW_R from the axle, which
+    is the wheel hub's light-hole circle, so a hex key reaches each one through a light hole (turn the wheel)."""
+    dx = math.sqrt(P.BRG_SCREW_R ** 2 - P.SLOT_OFF ** 2)
+    return [(ax + sx * dx, P.AXLE_Z + sz * P.SLOT_OFF) for sx in (-1, 1) for sz in (-1, 1)]
+
+
+def bearing_plate_outline(ax):
+    zb, zt = ZR0 + 1.0, ZR1 - 1.0
+    return fillet_poly(rect(ax - 56.0, ax + 56.0, zb, zt), 6.0)
 
 
 def side_plates():
-    """Outboard face of each inner rail, one plate per end (the old drive plate grown along the rail)."""
+    """Outboard face of each inner rail, one plate per end (the old drive plate grown along the rail): carries the
+    Falcon (its 4 x 10-32 into the Falcon's face) and the inner wheel bearing, and ties in every post on that stretch
+    with M5 button heads into T-nuts (the rail's two outboard slots and each post's two). extrusion-4040: the bearing
+    sits in a bottom-open slot (the inner bearing plate bolted over it holds it), so with the Falcon unbolted and the
+    8 bearing-plate screws out (through the hub's light holes) the wheel, axle and bearings drop straight out."""
     yo = P.DRIVE_PLATE_Y[1]                                  # outer face; the plate runs in to the rail at DRIVE_PLATE_Y[0]
     for end, sx in (("front", 1), ("rear", -1)):
         ax = sx * P.AX_X
         fx, fz = P.falcon_xz(end == "front")
         posts = POSTS[end]
-        xs = [x for x, _ in posts] + [ax, fx]
-        x0 = min(min(x for x, _ in posts) - 15.0, ax - 26.0, fx - 36.0)
-        x1 = max(max(x for x, _ in posts) + 15.0, ax + 26.0, fx + 36.0)
-        pts = rect(x0, x1, ZR0 + 6.0, ZR1) + circ(ax, P.AXLE_Z, 22.0) + circ(fx, fz, 37.0)
-        for x, _ in posts:
-            pts += rect(x - 14.0, x + 14.0, ZR1, TOP - 1.0)          # 146 mm tall: two to a 12 x 12 sheet
-        out = hull(pts)
-        holes = [(ax, P.AXLE_Z, 18.0), (fx, fz, 10.0)] + \
-                [(fx + 25.4 * math.cos(math.radians(60 * k)), fz + 25.4 * math.sin(math.radians(60 * k)), 2.4) for k in range(6)]
-        riv = []
-        x = x0 + 10.0
-        while x < x1 - 9.5:                                  # two rows into the rail, every 32 mm, clear of the axle
-            if abs(x - ax) > 30.0 and all(abs(x - p) > 9.0 for p, _ in posts):
-                riv += [(x, P.AXLE_Z - 12.7), (x, P.AXLE_Z + 12.7)]
-            x += 32.0
+        x0 = min(min(x for x, _ in posts) - 24.0, ax - 70.0, fx - 36.0)
+        x1 = max(max(x for x, _ in posts) + 24.0, ax + 70.0, fx + 36.0)
+        zb = ZR0 + 2.0
+        pts = rect(x0, x1, zb, ZR1)
         for x, kind in posts:
-            riv += [(x, ZR1 + 30.0), (x, TOP - 15.0)]        # two up each post
-        keep = [(u, v, 9.0) for u, v in riv] + [(ax, P.AXLE_Z, 25.0), (fx, fz, 35.0)]
-        pk = isogrid(out, keep)
+            pts += rect(x - 24.0, x + 24.0, ZR1, post_top(kind)[1])
+        hull_ = hull(pts)
+        # the Falcon's lobe on its own (a hull with it would cover the posts' faces where the arm brackets go)
+        lobe = hull(rect(fx - 37.0, fx + 37.0, zb, ZR1) + circ(fx, fz, 37.0))
+        out = notch_bottom(poly_union([hull_, lobe]), ax, P.AXLE_Z, BRG_R)
+        holes = [(fx + 25.4 * math.cos(math.radians(60 * k)), fz + 25.4 * math.sin(math.radians(60 * k)), 2.4)
+                 for k in range(6)] + [(fx, fz, 10.0)]
+        holes += [(u, v, P.M5["hole"]) for u, v in _brg_screws(ax)]          # the inner bearing plate's screws pass
+        fas = []
+        x = x0 + 12.0
+        while x < x1 - 11.5:                                 # two rows into the rail's slots, every 48 mm, clear of the
+            if abs(x - ax) > 66.0 and all(abs(x - p) > 24.0 for p, _ in posts):   # bearing plate and the post feet
+                fas += [(x, P.AXLE_Z - P.SLOT_OFF), (x, P.AXLE_Z + P.SLOT_OFF)]
+            x += 48.0
+        for x, kind in posts:                                # two up each post, one in each slot
+            fas += [(x - P.SLOT_OFF, ZR1 + 22.0), (x + P.SLOT_OFF, post_top(kind)[1] - 12.0)]
+        keep = [(u, v, 9.0) for u, v in fas] + [(ax, P.AXLE_Z, 60.0), (ax, zb, 60.0), (fx, fz, 48.0),
+                                                 (fx - 30.0, ZR1, 30.0), (fx + 30.0, ZR1, 30.0)]
+        pk = isogrid(hull_, keep)
         fr = frame((0.0, yo, 0.0), (1, 0, 0), (0, 0, 1))      # n = -y: the plate runs from y DRIVE_PLATE_Y[1] in to [0]
         nm = f"Side plate {end} L"
-        plate(nm, f"Side plate {end}", T8, fr, out, holes, riv, pk, group="drive",
-              note="carries the Falcon (4 x 10-32 into its face) and the axle, and rivets into the inner rail and every "
-                   "post on this stretch: " + ", ".join(f"{k} post x {x:.0f}" for x, k in posts),
-              mirrors=[(f"Side plate {end} R", mirror_y, mirror_fr_y(fr))], flush=True)   # the wheel runs right beside it
-
-
-def inboard_plates():
-    """Inner face of each inner rail round the same posts, clear of the Falcon bodies (r 30) by 3 mm or more."""
-    groups = [("rear", [-320.0, -215.0, -170.0], -335.0, -155.0, ZR1 + 30.0), ("rear tank", [-60.0], -74.0, -20.0, TOP),
-              ("front tank", [200.0], 160.0, 240.0, TOP)]
-    for tag, xs, x0, x1, top in groups:
-        fx, fz = P.falcon_xz(xs[0] > 0)
-        pts = rect(x0, x1, ZR0 + 3.0, ZR1)
-        for x in xs:
-            pts += rect(x - 14.0, x + 14.0, ZR1, top)
-        out = hull(pts)
-        samples = [(a[0] + (b[0] - a[0]) * k / 40, a[1] + (b[1] - a[1]) * k / 40)
-                   for a, b in zip(out, out[1:] + out[:1]) for k in range(41)]
-        gap = min(math.hypot(q[0] - fx, q[1] - fz) for q in samples) - P.FALCON_D / 2
-        assert gap > 3.0, (tag, gap)
-        riv = []
-        x = x0 + 10.0
-        while x < x1 - 9.5:
-            if all(abs(x - p) > 9.0 for p in xs):
-                riv += [(x, P.AXLE_Z - 12.7), (x, P.AXLE_Z + 12.7)]
-            x += 32.0
-        for x in xs:
-            riv += [(x, ZR1 + 30.0), (x, top - 14.0)] if top > ZR1 + 60.0 else [(x, ZR1 + 17.0)]
-        pk = isogrid(out, [(u, v, 9.0) for u, v in riv]) if top > ZR1 + 60.0 else []
-        fr = dict(o=(0.0, P.INNER_RAIL_Y[0], 0.0), u=(1, 0, 0), v=(0, 0, 1), n=(0, -1, 0))   # y0 - T .. y0, rail behind
-        plate(f"Inboard plate {tag} L", f"Inboard plate {tag}", T8, fr, out, [], riv, pk, group="frame",
-              note="inner face of the inner rail, riveted to it and up each post", tube="near",
-              mirrors=[(f"Inboard plate {tag} R", mirror_y, mirror_fr_y(fr))])
-
-
-def arm_knees():
-    """An L on the front and back faces of every post-to-arm joint (sled rails and tank arms). At the -320 sled post
-    the rear manifold sits right behind it and the line relief valve in front of its lower half, so that joint gets a
-    short knee on its front face only."""
-    y0, y1 = P.INNER_RAIL_Y
-    zt = ZARM + 25.4
-    ya = 190.0
-
-    def knee(zb):
-        out = [(y0, zb), (y1, zb), (y1, ZARM - 4.0), (y1 + 4.0, ZARM), (ya, ZARM), (ya, zt), (y0, zt)]
-        return fillet_poly(out, 3.0)
-    arm = [(IY, ZARM + 12.7), (150.0, ZARM + 12.7), (178.0, ZARM + 12.7)]
-    full = (knee(ZARM - 70.0), [(IY, ZARM - 52.0), (IY, ZARM - 22.0)] + arm)
-    short = (knee(ZARM - 40.0), [(IY, ZARM - 24.0)] + arm)
-    specs = {}
-    for x, kind in [(-320.0, "sled"), (-215.0, "sled"), (-60.0, "tank"), (200.0, "tank")]:
-        frf = dict(o=(x + 12.7, 0.0, 0.0), u=(0, 1, 0), v=(0, 0, 1), n=(1, 0, 0))      # front face, x + 12.7 .. + T
-        frb = mirror_fr_x(frf, x)
-        back = lambda s, x=x: s.mirror("YZ", (x, 0, 0))
-        backR = lambda s, x=x: s.mirror("YZ", (x, 0, 0)).mirror("XZ")
-        if x == -320.0:
-            outl, riv = short
-            mir = [(f"Arm knee short {kind} {x:.0f} front R", mirror_y, mirror_fr_y(frf))]
-            plate(f"Arm knee short {kind} {x:.0f} front L", "Arm knee short", T8, frf, outl, [], riv, (), group="frame",
-                  note="front face of the rearmost sled post / rail joint only (the rear manifold is right behind "
-                       "it, the line relief valve in front of the post's lower half): 1 rivet in the post, 3 in the rail",
-                  mirrors=mir, tube="near")
-            continue
-        outl, riv = full
-        mir = [(f"Arm knee {kind} {x:.0f} back L", back, frb),
-               (f"Arm knee {kind} {x:.0f} front R", mirror_y, mirror_fr_y(frf)),
-               (f"Arm knee {kind} {x:.0f} back R", backR, mirror_fr_y(frb))]
-        plate(f"Arm knee {kind} {x:.0f} front L", "Arm knee", T8, frf, outl, [], riv, (), group="frame",
-              note=f"one on each face of the {kind} post / arm joint: 2 rivets up the post, 3 along the arm",
-              mirrors=mir, tube="near")
+        plate(nm, f"Side plate {end}", T8, fr, out, holes, fas, pk, group="drive",
+              note="carries the Falcon (4 x 10-32 into its face) and the inner wheel bearing (bottom-open slot; the inner "
+                   "bearing plate over it), M5 into T-nuts in the inner rail and every post on this stretch: " +
+                   ", ".join(f"{k} post x {x:.0f}" for x, k in posts),
+              mirrors=[(f"Side plate {end} R", mirror_y, mirror_fr_y(fr))], head="button")
+        # the inner bearing plate, over the side plate's slot: the bearing's 5/16 in body through both
+        bo = bearing_plate_outline(ax)
+        bfr = frame((0.0, P.IN_BRG_PLATE_Y[1], 0.0), (1, 0, 0), (0, 0, 1))
+        plate(f"Inner bearing plate {end} L", "Bearing plate", T8, bfr, bo, [(ax, P.AXLE_Z, BRG_R)], _brg_screws(ax), (),
+              group="drive", note="closed bore: the flanged hex bearing pressed through it and the side plate's slot; "
+                                  "4 x M5 x 12 countersunk through both into the inner rail's T-nuts (reach them through "
+                                  "the wheel hub's light holes)",
+              mirrors=[(f"Inner bearing plate {end} R", mirror_y, mirror_fr_y(bfr))], head="csk2", stack=T8)
+        # the two outer bearing plates on the outer rail's inboard face (the same part as the inner one)
+        for k in (0, 1):                                     # a: wheel side (the screws' heads), b: rail side
+            yb1 = P.OUT_BRG_PLATE_Y[0] + (k + 1) * T8
+            ofr = frame((0.0, yb1, 0.0), (1, 0, 0), (0, 0, 1))  # n = -y: yb1 - T .. yb1, the rail behind ("near")
+            plate(f"Outer bearing plate {end} {'a' if k == 0 else 'b'} L", "Bearing plate", T8, ofr, bo,
+                  [(ax, P.AXLE_Z, BRG_R)] + ([] if k == 0 else [(u, v, P.M5["hole"]) for u, v in _brg_screws(ax)]),
+                  _brg_screws(ax) if k == 0 else [], (), group="drive", tube="near", stack=T8 if k == 0 else 0.0,
+                  note="two stacked on the outer rail's inboard face, the flanged hex bearing pressed through both; "
+                       "4 x M5 x 12 countersunk through both into the rail's T-nuts (reach them through the wheel hub's "
+                       "light holes)" if k == 0 else "the rail-side one of the pair (the screws come through it)",
+                  mirrors=[(f"Outer bearing plate {end} {'a' if k == 0 else 'b'} R", mirror_y, mirror_fr_y(ofr))],
+                  head="csk2")
+        # (the outer pair's screws are registered on the wheel-side plate "a"; they pass through "b" and into the rail)
 
 
 def tower_plates():
     """Flat: the in-well rail strip, a tapered tab down the tower and a tab up the bearing block; the rest of the rail
-    gets a flat spacer strip. Both under 12 in."""
+    gets a flat spacer strip. Both under 12 in. extrusion-4040: the tab takes 2 x M5 into T-nuts in the tower's
+    outboard slots (was 2 rivets)."""
     (rx0, rx1), (ry0, ry1), (rz0, rz1) = P.DECK_RAIL["x"], P.DECK_RAIL["y"], P.DECK_RAIL["z"]
     x0, x1 = P.TOWER_X
     px, pz = P.PIVOT
@@ -424,11 +473,12 @@ def tower_plates():
     import misc
     screws = [x_ for x_ in misc.DECK_RAIL_SCREWS]
     holes += [(x_, P.DECK_RAIL["screw_z"], 2.25) for x_ in screws if xs < x_ < xe]
-    riv = [((x0 + x1) / 2, rz0 - 40.0), ((x0 + x1) / 2, rz0 - 16.0)]
+    xc = (x0 + x1) / 2
+    fas = [(xc - P.SLOT_OFF, rz0 - 40.0), (xc + P.SLOT_OFF, rz0 - 16.0)]
     fr = dict(o=(0.0, ry1 + T8, 0.0), u=(1, 0, 0), v=(0, 0, 1), n=(0, -1, 0))     # y ry1 .. ry1 + T
-    plate("Tower plate L", "Tower plate", T8, fr, out, holes, riv, (), group="frame",
-          note="flat (was bent): 2 rivets into the tower, the in-well rail's M4s through it, 3 x 1/4-20 into the bearing "
-               "block; between the rail and the deck's well-edge member",
+    plate("Tower plate L", "Tower plate", T8, fr, out, holes, fas, (), group="frame",
+          note="flat: 2 x M5 into T-nuts in the tower's outboard slots, the in-well rail's M4s through it, 3 x 1/4-20 into "
+               "the bearing block; between the rail and the deck's well-edge member",
           mirrors=[("Tower plate R", mirror_y, mirror_fr_y(fr))])
     # the rest of the rail: a plain spacer strip so the rail stays straight
     sx0, sx1 = xe + 1.0, rx1
@@ -437,20 +487,6 @@ def tower_plates():
     plate("Rail spacer strip L", "Rail spacer strip", T8, fr, out2, sh, [], (), group="frame",
           note="fills the gap between the in-well rail and the deck member past the tower plate; the rail's M4s through it",
           mirrors=[("Rail spacer strip R", mirror_y, mirror_fr_y(fr))])
-
-
-def _mount_screws():
-    """(x, y) of each frame-mount post's #10-32 up through the outer / end rail (as misc.frame_mounts places them)."""
-    import misc
-    out = []
-    for name, q in misc.mount_points():
-        if name.startswith(("L ", "R ")):
-            sgn = 1 if name[0] == "L" else -1
-            out.append((q.x, sgn * sum(P.OUTER_RAIL_Y) / 2))
-        else:
-            sx = 1 if name.startswith("front") else -1
-            out.append((sx * (P.FRAME_X - 7.0), q.y))
-    return out
 
 
 def _inside(poly, u, v, margin=0.0):
@@ -468,39 +504,73 @@ def _inside(poly, u, v, margin=0.0):
     return c
 
 
-def corner_gussets():
-    """The top C and bottom L round each wheel end (as before), now drilled for rivets."""
-    xe0 = P.AX_X + P.WHEEL_R + 3.0
-    xa, xb = P.FRAME_X - 100.0, P.FRAME_X
+def _near_endtap(pt, r=9.0):
+    """True when a point is within r of any end-tap screw line or its access hole (so a T-nut there would foul it)."""
+    for f in lib.FASTENERS:
+        if f["kind"] != "endtap":
+            continue
+        a, d = f["at"], f["d"]
+        e = f.get("entry", a[[k for k in range(3) if d[k]][0]])
+        k = [k for k in range(3) if abs(d[k]) > 0.5][0]
+        lo, hi = sorted([e, a[k] + d[k] * 15.0])
+        q = [pt[0], pt[1], pt[2]]
+        t = max(lo, min(hi, q[k]))
+        c = list(a)
+        c[k] = t
+        if math.dist(q, c) < r + (P.M5["access_r"] if f.get("access") else P.M5["hole"]):
+            return True
+    return False
+
+
+def corner_plates():
+    """Flat 1/8 in corner plates top (a C over the end, outer and inner rails) and bottom (an L under the end and outer
+    rails) at each corner, on M5 T-nuts in the members' slots (was the riveted corner gussets); the butt joints under
+    them also have 2 M5 end taps each."""
+    import misc
+    xe0 = P.FRAME_X - P.RAIL_W
+    xa, xb = P.CORNER_PLATE_X, P.FRAME_X
     yi0, yi1 = P.INNER_RAIL_Y
     yo0, yo1 = P.OUTER_RAIL_Y
     top = [(xa, yi0), (xb, yi0), (xb, yo1), (xa, yo1), (xa, yo0), (xe0, yo0), (xe0, yi1), (xa, yi1)]
     bot = [(xe0, yi0), (xb, yi0), (xb, yo1), (xa, yo1), (xa, yo0), (xe0, yo0)]
-    xm = (xe0 + xb) / 2
-    ym_o = (yo0 + yo1) / 2
-    import misc
-    mounts = []
-    try:
-        import misc
-        mounts = [(q.x, q.y) for _, q in misc.mount_points()]
-    except Exception:
-        pass
-    mount_xy = [(abs(x), abs(y)) for x, y in _mount_screws()]
+    mount_xy = [(abs(x), abs(y)) for x, y, z in misc.MOUNT_SCREWS if z > ZR1 + 0.1]   # posts standing on the plate
     ug_xy = [(abs(x), abs(y)) for x, y in misc.UG_SCREWS]
+    xm = xb - P.RAIL_W / 2
 
-    def ok(u, v):
-        return all(math.hypot(u - a, v - b) > 13.0 for a, b in mount_xy + ug_xy)
-    end = [(xm, y) for y in (IY, 150.0, 185.0, 220.0, 245.0)]
-    outer = [(x, ym_o) for x in (xa + 12.0, xa + 40.0, xa + 68.0, xb - 10.0)]
-    inner = [(x, IY) for x in (xa + 40.0, xa + 64.0)]                 # (xa + 12 is under the sled post's foot)
-    for tag, poly, riv in (("top", top, end + outer + inner), ("bottom", bot, end + outer)):
-        riv = [(u, v) for u, v in riv if ok(u, v)]
+    def cands(tag):
+        pts = []
+        for xs in (xm - P.SLOT_OFF, xm + P.SLOT_OFF):                     # the end rail, along y
+            y = yi0 + 10.0
+            while y < yo0 - 8.0:
+                pts.append((xs, y))
+                y += 40.0
+        for ys in (P.OY - P.SLOT_OFF, P.OY + P.SLOT_OFF):                  # the outer rail, along x
+            x = xa + 10.0
+            while x < xb - 8.0:
+                pts.append((x, ys))
+                x += 40.0
+        if tag == "top":
+            for ys in (P.IY - P.SLOT_OFF, P.IY + P.SLOT_OFF):              # the inner rail, along x
+                x = xa + 10.0
+                while x < xe0 - 8.0:
+                    pts.append((x, ys))
+                    x += 40.0
+        return pts
+    for tag, poly in (("top", top), ("bottom", bot)):
+        z = ZR1 if tag == "top" else ZR0
+        fas = []
+        for u, v in cands(tag):
+            if not _inside(poly, u, v, 7.0):
+                continue
+            if any(math.hypot(u - a, v - b) < 13.0 for a, b in mount_xy + ug_xy):
+                continue
+            if _near_endtap((u, v, z)) or _near_endtap((-u, v, z)) or _near_endtap((u, -v, z)) or _near_endtap((-u, -v, z)):
+                continue
+            fas.append((u, v))
         poly = fillet_poly(poly, 6.0)
-        gh = [(u, v, 2.6) for u, v in mount_xy if _inside(poly, u, v, 4.0)]
-        if tag == "bottom":
-            gh += [(u, v, 3.05) for u, v in ug_xy if _inside(poly, u, v, 4.0)]
-        z = ZR1 if tag == "top" else ZR0 - T8
-        fr = dict(o=(0.0, 0.0, z), u=(1, 0, 0), v=(0, 1, 0), n=(0, 0, 1))     # z .. z + T
+        gh = [(u, v, P.M5["hole"]) for u, v in mount_xy if _inside(poly, u, v, 4.0)]
+        zp = ZR1 if tag == "top" else ZR0 - T8
+        fr = dict(o=(0.0, 0.0, zp), u=(1, 0, 0), v=(0, 1, 0), n=(0, 0, 1))     # zp .. zp + T
         mir = []
         for nm, f in (("front R", lambda s: s.mirror("XZ")), ("rear L", lambda s: s.mirror("YZ")),
                       ("rear R", lambda s: s.mirror("YZ").mirror("XZ"))):
@@ -509,36 +579,124 @@ def corner_gussets():
                 frm = mirror_fr_y(frm)
             if "rear" in nm:
                 frm = mirror_fr_x(frm, 0.0)
-            mir.append((f"Corner gusset {nm} {tag}", f, frm))
-        plate(f"Corner gusset front L {tag}", f"Corner gusset {tag}", T8, fr, poly, gh, riv, (), group="frame",
-              note="rivets into the end rail, the outer rail" + (" and the inner rail" if tag == "top" else "") +
-                   ("; countersunk (the underglow bracket runs right under it)" if tag == "bottom" else ""),
-              mirrors=mir, tube="near" if tag == "top" else "far", flush=(tag == "bottom"))
-
-
-SEAMS = ()
+            mir.append((f"Corner plate {nm} {tag}", f, frm))
+        plate(f"Corner plate front L {tag}", f"Corner plate {tag}", T8, fr, poly, gh, fas, (), group="frame",
+              note="M5 into T-nuts in the end rail, the outer rail" + (" and the inner rail" if tag == "top" else "") +
+                   ("; countersunk (the underglow bracket runs right under it)" if tag == "bottom" else
+                    "; the frame-mount posts' M5s through it where they stand on it"),
+              mirrors=mir, tube="near" if tag == "top" else "far", head="button" if tag == "top" else "csk")
 
 
 def bellypan():
     """One piece on the CNC router (Micah, 2026-11-11: "the bottom plate which can also be cnc'ed"), 768 x 259 mm,
-    riveted up into both inner rails (countersunk: a smooth underside), the two fog vents cut through, and every
-    electronics part's footprint lightly engraved (layer MARK) so its mounting holes get drilled to the real part."""
+    screwed up into both inner rails with M5 countersunk into T-nuts in their inner bottom slots (a smooth underside),
+    the two fog vents cut through, a 12 mm hole under each post's end taps, and every electronics part's footprint
+    lightly engraved (layer MARK) so its mounting holes get drilled to the real part."""
     import misc
     xa, xb = -P.FRAME_X + P.RAIL_W, P.FRAME_X - P.RAIL_W
     yb = P.INNER_RAIL_Y[1]
     holes = [(vx, vy, 13.5) for vx, vy in P.FOG_VENTS]
+    taps = [f["at"] for f in lib.FASTENERS if f["kind"] == "endtap" and abs(f["at"][2] - ZR1) < 0.5 and f["d"][2] > 0.5]
+    holes += [(a[0], a[1], 6.0) for a in taps]               # wrench access to the post feet
     out = fillet_poly(rect(xa, xb, -yb, yb), 3.0)
-    riv = []
+    fas = []
     x = xa + 12.0
     while x < xb - 11.0:
-        riv += [(x, IY), (x, -IY)]
-        x += 64.0
+        for sg in (1, -1):
+            pt = (x, sg * (P.IY - P.SLOT_OFF))
+            if all(math.hypot(pt[0] - a[0], pt[1] - a[1]) > 14.0 for a in taps):
+                fas.append(pt)
+        x += 48.0
     marks = [(lab, rect(x0, x1, y0, y1)) for lab, x0, x1, y0, y1 in misc.ELEC_MARKS]
     fr = dict(o=(0.0, 0.0, P.BELLY_Z - T8), u=(1, 0, 0), v=(0, 1, 0), n=(0, 0, 1))
-    plate("Bellypan", "Bellypan", T8, fr, out, holes, riv, (), group="frame",
+    plate("Bellypan", "Bellypan", T8, fr, out, holes, fas, (), group="frame",
           bom="Bellypan (1/8 Al, CNC router, one piece)",
-          note="one piece, CNC router: riveted up into both inner rails, the fog vents through it, every electronics "
-               "part's footprint engraved (drill its holes to the part)", flush=True, marks=marks)
+          note="one piece, CNC router: M5 countersunk up into T-nuts in both inner rails, the fog vents through it, a 12 mm "
+               "hole under each post foot's end taps, every electronics part's footprint engraved (drill its holes to the "
+               "part)", head="csk", marks=marks)
+
+
+# ------------------------------------------------------------------ cast 40-series corner brackets
+CNR = dict(L=40.0, W=40.0, t=4.0, hole_at=22.0, mass=0.035)
+
+
+def cnr_bracket(c, e1, e2):
+    """A cast 40-series L corner bracket in the inside corner along the line through c (its width along e3 = e1 x e2):
+    one leg on the face whose outward normal is e2 (running along e1), the other on the face whose normal is e1
+    (running along e2), a centre rib, 2 x M5 per leg on the slot lines (+/- 10 across). Returns (solid, fasteners)."""
+    L, W, t = CNR["L"], CNR["W"], CNR["t"]
+    e1, e2 = V(*e1), V(*e2)
+    e3 = e1.cross(e2)
+    pl = cq.Plane(origin=V(*c), xDir=e1, normal=e3)               # local x = e1, y = e2, z = e3
+    legA = cq.Solid.makeBox(L, t, W, V(0, 0, -W / 2))
+    legB = cq.Solid.makeBox(t, L, W, V(0, 0, -W / 2))
+    rib = cq.Solid.extrudeLinear(cq.Face.makeFromWires(cq.Wire.makePolygon(
+        [V(t, t, -2.0), V(L - 3.0, t, -2.0), V(t, L - 3.0, -2.0)], close=True)), V(0, 0, 4.0))
+    s = legA.fuse(legB).fuse(rib)
+    fas = []
+    for w in (-P.SLOT_OFF, P.SLOT_OFF):
+        s = s.cut(cyl(P.M5["hole"], t + 2, (CNR["hole_at"], -1.0, w), (0, 1, 0)))
+        s = s.cut(cyl(P.M5["hole"], t + 2, (-1.0, CNR["hole_at"], w), (1, 0, 0)))
+        fas.append(((CNR["hole_at"], 0.0, w), (0, -1, 0), (CNR["hole_at"], t, w), (0, 1, 0)))
+        fas.append(((0.0, CNR["hole_at"], w), (-1, 0, 0), (t, CNR["hole_at"], w), (1, 0, 0)))
+    loc = cq.Location(pl)
+    s = s.moved(loc)
+
+    def g(p):
+        return tuple(pl.toWorldCoords(p).toTuple())
+
+    def gd(d):
+        return tuple((pl.toWorldCoords(d) - pl.toWorldCoords((0, 0, 0))).toTuple())
+    return s, [(g(a), gd(d), g(h), gd(o)) for a, d, h, o in fas]
+
+
+def corner_brackets(log=print):
+    """Cast 40-series corner brackets wherever one fits (each candidate is dropped if it, or a button head on it, would
+    hit any part): both sides of each post foot on the inner rail, under each arm outboard of its post (above the side
+    plate), and the inside corners where the inner rails meet the end rails."""
+    cands = []
+    zr1 = ZR1
+    for sgn, side in ((1, "L"), (-1, "R")):
+        y_c = sgn * P.IY
+        for x, kind in POSTS["rear"] + POSTS["front"]:
+            for sx, face in ((1, "front"), (-1, "back")):
+                cands.append((f"Corner bracket {kind} {x:.0f} {side} foot {face}",
+                              (x + sx * P.SMALL_W / 2, y_c, zr1), (sx, 0, 0), (0, 0, 1)))
+            if kind in ("sled", "tank"):
+                cands.append((f"Corner bracket {kind} {x:.0f} {side} arm",
+                              (x, sgn * P.GUN_RAIL_Y, post_top(kind)[0]), (0, 0, -1), (0, sgn, 0)))
+        for sx, end in ((1, "front"), (-1, "rear")):
+            cands.append((f"Corner bracket {end} {side} inner rail",
+                          (sx * (P.FRAME_X - P.RAIL_W), sgn * P.INNER_RAIL_Y[0], (ZR0 + ZR1) / 2), (0, -sgn, 0), (-sx, 0, 0)))
+    named = [(p["shape"], _bb(p["shape"]), p["name"]) for p in PARTS if not p["moving"]]
+
+    def first_hit(sh, tol=0.5):
+        b = _bb(sh)
+        for so, bo, nm in named:
+            if _ov(b, bo) and sh.intersect(so).Volume() > tol:
+                return nm
+        return None
+    placed, dropped = [], []
+    for name, c, e1, e2 in cands:
+        s, fas = cnr_bracket(c, e1, e2)
+        why = first_hit(s)
+        if why is None:
+            for a, d, h, o in fas:
+                why = first_hit(cyl(P.M5["head_r"], P.M5["head_h"], h, o)) or ("an end tap" if _near_endtap(a, 6.0) else None)
+                if why:
+                    why = "head: " + why
+                    break
+        if why:
+            dropped.append(f"{name} [{why}]")
+            continue
+        named.append((s, _bb(s), name))
+        placed.append((s, name))
+        add(name, s, "alu", "frame", bom="40-series cast corner bracket (M5, 2 holes per leg)", kind="cots",
+            mass=CNR["mass"], note="4 x M5 x 10 button head + T-nut")
+        for a, d, h, o in fas:
+            lib.fastener("tnut", "M5 x 10 button head + T-nut", a, d, name)
+    log(f"corner brackets: {len(placed)} placed, {len(dropped)} candidates didn't fit" +
+        (f" ({', '.join(dropped)})" if dropped else ""))
 
 
 def build(log=print):
@@ -546,80 +704,161 @@ def build(log=print):
     RIVETS.clear()
     SPECS.clear()
     side_plates()
-    inboard_plates()
-    arm_knees()
     tower_plates()
-    corner_gussets()
+    corner_plates()
     bellypan()
     realise(log)
-    drill_tubes(log)
+    corner_brackets(log)
+    finish_members(log)
     span = lambda f: max(max(p[0] for p in f["outline"]) - min(p[0] for p in f["outline"]),
                          max(p[1] for p in f["outline"]) - min(p[1] for p in f["outline"]))
-    log(f"brackets: {sum(f['qty'] for f in FLAT)} flat parts ({len(FLAT)} different), {len(RIVETS)} rivets into tubes "
-        f"({sum(1 for r in RIVETS if r[3])} countersunk) + {10 * len(SEAMS)} through the bellypan seam straps; "
-        f"biggest {max(span(f) for f in FLAT):.0f} mm")
+    log(f"brackets: {sum(f['qty'] for f in FLAT)} flat parts ({len(FLAT)} different), {len(RIVETS)} plate M5s into T-nuts "
+        f"({sum(1 for r in RIVETS if r[3])} countersunk); biggest {max(span(f) for f in FLAT):.0f} mm")
 
 
-TUBE_TABLE = []                             # (tube, what, face, along, across, dia) for the CNC program
+CUT_LIST = []                               # (member, length, end taps a0, end taps a1, access holes) for the shop
 
 
-def drill_tubes(log=print):
-    """Cut every hole in the box tubes, the CNC'd holes: each bracket rivet through the wall under it, and every
-    fastener and bearing hole in lib.TUBE_HOLES (frame mounts, bumper screws, underglow rivnuts, axles). Fills
-    TUBE_TABLE with where each hole is on its tube."""
-    import lib
-    TUBE_TABLE.clear()
-    tubes = [p for p in PARTS if p["name"].endswith("(1x2)") or p["name"].endswith("(1x1)")]
-    bbs = []
-    for p in tubes:
-        b = p["shape"].BoundingBox()
-        bbs.append((b.xmin, b.ymin, b.zmin, b.xmax, b.ymax, b.zmax))
-    holes = [("rivet 3/16" + (" (countersunk plate)" if fl else ""), pt, d, RIV, WALL + 1.0, -0.5)
-             for nm, pt, d, fl in RIVETS] + [(w, pt, d, r, L, 0.0) for w, pt, d, r, L in lib.TUBE_HOLES]
-    per, missed = {}, []
-    for what, pt, d, r, L, back in holes:
-        a = tuple(pt[k] + d[k] * back for k in range(3))
-        b_ = tuple(a[k] + d[k] * L for k in range(3))
-        lo = [min(a[k], b_[k]) - r for k in range(3)]
-        hi = [max(a[k], b_[k]) + r for k in range(3)]
-        hit = [i for i, bb in enumerate(bbs) if all(lo[k] < bb[k + 3] and bb[k] < hi[k] for k in range(3))]
-        cy = cyl(r, L, a, d)
-        hit = [i for i in hit if tubes[i]["shape"].intersect(cy).Volume() > 0.05]
-        if not hit:
-            missed.append(what)
+def finish_members(log=print):
+    """Cut the 10 mm end-tap access holes into the members they pass through (each from its far face up to the joint
+    face's 1.8 mm lip, which the socket head bears on), and fill CUT_LIST. Replaces the box tube's drill_tubes."""
+    CUT_LIST.clear()
+    byname = {p["name"]: p for p in PARTS if p.get("frame")}
+    cuts = {}
+    for f in lib.FASTENERS:
+        if f["kind"] != "endtap" or not f.get("access") or f["cross"] not in byname:
             continue
-        for i in hit:
-            per.setdefault(i, []).append(cy)
-            bb = bbs[i]
-            dims = [bb[k + 3] - bb[k] for k in range(3)]
-            ax = dims.index(max(dims))
-            n = tuple(-c for c in d)                      # the face the hole is drilled from
-            nk = max(range(3), key=lambda k: abs(n[k]))
-            face = {(0, 1): "front (+x)", (0, -1): "rear (-x)", (1, 1): "left (+y)", (1, -1): "right (-y)",
-                    (2, 1): "top", (2, -1): "bottom"}[(nk, 1 if n[nk] > 0 else -1)]
-            through = L > 3 * WALL + 2.0
-            ck = [k for k in range(3) if k not in (ax, nk)][0]
-            centre = (bb[ck] + bb[ck + 3]) / 2
-            TUBE_TABLE.append((tubes[i]["name"], what, face + (" through both walls" if through else ""),
-                               round(pt[ax] - bb[ax], 1), round(pt[ck] - centre, 1), round(2 * r, 1)))
-    for i, cs in per.items():
-        tubes[i]["shape"] = tubes[i]["shape"].cut(union(cs) if len(cs) > 1 else cs[0])
-        tubes[i]["note"] = (tubes[i].get("note") or "") + f"; {len(cs)} CNC'd holes (docs/glacis/tube_drilling.csv)"
-    if missed:
-        from collections import Counter
-        log("holes with no tube under them:", dict(Counter(missed)))
-    log(f"tube holes: {len(TUBE_TABLE)} in {len(per)} tubes")
-    return missed
+        a, d = f["at"], f["d"]
+        k = [i for i in range(3) if abs(d[i]) > 0.5][0]
+        e = f["entry"]
+        L = abs(a[k] - e) - 1.8
+        start = list(a)
+        start[k] = e + (1.0 if e > a[k] else -1.0)
+        dirn = [0.0, 0.0, 0.0]
+        dirn[k] = 1.0 if a[k] > e else -1.0
+        cuts.setdefault(f["cross"], []).append(cyl(P.M5["access_r"], L + 1.0, tuple(start), tuple(dirn)))
+    for nm, cs in cuts.items():
+        p = byname[nm]
+        p["shape"] = p["shape"].cut(union(cs) if len(cs) > 1 else cs[0])
+        p["note"] = (p.get("note") or "") + f"; {len(cs)} x 10 mm end-tap access holes"
+    for m in lib.MEMBERS:
+        taps = [f for f in lib.FASTENERS if f["kind"] == "endtap" and _member_of_tap(f) is m]
+        n0 = sum(1 for f in taps if f["d"]["xyz".index(m["axis"])] > 0)
+        n1 = len(taps) - n0
+        acc = [f for f in lib.FASTENERS if f["kind"] == "endtap" and f.get("access") and f["cross"] == m["name"]]
+        ax = "xyz".index(m["axis"])
+        CUT_LIST.append((m["name"], round(m["a1"] - m["a0"], 1), n0, n1, len(acc),
+                         "; ".join(f"{_along(m, f):.1f}" for f in sorted(acc, key=lambda f: _along(m, f)))))
+    log(f"frame: {len(lib.MEMBERS)} 40x40 members, {sum(r[1] for r in CUT_LIST) / 1000:.2f} m; "
+        f"{sum(r[2] + r[3] for r in CUT_LIST)} M5 end taps, {sum(r[4] for r in CUT_LIST)} access holes")
 
 
-def export_tube_table(path):
+def _along(m, f):
+    """Where an access hole is along member m, from its a0 end."""
+    ax = "xyz".index(m["axis"])
+    return f["at"][ax] - m["a0"]
+
+
+def _member_of_tap(f):
+    a, d = f["at"], f["d"]
+    for m in lib.MEMBERS:
+        ax = "xyz".index(m["axis"])
+        if abs(d[ax]) < 0.5:
+            continue
+        end = m["a0"] if d[ax] > 0 else m["a1"]
+        o = [k for k in range(3) if k != ax]
+        if abs(a[ax] - end) < 0.3 and abs(abs(a[o[0]] - m["c1"]) - P.CORE_OFF) < 0.3 and \
+                abs(abs(a[o[1]] - m["c2"]) - P.CORE_OFF) < 0.3:
+            return m
+    return None
+
+
+def _member_of_tnut(f):
+    """(member, face key, across offset, along coordinate) for a T-nut, or None: the face plane must hold the point
+    (0.3 mm), face normal = -d, the point within the member's length."""
+    a, d = f["at"], f["d"]
+    k = [i for i in range(3) if abs(d[i]) > 0.5]
+    if len(k) != 1:
+        return None
+    k = k[0]
+    for m in lib.MEMBERS:
+        ax = "xyz".index(m["axis"])
+        if ax == k:
+            continue
+        o = [i for i in range(3) if i != ax]
+        cen = {o[0]: m["c1"], o[1]: m["c2"]}
+        face = cen[k] - d[k] * 20.0                          # the face the screw enters from
+        if abs(a[k] - face) > 0.3:
+            continue
+        acr = [i for i in o if i != k][0]
+        if abs(a[acr] - cen[acr]) > 20.0 or not (m["a0"] - 0.1 <= a[ax] <= m["a1"] + 0.1):
+            continue
+        return m, (m["name"], k, d[k]), a[acr] - cen[acr], a[ax]
+    return None
+
+
+def check_fasteners(log=print):
+    """Every T-nut screw on a slot centre line (0.3 mm) of the face it enters, T-nuts in one slot 12 mm or more apart and
+    8 mm or more from a member end; every end tap on a core of the member's end; nothing in an end tap's access hole;
+    any fastener that meets no member is listed."""
+    res = dict(tnut=0, endtap=0, off_slot=[], missed=[], close=[], near_end=[], tap_off_core=[], in_access=[])
+    slots = {}
+    for f in lib.FASTENERS:
+        if f["kind"] == "endtap":
+            res["endtap"] += 1
+            if _member_of_tap(f) is None:
+                res["tap_off_core"].append((f["by"], tuple(round(c, 1) for c in f["at"])))
+            continue
+        res["tnut"] += 1
+        hit = _member_of_tnut(f)
+        if hit is None:
+            res["missed"].append((f["by"], tuple(round(c, 1) for c in f["at"])))
+            continue
+        m, fk, acr, along = hit
+        if abs(abs(acr) - P.SLOT_OFF) > 0.3:
+            res["off_slot"].append((f["by"], m["name"], round(acr, 2)))
+            continue
+        if min(along - m["a0"], m["a1"] - along) < 8.0:
+            res["near_end"].append((f["by"], m["name"], round(min(along - m["a0"], m["a1"] - along), 1)))
+        slots.setdefault(fk + (round(acr, 1),), []).append((along, f["by"]))
+        if _near_endtap(f["at"], 2.0):
+            res["in_access"].append((f["by"], tuple(round(c, 1) for c in f["at"])))
+    for key, v in slots.items():
+        v.sort()
+        for (a1, b1), (a2, b2) in zip(v, v[1:]):
+            if a2 - a1 < 12.0:
+                res["close"].append((key[0], b1, b2, round(a2 - a1, 1)))
+    log(f"fasteners: {res['tnut']} T-nut screws, {res['endtap']} end taps; off a slot line {len(res['off_slot'])}, "
+        f"no member {len(res['missed'])}, end tap off a core {len(res['tap_off_core'])}, T-nuts under 12 mm apart "
+        f"{len(res['close'])}, within 8 mm of a member end {len(res['near_end'])}, in an access hole "
+        f"{len(res['in_access'])}")
+    for k in ("off_slot", "missed", "tap_off_core", "close", "near_end", "in_access"):
+        for r in res[k][:12]:
+            log("   ", k, r)
+    return res
+
+
+def hardware_counts():
+    """M5 hardware by spec, T-nuts, corner brackets, end taps and access holes (for the log and the docs)."""
+    from collections import Counter
+    c = Counter(f["spec"] for f in lib.FASTENERS)
+    tn = sum(1 for f in lib.FASTENERS if f["kind"] == "tnut")
+    # the 4 outer bearing-plate screws go through plate "b" too: registered once (on plate "a")
+    return c, tn
+
+
+def export_cut_list(path):
     import csv
-    rows = sorted(TUBE_TABLE, key=lambda r: (r[0], r[2], r[3], r[4]))
+    rows = sorted(CUT_LIST, key=lambda r: r[0])
     with open(path, "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
-        w.writerow(["Tube", "Hole", "Face (drilled from)", "Along the tube from its -x/-y/-z end (mm)",
-                    "Across the face from its centre line (mm)", "Diameter (mm)"])
+        w.writerow(["Member (40x40 20-series)", "Length (mm), square cut +0/-0.3", "M5 end taps at the -x/-y/-z end",
+                    "M5 end taps at the +x/+y/+z end", "10 mm access holes", "Access holes along it from its -x/-y/-z end (mm)"])
         w.writerows(rows)
+
+
+def export_tube_table(path):                # (kept for robot.py's old call; the box tube is gone)
+    export_cut_list(path.replace("tube_drilling.csv", "cut_list_4040.csv"))
 
 
 # ------------------------------------------------------------------ DXFs and the 12 x 12 nest

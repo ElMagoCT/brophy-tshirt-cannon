@@ -89,7 +89,7 @@ def material(p):
         return "Acr"
     if "box tube" in b:
         return "ATu"
-    if "20x20 T-slot" in b:
+    if "40x40 T-slot" in b or "20x20 T-slot" in b:
         return "AEx"
     if "Breech puck" in b or "Breech adapter" in b:
         return "ABr"
